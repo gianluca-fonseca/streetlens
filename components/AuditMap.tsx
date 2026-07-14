@@ -17,6 +17,8 @@ import {
 } from "@/components/mapConfig";
 import MapPanel from "@/components/MapPanel";
 import SegmentDetail from "@/components/SegmentDetail";
+import ContributeUI from "@/components/contribute/ContributeUI";
+import { useContribute } from "@/components/contribute/useContribute";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 export type { SegmentCollection } from "@/lib/segments";
@@ -168,14 +170,22 @@ export default function AuditMap({
 
   const [activeLayer, setActiveLayer] = useState<ScoreLayer>("overall");
   const [selected, setSelected] = useState<SegmentProperties | null>(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  // Map-integrated contribution flow (owns its own draw layers + handlers).
+  const contribute = useContribute(mapRef, mapReady);
 
   const activeLayerRef = useRef(activeLayer);
   const selectedIdRef = useRef<string | null>(null);
   const hoveredIdRef = useRef<string | null>(null);
   const segmentsRef = useRef(segments);
+  // Keep the latest contribute API reachable from the once-created map handlers
+  // without re-running the map-init effect.
+  const contributeRef = useRef(contribute);
   useEffect(() => {
     activeLayerRef.current = activeLayer;
     segmentsRef.current = segments;
+    contributeRef.current = contribute;
   });
 
   // Create the map exactly once.
@@ -212,6 +222,7 @@ export default function AuditMap({
       // Apply the current active layer + dark-mode glow.
       applyLayer(map, activeLayerRef.current, dark);
       readyRef.current = true;
+      setMapReady(true);
 
       map.on("mousemove", LINE_LAYER_ID, (e) => {
         const f = e.features?.[0];
@@ -242,6 +253,15 @@ export default function AuditMap({
         const f = e.features?.[0];
         if (!f) return;
         const props = f.properties as SegmentProperties;
+        // Gate for the contribution flow: swallow the click while tracing,
+        // and route it to the correction form while picking a segment.
+        const contrib = contributeRef.current;
+        const cmode = contrib.modeRef.current;
+        if (cmode === "trace") return;
+        if (cmode === "select") {
+          contrib.pickSegment({ id: props.id, name: props.name });
+          return;
+        }
         selectFeature(map, props, f.geometry);
         setSelected(props);
       });
@@ -322,6 +342,8 @@ export default function AuditMap({
           </div>
         ) : null}
       </div>
+
+      <ContributeUI contribute={contribute} />
     </div>
   );
 

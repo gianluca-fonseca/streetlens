@@ -1,0 +1,775 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import {
+  Check,
+  MapPin,
+  PencilLine,
+  Plus,
+  Route,
+  Trash2,
+  Undo2,
+  X,
+} from "lucide-react";
+import { submissionSchema, type Submission } from "@/lib/schemas";
+import {
+  CONDITION_KEYS,
+  CONDITION_OPTIONS,
+  isMeaningfulTier,
+  type ConditionKey,
+  type ConditionState,
+} from "@/components/contribute/conditions";
+import type { ContributeApi } from "@/components/contribute/useContribute";
+
+const HIGHWAY_KEYS = [
+  "residential",
+  "tertiary",
+  "secondary",
+  "unclassified",
+  "footway",
+  "path",
+  "living_street",
+] as const;
+type HighwayKey = (typeof HIGHWAY_KEYS)[number];
+
+const PANEL =
+  "pointer-events-auto w-[min(22rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[12px] border border-border bg-surface-elevated shadow-[var(--shadow-popover)]";
+const INPUT =
+  "w-full rounded-[4px] border border-border bg-surface-elevated px-2.5 py-2 text-[13px] text-ink placeholder:text-neutral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine";
+const LABEL = "mb-1 block text-[12px] font-medium text-ink";
+// Fixed dark pine so white text clears AA in BOTH themes (the token flips lighter in dark mode).
+const PRIMARY_BTN =
+  "inline-flex items-center justify-center gap-1.5 rounded-[4px] bg-[#1F5C4A] px-3.5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#164034] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated disabled:pointer-events-none disabled:opacity-50";
+const GHOST_BTN =
+  "inline-flex items-center justify-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine";
+
+/** Gentle one-time slide-up on mount (entrance on user action, not idle motion). */
+function SlideUp({ children }: Readonly<{ children: React.ReactNode }>) {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setShown(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <div
+      className={[
+        "transition-all duration-300 ease-out",
+        shown ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
+      ].join(" ")}
+    >
+      {children}
+    </div>
+  );
+}
+
+function useCompiledNote() {
+  const t = useTranslations("contribute");
+  return (conditions: ConditionState, userNote: string): string => {
+    const parts = CONDITION_KEYS.filter((k) =>
+      isMeaningfulTier(conditions[k] ?? ""),
+    ).map(
+      (k) =>
+        `${t(`conditions.${k}.label`)}: ${t(
+          `conditions.${k}.options.${conditions[k]}` as Parameters<typeof t>[0],
+        )}`,
+    );
+    const report = parts.length
+      ? `[${t("compiledNoteHeading")}] ${parts.join(" · ")}`
+      : "";
+    return [report, userNote.trim()].filter(Boolean).join(" — ");
+  };
+}
+
+function ConditionFields({
+  conditions,
+  onChange,
+}: Readonly<{
+  conditions: ConditionState;
+  onChange: (key: ConditionKey, value: string) => void;
+}>) {
+  const t = useTranslations("contribute");
+  return (
+    <div className="flex flex-col gap-2.5">
+      {CONDITION_KEYS.map((key) => (
+        <div key={key}>
+          <label className={LABEL} htmlFor={`cond-${key}`}>
+            {t(`conditions.${key}.label`)}
+          </label>
+          <select
+            id={`cond-${key}`}
+            className={INPUT}
+            value={conditions[key] ?? ""}
+            onChange={(e) => onChange(key, e.target.value)}
+          >
+            <option value="">—</option>
+            {CONDITION_OPTIONS[key].map((opt) => (
+              <option key={opt} value={opt}>
+                {t(`conditions.${key}.options.${opt}` as Parameters<typeof t>[0])}
+              </option>
+            ))}
+          </select>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HoneypotField({
+  value,
+  onChange,
+}: Readonly<{ value: string; onChange: (v: string) => void }>) {
+  // Hidden from humans (off-screen, not tabbable, aria-hidden). A filled value
+  // signals a bot; the server rejects it. Field name looks innocuous.
+  return (
+    <input
+      type="text"
+      name="website"
+      tabIndex={-1}
+      autoComplete="off"
+      aria-hidden="true"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
+    />
+  );
+}
+
+function ErrorLine({ messageKey }: Readonly<{ messageKey: string | null }>) {
+  const t = useTranslations("contribute");
+  if (!messageKey) return null;
+  return (
+    <p
+      role="alert"
+      className="rounded-[4px] border border-terracotta/40 bg-terracotta/10 px-2.5 py-1.5 text-[12px] text-ink"
+    >
+      {t(`errors.${messageKey}` as Parameters<typeof t>[0])}
+    </p>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+function Fab({ onOpen }: Readonly<{ onOpen: () => void }>) {
+  const t = useTranslations("contribute");
+  return (
+    <SlideUp>
+      <button type="button" onClick={onOpen} className={PRIMARY_BTN}>
+        <Plus size={16} strokeWidth={1.75} aria-hidden="true" />
+        {t("fab")}
+      </button>
+    </SlideUp>
+  );
+}
+
+function ChoosePanel({
+  onTrace,
+  onSelect,
+  onCancel,
+}: Readonly<{
+  onTrace: () => void;
+  onSelect: () => void;
+  onCancel: () => void;
+}>) {
+  const t = useTranslations("contribute");
+  return (
+    <SlideUp>
+      <section aria-label={t("choose.title")} className={PANEL}>
+        <header className="flex items-start justify-between gap-3 border-b border-border p-4">
+          <div>
+            <h2 className="font-display text-[1.05rem] font-semibold leading-tight text-ink">
+              {t("choose.title")}
+            </h2>
+            <p className="mt-1 text-[12px] leading-snug text-neutral-strong">
+              {t("choose.subtitle")}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            aria-label={t("choose.cancel")}
+            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+          >
+            <X size={16} strokeWidth={1.75} aria-hidden="true" />
+          </button>
+        </header>
+        <div className="flex flex-col gap-2 p-4">
+          <button
+            type="button"
+            onClick={onTrace}
+            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+          >
+            <Route
+              size={18}
+              strokeWidth={1.75}
+              className="mt-0.5 shrink-0 text-pine"
+              aria-hidden="true"
+            />
+            <span>
+              <span className="block text-[13px] font-semibold text-ink">
+                {t("choose.addSegment")}
+              </span>
+              <span className="mt-0.5 block text-[12px] text-neutral-strong">
+                {t("choose.addSegmentHint")}
+              </span>
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={onSelect}
+            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+          >
+            <PencilLine
+              size={18}
+              strokeWidth={1.75}
+              className="mt-0.5 shrink-0 text-pine"
+              aria-hidden="true"
+            />
+            <span>
+              <span className="block text-[13px] font-semibold text-ink">
+                {t("choose.proposeUpdate")}
+              </span>
+              <span className="mt-0.5 block text-[12px] text-neutral-strong">
+                {t("choose.proposeUpdateHint")}
+              </span>
+            </span>
+          </button>
+        </div>
+      </section>
+    </SlideUp>
+  );
+}
+
+function InstructionPill({
+  title,
+  hint,
+  onCancel,
+  cancelLabel,
+}: Readonly<{
+  title: string;
+  hint: string;
+  onCancel: () => void;
+  cancelLabel: string;
+}>) {
+  return (
+    <div className="pointer-events-none absolute left-1/2 top-3 z-20 flex -translate-x-1/2 justify-center px-3">
+      <div className="pointer-events-auto flex items-center gap-3 rounded-[8px] border border-border bg-surface-elevated px-3 py-2 shadow-[var(--shadow-panel)]">
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold text-ink">{title}</p>
+          <p className="text-[11px] leading-snug text-neutral-strong">{hint}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onCancel}
+          aria-label={cancelLabel}
+          className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+        >
+          <X size={15} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TraceControls({
+  count,
+  onUndo,
+  onClear,
+  onFinish,
+}: Readonly<{
+  count: number;
+  onUndo: () => void;
+  onClear: () => void;
+  onFinish: () => void;
+}>) {
+  const t = useTranslations("contribute");
+  return (
+    <SlideUp>
+      <div className="pointer-events-auto flex items-center gap-2 rounded-[8px] border border-border bg-surface-elevated px-3 py-2 shadow-[var(--shadow-panel)]">
+        <span className="font-mono text-[12px] text-neutral-strong">
+          {t("trace.points", { count })}
+        </span>
+        <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={onUndo}
+            disabled={count === 0}
+            className={`${GHOST_BTN} px-2`}
+            aria-label={t("trace.undo")}
+          >
+            <Undo2 size={15} strokeWidth={1.75} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={count === 0}
+            className={`${GHOST_BTN} px-2`}
+            aria-label={t("trace.clear")}
+          >
+            <Trash2 size={15} strokeWidth={1.75} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={onFinish}
+            disabled={count < 2}
+            className={PRIMARY_BTN}
+          >
+            <Check size={15} strokeWidth={1.75} aria-hidden="true" />
+            {t("trace.finish")}
+          </button>
+        </div>
+      </div>
+    </SlideUp>
+  );
+}
+
+function AddForm({
+  contribute,
+}: Readonly<{ contribute: ContributeApi }>) {
+  const t = useTranslations("contribute");
+  const compile = useCompiledNote();
+  const [name, setName] = useState("");
+  const [highway, setHighway] = useState<HighwayKey | "">("");
+  const [conditions, setConditions] = useState<ConditionState>({});
+  const [note, setNote] = useState("");
+  const [contact, setContact] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const coords = contribute.verts;
+  const canSubmit =
+    name.trim().length > 0 && highway !== "" && coords.length >= 2;
+  const submitting = contribute.submitState === "submitting";
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLocalError(null);
+    const compiled = compile(conditions, note);
+    const submission = {
+      type: "add_segment" as const,
+      payload: {
+        name: name.trim(),
+        highway: highway as HighwayKey,
+        coordinates: coords,
+        ...(compiled ? { note: compiled } : {}),
+      },
+      ...(contact.trim() ? { contact: contact.trim() } : {}),
+      honeypot,
+    };
+    const parsed = submissionSchema.safeParse(submission);
+    if (!parsed.success) {
+      setLocalError("invalid");
+      return;
+    }
+    await contribute.submit(parsed.data as Submission);
+  };
+
+  return (
+    <SlideUp>
+      <form onSubmit={onSubmit} className={PANEL}>
+        <header className="flex items-start justify-between gap-3 border-b border-border p-4">
+          <div>
+            <h2 className="font-display text-[1.05rem] font-semibold leading-tight text-ink">
+              {t("form.addTitle")}
+            </h2>
+            <p className="mt-1 font-mono text-[11px] text-neutral-strong">
+              {t("form.pathPoints", { count: coords.length })}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={contribute.cancel}
+            aria-label={t("form.cancel")}
+            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+          >
+            <X size={16} strokeWidth={1.75} aria-hidden="true" />
+          </button>
+        </header>
+
+        <div className="flex flex-col gap-3.5 p-4">
+          <HoneypotField value={honeypot} onChange={setHoneypot} />
+
+          <div>
+            <label className={LABEL} htmlFor="add-name">
+              {t("form.nameLabel")}
+            </label>
+            <input
+              id="add-name"
+              className={INPUT}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t("form.namePlaceholder")}
+              maxLength={160}
+              required
+            />
+          </div>
+
+          <div>
+            <label className={LABEL} htmlFor="add-highway">
+              {t("form.highwayLabel")}
+            </label>
+            <select
+              id="add-highway"
+              className={INPUT}
+              value={highway}
+              onChange={(e) => setHighway(e.target.value as HighwayKey | "")}
+              required
+            >
+              <option value="">{t("form.highwayPlaceholder")}</option>
+              {HIGHWAY_KEYS.map((h) => (
+                <option key={h} value={h}>
+                  {t(`highways.${h}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <fieldset className="border-t border-border pt-3">
+            <legend className="mb-1 text-[12px] font-semibold text-ink">
+              {t("form.conditionsTitle")}
+            </legend>
+            <p className="mb-2.5 text-[11px] text-neutral-strong">
+              {t("form.conditionsHint")}
+            </p>
+            <ConditionFields
+              conditions={conditions}
+              onChange={(k, v) => setConditions((c) => ({ ...c, [k]: v }))}
+            />
+          </fieldset>
+
+          <div>
+            <label className={LABEL} htmlFor="add-note">
+              {t("form.noteLabel")}{" "}
+              <span className="font-normal text-neutral-strong">
+                ({t("form.noteOptional")})
+              </span>
+            </label>
+            <textarea
+              id="add-note"
+              className={`${INPUT} min-h-16 resize-y`}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder={t("form.notePlaceholder")}
+              maxLength={800}
+            />
+          </div>
+
+          <div>
+            <label className={LABEL} htmlFor="add-contact">
+              {t("form.contactLabel")}{" "}
+              <span className="font-normal text-neutral-strong">
+                ({t("form.contactOptional")})
+              </span>
+            </label>
+            <input
+              id="add-contact"
+              className={INPUT}
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              placeholder={t("form.contactPlaceholder")}
+              maxLength={200}
+            />
+            <p className="mt-1 text-[11px] text-neutral-strong">
+              {t("form.contactHint")}
+            </p>
+          </div>
+
+          <ErrorLine messageKey={localError ?? contribute.errorKey} />
+
+          <p className="text-[11px] leading-snug text-neutral-strong">
+            {t("form.honestNote")}
+          </p>
+        </div>
+
+        <footer className="flex items-center justify-between gap-2 border-t border-border bg-surface-sunken px-4 py-3">
+          <button type="button" onClick={contribute.startTrace} className={GHOST_BTN}>
+            {t("form.redraw")}
+          </button>
+          <button type="submit" disabled={!canSubmit || submitting} className={PRIMARY_BTN}>
+            {submitting ? t("form.submitting") : t("form.submit")}
+          </button>
+        </footer>
+      </form>
+    </SlideUp>
+  );
+}
+
+function UpdateForm({
+  contribute,
+}: Readonly<{ contribute: ContributeApi }>) {
+  const t = useTranslations("contribute");
+  const compile = useCompiledNote();
+  const picked = contribute.picked;
+  const [name, setName] = useState(picked?.name ?? "");
+  const [highway, setHighway] = useState<HighwayKey | "">("");
+  const [conditions, setConditions] = useState<ConditionState>({});
+  const [note, setNote] = useState("");
+  const [reason, setReason] = useState("");
+  const [contact, setContact] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const submitting = contribute.submitState === "submitting";
+  const compiledNote = compile(conditions, note);
+
+  // Build the patch from actual changes only (schema requires ≥1 field).
+  const patch: { name?: string; highway?: HighwayKey; note?: string } = {};
+  if (picked && name.trim() && name.trim() !== picked.name) {
+    patch.name = name.trim();
+  }
+  if (highway !== "") patch.highway = highway;
+  if (compiledNote) patch.note = compiledNote;
+
+  const canSubmit =
+    !!picked && reason.trim().length > 0 && Object.keys(patch).length > 0;
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!picked) return;
+    setLocalError(null);
+    const submission = {
+      type: "update_segment" as const,
+      payload: {
+        segment_id: picked.id,
+        patch,
+        reason: reason.trim(),
+      },
+      ...(contact.trim() ? { contact: contact.trim() } : {}),
+      honeypot,
+    };
+    const parsed = submissionSchema.safeParse(submission);
+    if (!parsed.success) {
+      setLocalError("invalid");
+      return;
+    }
+    await contribute.submit(parsed.data as Submission);
+  };
+
+  return (
+    <SlideUp>
+      <form onSubmit={onSubmit} className={PANEL}>
+        <header className="flex items-start justify-between gap-3 border-b border-border p-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-[1.05rem] font-semibold leading-tight text-ink">
+              {t("form.updateTitle")}
+            </h2>
+            <p className="mt-1 truncate text-[12px] text-neutral-strong">
+              {t("form.editingSegment")}: {picked?.name}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={contribute.cancel}
+            aria-label={t("form.cancel")}
+            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+          >
+            <X size={16} strokeWidth={1.75} aria-hidden="true" />
+          </button>
+        </header>
+
+        <div className="flex flex-col gap-3.5 p-4">
+          <HoneypotField value={honeypot} onChange={setHoneypot} />
+
+          <div>
+            <label className={LABEL} htmlFor="upd-name">
+              {t("form.nameLabel")}
+            </label>
+            <input
+              id="upd-name"
+              className={INPUT}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={160}
+            />
+          </div>
+
+          <div>
+            <label className={LABEL} htmlFor="upd-highway">
+              {t("form.highwayLabel")}{" "}
+              <span className="font-normal text-neutral-strong">
+                ({t("form.noteOptional")})
+              </span>
+            </label>
+            <select
+              id="upd-highway"
+              className={INPUT}
+              value={highway}
+              onChange={(e) => setHighway(e.target.value as HighwayKey | "")}
+            >
+              <option value="">{t("form.highwayPlaceholder")}</option>
+              {HIGHWAY_KEYS.map((h) => (
+                <option key={h} value={h}>
+                  {t(`highways.${h}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <fieldset className="border-t border-border pt-3">
+            <legend className="mb-1 text-[12px] font-semibold text-ink">
+              {t("form.conditionsTitle")}
+            </legend>
+            <p className="mb-2.5 text-[11px] text-neutral-strong">
+              {t("form.conditionsHint")}
+            </p>
+            <ConditionFields
+              conditions={conditions}
+              onChange={(k, v) => setConditions((c) => ({ ...c, [k]: v }))}
+            />
+          </fieldset>
+
+          <div>
+            <label className={LABEL} htmlFor="upd-note">
+              {t("form.noteLabel")}{" "}
+              <span className="font-normal text-neutral-strong">
+                ({t("form.noteOptional")})
+              </span>
+            </label>
+            <textarea
+              id="upd-note"
+              className={`${INPUT} min-h-14 resize-y`}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder={t("form.notePlaceholder")}
+              maxLength={800}
+            />
+          </div>
+
+          <div>
+            <label className={LABEL} htmlFor="upd-reason">
+              {t("form.reasonLabel")}
+            </label>
+            <textarea
+              id="upd-reason"
+              className={`${INPUT} min-h-16 resize-y`}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder={t("form.reasonPlaceholder")}
+              maxLength={1000}
+              required
+            />
+          </div>
+
+          <div>
+            <label className={LABEL} htmlFor="upd-contact">
+              {t("form.contactLabel")}{" "}
+              <span className="font-normal text-neutral-strong">
+                ({t("form.contactOptional")})
+              </span>
+            </label>
+            <input
+              id="upd-contact"
+              className={INPUT}
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              placeholder={t("form.contactPlaceholder")}
+              maxLength={200}
+            />
+            <p className="mt-1 text-[11px] text-neutral-strong">
+              {t("form.contactHint")}
+            </p>
+          </div>
+
+          <ErrorLine messageKey={localError ?? contribute.errorKey} />
+
+          <p className="text-[11px] leading-snug text-neutral-strong">
+            {t("form.honestNote")}
+          </p>
+        </div>
+
+        <footer className="flex items-center justify-end gap-2 border-t border-border bg-surface-sunken px-4 py-3">
+          <button type="submit" disabled={!canSubmit || submitting} className={PRIMARY_BTN}>
+            {submitting ? t("form.submitting") : t("form.submit")}
+          </button>
+        </footer>
+      </form>
+    </SlideUp>
+  );
+}
+
+function SuccessCard({
+  onAddAnother,
+  onClose,
+}: Readonly<{ onAddAnother: () => void; onClose: () => void }>) {
+  const t = useTranslations("contribute");
+  return (
+    <SlideUp>
+      <section aria-label={t("success.title")} className={PANEL}>
+        <div className="flex flex-col gap-3 p-4">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-[8px] bg-pine/12 text-pine">
+              <MapPin size={18} strokeWidth={1.75} aria-hidden="true" />
+            </span>
+            <h2 className="font-display text-[1.05rem] font-semibold leading-tight text-ink">
+              {t("success.title")}
+            </h2>
+          </div>
+          <p className="text-[12.5px] leading-snug text-neutral-strong">
+            {t("success.body")}
+          </p>
+          <div className="mt-1 flex items-center justify-end gap-2">
+            <button type="button" onClick={onAddAnother} className={GHOST_BTN}>
+              {t("success.addAnother")}
+            </button>
+            <button type="button" onClick={onClose} className={PRIMARY_BTN}>
+              {t("success.close")}
+            </button>
+          </div>
+        </div>
+      </section>
+    </SlideUp>
+  );
+}
+
+export default function ContributeUI({
+  contribute,
+}: Readonly<{ contribute: ContributeApi }>) {
+  const t = useTranslations("contribute");
+  const { mode, submitState } = contribute;
+
+  const showInstruction = mode === "trace" || mode === "select";
+
+  return (
+    <>
+      {showInstruction ? (
+        <InstructionPill
+          title={t(mode === "trace" ? "trace.title" : "select.title")}
+          hint={t(mode === "trace" ? "trace.hint" : "select.hint")}
+          onCancel={contribute.cancel}
+          cancelLabel={t(mode === "trace" ? "trace.cancel" : "select.cancel")}
+        />
+      ) : null}
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-3 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:justify-end sm:p-0">
+        {submitState === "success" ? (
+          <SuccessCard
+            onAddAnother={() => {
+              contribute.reset();
+              contribute.open();
+            }}
+            onClose={contribute.reset}
+          />
+        ) : mode === "idle" ? (
+          <Fab onOpen={contribute.open} />
+        ) : mode === "choose" ? (
+          <ChoosePanel
+            onTrace={contribute.startTrace}
+            onSelect={contribute.startSelect}
+            onCancel={contribute.cancel}
+          />
+        ) : mode === "trace" ? (
+          <TraceControls
+            count={contribute.verts.length}
+            onUndo={contribute.undo}
+            onClear={contribute.clear}
+            onFinish={contribute.finishTrace}
+          />
+        ) : mode === "add" ? (
+          <AddForm contribute={contribute} />
+        ) : mode === "update" ? (
+          <UpdateForm contribute={contribute} />
+        ) : null}
+      </div>
+    </>
+  );
+}
