@@ -116,6 +116,27 @@ getSegmentDetail: esc-sa-0001 → district + audited_at strings, scores for all
 SMOKE PASS
 ```
 
+## 6. Follow-up: 0010 admin_list_submissions (Conductor/u4-admin finding)
+
+`submissions` was INSERT-only under RLS with no read RPC, so the admin queue
+had no way to list it. Added `0010_admin_list_rpc.sql`:
+`admin_list_submissions(secret text, status_filter text default 'pending')`,
+SECURITY DEFINER, same app_secrets gate as 0007, newest first, LIMIT 200,
+returning id/type/payload/status/created_at/reviewed_at/reviewer_note only
+(source_ip_hash and honeypot_tripped withheld: data minimization).
+
+Re-verified on a fresh real PostGIS 17 container: all TEN migrations + seed
+apply clean, then functionally:
+
+| Check | Result |
+| --- | --- |
+| wrong secret | ERROR: unauthorized |
+| invalid status filter | ERROR: invalid status filter: bogus |
+| default filter | 2 pending rows returned |
+| `'rejected'` filter | 1 row with reviewer_note |
+| return type | `TABLE(id, type, payload, status, created_at, reviewed_at, reviewer_note)` — no ip hash / honeypot |
+| as role `anon` | callable; secret remains the gate |
+
 ## Assumptions / notes for the Conductor
 
 - **535 segments vs a single "corridor".** The bbox covers the whole San Antonio
