@@ -33,14 +33,20 @@ export const SCORE_LAYERS: readonly ScoreLayer[] = [
  */
 export const LEY_7600_MIN_SCORE = 50;
 
-/** Properties carried on every segment GeoJSON feature. Consumed by AuditMap. */
+/**
+ * Properties carried on every segment GeoJSON feature. Consumed by AuditMap.
+ * Flat shape (frozen contract with the map UI unit, advisor rev 3/4):
+ * flat 0-100 `score_*` fields plus `district` and `audited_at`.
+ */
 export type SegmentProperties = {
   id: string;
   name: string;
+  district: string;
   score_overall: number;
   score_accessibility: number;
   score_drainage: number;
   score_shade: number;
+  audited_at: string;
   demo: boolean;
 };
 
@@ -68,6 +74,8 @@ export type PhotoDetail = {
 export type SegmentDetail = {
   id: string;
   name: string;
+  district: string;
+  audited_at: string;
   highway: string;
   length_m: number;
   demo: boolean;
@@ -82,7 +90,7 @@ export type SegmentDetail = {
 };
 
 /** Aggregate stats for the floating hero panel. */
-export type Stats = {
+export type StreetStats = {
   /** Number of audited segments. */
   segments: number;
   /** Total audited length in kilometers. */

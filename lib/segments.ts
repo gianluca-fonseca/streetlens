@@ -2,10 +2,11 @@
  * Segment data-access layer — the single source the UI reads through.
  *
  * Exports are a frozen contract shared with the map UI unit:
- *   - `ScoreLayer`
+ *   - `ScoreLayer`, `SCORE_LAYERS`, `SegmentProperties`, `SegmentCollection`,
+ *     `SegmentDetail`, `StreetStats`
  *   - `getSegments()`      -> SegmentCollection
  *   - `getSegmentDetail()` -> SegmentDetail | null
- *   - `getStats()`         -> { segments, km, coveragePct, heroPct }
+ *   - `getStats()`         -> StreetStats { segments, km, coveragePct, heroPct }
  *
  * Each reader tries Supabase first when it is configured, and falls back to the
  * generated static data files on any absence or error. The live database does
@@ -18,14 +19,30 @@ import path from "node:path";
 import { getSupabaseClient } from "./supabase";
 import {
   LEY_7600_MIN_SCORE,
+  SCORE_LAYERS,
   type ScoreLayer,
   type SegmentCollection,
   type SegmentDetail,
   type SegmentFeature,
-  type Stats,
+  type SegmentProperties,
+  type StreetStats,
 } from "./types";
 
-export type { ScoreLayer, SegmentCollection, SegmentDetail, Stats };
+/*
+ * FROZEN EXPORT SURFACE (advisor rev 2/3/4, shared with the map UI unit):
+ * ScoreLayer, SCORE_LAYERS, SegmentProperties, SegmentCollection,
+ * SegmentDetail, StreetStats, getSegments, getSegmentDetail, getStats.
+ * Do not rename or drop any of these.
+ */
+export { SCORE_LAYERS };
+export type {
+  ScoreLayer,
+  SegmentProperties,
+  SegmentFeature,
+  SegmentCollection,
+  SegmentDetail,
+  StreetStats,
+};
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DEMO_SEGMENTS_PATH = path.join(DATA_DIR, "demo-segments.geojson");
@@ -34,6 +51,9 @@ const DEMO_AUDITS_PATH = path.join(DATA_DIR, "demo-audits.json");
 /* ------------------------------------------------------------------ *
  * Static file readers (cached per process)
  * ------------------------------------------------------------------ */
+
+const DEFAULT_DISTRICT = "San Antonio";
+const DEFAULT_AUDITED_AT = "2026-07-10";
 
 type DemoCollection = SegmentCollection & {
   metadata?: {
@@ -72,11 +92,40 @@ type DemoAuditsFile = {
 let demoCollectionCache: DemoCollection | undefined;
 let demoAuditsCache: DemoAuditsFile | undefined;
 
+/**
+ * Guarantee the frozen SegmentProperties shape on a static feature. The
+ * generator emits district/audited_at already; this backstops any older data
+ * file (e.g. a pre-contract placeholder surviving a merge).
+ */
+function enrichFeature(feature: SegmentFeature): SegmentFeature {
+  const p = feature.properties as Partial<SegmentProperties> &
+    Pick<SegmentProperties, "id" | "name">;
+  if (typeof p.district === "string" && typeof p.audited_at === "string") {
+    return feature;
+  }
+  return {
+    ...feature,
+    properties: {
+      id: p.id,
+      name: p.name,
+      district: p.district ?? DEFAULT_DISTRICT,
+      score_overall: p.score_overall ?? 0,
+      score_accessibility: p.score_accessibility ?? 0,
+      score_drainage: p.score_drainage ?? 0,
+      score_shade: p.score_shade ?? 0,
+      audited_at: p.audited_at ?? DEFAULT_AUDITED_AT,
+      demo: p.demo ?? true,
+    },
+  };
+}
+
 async function readDemoCollection(): Promise<DemoCollection> {
   if (!demoCollectionCache) {
-    demoCollectionCache = JSON.parse(
+    const parsed = JSON.parse(
       await fs.readFile(DEMO_SEGMENTS_PATH, "utf8"),
     ) as DemoCollection;
+    parsed.features = parsed.features.map(enrichFeature);
+    demoCollectionCache = parsed;
   }
   return demoCollectionCache;
 }
@@ -98,9 +147,11 @@ async function readDemoAudits(): Promise<DemoAuditsFile> {
 type ScoreRow = {
   id: string;
   name: string;
+  district: string;
   highway: string;
   length_m: number;
   demo: boolean;
+  audited_at: string;
   geometry: { type: "LineString"; coordinates: [number, number][] };
   score_overall: number;
   score_accessibility: number;
@@ -114,10 +165,12 @@ function rowToFeature(row: ScoreRow): SegmentFeature {
     properties: {
       id: row.id,
       name: row.name,
+      district: row.district,
       score_overall: row.score_overall,
       score_accessibility: row.score_accessibility,
       score_drainage: row.score_drainage,
       score_shade: row.score_shade,
+      audited_at: row.audited_at,
       demo: row.demo,
     },
     geometry: row.geometry,
@@ -131,7 +184,7 @@ async function liveScoreRows(id?: string): Promise<ScoreRow[] | null> {
     let query = client
       .from("v_segment_scores")
       .select(
-        "id,name,highway,length_m,demo,geometry,score_overall,score_accessibility,score_drainage,score_shade",
+        "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade",
       );
     if (id) query = query.eq("id", id);
     const { data, error } = await query;
@@ -167,6 +220,8 @@ export async function getSegmentDetail(
     return {
       id: row.id,
       name: row.name,
+      district: row.district,
+      audited_at: row.audited_at,
       highway: row.highway,
       length_m: row.length_m,
       demo: row.demo,
@@ -195,6 +250,8 @@ export async function getSegmentDetail(
   return {
     id,
     name: feature.properties.name,
+    district: feature.properties.district,
+    audited_at: feature.properties.audited_at,
     highway: audit?.highway ?? "unknown",
     length_m: audit?.length_m ?? 0,
     demo: feature.properties.demo,
@@ -217,7 +274,7 @@ export async function getSegmentDetail(
 }
 
 /** Headline aggregate stats for the hero panel. */
-export async function getStats(): Promise<Stats> {
+export async function getStats(): Promise<StreetStats> {
   const demo = await readDemoCollection();
   const networkKm = demo.metadata?.network_km;
 
