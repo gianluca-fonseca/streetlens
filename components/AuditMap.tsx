@@ -204,6 +204,7 @@ export default function AuditMap({
 
     const onLoad = () => {
       styleLoaded = true;
+      map.resize();
       const dark = prefersDark();
       muteBasemap(map, dark);
       addDataLayers(map, segmentsRef.current);
@@ -295,12 +296,12 @@ export default function AuditMap({
   };
 
   return (
-    <div className="relative h-full w-full">
+    <div className="absolute inset-0">
       <div
         ref={containerRef}
         role="application"
         aria-label={t("ariaLabel")}
-        className="absolute inset-0"
+        className="h-full w-full"
       />
 
       <div className="pointer-events-none absolute inset-0 flex items-start justify-between gap-3 p-3 sm:p-4">
