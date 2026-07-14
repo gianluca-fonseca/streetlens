@@ -1,8 +1,10 @@
 import { useTranslations } from "next-intl";
+import { FlaskConical } from "lucide-react";
 
 /**
- * Persistent, non-dismissable banner flagging that all visible data is demo
- * data. Rendered on every page until real field data replaces the demo set.
+ * Persistent, non-dismissable honesty strip: every number on the map is demo
+ * data until field collection begins. Slim, warm, terracotta-keyed — never a
+ * marketing banner.
  */
 export default function DemoBanner() {
   const t = useTranslations("demoBanner");
@@ -10,9 +12,15 @@ export default function DemoBanner() {
   return (
     <div
       role="status"
-      className="w-full bg-amber-400 px-4 py-2 text-center text-sm font-medium text-amber-950"
+      className="flex shrink-0 items-center justify-center gap-2 border-b border-border bg-surface-sunken px-4 py-1.5 text-center text-[12.5px] font-medium text-ink"
     >
-      {t("message")}
+      <FlaskConical
+        size={14}
+        strokeWidth={1.75}
+        className="shrink-0 text-terracotta"
+        aria-hidden="true"
+      />
+      <span>{t("message")}</span>
     </div>
   );
 }
