@@ -51,18 +51,30 @@ function adminPassword(): string {
   return pw;
 }
 
-/** Derive an HMAC key from the admin password (SHA-256 of a namespaced secret). */
+/**
+ * Derive the HMAC signing key from `ADMIN_PASSWORD` via HKDF-SHA256 with a
+ * static context string (advisor rev 2, ruling 2). The password bytes are never
+ * used directly as the key; HKDF expands them into a proper 256-bit key.
+ */
 async function getSigningKey(): Promise<CryptoKey> {
   if (cachedKey) return cachedKey;
   cachedKey = (async () => {
-    const material = encoder.encode(
-      `${adminPassword()}:streetlens-admin-session-${SESSION_VERSION}`,
-    );
-    const digest = await crypto.subtle.digest("SHA-256", material);
-    return crypto.subtle.importKey(
+    const baseKey = await crypto.subtle.importKey(
       "raw",
-      digest,
-      { name: "HMAC", hash: "SHA-256" },
+      encoder.encode(adminPassword()),
+      "HKDF",
+      false,
+      ["deriveKey"],
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "HKDF",
+        hash: "SHA-256",
+        salt: encoder.encode("streetlens-admin/session-salt"),
+        info: encoder.encode(`streetlens-admin-session-${SESSION_VERSION}`),
+      },
+      baseKey,
+      { name: "HMAC", hash: "SHA-256", length: 256 },
       false,
       ["sign", "verify"],
     );
