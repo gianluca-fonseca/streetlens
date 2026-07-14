@@ -1,0 +1,55 @@
+[
+  {
+    "id": "59d0c320-94af-46f2-81bb-d6f6ae75d64a",
+    "created_at": "2026-07-14T20:59:12.236Z",
+    "type": "add_segment",
+    "payload": {
+      "name": "Calle de Prueba",
+      "highway": "residential",
+      "coordinates": [
+        [
+          -84.14,
+          9.91
+        ],
+        [
+          -84.139,
+          9.911
+        ],
+        [
+          -84.138,
+          9.912
+        ]
+      ],
+      "note": "[Condition report] Walking surface: Some cracks or bumps"
+    },
+    "status": "pending",
+    "source_ip_hash": "4dcccca0f5563aaadbb8d16d3727b19483dbbf8a495e88c02d1acbf3e685ac81",
+    "honeypot_tripped": false
+  },
+  {
+    "id": "c8a926e6-35be-45ff-bbc4-0c6fa6114251",
+    "created_at": "2026-07-14T20:59:12.254Z",
+    "type": "update_segment",
+    "payload": {
+      "segment_id": "seg-001",
+      "patch": {
+        "note": "[Condition report] Drainage: Floods often"
+      },
+      "reason": "Sidewalk floods after rain"
+    },
+    "status": "pending",
+    "source_ip_hash": "4dcccca0f5563aaadbb8d16d3727b19483dbbf8a495e88c02d1acbf3e685ac81",
+    "honeypot_tripped": false
+  },
+  {
+    "id": "cee4ae8b-184e-4f62-aeed-491900356bb3",
+    "created_at": "2026-07-14T20:59:12.278Z",
+    "type": "add_segment",
+    "payload": {
+      "rejected": "honeypot"
+    },
+    "status": "rejected",
+    "source_ip_hash": "4dcccca0f5563aaadbb8d16d3727b19483dbbf8a495e88c02d1acbf3e685ac81",
+    "honeypot_tripped": true
+  }
+]
