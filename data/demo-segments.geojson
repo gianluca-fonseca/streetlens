@@ -1,0 +1,176 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-001",
+        "name": "Avenida Central, Escazú centro",
+        "score_overall": 72,
+        "score_accessibility": 68,
+        "score_drainage": 75,
+        "score_shade": 55,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.1448, 9.9187],
+          [-84.142, 9.9188],
+          [-84.1397, 9.9189],
+          [-84.1372, 9.919],
+          [-84.1349, 9.9191]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-002",
+        "name": "Calle Central, Escazú centro",
+        "score_overall": 55,
+        "score_accessibility": 48,
+        "score_drainage": 62,
+        "score_shade": 40,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.1398, 9.9232],
+          [-84.1397, 9.9207],
+          [-84.1396, 9.9189],
+          [-84.1395, 9.9166],
+          [-84.1394, 9.9148]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-003",
+        "name": "Avenida 2, Escazú centro",
+        "score_overall": 38,
+        "score_accessibility": 30,
+        "score_drainage": 45,
+        "score_shade": 35,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.1432, 9.9176],
+          [-84.1405, 9.9177],
+          [-84.1379, 9.9178],
+          [-84.1358, 9.9179]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-004",
+        "name": "Calle 2, costado este de la iglesia",
+        "score_overall": 64,
+        "score_accessibility": 60,
+        "score_drainage": 70,
+        "score_shade": 48,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.1385, 9.9216],
+          [-84.1384, 9.9195],
+          [-84.1383, 9.9172],
+          [-84.1382, 9.9158]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-005",
+        "name": "Camino a San Antonio, tramo norte",
+        "score_overall": 45,
+        "score_accessibility": 35,
+        "score_drainage": 50,
+        "score_shade": 60,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.1394, 9.9148],
+          [-84.139, 9.9128],
+          [-84.1383, 9.9108],
+          [-84.1376, 9.9088],
+          [-84.137, 9.907]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-006",
+        "name": "Camino a San Antonio, tramo sur",
+        "score_overall": 30,
+        "score_accessibility": 22,
+        "score_drainage": 35,
+        "score_shade": 65,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.137, 9.907],
+          [-84.1364, 9.9052],
+          [-84.1357, 9.9036],
+          [-84.1352, 9.9022]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-007",
+        "name": "Avenida Central, San Antonio",
+        "score_overall": 58,
+        "score_accessibility": 52,
+        "score_drainage": 60,
+        "score_shade": 44,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.1392, 9.9043],
+          [-84.137, 9.9044],
+          [-84.1349, 9.9045],
+          [-84.1327, 9.9046]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "seg-esc-008",
+        "name": "Calle La Cruz, San Antonio",
+        "score_overall": 82,
+        "score_accessibility": 78,
+        "score_drainage": 85,
+        "score_shade": 70,
+        "demo": true
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-84.1352, 9.9022],
+          [-84.135, 9.9004],
+          [-84.1347, 9.8986],
+          [-84.1345, 9.8968]
+        ]
+      }
+    }
+  ]
+}

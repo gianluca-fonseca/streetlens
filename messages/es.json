@@ -15,6 +15,17 @@
       "unit": "/100",
       "label": "Puntaje promedio de aceras, corredor piloto de San Antonio",
       "demoNote": "Cifra de demostración. No es una medición real."
+    },
+    "mapHeading": "Mapa del piloto de Escazú"
+  },
+  "map": {
+    "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
+    "demoTag": "DEMO",
+    "scores": {
+      "overall": "General",
+      "accessibility": "Accesibilidad",
+      "drainage": "Drenaje",
+      "shade": "Sombra"
     }
   }
 }

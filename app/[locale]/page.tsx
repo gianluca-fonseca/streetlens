@@ -1,18 +1,28 @@
-import { setRequestLocale } from "next-intl/server";
-import { useTranslations } from "next-intl";
-import { use } from "react";
+import { promises as fs } from "fs";
+import path from "path";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
+import AuditMap, { type SegmentCollection } from "@/components/AuditMap";
 import DemoBanner from "@/components/DemoBanner";
 
-export default function HomePage({
+async function loadDemoSegments(): Promise<SegmentCollection> {
+  const raw = await fs.readFile(
+    path.join(process.cwd(), "data", "demo-segments.geojson"),
+    "utf8",
+  );
+  return JSON.parse(raw) as SegmentCollection;
+}
+
+export default async function HomePage({
   params,
 }: Readonly<{
   params: Promise<{ locale: Locale }>;
 }>) {
-  const { locale } = use(params);
+  const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = useTranslations("home");
+  const t = await getTranslations("home");
+  const segments = await loadDemoSegments();
 
   return (
     <>
@@ -43,6 +53,11 @@ export default function HomePage({
               {t("stat.demoNote")}
             </p>
           </div>
+        </section>
+
+        <section className="w-full">
+          <h2 className="sr-only">{t("mapHeading")}</h2>
+          <AuditMap segments={segments} />
         </section>
       </main>
     </>

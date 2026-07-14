@@ -15,6 +15,17 @@
       "unit": "/100",
       "label": "Average sidewalk score, San Antonio pilot corridor",
       "demoNote": "Demo figure. Not a real measurement."
+    },
+    "mapHeading": "Escazú pilot map"
+  },
+  "map": {
+    "ariaLabel": "Interactive map of audited street segments in Escazú",
+    "demoTag": "DEMO",
+    "scores": {
+      "overall": "Overall",
+      "accessibility": "Accessibility",
+      "drainage": "Drainage",
+      "shade": "Shade"
     }
   }
 }
