@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "title": "StreetLens",
+    "description": "Open street audits for Costa Rica. Mapping sidewalk quality, accessibility, drainage, and shade in Escazú, one segment at a time."
+  },
+  "demoBanner": {
+    "message": "Demo data: field pilot begins August 2026"
+  },
+  "home": {
+    "title": "StreetLens",
+    "tagline": "Open street audits for Costa Rica",
+    "subtext": "Mapping sidewalk quality, accessibility, drainage, and shade in Escazú, one segment at a time.",
+    "stat": {
+      "value": "61",
+      "unit": "/100",
+      "label": "Average sidewalk score, San Antonio pilot corridor",
+      "demoNote": "Demo figure. Not a real measurement."
+    }
+  }
+}

@@ -4,7 +4,7 @@
 
 StreetLens is an open-source, bilingual (ES/EN) platform for auditing the quality, accessibility, drainage, and shade of city streets, one segment at a time. The pilot audits the cantón of **Escazú, Costa Rica** against a rubric adapted from validated instruments (MAPS-Mini, LANAMME-UCR's sidewalk condition index, Ley 7600 accessibility requirements, and the HOT/Resilience Academy drainage-mapping protocol).
 
-A project of **CUSP** (Collective for Urbanism and Sustainable Progress), led by Gianluca Fonseca.
+A project of **CUSP** (Collective for Urbanism and Sustainable Progress), led by [Gianluca Fonseca](https://github.com/gianluca-fonseca).
 
 > **Status: pre-pilot development.** The public map currently shows clearly-labeled DEMO data over real street geometry. Field data collection begins August 2026. No number shown on a demo surface is a real measurement.
 
