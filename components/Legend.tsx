@@ -23,7 +23,7 @@ export default function Legend({
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
           {t("title")}
         </h3>
-        <span className="font-mono text-[10px] text-neutral">
+        <span className="font-mono text-[10px] text-neutral-strong">
           {t("scaleHint")}
         </span>
       </div>
@@ -47,7 +47,7 @@ export default function Legend({
             <span className="text-[12px] font-medium text-ink">
               {t(`bins.${bin.key}`)}
             </span>
-            <span className="ml-auto font-mono text-[11px] text-neutral">
+            <span className="ml-auto font-mono text-[11px] text-neutral-strong">
               {bin.min}–{bin.max}
             </span>
           </li>

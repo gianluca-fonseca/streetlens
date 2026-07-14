@@ -54,7 +54,7 @@ export default function SegmentDetail({
           </h2>
           <p className="mt-0.5 text-[12px] text-neutral-strong">
             {segment.district}
-            <span className="mx-1.5 text-neutral">·</span>
+            <span className="mx-1.5 text-neutral-strong">·</span>
             <span className="font-mono">
               {t("auditedLabel")} {segment.audited_at}
             </span>
@@ -108,7 +108,7 @@ export default function SegmentDetail({
 
         <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
           {t("breakdownHeading")}
-          <span className="ml-1.5 font-sans font-normal normal-case tracking-normal text-neutral">
+          <span className="ml-1.5 font-sans font-normal normal-case tracking-normal text-neutral-strong">
             · {tl(`${activeLayer}.name`)}
           </span>
         </h3>
@@ -125,7 +125,7 @@ export default function SegmentDetail({
               </span>
               <span className="font-mono text-[12.5px] font-medium text-neutral-strong">
                 {item.score}
-                <span className="text-neutral">/100</span>
+                <span className="text-neutral-strong">/100</span>
               </span>
             </li>
           ))}
