@@ -41,3 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .planning/evidence/dev-server.log
+
+# Local anonymous-submission queue (DB fallback; never committed)
+data/pending-submissions.local.json
