@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
+  Camera,
   Check,
   MapPin,
   PencilLine,
@@ -132,6 +133,32 @@ function HoneypotField({
       onChange={(e) => onChange(e.target.value)}
       className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
     />
+  );
+}
+
+function PhotoPlaceholder() {
+  // Field for the future: photo upload arrives with the pilot. Honest, disabled.
+  const t = useTranslations("contribute");
+  return (
+    <div>
+      <span className={LABEL}>
+        {t("form.photoLabel")}{" "}
+        <span className="font-normal text-neutral-strong">
+          ({t("form.noteOptional")})
+        </span>
+      </span>
+      <div className="flex items-center gap-2.5 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 py-2.5">
+        <Camera
+          size={18}
+          strokeWidth={1.75}
+          className="shrink-0 text-neutral"
+          aria-hidden="true"
+        />
+        <span className="text-[11px] leading-snug text-neutral-strong">
+          {t("form.photoSoon")}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -454,6 +481,8 @@ function AddForm({
             />
           </div>
 
+          <PhotoPlaceholder />
+
           <div>
             <label className={LABEL} htmlFor="add-contact">
               {t("form.contactLabel")}{" "}
@@ -649,6 +678,8 @@ function UpdateForm({
               required
             />
           </div>
+
+          <PhotoPlaceholder />
 
           <div>
             <label className={LABEL} htmlFor="upd-contact">
