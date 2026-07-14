@@ -259,7 +259,12 @@ export default function AuditMap({
         const cmode = contrib.modeRef.current;
         if (cmode === "trace") return;
         if (cmode === "select") {
-          contrib.pickSegment({ id: props.id, name: props.name });
+          const geom = f.geometry;
+          const coordinates =
+            geom.type === "LineString"
+              ? (geom.coordinates as [number, number][])
+              : [];
+          contrib.pickSegment({ id: props.id, name: props.name, coordinates });
           return;
         }
         selectFeature(map, props, f.geometry);

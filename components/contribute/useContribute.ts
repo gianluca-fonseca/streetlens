@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type maplibregl from "maplibre-gl";
+import maplibregl from "maplibre-gl";
 import type { Submission } from "@/lib/schemas";
 
 /**
@@ -23,8 +23,13 @@ export type ContributeMode =
   | "update";
 
 export type SubmitState = "idle" | "submitting" | "success";
-export type PickedSegment = { id: string; name: string };
 export type Vertex = [number, number];
+export type PickedSegment = {
+  id: string;
+  name: string;
+  /** The selected segment's geometry, for the "View my trace" fly-to. */
+  coordinates: Vertex[];
+};
 
 const LINE_SRC = "contribute-line";
 const VERT_SRC = "contribute-verts";
@@ -116,6 +121,8 @@ export type ContributeApi = {
   finishTrace: () => void;
   pickSegment: (segment: PickedSegment) => void;
   backToChoose: () => void;
+  /** Fly the camera to fit the given geometry, left of the right-docked form. */
+  flyToCoords: (coords: Vertex[]) => void;
   submit: (submission: Submission) => Promise<boolean>;
   reset: () => void;
 };
@@ -241,6 +248,26 @@ export function useContribute(
     setMode("choose");
   }, []);
 
+  const flyToCoords = useCallback(
+    (coords: Vertex[]) => {
+      const map = mapRef.current;
+      if (!map || coords.length === 0) return;
+      const bounds = coords.reduce(
+        (b, c) => b.extend(c),
+        new maplibregl.LngLatBounds(coords[0], coords[0]),
+      );
+      // Extra right padding (~form width) so the geometry lands visibly LEFT
+      // of the right-docked form; matches the u1 segment-select fly-to feel.
+      map.fitBounds(bounds, {
+        padding: { top: 100, bottom: 80, left: 120, right: 420 },
+        maxZoom: 16.5,
+        duration: 1100,
+        essential: true,
+      });
+    },
+    [mapRef],
+  );
+
   const submit = useCallback(
     async (submission: Submission): Promise<boolean> => {
       setSubmitState("submitting");
@@ -287,6 +314,7 @@ export function useContribute(
     finishTrace,
     pickSegment,
     backToChoose,
+    flyToCoords,
     submit,
     reset,
   };
