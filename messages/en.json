@@ -4,28 +4,82 @@
     "description": "Open street audits for Costa Rica. Mapping sidewalk quality, accessibility, drainage, and shade in Escazú, one segment at a time."
   },
   "demoBanner": {
-    "message": "Demo data: field pilot begins August 2026"
-  },
-  "home": {
-    "title": "StreetLens",
-    "tagline": "Open street audits for Costa Rica",
-    "subtext": "Mapping sidewalk quality, accessibility, drainage, and shade in Escazú, one segment at a time.",
-    "stat": {
-      "value": "61",
-      "unit": "/100",
-      "label": "Average sidewalk score, San Antonio pilot corridor",
-      "demoNote": "Demo figure. Not a real measurement."
-    },
-    "mapHeading": "Escazú pilot map"
+    "message": "Demo data over real street geometry. Field pilot begins August 2026 — no number shown is a real measurement."
   },
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
     "demoTag": "DEMO",
-    "scores": {
-      "overall": "Overall",
-      "accessibility": "Accessibility",
-      "drainage": "Drainage",
-      "shade": "Shade"
+    "loading": "Loading map…"
+  },
+  "layers": {
+    "switcherLabel": "Score layer",
+    "overall": {
+      "name": "Overall",
+      "short": "Composite sidewalk score"
+    },
+    "accessibility": {
+      "name": "Accessibility",
+      "short": "Ley 7600 compliance"
+    },
+    "drainage": {
+      "name": "Drainage",
+      "short": "Flood and ponding risk"
+    },
+    "shade": {
+      "name": "Shade",
+      "short": "Tree canopy and cover"
+    }
+  },
+  "legend": {
+    "title": "Legend",
+    "scaleHint": "Higher is better (0–100)",
+    "widthNote": "Thicker lines mark lower-scoring segments.",
+    "bins": {
+      "poor": "Poor",
+      "fair": "Fair",
+      "good": "Good",
+      "excellent": "Excellent"
+    }
+  },
+  "panel": {
+    "eyebrow": "Escazú pilot",
+    "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",
+    "heroDemoNote": "Demo figure. Not a real measurement.",
+    "segmentsLabel": "Segments audited",
+    "kmLabel": "Corridor km",
+    "coverageLabel": "Pilot coverage",
+    "unitKm": "km",
+    "unitPct": "%"
+  },
+  "detail": {
+    "auditedLabel": "Audited",
+    "scoresHeading": "Scores by layer",
+    "breakdownHeading": "Rubric breakdown",
+    "photosHeading": "Photos",
+    "photoPlaceholder": "Photo pending fieldwork",
+    "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
+    "close": "Close detail panel"
+  },
+  "rubric": {
+    "overall": {
+      "surface": "Surface condition",
+      "width": "Effective width",
+      "obstruction": "Obstructions"
+    },
+    "accessibility": {
+      "ramp": "Curb ramps",
+      "tactile": "Tactile paving",
+      "crossing": "Safe crossings"
+    },
+    "drainage": {
+      "grate": "Grates and inlets",
+      "slope": "Cross slope",
+      "ponding": "Ponding history"
+    },
+    "shade": {
+      "canopy": "Tree canopy",
+      "awning": "Awnings and cover",
+      "exposure": "Sun exposure"
     }
   }
 }
