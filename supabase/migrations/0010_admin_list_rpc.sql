@@ -7,8 +7,8 @@
 -- NOT returned; they exist for abuse forensics, not for the review UI.
 
 create or replace function admin_list_submissions(
-  secret        text,
-  status_filter text default 'pending'
+  p_secret        text,
+  p_status_filter text default 'pending'
 ) returns table (
   id            uuid,
   type          text,
@@ -26,18 +26,18 @@ declare
   v_expected text;
 begin
   select value into v_expected from app_secrets where key = 'admin_rpc_secret';
-  if v_expected is null or secret is null or secret <> v_expected then
+  if v_expected is null or p_secret is null or p_secret <> v_expected then
     raise exception 'unauthorized';
   end if;
 
-  if status_filter not in ('pending', 'approved', 'rejected') then
-    raise exception 'invalid status filter: %', status_filter;
+  if p_status_filter not in ('pending', 'approved', 'rejected') then
+    raise exception 'invalid status filter: %', p_status_filter;
   end if;
 
   return query
     select s.id, s.type, s.payload, s.status, s.created_at, s.reviewed_at, s.reviewer_note
     from submissions s
-    where s.status = status_filter
+    where s.status = p_status_filter
     order by s.created_at desc
     limit 200;
 end;

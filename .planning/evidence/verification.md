@@ -120,8 +120,11 @@ SMOKE PASS
 
 `submissions` was INSERT-only under RLS with no read RPC, so the admin queue
 had no way to list it. Added `0010_admin_list_rpc.sql`:
-`admin_list_submissions(secret text, status_filter text default 'pending')`,
-SECURITY DEFINER, same app_secrets gate as 0007, newest first, LIMIT 200,
+`admin_list_submissions(p_secret text, p_status_filter text default 'pending')`
+(params renamed in place per Conductor ruling to match the `p_` convention
+from 0007 and u4-admin's committed named-arg caller; 0010 had never been
+applied anywhere), SECURITY DEFINER, same app_secrets gate as 0007, newest
+first, LIMIT 200,
 returning id/type/payload/status/created_at/reviewed_at/reviewer_note only
 (source_ip_hash and honeypot_tripped withheld: data minimization).
 
@@ -136,6 +139,13 @@ apply clean, then functionally:
 | `'rejected'` filter | 1 row with reviewer_note |
 | return type | `TABLE(id, type, payload, status, created_at, reviewed_at, reviewer_note)` — no ip hash / honeypot |
 | as role `anon` | callable; secret remains the gate |
+
+Post-rename re-verification (fresh container, all 10 migrations OK):
+`pg_get_function_identity_arguments` → `p_secret text, p_status_filter text`;
+as role `anon`, NAMED-argument calls (`p_secret =>`, `p_status_filter =>`,
+the shape u4-admin's caller uses) return correct counts for default,
+explicit-pending, and rejected filters; wrong secret via named args →
+`ERROR: unauthorized`.
 
 ## Assumptions / notes for the Conductor
 
