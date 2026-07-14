@@ -82,7 +82,6 @@
       "exposure": "Exposición al sol"
     }
   },
-<<<<<<< HEAD
   "admin": {
     "brand": "StreetLens Admin",
     "nav": {
@@ -151,7 +150,8 @@
       "pending": "Pendiente",
       "approved": "Aprobada",
       "rejected": "Rechazada"
-=======
+    }
+  },
   "contribute": {
     "fab": "Contribuir",
     "fabClose": "Cerrar el menú de contribución",
@@ -267,7 +267,6 @@
       "rateLimited": "Enviaste varios envíos muy rápido. Esperá un momento e intentá de nuevo.",
       "invalid": "Revisá los campos señalados e intentá de nuevo.",
       "network": "No se pudo contactar al servidor. Revisá tu conexión e intentá de nuevo."
->>>>>>> unit/u3-contribution
     }
   }
 }

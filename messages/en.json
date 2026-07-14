@@ -150,6 +150,8 @@
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected"
+    }
+  },
   "contribute": {
     "fab": "Contribute",
     "fabClose": "Close contribution menu",
