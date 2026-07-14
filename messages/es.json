@@ -81,5 +81,122 @@
       "awning": "Toldos y cobertura",
       "exposure": "Exposición al sol"
     }
+  },
+  "contribute": {
+    "fab": "Contribuir",
+    "fabClose": "Cerrar el menú de contribución",
+    "choose": {
+      "title": "Ayudá a mapear Escazú",
+      "subtitle": "Agregá una calle que falte o señalá una corrección en una que ya mapeamos. Una persona revisa cada envío antes de que algo cambie.",
+      "addSegment": "Agregar una calle faltante",
+      "addSegmentHint": "Trazá la acera en el mapa",
+      "proposeUpdate": "Proponer una corrección",
+      "proposeUpdateHint": "Elegí un segmento mapeado y contanos qué está mal",
+      "cancel": "Cancelar"
+    },
+    "trace": {
+      "title": "Trazá la calle",
+      "hint": "Hacé clic para colocar puntos a lo largo de la acera. Doble clic, o tocá Finalizar, al llegar al final.",
+      "points": "{count, plural, =0 {Aún sin puntos} one {# punto} other {# puntos}}",
+      "undo": "Deshacer punto",
+      "clear": "Empezar de nuevo",
+      "finish": "Finalizar",
+      "needMore": "Agregá al menos dos puntos para continuar.",
+      "cancel": "Cancelar"
+    },
+    "select": {
+      "title": "Elegí un segmento",
+      "hint": "Hacé clic en cualquier calle mapeada para proponerle una corrección.",
+      "cancel": "Cancelar"
+    },
+    "form": {
+      "addTitle": "Datos de la nueva calle",
+      "updateTitle": "Proponer una corrección",
+      "editingSegment": "Editando",
+      "nameLabel": "Nombre de la calle",
+      "namePlaceholder": "ej. Calle del Roble",
+      "highwayLabel": "Tipo de vía",
+      "highwayPlaceholder": "Seleccioná un tipo",
+      "conditionsTitle": "Estado de la acera",
+      "conditionsHint": "Respondé lo que puedas. Omití lo que no sepas con certeza.",
+      "noteLabel": "¿Algo más?",
+      "noteOptional": "opcional",
+      "notePlaceholder": "Una nota breve para quien revise.",
+      "reasonLabel": "¿Qué debería cambiar?",
+      "reasonPlaceholder": "Contale a quien revise qué está mal o desactualizado.",
+      "contactLabel": "Contacto",
+      "contactOptional": "opcional",
+      "contactPlaceholder": "Correo, solo si querés una respuesta",
+      "contactHint": "Nunca se publica. Se usa únicamente para dar seguimiento a tu envío.",
+      "photoLabel": "Foto",
+      "photoSoon": "La carga de fotos llega con el piloto de campo. Por ahora, describila en tu nota.",
+      "pathPoints": "{count, plural, one {Trazado · # punto} other {Trazado · # puntos}}",
+      "redraw": "Volver a trazar",
+      "submit": "Enviar para revisión",
+      "submitting": "Enviando…",
+      "back": "Atrás",
+      "cancel": "Cancelar",
+      "honestNote": "Los envíos quedan como propuestas pendientes. Nada en el mapa público cambia hasta que una persona lo apruebe."
+    },
+    "conditions": {
+      "surface": {
+        "label": "Superficie para caminar",
+        "options": {
+          "good": "Lisa y transitable",
+          "fair": "Con grietas o desniveles",
+          "poor": "Rota o bloqueada",
+          "none": "Sin acera del todo"
+        }
+      },
+      "accessibility": {
+        "label": "Accesibilidad",
+        "options": {
+          "good": "Rampas, pareja, sin gradas",
+          "partial": "Parcialmente accesible",
+          "poor": "No apta para silla de ruedas",
+          "unsure": "No estoy seguro"
+        }
+      },
+      "drainage": {
+        "label": "Drenaje",
+        "options": {
+          "good": "Drena bien",
+          "fair": "A veces se encharca",
+          "poor": "Se inunda seguido",
+          "unsure": "No estoy seguro"
+        }
+      },
+      "shade": {
+        "label": "Sombra",
+        "options": {
+          "good": "Bastante sombra",
+          "fair": "Algo de sombra",
+          "poor": "Poca o ninguna sombra",
+          "unsure": "No estoy seguro"
+        }
+      }
+    },
+    "highways": {
+      "residential": "Calle residencial",
+      "tertiary": "Vía terciaria",
+      "secondary": "Vía secundaria",
+      "unclassified": "Vía sin clasificar",
+      "footway": "Acera / peatonal",
+      "path": "Sendero",
+      "living_street": "Calle de convivencia"
+    },
+    "compiledNoteHeading": "Reporte de estado",
+    "success": {
+      "title": "Enviado para revisión",
+      "body": "Gracias. Tu propuesta queda pendiente de revisión: una persona la revisará antes de que algo cambie en el mapa.",
+      "addAnother": "Contribuir de nuevo",
+      "close": "Listo"
+    },
+    "errors": {
+      "generic": "Algo salió mal. Intentá de nuevo.",
+      "rateLimited": "Enviaste varios envíos muy rápido. Esperá un momento e intentá de nuevo.",
+      "invalid": "Revisá los campos señalados e intentá de nuevo.",
+      "network": "No se pudo contactar al servidor. Revisá tu conexión e intentá de nuevo."
+    }
   }
 }

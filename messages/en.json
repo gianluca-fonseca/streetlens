@@ -81,5 +81,122 @@
       "awning": "Awnings and cover",
       "exposure": "Sun exposure"
     }
+  },
+  "contribute": {
+    "fab": "Contribute",
+    "fabClose": "Close contribution menu",
+    "choose": {
+      "title": "Help map Escazú",
+      "subtitle": "Add a street we missed, or flag a correction on one we mapped. A reviewer checks every submission before anything changes.",
+      "addSegment": "Add a missing street",
+      "addSegmentHint": "Trace the sidewalk on the map",
+      "proposeUpdate": "Propose a correction",
+      "proposeUpdateHint": "Pick a mapped segment and tell us what's off",
+      "cancel": "Cancel"
+    },
+    "trace": {
+      "title": "Trace the street",
+      "hint": "Click to drop points along the sidewalk. Double-click, or press Finish, when you reach the end.",
+      "points": "{count, plural, =0 {No points yet} one {# point} other {# points}}",
+      "undo": "Undo point",
+      "clear": "Start over",
+      "finish": "Finish",
+      "needMore": "Add at least two points to continue.",
+      "cancel": "Cancel"
+    },
+    "select": {
+      "title": "Pick a segment",
+      "hint": "Click any mapped street to propose a correction to it.",
+      "cancel": "Cancel"
+    },
+    "form": {
+      "addTitle": "New street details",
+      "updateTitle": "Propose a correction",
+      "editingSegment": "Editing",
+      "nameLabel": "Street name",
+      "namePlaceholder": "e.g. Calle del Roble",
+      "highwayLabel": "Street type",
+      "highwayPlaceholder": "Select a type",
+      "conditionsTitle": "Sidewalk condition",
+      "conditionsHint": "Answer what you can. Skip anything you're unsure about.",
+      "noteLabel": "Anything else?",
+      "noteOptional": "optional",
+      "notePlaceholder": "A short note for the reviewer.",
+      "reasonLabel": "What should change?",
+      "reasonPlaceholder": "Tell the reviewer what's wrong or out of date.",
+      "contactLabel": "Contact",
+      "contactOptional": "optional",
+      "contactPlaceholder": "Email, only if you'd like a reply",
+      "contactHint": "Never published. Used only to follow up on your submission.",
+      "photoLabel": "Photo",
+      "photoSoon": "Photo upload arrives with the field pilot. For now, describe it in your note.",
+      "pathPoints": "{count, plural, one {Path traced · # point} other {Path traced · # points}}",
+      "redraw": "Re-draw path",
+      "submit": "Submit for review",
+      "submitting": "Submitting…",
+      "back": "Back",
+      "cancel": "Cancel",
+      "honestNote": "Submissions land as pending proposals. Nothing on the public map changes until a reviewer approves it."
+    },
+    "conditions": {
+      "surface": {
+        "label": "Walking surface",
+        "options": {
+          "good": "Smooth and walkable",
+          "fair": "Some cracks or bumps",
+          "poor": "Broken or blocked",
+          "none": "No sidewalk at all"
+        }
+      },
+      "accessibility": {
+        "label": "Accessibility",
+        "options": {
+          "good": "Ramps, even, step-free",
+          "partial": "Partly accessible",
+          "poor": "Not wheelchair-friendly",
+          "unsure": "Not sure"
+        }
+      },
+      "drainage": {
+        "label": "Drainage",
+        "options": {
+          "good": "Drains well",
+          "fair": "Puddles sometimes",
+          "poor": "Floods often",
+          "unsure": "Not sure"
+        }
+      },
+      "shade": {
+        "label": "Shade",
+        "options": {
+          "good": "Plenty of shade",
+          "fair": "Some shade",
+          "poor": "Little or no shade",
+          "unsure": "Not sure"
+        }
+      }
+    },
+    "highways": {
+      "residential": "Residential street",
+      "tertiary": "Tertiary road",
+      "secondary": "Secondary road",
+      "unclassified": "Unclassified road",
+      "footway": "Footway / sidewalk",
+      "path": "Path",
+      "living_street": "Living street"
+    },
+    "compiledNoteHeading": "Condition report",
+    "success": {
+      "title": "Submitted for review",
+      "body": "Thank you. Your proposal is pending review — a reviewer will check it before anything on the map changes.",
+      "addAnother": "Contribute another",
+      "close": "Done"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "rateLimited": "You've sent a few submissions quickly. Please wait a moment and try again.",
+      "invalid": "Please check the highlighted fields and try again.",
+      "network": "Couldn't reach the server. Check your connection and try again."
+    }
   }
 }
