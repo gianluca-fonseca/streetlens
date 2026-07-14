@@ -46,3 +46,5 @@ next-env.d.ts
 /data/pending-submissions.local.json
 /data/submission-reviews.local.json
 /data/approved-submissions.local.json
+  # Local anonymous-submission queue (DB fallback; never committed)
+data/pending-submissions.local.json
