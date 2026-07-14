@@ -20,6 +20,9 @@ supabase/
     0005_submissions.sql  anonymous contribution queue
     0006_rls.sql          row-level security
     0007_admin_rpcs.sql   app_secrets + admin RPCs (no service role)
+    0008_views.sql        v_segment_scores read model for the map
+    0009_views_district_audited_at.sql  view fixup: district + audited_at
+    0010_admin_list_rpc.sql  admin_list_submissions (queue read path)
   seed.sql                rubric v0.1 + demo geography/segments/audits (generated)
 ```
 
@@ -50,8 +53,13 @@ policies, so it is unreadable except from inside the definer functions):
 - `admin_review_submission(p_submission_id uuid, p_action text, p_reason text, p_secret text)`
   — approves/rejects a pending submission; returns the updated row.
 - `admin_stats(p_secret text)` — returns aggregate counts as JSON.
+- `admin_list_submissions(secret text, status_filter text default 'pending')`
+  — lists the submissions queue (id, type, payload, status, created_at,
+  reviewed_at, reviewer_note), filtered by status, newest first, max 200 rows.
+  `source_ip_hash` and `honeypot_tripped` are deliberately not returned
+  (data minimization; they are abuse-forensics fields, not review-UI fields).
 
-Both raise `unauthorized` unless `p_secret` matches `app_secrets.admin_rpc_secret`.
+All raise `unauthorized` unless the secret matches `app_secrets.admin_rpc_secret`.
 The admin client holds only the anon key plus the secret; the **secret, not the
 role, is the gate**.
 
