@@ -81,5 +81,75 @@
       "awning": "Awnings and cover",
       "exposure": "Sun exposure"
     }
+  },
+  "admin": {
+    "brand": "StreetLens Admin",
+    "nav": {
+      "dashboard": "Overview",
+      "queue": "Verification queue",
+      "logout": "Log out",
+      "publicMap": "Public map"
+    },
+    "login": {
+      "title": "Admin access",
+      "subtitle": "Enter the shared admin password to review contributions.",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Admin password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "errorInvalid": "Incorrect password.",
+      "errorRateLimited": "Too many attempts. Try again in {seconds}s.",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "dashboard": {
+      "title": "Overview",
+      "subtitle": "Live figures from the current dataset.",
+      "segments": "Segments audited",
+      "km": "Corridor km",
+      "coverage": "Pilot coverage",
+      "hero": "Fail Ley 7600",
+      "pending": "Pending review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "queueLink": "Open the verification queue",
+      "districtHeading": "By district",
+      "colDistrict": "District",
+      "colSegments": "Segments",
+      "colAvg": "Avg. overall",
+      "demoNote": "Demo dataset over real OSM geometry. No figure is a real measurement until field collection begins."
+    },
+    "queue": {
+      "title": "Verification queue",
+      "subtitleZero": "No submissions awaiting review.",
+      "subtitleOne": "{count} submission awaiting review.",
+      "subtitleMany": "{count} submissions awaiting review.",
+      "empty": "The queue is clear. New contributions will appear here.",
+      "typeAdd": "New segment",
+      "typeUpdate": "Edit",
+      "submittedAt": "Submitted",
+      "previewLabel": "Geometry preview",
+      "fieldName": "Name",
+      "fieldHighway": "Road type",
+      "fieldNote": "Note",
+      "fieldReason": "Contributor reason",
+      "diffHeading": "Proposed changes",
+      "current": "Current",
+      "proposed": "Proposed",
+      "unset": "—",
+      "unchanged": "unchanged",
+      "approve": "Approve",
+      "reject": "Reject",
+      "reasonLabel": "Review reason",
+      "reasonPlaceholder": "Why are you approving or rejecting this?",
+      "reasonRequired": "A reason is required.",
+      "working": "Saving…",
+      "errorGeneric": "Could not save the review. Please try again.",
+      "localNote": "No database configured. Reviews are staged locally for a post-database apply step."
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
   }
 }
