@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Lock, LoaderCircle } from "lucide-react";
@@ -9,8 +9,19 @@ import { Lock, LoaderCircle } from "lucide-react";
  * Admin login. Posts the shared password to `/api/admin/login`; on success the
  * server sets an httpOnly session cookie and we navigate to the requested admin
  * page (validated to stay within `/[locale]/admin` to avoid open redirects).
+ *
+ * The form reads `useSearchParams()` (the post-login redirect target), so it is
+ * wrapped in a Suspense boundary to satisfy the CSR-bailout prerender rule.
  */
 export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const t = useTranslations("admin.login");
   const locale = useLocale();
   const router = useRouter();
