@@ -41,4 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .planning/evidence/dev-server.log
-.vercel
+
+# admin runtime submission data (u3 queue + local review overlay/staging)
+/data/pending-submissions.local.json
+/data/submission-reviews.local.json
+/data/approved-submissions.local.json

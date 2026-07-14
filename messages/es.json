@@ -81,5 +81,75 @@
       "awning": "Toldos y cobertura",
       "exposure": "Exposición al sol"
     }
+  },
+  "admin": {
+    "brand": "StreetLens Admin",
+    "nav": {
+      "dashboard": "Resumen",
+      "queue": "Cola de verificación",
+      "logout": "Cerrar sesión",
+      "publicMap": "Mapa público"
+    },
+    "login": {
+      "title": "Acceso de administración",
+      "subtitle": "Ingrese la contraseña compartida de administración para revisar las contribuciones.",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Contraseña de administración",
+      "submit": "Ingresar",
+      "submitting": "Ingresando…",
+      "errorInvalid": "Contraseña incorrecta.",
+      "errorRateLimited": "Demasiados intentos. Vuelva a intentarlo en {seconds}s.",
+      "errorGeneric": "Algo salió mal. Inténtelo de nuevo."
+    },
+    "dashboard": {
+      "title": "Resumen",
+      "subtitle": "Cifras en vivo del conjunto de datos actual.",
+      "segments": "Segmentos auditados",
+      "km": "Km del corredor",
+      "coverage": "Cobertura del piloto",
+      "hero": "Incumplen la Ley 7600",
+      "pending": "Pendientes de revisión",
+      "approved": "Aprobadas",
+      "rejected": "Rechazadas",
+      "queueLink": "Abrir la cola de verificación",
+      "districtHeading": "Por distrito",
+      "colDistrict": "Distrito",
+      "colSegments": "Segmentos",
+      "colAvg": "Promedio general",
+      "demoNote": "Conjunto de datos de demostración sobre geometría real de OSM. Ninguna cifra es una medición real hasta que inicie la recolección de campo."
+    },
+    "queue": {
+      "title": "Cola de verificación",
+      "subtitleZero": "No hay contribuciones pendientes de revisión.",
+      "subtitleOne": "{count} contribución pendiente de revisión.",
+      "subtitleMany": "{count} contribuciones pendientes de revisión.",
+      "empty": "La cola está vacía. Las nuevas contribuciones aparecerán aquí.",
+      "typeAdd": "Segmento nuevo",
+      "typeUpdate": "Edición",
+      "submittedAt": "Enviada",
+      "previewLabel": "Vista previa de la geometría",
+      "fieldName": "Nombre",
+      "fieldHighway": "Tipo de vía",
+      "fieldNote": "Nota",
+      "fieldReason": "Motivo del contribuyente",
+      "diffHeading": "Cambios propuestos",
+      "current": "Actual",
+      "proposed": "Propuesto",
+      "unset": "—",
+      "unchanged": "sin cambios",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "reasonLabel": "Motivo de la revisión",
+      "reasonPlaceholder": "¿Por qué aprueba o rechaza esta contribución?",
+      "reasonRequired": "Se requiere un motivo.",
+      "working": "Guardando…",
+      "errorGeneric": "No se pudo guardar la revisión. Inténtelo de nuevo.",
+      "localNote": "Sin base de datos configurada. Las revisiones se guardan localmente para aplicarlas tras la puesta en marcha de la base de datos."
+    },
+    "status": {
+      "pending": "Pendiente",
+      "approved": "Aprobada",
+      "rejected": "Rechazada"
+    }
   }
 }

@@ -1,0 +1,55 @@
+{
+  "_comment": "SAMPLE demo fixtures for the admin verification queue. NOT real contributions. Used only when no Supabase and no local pending-submissions.local.json (u3 runtime output) are present. Every name/note is prefixed 'SAMPLE —' on purpose.",
+  "submissions": [
+    {
+      "id": "sample-0001",
+      "type": "add_segment",
+      "status": "pending",
+      "created_at": "2026-07-13T15:42:00.000Z",
+      "contact": null,
+      "payload": {
+        "name": "SAMPLE — Calle sin nombre (propuesta)",
+        "highway": "residential",
+        "coordinates": [
+          [-84.1412, 9.9128],
+          [-84.1405, 9.9134],
+          [-84.1398, 9.9139]
+        ],
+        "note": "SAMPLE — Tramo residencial faltante cerca del parque. Contribución de demostración."
+      }
+    },
+    {
+      "id": "sample-0002",
+      "type": "add_segment",
+      "status": "pending",
+      "created_at": "2026-07-13T18:07:00.000Z",
+      "contact": null,
+      "payload": {
+        "name": "SAMPLE — Sendero peatonal propuesto",
+        "highway": "footway",
+        "coordinates": [
+          [-84.1445, 9.9161],
+          [-84.1439, 9.9166],
+          [-84.1436, 9.9172],
+          [-84.143, 9.9177]
+        ],
+        "note": "SAMPLE — Conector peatonal informal. Contribución de demostración."
+      }
+    },
+    {
+      "id": "sample-0003",
+      "type": "update_segment",
+      "status": "pending",
+      "created_at": "2026-07-14T09:21:00.000Z",
+      "contact": null,
+      "payload": {
+        "segment_id": "esc-sa-0001",
+        "patch": {
+          "name": "SAMPLE — Calle 130 (nombre corregido)",
+          "highway": "tertiary"
+        },
+        "reason": "SAMPLE — El tipo de vía y el nombre no coinciden con la señalización actual."
+      }
+    }
+  ]
+}
