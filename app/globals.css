@@ -1,26 +1,148 @@
 @import "tailwindcss";
 
+/*
+ * StreetLens design tokens — sealed from docs/design-direction.md (v1, 2026-07-14).
+ * Warm eco-urbanist civic instrument. Soft-depth (dual warm-tinted shadow),
+ * non-uniform radius (4/8/12), colorblind-safe data, no glassmorphism.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces (light: warm bone) */
+  --surface-base: #f4f1ea;
+  --surface-elevated: #fbfaf6;
+  --surface-sunken: #eceadf;
+
+  /* Ink + neutral ramp */
+  --ink: #1c2321;
+  --neutral-strong: #6b7069;
+  --neutral: #9aa097;
+  --neutral-soft: #d8d6cc;
+
+  /* Brand */
+  --pine: #1f5c4a;
+  --pine-strong: #164034;
+  --terracotta: #e07a3f;
+
+  /* Borders / rings (non-shadow affordance, >=3:1) */
+  --border: #d8d6cc;
+  --border-strong: #b9b6a9;
+  --ring: #1f5c4a;
+
+  /* Soft-depth shadows: dual warm-tinted (ambient + tight directional), never pure black. */
+  --shadow-panel:
+    0 1px 2px rgba(58, 52, 40, 0.10),
+    0 8px 24px -6px rgba(58, 52, 40, 0.16);
+  --shadow-popover:
+    0 2px 6px rgba(58, 52, 40, 0.14),
+    0 18px 42px -10px rgba(58, 52, 40, 0.26);
+
+  /* Radius system (intentional, non-uniform) */
+  --radius-chip: 4px;
+  --radius-panel: 8px;
+  --radius-primary: 12px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface-base);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-neutral-strong: var(--neutral-strong);
+  --color-neutral: var(--neutral);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-pine: var(--pine);
+  --color-pine-strong: var(--pine-strong);
+  --color-terracotta: var(--terracotta);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-background: var(--surface-base);
+  --color-foreground: var(--ink);
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-chip: var(--radius-chip);
+  --radius-panel: var(--radius-panel);
+  --radius-primary: var(--radius-primary);
+
+  --shadow-panel: var(--shadow-panel);
+  --shadow-popover: var(--shadow-popover);
 }
 
+/* Dark mode: near-black warm base. Data glow (dark only) lives on the map layer, not chrome. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --surface-base: #14140f;
+    --surface-elevated: #1e1e17;
+    --surface-sunken: #0f0f0b;
+
+    --ink: #ecebe0;
+    --neutral-strong: #a9ac9f;
+    --neutral: #7d8175;
+    --neutral-soft: #35352b;
+
+    --pine: #3f9c7f;
+    --pine-strong: #2c7a62;
+    --terracotta: #ef8f56;
+
+    --border: #35352b;
+    --border-strong: #4c4c3e;
+    --ring: #3f9c7f;
+
+    --shadow-panel:
+      0 1px 2px rgba(0, 0, 0, 0.44),
+      0 8px 24px -6px rgba(0, 0, 0, 0.56);
+    --shadow-popover:
+      0 2px 6px rgba(0, 0, 0, 0.5),
+      0 18px 42px -10px rgba(0, 0, 0, 0.66);
   }
 }
 
+* {
+  border-color: var(--border);
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+}
+
+body {
+  background: var(--surface-base);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  /* Subtle warm paper grain on the bone base (no aurora/mesh). */
+  background-image: radial-gradient(
+    rgba(28, 35, 33, 0.018) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 3px 3px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* MapLibre popup/control overrides so nothing ships looking default. */
+.maplibregl-ctrl-group {
+  background: var(--surface-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-panel) !important;
+  box-shadow: var(--shadow-panel) !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border) !important;
+}
+.maplibregl-ctrl button .maplibregl-ctrl-icon {
+  filter: none;
+}
+.maplibregl-ctrl-attrib {
+  background: rgba(251, 250, 246, 0.78) !important;
+  color: var(--neutral-strong) !important;
+  border-radius: var(--radius-chip) 0 0 0 !important;
+}
+@media (prefers-color-scheme: dark) {
+  .maplibregl-ctrl-attrib {
+    background: rgba(30, 30, 23, 0.78) !important;
+  }
 }
