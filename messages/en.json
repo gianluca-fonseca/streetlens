@@ -188,7 +188,7 @@
     "compiledNoteHeading": "Condition report",
     "success": {
       "title": "Submitted for review",
-      "body": "Thank you. Your proposal is pending review — a reviewer will check it before anything on the map changes.",
+      "body": "Thank you. Your proposal is pending review. A reviewer will check it before anything on the map changes.",
       "addAnother": "Contribute another",
       "close": "Done"
     },

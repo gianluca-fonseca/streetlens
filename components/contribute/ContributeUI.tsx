@@ -181,7 +181,11 @@ function Fab({ onOpen }: Readonly<{ onOpen: () => void }>) {
   const t = useTranslations("contribute");
   return (
     <SlideUp>
-      <button type="button" onClick={onOpen} className={PRIMARY_BTN}>
+      <button
+        type="button"
+        onClick={onOpen}
+        className={`pointer-events-auto ${PRIMARY_BTN}`}
+      >
         <Plus size={16} strokeWidth={1.75} aria-hidden="true" />
         {t("fab")}
       </button>
@@ -759,6 +763,13 @@ export default function ContributeUI({
   const { mode, submitState } = contribute;
 
   const showInstruction = mode === "trace" || mode === "select";
+  // Tall forms dock on the right (clear of the top-left stats panel); the small
+  // FAB / menu / toolbar / confirmation stay bottom-left (a free, quiet corner
+  // that never covers MapLibre's bottom-right attribution).
+  const rightDock = mode === "add" || mode === "update";
+  const dockClass = rightDock
+    ? "inset-x-0 bottom-0 justify-center p-3 sm:inset-x-auto sm:right-4 sm:top-[4.75rem] sm:bottom-4 sm:items-start sm:justify-end sm:p-0"
+    : "inset-x-0 bottom-0 justify-center p-3 sm:inset-x-auto sm:left-4 sm:bottom-4 sm:justify-start sm:p-0";
 
   return (
     <>
@@ -771,7 +782,7 @@ export default function ContributeUI({
         />
       ) : null}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-3 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:justify-end sm:p-0">
+      <div className={`pointer-events-none absolute z-20 flex ${dockClass}`}>
         {submitState === "success" ? (
           <SuccessCard
             onAddAnother={() => {
