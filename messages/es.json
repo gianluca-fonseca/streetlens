@@ -3,8 +3,18 @@
     "title": "StreetLens",
     "description": "Auditorías abiertas de calles para Costa Rica. Mapeamos la calidad, accesibilidad, drenaje y sombra de las aceras de Escazú, segmento por segmento."
   },
+  "demoBanner": {
+    "message": "Datos de demostración: el piloto de campo inicia en agosto de 2026"
+  },
   "home": {
     "title": "StreetLens",
-    "tagline": "Auditorías abiertas de calles para Costa Rica"
+    "tagline": "Auditorías abiertas de calles para Costa Rica",
+    "subtext": "Mapeamos la calidad, accesibilidad, drenaje y sombra de las aceras de Escazú, segmento por segmento.",
+    "stat": {
+      "value": "61",
+      "unit": "/100",
+      "label": "Puntaje promedio de aceras, corredor piloto de San Antonio",
+      "demoNote": "Cifra de demostración. No es una medición real."
+    }
   }
 }
