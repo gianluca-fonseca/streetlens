@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Switch this repo's commit identity back to the machine's global identity (Filippo).
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+git config user.name "$(git config --global user.name)"
+git config user.email "$(git config --global user.email)"
+echo "This repo now commits as: $(git config user.name) <$(git config user.email)>"
