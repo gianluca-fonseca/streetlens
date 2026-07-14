@@ -31,6 +31,7 @@ const DEMO_AUDITS_PATH = path.join(ROOT, "data", "demo-audits.json");
 const SEED_PATH = path.join(ROOT, "supabase", "seed.sql");
 
 const RUBRIC_VERSION_ID = "v0.1";
+const DISTRICT_NAME = "San Antonio";
 const AUDIT_DATE = "2026-07-10";
 const AUDITOR = "demo-generator";
 const SEED = 0x51_7e_ec_a5;
@@ -235,10 +236,12 @@ async function main() {
       properties: {
         id: props.id,
         name: props.name,
+        district: DISTRICT_NAME,
         score_overall: scores.overall,
         score_accessibility: scores.accessibility,
         score_drainage: scores.drainage,
         score_shade: scores.shade,
+        audited_at: AUDIT_DATE,
         demo: true,
       },
       geometry: feature.geometry,

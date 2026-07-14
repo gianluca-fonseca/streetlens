@@ -21,7 +21,7 @@
     "demo": true,
     "note": "Synthetic demo scores over real OSM geometry. Not real measurements.",
     "rubric_version_id": "v0.1",
-    "scored_at": "2026-07-14T20:19:03.287Z"
+    "scored_at": "2026-07-14T20:32:40.209Z"
   },
   "features": [
     {
@@ -29,10 +29,12 @@
       "properties": {
         "id": "esc-sa-0001",
         "name": "Calle 130",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -58,10 +60,12 @@
       "properties": {
         "id": "esc-sa-0002",
         "name": "Calle 130",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -87,10 +91,12 @@
       "properties": {
         "id": "esc-sa-0003",
         "name": "Calle 140",
+        "district": "San Antonio",
         "score_overall": 79,
         "score_accessibility": 69,
         "score_drainage": 86,
         "score_shade": 86,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -116,10 +122,12 @@
       "properties": {
         "id": "esc-sa-0004",
         "name": "Calle 140",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 68,
         "score_drainage": 85,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -145,10 +153,12 @@
       "properties": {
         "id": "esc-sa-0005",
         "name": "Calle 140",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 65,
         "score_drainage": 84,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -174,10 +184,12 @@
       "properties": {
         "id": "esc-sa-0006",
         "name": "Calle 140",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 62,
         "score_drainage": 84,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -199,10 +211,12 @@
       "properties": {
         "id": "esc-sa-0007",
         "name": "Avenida 26",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 75,
         "score_drainage": 78,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -224,10 +238,12 @@
       "properties": {
         "id": "esc-sa-0008",
         "name": "Avenida 28",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 74,
         "score_drainage": 79,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -253,10 +269,12 @@
       "properties": {
         "id": "esc-sa-0009",
         "name": "Avenida 28",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 79,
         "score_drainage": 75,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -286,10 +304,12 @@
       "properties": {
         "id": "esc-sa-0010",
         "name": "Avenida 28",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 80,
         "score_drainage": 74,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -315,10 +335,12 @@
       "properties": {
         "id": "esc-sa-0011",
         "name": "Avenida 28",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 80,
         "score_drainage": 73,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -340,10 +362,12 @@
       "properties": {
         "id": "esc-sa-0012",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -369,10 +393,12 @@
       "properties": {
         "id": "esc-sa-0013",
         "name": "Avenida 38",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -398,10 +424,12 @@
       "properties": {
         "id": "esc-sa-0014",
         "name": "Avenida 38",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 75,
         "score_drainage": 64,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -427,10 +455,12 @@
       "properties": {
         "id": "esc-sa-0015",
         "name": "Avenida 38",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 68,
         "score_drainage": 53,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -452,10 +482,12 @@
       "properties": {
         "id": "esc-sa-0016",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -477,10 +509,12 @@
       "properties": {
         "id": "esc-sa-0017",
         "name": "Calle 128",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 71,
         "score_drainage": 72,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -514,10 +548,12 @@
       "properties": {
         "id": "esc-sa-0018",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 49,
         "score_drainage": 81,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -555,10 +591,12 @@
       "properties": {
         "id": "esc-sa-0019",
         "name": "Calle Chiquero",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 50,
         "score_drainage": 82,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -596,10 +634,12 @@
       "properties": {
         "id": "esc-sa-0020",
         "name": "Calle Chiquero",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 48,
         "score_drainage": 82,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -629,10 +669,12 @@
       "properties": {
         "id": "esc-sa-0021",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 59,
         "score_drainage": 67,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -674,10 +716,12 @@
       "properties": {
         "id": "esc-sa-0022",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 58,
         "score_drainage": 60,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -727,10 +771,12 @@
       "properties": {
         "id": "esc-sa-0023",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 53,
         "score_drainage": 59,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -760,10 +806,12 @@
       "properties": {
         "id": "esc-sa-0024",
         "name": "Calle Maná",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 57,
         "score_drainage": 50,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -805,10 +853,12 @@
       "properties": {
         "id": "esc-sa-0025",
         "name": "Calle Maná",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 56,
         "score_drainage": 48,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -838,10 +888,12 @@
       "properties": {
         "id": "esc-sa-0026",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 60,
         "score_drainage": 51,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -891,10 +943,12 @@
       "properties": {
         "id": "esc-sa-0027",
         "name": "Avenida 42",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 71,
         "score_drainage": 60,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -920,10 +974,12 @@
       "properties": {
         "id": "esc-sa-0028",
         "name": "Calle Sabanillas",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 62,
         "score_drainage": 79,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -957,10 +1013,12 @@
       "properties": {
         "id": "esc-sa-0029",
         "name": "Calle Sabanillas",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 70,
         "score_drainage": 54,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -982,10 +1040,12 @@
       "properties": {
         "id": "esc-sa-0030",
         "name": "Calle Los Gatos",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 62,
         "score_drainage": 67,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1015,10 +1075,12 @@
       "properties": {
         "id": "esc-sa-0031",
         "name": "Calle Sabanillas",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 60,
         "score_drainage": 83,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1080,10 +1142,12 @@
       "properties": {
         "id": "esc-sa-0032",
         "name": "Calle Sabanillas",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 59,
         "score_drainage": 74,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1129,10 +1193,12 @@
       "properties": {
         "id": "esc-sa-0033",
         "name": "Calle Sabanillas",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 59,
         "score_drainage": 69,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1178,10 +1244,12 @@
       "properties": {
         "id": "esc-sa-0034",
         "name": "Calle Sabanillas",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 56,
         "score_drainage": 80,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1219,10 +1287,12 @@
       "properties": {
         "id": "esc-sa-0035",
         "name": "Calle Sabanillas",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 53,
         "score_drainage": 80,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1256,10 +1326,12 @@
       "properties": {
         "id": "esc-sa-0036",
         "name": "Calle Masilla Norte",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 55,
         "score_drainage": 70,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1289,10 +1361,12 @@
       "properties": {
         "id": "esc-sa-0037",
         "name": "Calle Masilla Norte",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 57,
         "score_drainage": 51,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1326,10 +1400,12 @@
       "properties": {
         "id": "esc-sa-0038",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 45,
         "score_drainage": 76,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1383,10 +1459,12 @@
       "properties": {
         "id": "esc-sa-0039",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 41,
         "score_drainage": 77,
         "score_shade": 46,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1440,10 +1518,12 @@
       "properties": {
         "id": "esc-sa-0040",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 49,
         "score_accessibility": 35,
         "score_drainage": 74,
         "score_shade": 43,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1525,10 +1605,12 @@
       "properties": {
         "id": "esc-sa-0041",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 48,
         "score_accessibility": 33,
         "score_drainage": 73,
         "score_shade": 44,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1606,10 +1688,12 @@
       "properties": {
         "id": "esc-sa-0042",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 35,
         "score_drainage": 75,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1659,10 +1743,12 @@
       "properties": {
         "id": "esc-sa-0043",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 41,
         "score_drainage": 77,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1712,10 +1798,12 @@
       "properties": {
         "id": "esc-sa-0044",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 47,
         "score_drainage": 79,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1761,10 +1849,12 @@
       "properties": {
         "id": "esc-sa-0045",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 78,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1806,10 +1896,12 @@
       "properties": {
         "id": "esc-sa-0046",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1863,10 +1955,12 @@
       "properties": {
         "id": "esc-sa-0047",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 83,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1896,10 +1990,12 @@
       "properties": {
         "id": "esc-sa-0048",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1937,10 +2033,12 @@
       "properties": {
         "id": "esc-sa-0049",
         "name": "Calle sin nombre 49",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -1966,10 +2064,12 @@
       "properties": {
         "id": "esc-sa-0050",
         "name": "Avenida 46",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 62,
         "score_drainage": 88,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2011,10 +2111,12 @@
       "properties": {
         "id": "esc-sa-0051",
         "name": "Avenida 42",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 71,
         "score_drainage": 72,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2036,10 +2138,12 @@
       "properties": {
         "id": "esc-sa-0052",
         "name": "Calle Mireya Guevara",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 57,
         "score_drainage": 64,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2089,10 +2193,12 @@
       "properties": {
         "id": "esc-sa-0053",
         "name": "Calle Mireya Guevara",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 63,
         "score_drainage": 88,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2138,10 +2244,12 @@
       "properties": {
         "id": "esc-sa-0054",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 59,
         "score_drainage": 78,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2203,10 +2311,12 @@
       "properties": {
         "id": "esc-sa-0055",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 59,
         "score_drainage": 83,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2256,10 +2366,12 @@
       "properties": {
         "id": "esc-sa-0056",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2305,10 +2417,12 @@
       "properties": {
         "id": "esc-sa-0057",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 48,
         "score_drainage": 84,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2342,10 +2456,12 @@
       "properties": {
         "id": "esc-sa-0058",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 54,
         "score_drainage": 87,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2395,10 +2511,12 @@
       "properties": {
         "id": "esc-sa-0059",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 58,
         "score_drainage": 88,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2444,10 +2562,12 @@
       "properties": {
         "id": "esc-sa-0060",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 59,
         "score_drainage": 88,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2521,10 +2641,12 @@
       "properties": {
         "id": "esc-sa-0061",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 58,
         "score_drainage": 85,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2550,10 +2672,12 @@
       "properties": {
         "id": "esc-sa-0062",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 47,
         "score_drainage": 89,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2599,10 +2723,12 @@
       "properties": {
         "id": "esc-sa-0063",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 48,
         "score_drainage": 89,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2656,10 +2782,12 @@
       "properties": {
         "id": "esc-sa-0064",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 47,
         "score_drainage": 90,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2689,10 +2817,12 @@
       "properties": {
         "id": "esc-sa-0065",
         "name": "Calle sin nombre 65",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 44,
         "score_drainage": 88,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2714,10 +2844,12 @@
       "properties": {
         "id": "esc-sa-0066",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 52,
         "score_drainage": 81,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2771,10 +2903,12 @@
       "properties": {
         "id": "esc-sa-0067",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2812,10 +2946,12 @@
       "properties": {
         "id": "esc-sa-0068",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 69,
         "score_drainage": 82,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2837,10 +2973,12 @@
       "properties": {
         "id": "esc-sa-0069",
         "name": "Avenida 36",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 74,
         "score_drainage": 67,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2866,10 +3004,12 @@
       "properties": {
         "id": "esc-sa-0070",
         "name": "Avenida 36",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 76,
         "score_drainage": 71,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2891,10 +3031,12 @@
       "properties": {
         "id": "esc-sa-0071",
         "name": "Avenida 44",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 68,
         "score_drainage": 80,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2932,10 +3074,12 @@
       "properties": {
         "id": "esc-sa-0072",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2961,10 +3105,12 @@
       "properties": {
         "id": "esc-sa-0073",
         "name": "Diagonal 24",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 70,
         "score_drainage": 81,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -2986,10 +3132,12 @@
       "properties": {
         "id": "esc-sa-0074",
         "name": "Diagonal 24",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 69,
         "score_drainage": 80,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3027,10 +3175,12 @@
       "properties": {
         "id": "esc-sa-0075",
         "name": "Diagonal 24",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 62,
         "score_drainage": 77,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3064,10 +3214,12 @@
       "properties": {
         "id": "esc-sa-0076",
         "name": "Diagonal 24",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 61,
         "score_drainage": 77,
         "score_shade": 46,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3105,10 +3257,12 @@
       "properties": {
         "id": "esc-sa-0077",
         "name": "Calle sin nombre 77",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 62,
         "score_drainage": 76,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3154,10 +3308,12 @@
       "properties": {
         "id": "esc-sa-0078",
         "name": "Calle sin nombre 78",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3199,10 +3355,12 @@
       "properties": {
         "id": "esc-sa-0079",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3244,10 +3402,12 @@
       "properties": {
         "id": "esc-sa-0080",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 64,
         "score_drainage": 73,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3297,10 +3457,12 @@
       "properties": {
         "id": "esc-sa-0081",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 64,
         "score_drainage": 73,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3354,10 +3516,12 @@
       "properties": {
         "id": "esc-sa-0082",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3411,10 +3575,12 @@
       "properties": {
         "id": "esc-sa-0083",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 64,
         "score_drainage": 76,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3472,10 +3638,12 @@
       "properties": {
         "id": "esc-sa-0084",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 64,
         "score_drainage": 76,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3549,10 +3717,12 @@
       "properties": {
         "id": "esc-sa-0085",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 64,
         "score_drainage": 76,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3594,10 +3764,12 @@
       "properties": {
         "id": "esc-sa-0086",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 67,
         "score_drainage": 80,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3643,10 +3815,12 @@
       "properties": {
         "id": "esc-sa-0087",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 68,
         "score_drainage": 80,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3696,10 +3870,12 @@
       "properties": {
         "id": "esc-sa-0088",
         "name": "Calle Acrópolis",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 69,
         "score_drainage": 84,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3733,10 +3909,12 @@
       "properties": {
         "id": "esc-sa-0089",
         "name": "Acceso 3",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 63,
         "score_drainage": 76,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3762,10 +3940,12 @@
       "properties": {
         "id": "esc-sa-0090",
         "name": "Calle 138A Los Castro",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 62,
         "score_drainage": 36,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3831,10 +4011,12 @@
       "properties": {
         "id": "esc-sa-0091",
         "name": "Diagonal 40",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 57,
         "score_drainage": 59,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3904,10 +4086,12 @@
       "properties": {
         "id": "esc-sa-0092",
         "name": "Calle Santa Eduviges",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 65,
         "score_drainage": 55,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3933,10 +4117,12 @@
       "properties": {
         "id": "esc-sa-0093",
         "name": "Calle 146",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 60,
         "score_drainage": 80,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3958,10 +4144,12 @@
       "properties": {
         "id": "esc-sa-0094",
         "name": "Avenida 38",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 73,
         "score_drainage": 73,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -3983,10 +4171,12 @@
       "properties": {
         "id": "esc-sa-0095",
         "name": "Calle Vista de Oro",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4012,10 +4202,12 @@
       "properties": {
         "id": "esc-sa-0096",
         "name": "Avenida 3",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 61,
         "score_drainage": 75,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4037,10 +4229,12 @@
       "properties": {
         "id": "esc-sa-0097",
         "name": "Calle Vista de Oro",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 60,
         "score_drainage": 75,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4106,10 +4300,12 @@
       "properties": {
         "id": "esc-sa-0098",
         "name": "Calle Vista de Oro",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 60,
         "score_drainage": 76,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4171,10 +4367,12 @@
       "properties": {
         "id": "esc-sa-0099",
         "name": "Avenida 4",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4196,10 +4394,12 @@
       "properties": {
         "id": "esc-sa-0100",
         "name": "Calle 152",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 69,
         "score_drainage": 76,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4265,10 +4465,12 @@
       "properties": {
         "id": "esc-sa-0101",
         "name": "Calle 152",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 70,
         "score_drainage": 79,
         "score_shade": 80,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4330,10 +4532,12 @@
       "properties": {
         "id": "esc-sa-0102",
         "name": "Calle 152",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 71,
         "score_drainage": 82,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4367,10 +4571,12 @@
       "properties": {
         "id": "esc-sa-0103",
         "name": "Calle Callejón",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 59,
         "score_drainage": 61,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4412,10 +4618,12 @@
       "properties": {
         "id": "esc-sa-0104",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 54,
         "score_drainage": 63,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4461,10 +4669,12 @@
       "properties": {
         "id": "esc-sa-0105",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 52,
         "score_drainage": 81,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4514,10 +4724,12 @@
       "properties": {
         "id": "esc-sa-0106",
         "name": "Avenida 60",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 49,
         "score_drainage": 81,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4543,10 +4755,12 @@
       "properties": {
         "id": "esc-sa-0107",
         "name": "Calle El Curio",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4588,10 +4802,12 @@
       "properties": {
         "id": "esc-sa-0108",
         "name": "Calle Lalo Leriano",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4641,10 +4857,12 @@
       "properties": {
         "id": "esc-sa-0109",
         "name": "Calle Lalo Leriano",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 81,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4674,10 +4892,12 @@
       "properties": {
         "id": "esc-sa-0110",
         "name": "Calle Masilla Sur",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 49,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4727,10 +4947,12 @@
       "properties": {
         "id": "esc-sa-0111",
         "name": "Calle Masilla Sur",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 44,
         "score_drainage": 79,
         "score_shade": 44,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4780,10 +5002,12 @@
       "properties": {
         "id": "esc-sa-0112",
         "name": "Calle del CTP",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 47,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4829,10 +5053,12 @@
       "properties": {
         "id": "esc-sa-0113",
         "name": "Calle Chiverral",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 41,
         "score_drainage": 84,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4882,10 +5108,12 @@
       "properties": {
         "id": "esc-sa-0114",
         "name": "Calle Chiverral",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4943,10 +5171,12 @@
       "properties": {
         "id": "esc-sa-0115",
         "name": "Calle Chiverral",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -4984,10 +5214,12 @@
       "properties": {
         "id": "esc-sa-0116",
         "name": "Calle El Alto",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 38,
         "score_drainage": 84,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5041,10 +5273,12 @@
       "properties": {
         "id": "esc-sa-0117",
         "name": "Calle El Alto",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 38,
         "score_drainage": 83,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5078,10 +5312,12 @@
       "properties": {
         "id": "esc-sa-0118",
         "name": "Calle El Carmen",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 39,
         "score_drainage": 85,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5135,10 +5371,12 @@
       "properties": {
         "id": "esc-sa-0119",
         "name": "Calle El Carmen",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 40,
         "score_drainage": 85,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5224,10 +5462,12 @@
       "properties": {
         "id": "esc-sa-0120",
         "name": "Calle Noé Marín",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 43,
         "score_drainage": 84,
         "score_shade": 47,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5253,10 +5493,12 @@
       "properties": {
         "id": "esc-sa-0121",
         "name": "Calle Noé Marín",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 49,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5290,10 +5532,12 @@
       "properties": {
         "id": "esc-sa-0122",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5343,10 +5587,12 @@
       "properties": {
         "id": "esc-sa-0123",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 45,
         "score_drainage": 75,
         "score_shade": 39,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5372,10 +5618,12 @@
       "properties": {
         "id": "esc-sa-0124",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 47,
         "score_drainage": 77,
         "score_shade": 45,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5405,10 +5653,12 @@
       "properties": {
         "id": "esc-sa-0125",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 42,
         "score_drainage": 81,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5434,10 +5684,12 @@
       "properties": {
         "id": "esc-sa-0126",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 52,
         "score_accessibility": 35,
         "score_drainage": 82,
         "score_shade": 45,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5503,10 +5755,12 @@
       "properties": {
         "id": "esc-sa-0127",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 34,
         "score_drainage": 82,
         "score_shade": 47,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5568,10 +5822,12 @@
       "properties": {
         "id": "esc-sa-0128",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 33,
         "score_drainage": 81,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5597,10 +5853,12 @@
       "properties": {
         "id": "esc-sa-0129",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 35,
         "score_drainage": 80,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5662,10 +5920,12 @@
       "properties": {
         "id": "esc-sa-0130",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 39,
         "score_drainage": 78,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5711,10 +5971,12 @@
       "properties": {
         "id": "esc-sa-0131",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 43,
         "score_drainage": 75,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5752,10 +6014,12 @@
       "properties": {
         "id": "esc-sa-0132",
         "name": "Calle La Nuez",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 57,
         "score_drainage": 73,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5785,10 +6049,12 @@
       "properties": {
         "id": "esc-sa-0133",
         "name": "Calle La Nuez",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 54,
         "score_drainage": 85,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5826,10 +6092,12 @@
       "properties": {
         "id": "esc-sa-0134",
         "name": "Calle Principal",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 58,
         "score_drainage": 85,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5867,10 +6135,12 @@
       "properties": {
         "id": "esc-sa-0135",
         "name": "Calle Boyero",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 61,
         "score_drainage": 88,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5932,10 +6202,12 @@
       "properties": {
         "id": "esc-sa-0136",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 49,
         "score_drainage": 79,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -5977,10 +6249,12 @@
       "properties": {
         "id": "esc-sa-0137",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 51,
         "score_drainage": 81,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6018,10 +6292,12 @@
       "properties": {
         "id": "esc-sa-0138",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 48,
         "score_drainage": 80,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6099,10 +6375,12 @@
       "properties": {
         "id": "esc-sa-0139",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 33,
         "score_drainage": 78,
         "score_shade": 60,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6124,10 +6402,12 @@
       "properties": {
         "id": "esc-sa-0140",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 32,
         "score_drainage": 78,
         "score_shade": 60,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6185,10 +6465,12 @@
       "properties": {
         "id": "esc-sa-0141",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 34,
         "score_drainage": 78,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6230,10 +6512,12 @@
       "properties": {
         "id": "esc-sa-0142",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 40,
         "score_drainage": 79,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6267,10 +6551,12 @@
       "properties": {
         "id": "esc-sa-0143",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6296,10 +6582,12 @@
       "properties": {
         "id": "esc-sa-0144",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 46,
         "score_drainage": 81,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6333,10 +6621,12 @@
       "properties": {
         "id": "esc-sa-0145",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6378,10 +6668,12 @@
       "properties": {
         "id": "esc-sa-0146",
         "name": "Calle La Catalina",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 47,
         "score_drainage": 80,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6407,10 +6699,12 @@
       "properties": {
         "id": "esc-sa-0147",
         "name": "Calle León Cortés",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 81,
         "score_drainage": 76,
         "score_shade": 60,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6452,10 +6746,12 @@
       "properties": {
         "id": "esc-sa-0148",
         "name": "Calle León",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 81,
         "score_drainage": 75,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6481,10 +6777,12 @@
       "properties": {
         "id": "esc-sa-0149",
         "name": "Calle León",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 80,
         "score_drainage": 76,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6522,10 +6820,12 @@
       "properties": {
         "id": "esc-sa-0150",
         "name": "Calle León",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 81,
         "score_drainage": 75,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6547,10 +6847,12 @@
       "properties": {
         "id": "esc-sa-0151",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 78,
         "score_drainage": 72,
         "score_shade": 49,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6592,10 +6894,12 @@
       "properties": {
         "id": "esc-sa-0152",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 75,
         "score_drainage": 73,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6625,10 +6929,12 @@
       "properties": {
         "id": "esc-sa-0153",
         "name": "Avenida 28",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 69,
         "score_drainage": 83,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6666,10 +6972,12 @@
       "properties": {
         "id": "esc-sa-0154",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6691,10 +6999,12 @@
       "properties": {
         "id": "esc-sa-0155",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 62,
         "score_drainage": 85,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6724,10 +7034,12 @@
       "properties": {
         "id": "esc-sa-0156",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 63,
         "score_drainage": 84,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6797,10 +7109,12 @@
       "properties": {
         "id": "esc-sa-0157",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 75,
         "score_drainage": 78,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6826,10 +7140,12 @@
       "properties": {
         "id": "esc-sa-0158",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6867,10 +7183,12 @@
       "properties": {
         "id": "esc-sa-0159",
         "name": "Avenida 44",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 68,
         "score_drainage": 79,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6908,10 +7226,12 @@
       "properties": {
         "id": "esc-sa-0160",
         "name": "Avenida 44",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 66,
         "score_drainage": 79,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6941,10 +7261,12 @@
       "properties": {
         "id": "esc-sa-0161",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 48,
         "score_drainage": 81,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6974,10 +7296,12 @@
       "properties": {
         "id": "esc-sa-0162",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 49,
         "score_drainage": 80,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -6999,10 +7323,12 @@
       "properties": {
         "id": "esc-sa-0163",
         "name": "Avenida 42",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 70,
         "score_drainage": 74,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7032,10 +7358,12 @@
       "properties": {
         "id": "esc-sa-0164",
         "name": "Avenida 42",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 70,
         "score_drainage": 76,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7061,10 +7389,12 @@
       "properties": {
         "id": "esc-sa-0165",
         "name": "Avenida 40",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 60,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7090,10 +7420,12 @@
       "properties": {
         "id": "esc-sa-0166",
         "name": "Avenida 40",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 73,
         "score_drainage": 74,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7123,10 +7455,12 @@
       "properties": {
         "id": "esc-sa-0167",
         "name": "Calle Avellana",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 67,
         "score_drainage": 83,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7172,10 +7506,12 @@
       "properties": {
         "id": "esc-sa-0168",
         "name": "Calle Avellana",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 63,
         "score_drainage": 88,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7205,10 +7541,12 @@
       "properties": {
         "id": "esc-sa-0169",
         "name": "Calle Avellana",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 62,
         "score_drainage": 89,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7234,10 +7572,12 @@
       "properties": {
         "id": "esc-sa-0170",
         "name": "Calle Avellana",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 50,
         "score_drainage": 84,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7267,10 +7607,12 @@
       "properties": {
         "id": "esc-sa-0171",
         "name": "Calle Avellana",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 47,
         "score_drainage": 83,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7296,10 +7638,12 @@
       "properties": {
         "id": "esc-sa-0172",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 49,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7333,10 +7677,12 @@
       "properties": {
         "id": "esc-sa-0173",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 46,
         "score_drainage": 80,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7366,10 +7712,12 @@
       "properties": {
         "id": "esc-sa-0174",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 46,
         "score_drainage": 81,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7403,10 +7751,12 @@
       "properties": {
         "id": "esc-sa-0175",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 45,
         "score_drainage": 82,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7444,10 +7794,12 @@
       "properties": {
         "id": "esc-sa-0176",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 40,
         "score_drainage": 85,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7489,10 +7841,12 @@
       "properties": {
         "id": "esc-sa-0177",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 36,
         "score_drainage": 87,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7526,10 +7880,12 @@
       "properties": {
         "id": "esc-sa-0178",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 34,
         "score_drainage": 89,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7575,10 +7931,12 @@
       "properties": {
         "id": "esc-sa-0179",
         "name": "Calle Lajas",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 36,
         "score_drainage": 85,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7620,10 +7978,12 @@
       "properties": {
         "id": "esc-sa-0180",
         "name": "Calle Los Gatos",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 61,
         "score_drainage": 81,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7645,10 +8005,12 @@
       "properties": {
         "id": "esc-sa-0181",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 83,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7674,10 +8036,12 @@
       "properties": {
         "id": "esc-sa-0182",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 77,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7699,10 +8063,12 @@
       "properties": {
         "id": "esc-sa-0183",
         "name": "Calle Naranjo",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 48,
         "score_drainage": 39,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7748,10 +8114,12 @@
       "properties": {
         "id": "esc-sa-0184",
         "name": "Calle Naranjo",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 48,
         "score_drainage": 50,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7781,10 +8149,12 @@
       "properties": {
         "id": "esc-sa-0185",
         "name": "Calle sin nombre 185",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 53,
         "score_drainage": 82,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7834,10 +8204,12 @@
       "properties": {
         "id": "esc-sa-0186",
         "name": "Calle sin nombre 186",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 48,
         "score_drainage": 81,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7883,10 +8255,12 @@
       "properties": {
         "id": "esc-sa-0187",
         "name": "Calle sin nombre 187",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 55,
         "score_drainage": 79,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7940,10 +8314,12 @@
       "properties": {
         "id": "esc-sa-0188",
         "name": "Calle sin nombre 188",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 57,
         "score_drainage": 77,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -7997,10 +8373,12 @@
       "properties": {
         "id": "esc-sa-0189",
         "name": "Calle sin nombre 189",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 56,
         "score_drainage": 75,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8054,10 +8432,12 @@
       "properties": {
         "id": "esc-sa-0190",
         "name": "Calle sin nombre 190",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 52,
         "score_drainage": 76,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8103,10 +8483,12 @@
       "properties": {
         "id": "esc-sa-0191",
         "name": "Calle Dos Cercas",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 41,
         "score_drainage": 75,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8128,10 +8510,12 @@
       "properties": {
         "id": "esc-sa-0192",
         "name": "Calle Dos Cercas",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 40,
         "score_drainage": 75,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8169,10 +8553,12 @@
       "properties": {
         "id": "esc-sa-0193",
         "name": "Calle Dos Cercas",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 41,
         "score_drainage": 74,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8198,10 +8584,12 @@
       "properties": {
         "id": "esc-sa-0194",
         "name": "Calle Monte Abajo",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 58,
         "score_drainage": 75,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8239,10 +8627,12 @@
       "properties": {
         "id": "esc-sa-0195",
         "name": "Calle Monte Abajo",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 60,
         "score_drainage": 76,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8284,10 +8674,12 @@
       "properties": {
         "id": "esc-sa-0196",
         "name": "Calle Monte Abajo",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 61,
         "score_drainage": 76,
         "score_shade": 80,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8329,10 +8721,12 @@
       "properties": {
         "id": "esc-sa-0197",
         "name": "Calle Monte Abajo",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8394,10 +8788,12 @@
       "properties": {
         "id": "esc-sa-0198",
         "name": "Calle Monte Abajo",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 62,
         "score_drainage": 76,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8447,10 +8843,12 @@
       "properties": {
         "id": "esc-sa-0199",
         "name": "Calle Monte Abajo",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 58,
         "score_drainage": 73,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8488,10 +8886,12 @@
       "properties": {
         "id": "esc-sa-0200",
         "name": "Calle sin nombre 200",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 70,
         "score_drainage": 84,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8545,10 +8945,12 @@
       "properties": {
         "id": "esc-sa-0201",
         "name": "Calle sin nombre 201",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 68,
         "score_drainage": 82,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8578,10 +8980,12 @@
       "properties": {
         "id": "esc-sa-0202",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 76,
         "score_drainage": 84,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8615,10 +9019,12 @@
       "properties": {
         "id": "esc-sa-0203",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 74,
         "score_drainage": 85,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8656,10 +9062,12 @@
       "properties": {
         "id": "esc-sa-0204",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 76,
         "score_drainage": 81,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8713,10 +9121,12 @@
       "properties": {
         "id": "esc-sa-0205",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 76,
         "score_drainage": 73,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8754,10 +9164,12 @@
       "properties": {
         "id": "esc-sa-0206",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 75,
         "score_drainage": 72,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8795,10 +9207,12 @@
       "properties": {
         "id": "esc-sa-0207",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 75,
         "score_drainage": 76,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8828,10 +9242,12 @@
       "properties": {
         "id": "esc-sa-0208",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 74,
         "score_drainage": 80,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8889,10 +9305,12 @@
       "properties": {
         "id": "esc-sa-0209",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 72,
         "score_drainage": 80,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8942,10 +9360,12 @@
       "properties": {
         "id": "esc-sa-0210",
         "name": "Calle 178",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 67,
         "score_drainage": 81,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -8987,10 +9407,12 @@
       "properties": {
         "id": "esc-sa-0211",
         "name": "Calle sin nombre 211",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 57,
         "score_drainage": 76,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9016,10 +9438,12 @@
       "properties": {
         "id": "esc-sa-0212",
         "name": "Calle Marín",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 57,
         "score_drainage": 75,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9061,10 +9485,12 @@
       "properties": {
         "id": "esc-sa-0213",
         "name": "Calle sin nombre 213",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 82,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9130,10 +9556,12 @@
       "properties": {
         "id": "esc-sa-0214",
         "name": "Calle sin nombre 214",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 47,
         "score_drainage": 80,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9187,10 +9615,12 @@
       "properties": {
         "id": "esc-sa-0215",
         "name": "Avenida El Rey",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 64,
         "score_drainage": 81,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9216,10 +9646,12 @@
       "properties": {
         "id": "esc-sa-0216",
         "name": "Calle El Rey",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 64,
         "score_drainage": 81,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9277,10 +9709,12 @@
       "properties": {
         "id": "esc-sa-0217",
         "name": "Calle 150B",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 68,
         "score_drainage": 78,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9330,10 +9764,12 @@
       "properties": {
         "id": "esc-sa-0218",
         "name": "Calle La Paz",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 44,
         "score_drainage": 78,
         "score_shade": 42,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9359,10 +9795,12 @@
       "properties": {
         "id": "esc-sa-0219",
         "name": "Calle de la Bruja",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 46,
         "score_drainage": 80,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9396,10 +9834,12 @@
       "properties": {
         "id": "esc-sa-0220",
         "name": "Calle Samuel Piano",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 43,
         "score_drainage": 80,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9433,10 +9873,12 @@
       "properties": {
         "id": "esc-sa-0221",
         "name": "Calle Lajitas",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 48,
         "score_drainage": 81,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9494,10 +9936,12 @@
       "properties": {
         "id": "esc-sa-0222",
         "name": "Avenida 40",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9519,10 +9963,12 @@
       "properties": {
         "id": "esc-sa-0223",
         "name": "Avenida 40",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 73,
         "score_drainage": 59,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9548,10 +9994,12 @@
       "properties": {
         "id": "esc-sa-0224",
         "name": "Avenida 26",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 79,
         "score_drainage": 76,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9597,10 +10045,12 @@
       "properties": {
         "id": "esc-sa-0225",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 76,
         "score_drainage": 72,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9626,10 +10076,12 @@
       "properties": {
         "id": "esc-sa-0226",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9655,10 +10107,12 @@
       "properties": {
         "id": "esc-sa-0227",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9688,10 +10142,12 @@
       "properties": {
         "id": "esc-sa-0228",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 72,
         "score_drainage": 77,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9713,10 +10169,12 @@
       "properties": {
         "id": "esc-sa-0229",
         "name": "Avenida 36",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 74,
         "score_drainage": 73,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9750,10 +10208,12 @@
       "properties": {
         "id": "esc-sa-0230",
         "name": "Avenida 36",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9787,10 +10247,12 @@
       "properties": {
         "id": "esc-sa-0231",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 64,
         "score_drainage": 86,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9816,10 +10278,12 @@
       "properties": {
         "id": "esc-sa-0232",
         "name": "Calle 134",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9849,10 +10313,12 @@
       "properties": {
         "id": "esc-sa-0233",
         "name": "Calle 134",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 75,
         "score_drainage": 64,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9878,10 +10344,12 @@
       "properties": {
         "id": "esc-sa-0234",
         "name": "Calle 134",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 71,
         "score_drainage": 60,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9903,10 +10371,12 @@
       "properties": {
         "id": "esc-sa-0235",
         "name": "Calle 136",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 69,
         "score_drainage": 49,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9928,10 +10398,12 @@
       "properties": {
         "id": "esc-sa-0236",
         "name": "Calle 128",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 80,
         "score_drainage": 75,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9961,10 +10433,12 @@
       "properties": {
         "id": "esc-sa-0237",
         "name": "Calle 128",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -9990,10 +10464,12 @@
       "properties": {
         "id": "esc-sa-0238",
         "name": "Calle 128",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10015,10 +10491,12 @@
       "properties": {
         "id": "esc-sa-0239",
         "name": "Calle 132",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 75,
         "score_drainage": 71,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10044,10 +10522,12 @@
       "properties": {
         "id": "esc-sa-0240",
         "name": "Calle 132",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 71,
         "score_drainage": 72,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10069,10 +10549,12 @@
       "properties": {
         "id": "esc-sa-0241",
         "name": "Calle 132",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 80,
         "score_drainage": 74,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10098,10 +10580,12 @@
       "properties": {
         "id": "esc-sa-0242",
         "name": "Calle 132",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10123,10 +10607,12 @@
       "properties": {
         "id": "esc-sa-0243",
         "name": "Avenida 36",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10148,10 +10634,12 @@
       "properties": {
         "id": "esc-sa-0244",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 68,
         "score_drainage": 80,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10173,10 +10661,12 @@
       "properties": {
         "id": "esc-sa-0245",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 78,
         "score_drainage": 74,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10214,10 +10704,12 @@
       "properties": {
         "id": "esc-sa-0246",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 75,
         "score_drainage": 74,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10255,10 +10747,12 @@
       "properties": {
         "id": "esc-sa-0247",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 73,
         "score_drainage": 75,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10308,10 +10802,12 @@
       "properties": {
         "id": "esc-sa-0248",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 74,
         "score_drainage": 76,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10345,10 +10841,12 @@
       "properties": {
         "id": "esc-sa-0249",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 71,
         "score_drainage": 78,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10394,10 +10892,12 @@
       "properties": {
         "id": "esc-sa-0250",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 64,
         "score_drainage": 84,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10439,10 +10939,12 @@
       "properties": {
         "id": "esc-sa-0251",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 61,
         "score_drainage": 88,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10472,10 +10974,12 @@
       "properties": {
         "id": "esc-sa-0252",
         "name": "Avenida 40",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 69,
         "score_drainage": 45,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10501,10 +11005,12 @@
       "properties": {
         "id": "esc-sa-0253",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 69,
         "score_drainage": 75,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10534,10 +11040,12 @@
       "properties": {
         "id": "esc-sa-0254",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 73,
         "score_drainage": 78,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10563,10 +11071,12 @@
       "properties": {
         "id": "esc-sa-0255",
         "name": "Calle 140",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 62,
         "score_drainage": 73,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10624,10 +11134,12 @@
       "properties": {
         "id": "esc-sa-0256",
         "name": "Calle 140",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 59,
         "score_drainage": 58,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10677,10 +11189,12 @@
       "properties": {
         "id": "esc-sa-0257",
         "name": "Calle 124",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 74,
         "score_drainage": 72,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10702,10 +11216,12 @@
       "properties": {
         "id": "esc-sa-0258",
         "name": "Calle San Miguel",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 81,
         "score_drainage": 77,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10767,10 +11283,12 @@
       "properties": {
         "id": "esc-sa-0259",
         "name": "Avenida 48",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 64,
         "score_drainage": 79,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10840,10 +11358,12 @@
       "properties": {
         "id": "esc-sa-0260",
         "name": "Avenida 48",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 45,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -10925,10 +11445,12 @@
       "properties": {
         "id": "esc-sa-0261",
         "name": "Avenida 48",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 42,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11018,10 +11540,12 @@
       "properties": {
         "id": "esc-sa-0262",
         "name": "Avenida 48",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 66,
         "score_drainage": 79,
         "score_shade": 48,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11051,10 +11575,12 @@
       "properties": {
         "id": "esc-sa-0263",
         "name": "Avenida 38",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 60,
         "score_drainage": 81,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11092,10 +11618,12 @@
       "properties": {
         "id": "esc-sa-0264",
         "name": "Avenida 38",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11121,10 +11649,12 @@
       "properties": {
         "id": "esc-sa-0265",
         "name": "Calle 144",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 63,
         "score_drainage": 83,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11154,10 +11684,12 @@
       "properties": {
         "id": "esc-sa-0266",
         "name": "Condominio Los Pórticos de Escazú",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 66,
         "score_drainage": 41,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11183,10 +11715,12 @@
       "properties": {
         "id": "esc-sa-0267",
         "name": "Diagonal 34A",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11228,10 +11762,12 @@
       "properties": {
         "id": "esc-sa-0268",
         "name": "Diagonal 34A",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 61,
         "score_drainage": 86,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11265,10 +11801,12 @@
       "properties": {
         "id": "esc-sa-0269",
         "name": "Diagonal 34A",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11302,10 +11840,12 @@
       "properties": {
         "id": "esc-sa-0270",
         "name": "Diagonal 34A",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 63,
         "score_drainage": 82,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11347,10 +11887,12 @@
       "properties": {
         "id": "esc-sa-0271",
         "name": "Calle 170",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 61,
         "score_drainage": 86,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11396,10 +11938,12 @@
       "properties": {
         "id": "esc-sa-0272",
         "name": "Calle 170",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 62,
         "score_drainage": 83,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11449,10 +11993,12 @@
       "properties": {
         "id": "esc-sa-0273",
         "name": "Calle sin nombre 273",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 69,
         "score_drainage": 85,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11506,10 +12052,12 @@
       "properties": {
         "id": "esc-sa-0274",
         "name": "Calle sin nombre 274",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 68,
         "score_drainage": 81,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11567,10 +12115,12 @@
       "properties": {
         "id": "esc-sa-0275",
         "name": "Calle sin nombre 275",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 67,
         "score_drainage": 74,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11604,10 +12154,12 @@
       "properties": {
         "id": "esc-sa-0276",
         "name": "Calle Monte Oeste",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11653,10 +12205,12 @@
       "properties": {
         "id": "esc-sa-0277",
         "name": "Calle Las Labranzas",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 50,
         "score_drainage": 81,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11682,10 +12236,12 @@
       "properties": {
         "id": "esc-sa-0278",
         "name": "Calle sin nombre 278",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11715,10 +12271,12 @@
       "properties": {
         "id": "esc-sa-0279",
         "name": "Alameda 1",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 67,
         "score_drainage": 62,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11740,10 +12298,12 @@
       "properties": {
         "id": "esc-sa-0280",
         "name": "Transversal 150A",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 70,
         "score_drainage": 80,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11805,10 +12365,12 @@
       "properties": {
         "id": "esc-sa-0281",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 69,
         "score_drainage": 78,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11874,10 +12436,12 @@
       "properties": {
         "id": "esc-sa-0282",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 67,
         "score_drainage": 77,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11939,10 +12503,12 @@
       "properties": {
         "id": "esc-sa-0283",
         "name": "Avenida 36",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 60,
         "score_drainage": 80,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -11968,10 +12534,12 @@
       "properties": {
         "id": "esc-sa-0284",
         "name": "Transversal 158",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 60,
         "score_drainage": 76,
         "score_shade": 46,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12013,10 +12581,12 @@
       "properties": {
         "id": "esc-sa-0285",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 62,
         "score_drainage": 83,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12042,10 +12612,12 @@
       "properties": {
         "id": "esc-sa-0286",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 59,
         "score_drainage": 69,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12087,10 +12659,12 @@
       "properties": {
         "id": "esc-sa-0287",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 58,
         "score_drainage": 41,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12136,10 +12710,12 @@
       "properties": {
         "id": "esc-sa-0288",
         "name": "Calle El Bosque",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 62,
         "score_drainage": 84,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12173,10 +12749,12 @@
       "properties": {
         "id": "esc-sa-0289",
         "name": "Calle El Bosque",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 64,
         "score_drainage": 86,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12214,10 +12792,12 @@
       "properties": {
         "id": "esc-sa-0290",
         "name": "Calle La Pajarera",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 59,
         "score_drainage": 79,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12259,10 +12839,12 @@
       "properties": {
         "id": "esc-sa-0291",
         "name": "Avenida 38A",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 61,
         "score_drainage": 51,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12308,10 +12890,12 @@
       "properties": {
         "id": "esc-sa-0292",
         "name": "Calle 138",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 67,
         "score_drainage": 45,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12353,10 +12937,12 @@
       "properties": {
         "id": "esc-sa-0293",
         "name": "Calle 150",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 63,
         "score_drainage": 81,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12390,10 +12976,12 @@
       "properties": {
         "id": "esc-sa-0294",
         "name": "Calle 150",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12431,10 +13019,12 @@
       "properties": {
         "id": "esc-sa-0295",
         "name": "Calle 150",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 58,
         "score_drainage": 81,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12464,10 +13054,12 @@
       "properties": {
         "id": "esc-sa-0296",
         "name": "Calle 150",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 60,
         "score_drainage": 79,
         "score_shade": 80,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12509,10 +13101,12 @@
       "properties": {
         "id": "esc-sa-0297",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12538,10 +13132,12 @@
       "properties": {
         "id": "esc-sa-0298",
         "name": "Calle sin nombre 298",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12563,10 +13159,12 @@
       "properties": {
         "id": "esc-sa-0299",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 47,
         "score_drainage": 76,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12596,10 +13194,12 @@
       "properties": {
         "id": "esc-sa-0300",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 41,
         "score_drainage": 75,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12633,10 +13233,12 @@
       "properties": {
         "id": "esc-sa-0301",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 34,
         "score_drainage": 79,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12678,10 +13280,12 @@
       "properties": {
         "id": "esc-sa-0302",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 36,
         "score_drainage": 75,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12711,10 +13315,12 @@
       "properties": {
         "id": "esc-sa-0303",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 38,
         "score_drainage": 72,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12744,10 +13350,12 @@
       "properties": {
         "id": "esc-sa-0304",
         "name": "Calle Los Muta",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 45,
         "score_drainage": 79,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12801,10 +13409,12 @@
       "properties": {
         "id": "esc-sa-0305",
         "name": "Calle Los Muta",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 46,
         "score_drainage": 71,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12830,10 +13440,12 @@
       "properties": {
         "id": "esc-sa-0306",
         "name": "Calle Vuelta Los Montoya",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 32,
         "score_drainage": 79,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12903,10 +13515,12 @@
       "properties": {
         "id": "esc-sa-0307",
         "name": "Calle Vuelta Los Montoya",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 35,
         "score_drainage": 80,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12940,10 +13554,12 @@
       "properties": {
         "id": "esc-sa-0308",
         "name": "Calle Vuelta Los Montoya",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 38,
         "score_drainage": 78,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -12981,10 +13597,12 @@
       "properties": {
         "id": "esc-sa-0309",
         "name": "Calle Los Amigos",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 44,
         "score_drainage": 61,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13010,10 +13628,12 @@
       "properties": {
         "id": "esc-sa-0310",
         "name": "Calle Los Amigos",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 46,
         "score_drainage": 50,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13039,10 +13659,12 @@
       "properties": {
         "id": "esc-sa-0311",
         "name": "Calle Isabel Agüero",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 46,
         "score_drainage": 61,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13080,10 +13702,12 @@
       "properties": {
         "id": "esc-sa-0312",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 50,
         "score_drainage": 80,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13121,10 +13745,12 @@
       "properties": {
         "id": "esc-sa-0313",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 50,
         "score_drainage": 80,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13174,10 +13800,12 @@
       "properties": {
         "id": "esc-sa-0314",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 48,
         "score_drainage": 74,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13211,10 +13839,12 @@
       "properties": {
         "id": "esc-sa-0315",
         "name": "Calle sin nombre 315",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 46,
         "score_drainage": 70,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13268,10 +13898,12 @@
       "properties": {
         "id": "esc-sa-0316",
         "name": "Calle sin nombre 316",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 48,
         "score_drainage": 74,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13305,10 +13937,12 @@
       "properties": {
         "id": "esc-sa-0317",
         "name": "Calle Masilla Este",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 54,
         "score_drainage": 67,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13330,10 +13964,12 @@
       "properties": {
         "id": "esc-sa-0318",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 47,
         "score_drainage": 71,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13363,10 +13999,12 @@
       "properties": {
         "id": "esc-sa-0319",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 49,
         "score_drainage": 45,
         "score_shade": 82,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13408,10 +14046,12 @@
       "properties": {
         "id": "esc-sa-0320",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 47,
         "score_drainage": 51,
         "score_shade": 80,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13465,10 +14105,12 @@
       "properties": {
         "id": "esc-sa-0321",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 47,
         "score_drainage": 41,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13522,10 +14164,12 @@
       "properties": {
         "id": "esc-sa-0322",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 47,
         "score_drainage": 50,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13563,10 +14207,12 @@
       "properties": {
         "id": "esc-sa-0323",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 47,
         "score_drainage": 67,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13616,10 +14262,12 @@
       "properties": {
         "id": "esc-sa-0324",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 46,
         "score_drainage": 75,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13677,10 +14325,12 @@
       "properties": {
         "id": "esc-sa-0325",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 43,
         "score_drainage": 73,
         "score_shade": 47,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13726,10 +14376,12 @@
       "properties": {
         "id": "esc-sa-0326",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 40,
         "score_drainage": 84,
         "score_shade": 39,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13787,10 +14439,12 @@
       "properties": {
         "id": "esc-sa-0327",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 40,
         "score_drainage": 85,
         "score_shade": 41,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13828,10 +14482,12 @@
       "properties": {
         "id": "esc-sa-0328",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 45,
         "score_drainage": 88,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13909,10 +14565,12 @@
       "properties": {
         "id": "esc-sa-0329",
         "name": "Calle Paso Hondo",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 50,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13946,10 +14604,12 @@
       "properties": {
         "id": "esc-sa-0330",
         "name": "Calle Marín",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 54,
         "score_drainage": 81,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -13983,10 +14643,12 @@
       "properties": {
         "id": "esc-sa-0331",
         "name": "Calle sin nombre 331",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 45,
         "score_drainage": 82,
         "score_shade": 48,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14028,10 +14690,12 @@
       "properties": {
         "id": "esc-sa-0332",
         "name": "Calle sin nombre 332",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14053,10 +14717,12 @@
       "properties": {
         "id": "esc-sa-0333",
         "name": "Calle sin nombre 333",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 47,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14082,10 +14748,12 @@
       "properties": {
         "id": "esc-sa-0334",
         "name": "Calle Primera",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 62,
         "score_drainage": 82,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14151,10 +14819,12 @@
       "properties": {
         "id": "esc-sa-0335",
         "name": "Calle Primera",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 60,
         "score_drainage": 69,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14184,10 +14854,12 @@
       "properties": {
         "id": "esc-sa-0336",
         "name": "Calle Segunda",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 59,
         "score_drainage": 66,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14233,10 +14905,12 @@
       "properties": {
         "id": "esc-sa-0337",
         "name": "Avenida Segunda",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 60,
         "score_drainage": 71,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14258,10 +14932,12 @@
       "properties": {
         "id": "esc-sa-0338",
         "name": "Calle 134",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 79,
         "score_drainage": 75,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14287,10 +14963,12 @@
       "properties": {
         "id": "esc-sa-0339",
         "name": "Calle 128",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 80,
         "score_drainage": 73,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14312,10 +14990,12 @@
       "properties": {
         "id": "esc-sa-0340",
         "name": "Calle 144",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 70,
         "score_drainage": 87,
         "score_shade": 84,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14341,10 +15021,12 @@
       "properties": {
         "id": "esc-sa-0341",
         "name": "Calle 144",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 69,
         "score_drainage": 86,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14390,10 +15072,12 @@
       "properties": {
         "id": "esc-sa-0342",
         "name": "Calle 144",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 68,
         "score_drainage": 84,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14423,10 +15107,12 @@
       "properties": {
         "id": "esc-sa-0343",
         "name": "Calle sin nombre 343",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 61,
         "score_drainage": 89,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14460,10 +15146,12 @@
       "properties": {
         "id": "esc-sa-0344",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 62,
         "score_drainage": 81,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14489,10 +15177,12 @@
       "properties": {
         "id": "esc-sa-0345",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14542,10 +15232,12 @@
       "properties": {
         "id": "esc-sa-0346",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 64,
         "score_drainage": 75,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14587,10 +15279,12 @@
       "properties": {
         "id": "esc-sa-0347",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 65,
         "score_drainage": 73,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14620,10 +15314,12 @@
       "properties": {
         "id": "esc-sa-0348",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 66,
         "score_drainage": 74,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14681,10 +15377,12 @@
       "properties": {
         "id": "esc-sa-0349",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 66,
         "score_drainage": 78,
         "score_shade": 53,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14718,10 +15416,12 @@
       "properties": {
         "id": "esc-sa-0350",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 65,
         "score_drainage": 79,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14791,10 +15491,12 @@
       "properties": {
         "id": "esc-sa-0351",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14864,10 +15566,12 @@
       "properties": {
         "id": "esc-sa-0352",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14945,10 +15649,12 @@
       "properties": {
         "id": "esc-sa-0353",
         "name": "Calle 150",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 62,
         "score_drainage": 77,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -14986,10 +15692,12 @@
       "properties": {
         "id": "esc-sa-0354",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 60,
         "score_drainage": 82,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15023,10 +15731,12 @@
       "properties": {
         "id": "esc-sa-0355",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15048,10 +15758,12 @@
       "properties": {
         "id": "esc-sa-0356",
         "name": "Calle Carrizal",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 61,
         "score_drainage": 82,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15081,10 +15793,12 @@
       "properties": {
         "id": "esc-sa-0357",
         "name": "Calle 148B Los Castro",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 62,
         "score_drainage": 77,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15158,10 +15872,12 @@
       "properties": {
         "id": "esc-sa-0358",
         "name": "Calle 148B Los Castro",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 80,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15203,10 +15919,12 @@
       "properties": {
         "id": "esc-sa-0359",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 60,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15232,10 +15950,12 @@
       "properties": {
         "id": "esc-sa-0360",
         "name": "Calle 132",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 78,
         "score_drainage": 72,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15261,10 +15981,12 @@
       "properties": {
         "id": "esc-sa-0361",
         "name": "Calle sin nombre 361",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 74,
         "score_drainage": 81,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15314,10 +16036,12 @@
       "properties": {
         "id": "esc-sa-0362",
         "name": "Calle sin nombre 362",
+        "district": "San Antonio",
         "score_overall": 77,
         "score_accessibility": 75,
         "score_drainage": 80,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15351,10 +16075,12 @@
       "properties": {
         "id": "esc-sa-0363",
         "name": "Calle sin nombre 363",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 76,
         "score_drainage": 77,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15408,10 +16134,12 @@
       "properties": {
         "id": "esc-sa-0364",
         "name": "Calle sin nombre 364",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 76,
         "score_drainage": 77,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15473,10 +16201,12 @@
       "properties": {
         "id": "esc-sa-0365",
         "name": "Calle sin nombre 365",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 77,
         "score_drainage": 74,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15506,10 +16236,12 @@
       "properties": {
         "id": "esc-sa-0366",
         "name": "Sendero sin nombre 366",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 89,
         "score_drainage": 73,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15547,10 +16279,12 @@
       "properties": {
         "id": "esc-sa-0367",
         "name": "Sendero sin nombre 367",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 89,
         "score_drainage": 73,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15584,10 +16318,12 @@
       "properties": {
         "id": "esc-sa-0368",
         "name": "Sendero sin nombre 368",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 88,
         "score_drainage": 74,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15617,10 +16353,12 @@
       "properties": {
         "id": "esc-sa-0369",
         "name": "Sendero sin nombre 369",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 88,
         "score_drainage": 73,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15674,10 +16412,12 @@
       "properties": {
         "id": "esc-sa-0370",
         "name": "Sendero sin nombre 370",
+        "district": "San Antonio",
         "score_overall": 78,
         "score_accessibility": 88,
         "score_drainage": 73,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15715,10 +16455,12 @@
       "properties": {
         "id": "esc-sa-0371",
         "name": "Calle Macadamia",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 59,
         "score_drainage": 87,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15740,10 +16482,12 @@
       "properties": {
         "id": "esc-sa-0372",
         "name": "Avenida 32",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 78,
         "score_drainage": 74,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15765,10 +16509,12 @@
       "properties": {
         "id": "esc-sa-0373",
         "name": "Calle 142",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15806,10 +16552,12 @@
       "properties": {
         "id": "esc-sa-0374",
         "name": "Calle 136",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 76,
         "score_drainage": 77,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15839,10 +16587,12 @@
       "properties": {
         "id": "esc-sa-0375",
         "name": "Acceso 2",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 58,
         "score_drainage": 83,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15944,10 +16694,12 @@
       "properties": {
         "id": "esc-sa-0376",
         "name": "Acceso 3",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -15981,10 +16733,12 @@
       "properties": {
         "id": "esc-sa-0377",
         "name": "Acceso 1",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16010,10 +16764,12 @@
       "properties": {
         "id": "esc-sa-0378",
         "name": "Calle Roldán",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 57,
         "score_drainage": 76,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16067,10 +16823,12 @@
       "properties": {
         "id": "esc-sa-0379",
         "name": "Avenida 36",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 76,
         "score_drainage": 71,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16096,10 +16854,12 @@
       "properties": {
         "id": "esc-sa-0380",
         "name": "Calle 128",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16129,10 +16889,12 @@
       "properties": {
         "id": "esc-sa-0381",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16158,10 +16920,12 @@
       "properties": {
         "id": "esc-sa-0382",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 63,
         "score_drainage": 76,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16191,10 +16955,12 @@
       "properties": {
         "id": "esc-sa-0383",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 56,
         "score_drainage": 78,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16240,10 +17006,12 @@
       "properties": {
         "id": "esc-sa-0384",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 52,
         "score_drainage": 80,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16285,10 +17053,12 @@
       "properties": {
         "id": "esc-sa-0385",
         "name": "Calle Chirca",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 51,
         "score_drainage": 81,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16314,10 +17084,12 @@
       "properties": {
         "id": "esc-sa-0386",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 81,
         "score_drainage": 73,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16347,10 +17119,12 @@
       "properties": {
         "id": "esc-sa-0387",
         "name": "Calle 130",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16376,10 +17150,12 @@
       "properties": {
         "id": "esc-sa-0388",
         "name": "Calle 130",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 78,
         "score_drainage": 76,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16401,10 +17177,12 @@
       "properties": {
         "id": "esc-sa-0389",
         "name": "Avenida 40",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 73,
         "score_drainage": 71,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16426,10 +17204,12 @@
       "properties": {
         "id": "esc-sa-0390",
         "name": "Calle 136",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 71,
         "score_drainage": 48,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16459,10 +17239,12 @@
       "properties": {
         "id": "esc-sa-0391",
         "name": "Calle 136",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 74,
         "score_drainage": 67,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16488,10 +17270,12 @@
       "properties": {
         "id": "esc-sa-0392",
         "name": "Calle 136",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 79,
         "score_drainage": 74,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16529,10 +17313,12 @@
       "properties": {
         "id": "esc-sa-0393",
         "name": "Calle sin nombre 393",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 64,
         "score_drainage": 60,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16562,10 +17348,12 @@
       "properties": {
         "id": "esc-sa-0394",
         "name": "Diagonal 40",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 57,
         "score_drainage": 66,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16639,10 +17427,12 @@
       "properties": {
         "id": "esc-sa-0395",
         "name": "Diagonal 40",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 58,
         "score_drainage": 80,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16688,10 +17478,12 @@
       "properties": {
         "id": "esc-sa-0396",
         "name": "Diagonal 40",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 58,
         "score_drainage": 81,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16717,10 +17509,12 @@
       "properties": {
         "id": "esc-sa-0397",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 46,
         "score_drainage": 82,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16778,10 +17572,12 @@
       "properties": {
         "id": "esc-sa-0398",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 48,
         "score_drainage": 85,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16831,10 +17627,12 @@
       "properties": {
         "id": "esc-sa-0399",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 42,
         "score_drainage": 81,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16876,10 +17674,12 @@
       "properties": {
         "id": "esc-sa-0400",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 38,
         "score_drainage": 82,
         "score_shade": 49,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16929,10 +17729,12 @@
       "properties": {
         "id": "esc-sa-0401",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 38,
         "score_drainage": 83,
         "score_shade": 46,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -16978,10 +17780,12 @@
       "properties": {
         "id": "esc-sa-0402",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 41,
         "score_drainage": 85,
         "score_shade": 48,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17031,10 +17835,12 @@
       "properties": {
         "id": "esc-sa-0403",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 39,
         "score_drainage": 82,
         "score_shade": 57,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17104,10 +17910,12 @@
       "properties": {
         "id": "esc-sa-0404",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 40,
         "score_drainage": 84,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17173,10 +17981,12 @@
       "properties": {
         "id": "esc-sa-0405",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 40,
         "score_drainage": 81,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17238,10 +18048,12 @@
       "properties": {
         "id": "esc-sa-0406",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 40,
         "score_drainage": 81,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17291,10 +18103,12 @@
       "properties": {
         "id": "esc-sa-0407",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 44,
         "score_drainage": 82,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17352,10 +18166,12 @@
       "properties": {
         "id": "esc-sa-0408",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 53,
         "score_drainage": 83,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17393,10 +18209,12 @@
       "properties": {
         "id": "esc-sa-0409",
         "name": "Calle 35",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 56,
         "score_drainage": 83,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17422,10 +18240,12 @@
       "properties": {
         "id": "esc-sa-0410",
         "name": "Calle Las Labranzas",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 38,
         "score_drainage": 75,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17475,10 +18295,12 @@
       "properties": {
         "id": "esc-sa-0411",
         "name": "Calle Las Labranzas",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 44,
         "score_drainage": 83,
         "score_shade": 45,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17504,10 +18326,12 @@
       "properties": {
         "id": "esc-sa-0412",
         "name": "Calle Las Labranzas",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 38,
         "score_drainage": 77,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17529,10 +18353,12 @@
       "properties": {
         "id": "esc-sa-0413",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 47,
         "score_drainage": 83,
         "score_shade": 42,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17578,10 +18404,12 @@
       "properties": {
         "id": "esc-sa-0414",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 48,
         "score_drainage": 84,
         "score_shade": 38,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17619,10 +18447,12 @@
       "properties": {
         "id": "esc-sa-0415",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 47,
         "score_drainage": 83,
         "score_shade": 38,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17660,10 +18490,12 @@
       "properties": {
         "id": "esc-sa-0416",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 38,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17709,10 +18541,12 @@
       "properties": {
         "id": "esc-sa-0417",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 53,
         "score_accessibility": 42,
         "score_drainage": 82,
         "score_shade": 36,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17754,10 +18588,12 @@
       "properties": {
         "id": "esc-sa-0418",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 39,
         "score_drainage": 81,
         "score_shade": 37,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17819,10 +18655,12 @@
       "properties": {
         "id": "esc-sa-0419",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 37,
         "score_drainage": 80,
         "score_shade": 41,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17856,10 +18694,12 @@
       "properties": {
         "id": "esc-sa-0420",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 49,
         "score_accessibility": 36,
         "score_drainage": 80,
         "score_shade": 36,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17893,10 +18733,12 @@
       "properties": {
         "id": "esc-sa-0421",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 34,
         "score_drainage": 80,
         "score_shade": 45,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17930,10 +18772,12 @@
       "properties": {
         "id": "esc-sa-0422",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 38,
         "score_drainage": 83,
         "score_shade": 47,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -17971,10 +18815,12 @@
       "properties": {
         "id": "esc-sa-0423",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 35,
         "score_drainage": 81,
         "score_shade": 45,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18012,10 +18858,12 @@
       "properties": {
         "id": "esc-sa-0424",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 50,
         "score_accessibility": 33,
         "score_drainage": 80,
         "score_shade": 44,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18053,10 +18901,12 @@
       "properties": {
         "id": "esc-sa-0425",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 51,
         "score_accessibility": 35,
         "score_drainage": 81,
         "score_shade": 45,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18106,10 +18956,12 @@
       "properties": {
         "id": "esc-sa-0426",
         "name": "Diagonal 68",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 39,
         "score_drainage": 81,
         "score_shade": 60,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18147,10 +18999,12 @@
       "properties": {
         "id": "esc-sa-0427",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 47,
         "score_drainage": 82,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18192,10 +19046,12 @@
       "properties": {
         "id": "esc-sa-0428",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 62,
         "score_accessibility": 49,
         "score_drainage": 82,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18229,10 +19085,12 @@
       "properties": {
         "id": "esc-sa-0429",
         "name": "Calle 132",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 72,
         "score_drainage": 80,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18258,10 +19116,12 @@
       "properties": {
         "id": "esc-sa-0430",
         "name": "Acceso 1",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 73,
         "score_drainage": 71,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18299,10 +19159,12 @@
       "properties": {
         "id": "esc-sa-0431",
         "name": "Acceso 2",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 73,
         "score_drainage": 71,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18324,10 +19186,12 @@
       "properties": {
         "id": "esc-sa-0432",
         "name": "Acceso 3",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18349,10 +19213,12 @@
       "properties": {
         "id": "esc-sa-0433",
         "name": "Diagonal 18",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 62,
         "score_drainage": 79,
         "score_shade": 55,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18398,10 +19264,12 @@
       "properties": {
         "id": "esc-sa-0434",
         "name": "Diagonal 18",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 66,
         "score_drainage": 80,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18447,10 +19315,12 @@
       "properties": {
         "id": "esc-sa-0435",
         "name": "Diagonal 18",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 63,
         "score_drainage": 82,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18484,10 +19354,12 @@
       "properties": {
         "id": "esc-sa-0436",
         "name": "Avenida 30",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 62,
         "score_drainage": 78,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18521,10 +19393,12 @@
       "properties": {
         "id": "esc-sa-0437",
         "name": "Calle 154",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 65,
         "score_drainage": 77,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18562,10 +19436,12 @@
       "properties": {
         "id": "esc-sa-0438",
         "name": "Acceso 2",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 64,
         "score_drainage": 77,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18595,10 +19471,12 @@
       "properties": {
         "id": "esc-sa-0439",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 64,
         "score_drainage": 78,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18640,10 +19518,12 @@
       "properties": {
         "id": "esc-sa-0440",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 66,
         "score_drainage": 79,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18709,10 +19589,12 @@
       "properties": {
         "id": "esc-sa-0441",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 64,
         "score_drainage": 81,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18754,10 +19636,12 @@
       "properties": {
         "id": "esc-sa-0442",
         "name": "Calle Las Planchitas",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 58,
         "score_drainage": 88,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18795,10 +19679,12 @@
       "properties": {
         "id": "esc-sa-0443",
         "name": "Calle Las Planchitas",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 54,
         "score_drainage": 89,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18824,10 +19710,12 @@
       "properties": {
         "id": "esc-sa-0444",
         "name": "Alameda 3",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 67,
         "score_drainage": 60,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18849,10 +19737,12 @@
       "properties": {
         "id": "esc-sa-0445",
         "name": "Alameda 2",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 67,
         "score_drainage": 55,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18874,10 +19764,12 @@
       "properties": {
         "id": "esc-sa-0446",
         "name": "Avenida 58",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 47,
         "score_drainage": 82,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18939,10 +19831,12 @@
       "properties": {
         "id": "esc-sa-0447",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 52,
         "score_drainage": 79,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -18980,10 +19874,12 @@
       "properties": {
         "id": "esc-sa-0448",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 53,
         "score_drainage": 77,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19021,10 +19917,12 @@
       "properties": {
         "id": "esc-sa-0449",
         "name": "Calle sin nombre 449",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19054,10 +19952,12 @@
       "properties": {
         "id": "esc-sa-0450",
         "name": "Calle Antigua",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19095,10 +19995,12 @@
       "properties": {
         "id": "esc-sa-0451",
         "name": "Calle Antigua",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 82,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19132,10 +20034,12 @@
       "properties": {
         "id": "esc-sa-0452",
         "name": "Avenida 5",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 58,
         "score_drainage": 77,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19189,10 +20093,12 @@
       "properties": {
         "id": "esc-sa-0453",
         "name": "Avenida 5",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 61,
         "score_drainage": 77,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19246,10 +20152,12 @@
       "properties": {
         "id": "esc-sa-0454",
         "name": "Calle 2",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 60,
         "score_drainage": 75,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19283,10 +20191,12 @@
       "properties": {
         "id": "esc-sa-0455",
         "name": "Calle Perú",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 47,
         "score_drainage": 80,
         "score_shade": 80,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19340,10 +20250,12 @@
       "properties": {
         "id": "esc-sa-0456",
         "name": "Calle Perú",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 46,
         "score_drainage": 79,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19397,10 +20309,12 @@
       "properties": {
         "id": "esc-sa-0457",
         "name": "Calle Perú",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 46,
         "score_drainage": 80,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19470,10 +20384,12 @@
       "properties": {
         "id": "esc-sa-0458",
         "name": "Calle Naranjo",
+        "district": "San Antonio",
         "score_overall": 56,
         "score_accessibility": 49,
         "score_drainage": 55,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19507,10 +20423,12 @@
       "properties": {
         "id": "esc-sa-0459",
         "name": "Calle sin nombre 459",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 49,
         "score_drainage": 57,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19536,10 +20454,12 @@
       "properties": {
         "id": "esc-sa-0460",
         "name": "Calle sin nombre 460",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 55,
         "score_drainage": 77,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19585,10 +20505,12 @@
       "properties": {
         "id": "esc-sa-0461",
         "name": "Calle sin nombre 461",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 52,
         "score_drainage": 61,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19622,10 +20544,12 @@
       "properties": {
         "id": "esc-sa-0462",
         "name": "Calle sin nombre 462",
+        "district": "San Antonio",
         "score_overall": 52,
         "score_accessibility": 47,
         "score_drainage": 55,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19647,10 +20571,12 @@
       "properties": {
         "id": "esc-sa-0463",
         "name": "Diagonal 34",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 71,
         "score_drainage": 81,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19696,10 +20622,12 @@
       "properties": {
         "id": "esc-sa-0464",
         "name": "Diagonal 34",
+        "district": "San Antonio",
         "score_overall": 69,
         "score_accessibility": 62,
         "score_drainage": 85,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19733,10 +20661,12 @@
       "properties": {
         "id": "esc-sa-0465",
         "name": "Diagonal 34",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 61,
         "score_drainage": 86,
         "score_shade": 67,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19790,10 +20720,12 @@
       "properties": {
         "id": "esc-sa-0466",
         "name": "Diagonal 34",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 60,
         "score_drainage": 87,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19847,10 +20779,12 @@
       "properties": {
         "id": "esc-sa-0467",
         "name": "Diagonal 34",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 59,
         "score_drainage": 83,
         "score_shade": 60,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19896,10 +20830,12 @@
       "properties": {
         "id": "esc-sa-0468",
         "name": "Diagonal 34",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 59,
         "score_drainage": 77,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19945,10 +20881,12 @@
       "properties": {
         "id": "esc-sa-0469",
         "name": "Calle El Progreso",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 61,
         "score_drainage": 81,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19970,10 +20908,12 @@
       "properties": {
         "id": "esc-sa-0470",
         "name": "Avenida 40",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -19999,10 +20939,12 @@
       "properties": {
         "id": "esc-sa-0471",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 62,
         "score_drainage": 84,
         "score_shade": 59,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20024,10 +20966,12 @@
       "properties": {
         "id": "esc-sa-0472",
         "name": "Calle 138",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 70,
         "score_drainage": 65,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20057,10 +21001,12 @@
       "properties": {
         "id": "esc-sa-0473",
         "name": "Calle 138",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 73,
         "score_drainage": 78,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20082,10 +21028,12 @@
       "properties": {
         "id": "esc-sa-0474",
         "name": "Avenida 42",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 69,
         "score_drainage": 49,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20107,10 +21055,12 @@
       "properties": {
         "id": "esc-sa-0475",
         "name": "Calle 138",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 72,
         "score_drainage": 81,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20136,10 +21086,12 @@
       "properties": {
         "id": "esc-sa-0476",
         "name": "Calle sin nombre 476",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 48,
         "score_drainage": 80,
         "score_shade": 78,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20161,10 +21113,12 @@
       "properties": {
         "id": "esc-sa-0477",
         "name": "Calle Callejón",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 58,
         "score_drainage": 75,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20202,10 +21156,12 @@
       "properties": {
         "id": "esc-sa-0478",
         "name": "Calle Chumico",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 49,
         "score_drainage": 79,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20247,10 +21203,12 @@
       "properties": {
         "id": "esc-sa-0479",
         "name": "Calle Meza",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 52,
         "score_drainage": 81,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20296,10 +21254,12 @@
       "properties": {
         "id": "esc-sa-0480",
         "name": "Alameda Avellana",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 63,
         "score_drainage": 86,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20377,10 +21337,12 @@
       "properties": {
         "id": "esc-sa-0481",
         "name": "Calle sin nombre 481",
+        "district": "San Antonio",
         "score_overall": 77,
         "score_accessibility": 70,
         "score_drainage": 86,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20402,10 +21364,12 @@
       "properties": {
         "id": "esc-sa-0482",
         "name": "Calle sin nombre 482",
+        "district": "San Antonio",
         "score_overall": 77,
         "score_accessibility": 73,
         "score_drainage": 83,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20443,10 +21407,12 @@
       "properties": {
         "id": "esc-sa-0483",
         "name": "Calle sin nombre 483",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 74,
         "score_drainage": 79,
         "score_shade": 73,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20476,10 +21442,12 @@
       "properties": {
         "id": "esc-sa-0484",
         "name": "Calle sin nombre 484",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 72,
         "score_drainage": 81,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20509,10 +21477,12 @@
       "properties": {
         "id": "esc-sa-0485",
         "name": "Calle sin nombre 485",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 70,
         "score_drainage": 82,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20558,10 +21528,12 @@
       "properties": {
         "id": "esc-sa-0486",
         "name": "Calle sin nombre 486",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 70,
         "score_drainage": 81,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20627,10 +21599,12 @@
       "properties": {
         "id": "esc-sa-0487",
         "name": "Calle sin nombre 487",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 69,
         "score_drainage": 83,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20664,10 +21638,12 @@
       "properties": {
         "id": "esc-sa-0488",
         "name": "Calle sin nombre 488",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 48,
         "score_drainage": 45,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20725,10 +21701,12 @@
       "properties": {
         "id": "esc-sa-0489",
         "name": "Calle 142",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 66,
         "score_drainage": 86,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20762,10 +21740,12 @@
       "properties": {
         "id": "esc-sa-0490",
         "name": "Calle 144",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 65,
         "score_drainage": 84,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20787,10 +21767,12 @@
       "properties": {
         "id": "esc-sa-0491",
         "name": "Calle 138",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 75,
         "score_drainage": 78,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20812,10 +21794,12 @@
       "properties": {
         "id": "esc-sa-0492",
         "name": "Calle sin nombre 492",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 67,
         "score_drainage": 82,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20873,10 +21857,12 @@
       "properties": {
         "id": "esc-sa-0493",
         "name": "Calle sin nombre 493",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 35,
         "score_drainage": 77,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20898,10 +21884,12 @@
       "properties": {
         "id": "esc-sa-0494",
         "name": "Calle sin nombre 494",
+        "district": "San Antonio",
         "score_overall": 55,
         "score_accessibility": 36,
         "score_drainage": 77,
         "score_shade": 63,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20939,10 +21927,12 @@
       "properties": {
         "id": "esc-sa-0495",
         "name": "Calle sin nombre 495",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 48,
         "score_drainage": 58,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -20984,10 +21974,12 @@
       "properties": {
         "id": "esc-sa-0496",
         "name": "Calle sin nombre 496",
+        "district": "San Antonio",
         "score_overall": 54,
         "score_accessibility": 48,
         "score_drainage": 38,
         "score_shade": 82,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21053,10 +22045,12 @@
       "properties": {
         "id": "esc-sa-0497",
         "name": "Calle del Llano",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 51,
         "score_drainage": 83,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21078,10 +22072,12 @@
       "properties": {
         "id": "esc-sa-0498",
         "name": "Calle 138",
+        "district": "San Antonio",
         "score_overall": 72,
         "score_accessibility": 72,
         "score_drainage": 77,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21103,10 +22099,12 @@
       "properties": {
         "id": "esc-sa-0499",
         "name": "Transversal 144B",
+        "district": "San Antonio",
         "score_overall": 75,
         "score_accessibility": 70,
         "score_drainage": 83,
         "score_shade": 76,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21148,10 +22146,12 @@
       "properties": {
         "id": "esc-sa-0500",
         "name": "Transversal 144B",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 68,
         "score_drainage": 84,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21181,10 +22181,12 @@
       "properties": {
         "id": "esc-sa-0501",
         "name": "Calle Cuesta Grande",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 51,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21218,10 +22220,12 @@
       "properties": {
         "id": "esc-sa-0502",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 48,
         "score_drainage": 72,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21259,10 +22263,12 @@
       "properties": {
         "id": "esc-sa-0503",
         "name": "Calle Entierrillos",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 47,
         "score_drainage": 82,
         "score_shade": 58,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21288,10 +22294,12 @@
       "properties": {
         "id": "esc-sa-0504",
         "name": "Calle sin nombre 504",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 73,
         "score_drainage": 78,
         "score_shade": 68,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21321,10 +22329,12 @@
       "properties": {
         "id": "esc-sa-0505",
         "name": "Calle sin nombre 505",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 75,
         "score_drainage": 80,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21374,10 +22384,12 @@
       "properties": {
         "id": "esc-sa-0506",
         "name": "Calle sin nombre 506",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 75,
         "score_drainage": 79,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21427,10 +22439,12 @@
       "properties": {
         "id": "esc-sa-0507",
         "name": "Calle sin nombre 507",
+        "district": "San Antonio",
         "score_overall": 76,
         "score_accessibility": 75,
         "score_drainage": 80,
         "score_shade": 72,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21492,10 +22506,12 @@
       "properties": {
         "id": "esc-sa-0508",
         "name": "Calle sin nombre 508",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 74,
         "score_drainage": 78,
         "score_shade": 70,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21521,10 +22537,12 @@
       "properties": {
         "id": "esc-sa-0509",
         "name": "Calle Vista de Oro",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21554,10 +22572,12 @@
       "properties": {
         "id": "esc-sa-0510",
         "name": "Calle Vista de Oro",
+        "district": "San Antonio",
         "score_overall": 66,
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21591,10 +22611,12 @@
       "properties": {
         "id": "esc-sa-0511",
         "name": "Avenida 1",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 62,
         "score_drainage": 76,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21640,10 +22662,12 @@
       "properties": {
         "id": "esc-sa-0512",
         "name": "Avenida 1",
+        "district": "San Antonio",
         "score_overall": 67,
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21689,10 +22713,12 @@
       "properties": {
         "id": "esc-sa-0513",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 54,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21718,10 +22744,12 @@
       "properties": {
         "id": "esc-sa-0514",
         "name": "Acceso 1",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 64,
         "score_drainage": 77,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21759,10 +22787,12 @@
       "properties": {
         "id": "esc-sa-0515",
         "name": "Acceso 2",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 67,
         "score_drainage": 77,
         "score_shade": 80,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21804,10 +22834,12 @@
       "properties": {
         "id": "esc-sa-0516",
         "name": "Acceso 1",
+        "district": "San Antonio",
         "score_overall": 73,
         "score_accessibility": 66,
         "score_drainage": 78,
         "score_shade": 81,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21833,10 +22865,12 @@
       "properties": {
         "id": "esc-sa-0517",
         "name": "Acceso 1",
+        "district": "San Antonio",
         "score_overall": 74,
         "score_accessibility": 68,
         "score_drainage": 78,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21882,10 +22916,12 @@
       "properties": {
         "id": "esc-sa-0518",
         "name": "Avenida 1",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 61,
         "score_drainage": 77,
         "score_shade": 69,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21915,10 +22951,12 @@
       "properties": {
         "id": "esc-sa-0519",
         "name": "Calle sin nombre 519",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 52,
         "score_drainage": 78,
         "score_shade": 75,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21940,10 +22978,12 @@
       "properties": {
         "id": "esc-sa-0520",
         "name": "Calle sin nombre 520",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 50,
         "score_drainage": 78,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -21977,10 +23017,12 @@
       "properties": {
         "id": "esc-sa-0521",
         "name": "Calle sin nombre 521",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 49,
         "score_drainage": 79,
         "score_shade": 79,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22002,10 +23044,12 @@
       "properties": {
         "id": "esc-sa-0522",
         "name": "Calle Chiverral",
+        "district": "San Antonio",
         "score_overall": 57,
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 49,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22047,10 +23091,12 @@
       "properties": {
         "id": "esc-sa-0523",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 41,
         "score_drainage": 79,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22084,10 +23130,12 @@
       "properties": {
         "id": "esc-sa-0524",
         "name": "Calle Bebedero",
+        "district": "San Antonio",
         "score_overall": 58,
         "score_accessibility": 39,
         "score_drainage": 82,
         "score_shade": 62,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22133,10 +23181,12 @@
       "properties": {
         "id": "esc-sa-0525",
         "name": "Avenida Primera",
+        "district": "San Antonio",
         "score_overall": 68,
         "score_accessibility": 62,
         "score_drainage": 80,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22158,10 +23208,12 @@
       "properties": {
         "id": "esc-sa-0526",
         "name": "Calle Naranjo",
+        "district": "San Antonio",
         "score_overall": 59,
         "score_accessibility": 55,
         "score_drainage": 60,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22195,10 +23247,12 @@
       "properties": {
         "id": "esc-sa-0527",
         "name": "Calle sin nombre 527",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 61,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22220,10 +23274,12 @@
       "properties": {
         "id": "esc-sa-0528",
         "name": "Calle sin nombre 528",
+        "district": "San Antonio",
         "score_overall": 64,
         "score_accessibility": 47,
         "score_drainage": 89,
         "score_shade": 64,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22245,10 +23301,12 @@
       "properties": {
         "id": "esc-sa-0529",
         "name": "Calle sin nombre 529",
+        "district": "San Antonio",
         "score_overall": 71,
         "score_accessibility": 62,
         "score_drainage": 80,
         "score_shade": 77,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22270,10 +23328,12 @@
       "properties": {
         "id": "esc-sa-0530",
         "name": "Avenida 34",
+        "district": "San Antonio",
         "score_overall": 70,
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 74,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22367,10 +23427,12 @@
       "properties": {
         "id": "esc-sa-0531",
         "name": "Calle sin nombre 531",
+        "district": "San Antonio",
         "score_overall": 61,
         "score_accessibility": 60,
         "score_drainage": 77,
         "score_shade": 44,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22400,10 +23462,12 @@
       "properties": {
         "id": "esc-sa-0532",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 63,
         "score_accessibility": 50,
         "score_drainage": 79,
         "score_shade": 65,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22433,10 +23497,12 @@
       "properties": {
         "id": "esc-sa-0533",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 52,
         "score_drainage": 77,
         "score_shade": 71,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22466,10 +23532,12 @@
       "properties": {
         "id": "esc-sa-0534",
         "name": "Calle Las Planchitas",
+        "district": "San Antonio",
         "score_overall": 65,
         "score_accessibility": 49,
         "score_drainage": 89,
         "score_shade": 66,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
@@ -22499,10 +23567,12 @@
       "properties": {
         "id": "esc-sa-0535",
         "name": "Calle Hoja Blanca",
+        "district": "San Antonio",
         "score_overall": 60,
         "score_accessibility": 49,
         "score_drainage": 81,
         "score_shade": 56,
+        "audited_at": "2026-07-10",
         "demo": true
       },
       "geometry": {
