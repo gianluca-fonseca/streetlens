@@ -1,0 +1,22 @@
+
+> streetlens@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3111
+- Network:       http://10.10.240.156:3111
+- Environments: .env.local
+✓ Ready in 786ms
+
+○ Compiling /[locale] ...
+ GET /en 200 in 4.0s (next.js: 3.7s, proxy.ts: 105ms, generate-params: 233ms, application-code: 179ms)
+ GET /en 200 in 54ms (next.js: 7ms, proxy.ts: 5ms, generate-params: 3ms, application-code: 42ms)
+✓ Compiled in 51ms
+✓ Compiled in 19ms
+✓ Compiled in 23ms
+ GET /en 200 in 66ms (next.js: 12ms, proxy.ts: 4ms, generate-params: 1706µs, application-code: 50ms)
+✓ Compiled in 26ms
+ GET /en 200 in 135ms (next.js: 21ms, proxy.ts: 5ms, generate-params: 9ms, application-code: 109ms)
+ GET /es 200 in 175ms (next.js: 13ms, proxy.ts: 23ms, generate-params: 4ms, application-code: 139ms)
+✓ Compiled in 29ms
+✓ Compiled in 31ms
