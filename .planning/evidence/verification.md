@@ -1,6 +1,28 @@
 # u2-data-layer — Verification evidence
 
-Run: sesh-1784059200603 · branch `unit/u2-data-layer` · advisor rev 1.
+Run: sesh-1784059200603 · branch `unit/u2-data-layer` · advisor rev 4.
+
+## 0. Honest correction (rev 4 remediation)
+
+The first "done" declaration was premature: it was made against advisor rev 1
+without re-reading the advisor file, which by then carried rev 4 (BLOCKING).
+Conductor verification correctly failed it. Violations found and fixed:
+
+1. **Export surface** — shipped `Stats` instead of `StreetStats`, omitted
+   `SCORE_LAYERS`, and did not re-export `SegmentProperties` from
+   `lib/segments.ts`. Fixed in `412011d` (surface now verbatim: `ScoreLayer`,
+   `SCORE_LAYERS`, `SegmentProperties`, `SegmentCollection`, `SegmentDetail`,
+   `StreetStats`, `getSegments`, `getSegmentDetail`, `getStats`, diffed against
+   `git show unit/u1-design-map:lib/segments.ts`).
+2. **Missing `district` + `audited_at`** on feature properties. Fixed in both
+   paths: generator emits them and data was regenerated (`59392d6`); the live
+   view surfaces them via migration `0009` (`9e1197b`); the adapter also
+   defensively enriches stale static data (`412011d`).
+3. **Smoke assertions** extended and committed as `scripts/smoke-adapter.mjs`
+   (`a260942`): asserts export names against the frozen list and that every
+   feature carries district, audited_at, and all four `score_*` fields.
+
+All evidence below was re-run after these fixes.
 
 ## 1. Build + lint (green)
 
@@ -38,12 +60,12 @@ Run: sesh-1784059200603 · branch `unit/u2-data-layer` · advisor rev 1.
 ## 4. SQL migrations — applied against real PostGIS (not just reviewed)
 
 Local Postgres CLI is absent (`psql`/`pg_ctl` not installed), but Docker was up
-with the Supabase Postgres 17 + PostGIS image already cached. All eight
-migrations were applied in order against a real instance with the `anon`,
-`authenticated`, `service_role` roles present:
+with the Supabase Postgres 17 + PostGIS image already cached. All nine
+migrations were applied in order, on a FRESH instance after the rev 4 fixes,
+with the `anon`, `authenticated`, `service_role` roles present:
 
 ```
-0001_extensions … 0008_views  → each: OK (ON_ERROR_STOP=1)
+0001_extensions … 0009_views_district_audited_at  → each: OK (ON_ERROR_STOP=1)
 ```
 
 Then `supabase/seed.sql` loaded cleanly:
@@ -67,18 +89,30 @@ segments=535 | audits=535 | observations=6420 | rubric_items=12 | srid=4326
 
 - `admin_rpc_secret` seeded into `app_secrets`; SECURITY DEFINER functions gate
   on the secret, not the role. `app_secrets` unreadable by anon.
-- `v_segment_scores` view: 535 rows, `geometry` returned as a JSON object,
-  readable by `anon` (security_invoker honors public-read RLS).
-
-## 5. Fallback adapter smoke (compiled lib exercised with Node)
-
-`lib/segments.ts` compiled to CJS and run (Supabase env absent → static path):
+- `v_segment_scores` view (post-0009): 535 rows, `geometry` as JSON object,
+  **`district` and `audited_at` populated on all 535 rows (0 null/empty)**,
+  readable by `anon` (security_invoker honors public-read RLS):
 
 ```
-getSegments:        FeatureCollection, 535 features, all demo=true, all scores numeric
-getStats:           {"segments":535,"km":76.84,"coveragePct":80.3,"heroPct":29}
-getSegmentDetail:   esc-sa-0001 → 12 observations, bilingual labels, scores present
-getSegmentDetail(unknown) → null
+esc-sa-0001|Calle 130|San Antonio|2026-07-10|75|85|83|78
+rows=535 | null_district=0 | null_audited=0 | anon_view_rows=535
+```
+
+## 5. Fallback adapter smoke — `node scripts/smoke-adapter.mjs`
+
+Committed smoke script; compiles the lib to CJS and runs with Supabase env
+absent (static path). **29/29 checks pass**, including the rev 4 additions:
+
+```
+Export surface: ScoreLayer, SCORE_LAYERS, SegmentProperties, SegmentCollection,
+                SegmentDetail, StreetStats, getSegments, getSegmentDetail,
+                getStats — all present; no stale `Stats` export
+Runtime exports + SCORE_LAYERS value: ok
+getSegments:  FeatureCollection, 535 features; every feature has district,
+              audited_at, all four score_* in 0..100, demo=true, real LineString
+getStats:     {"segments":535,"km":76.84,"coveragePct":80.3,"heroPct":29}
+getSegmentDetail: esc-sa-0001 → district + audited_at strings, scores for all
+              layers, 12 observations; unknown id → null
 SMOKE PASS
 ```
 
