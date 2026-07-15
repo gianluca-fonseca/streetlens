@@ -16,14 +16,20 @@ import type { FeatureCollection, LineString, Feature } from "geojson";
  * Adapter / view types (interop contract with the UI unit)
  * ------------------------------------------------------------------ */
 
-/** The four scoring lenses. Exactly one is active on the map at a time. */
-export type ScoreLayer = "overall" | "accessibility" | "drainage" | "shade";
+/** The five scoring lenses. Exactly one is active on the map at a time. */
+export type ScoreLayer =
+  | "overall"
+  | "accessibility"
+  | "drainage"
+  | "shade"
+  | "bike";
 
 export const SCORE_LAYERS: readonly ScoreLayer[] = [
   "overall",
   "accessibility",
   "drainage",
   "shade",
+  "bike",
 ] as const;
 
 /**
@@ -35,8 +41,8 @@ export const LEY_7600_MIN_SCORE = 50;
 
 /**
  * Properties carried on every segment GeoJSON feature. Consumed by AuditMap.
- * Flat shape (frozen contract with the map UI unit, advisor rev 3/4):
- * flat 0-100 `score_*` fields plus `district` and `audited_at`.
+ * Flat shape (contract v2, advisor rev 1 u6): the four original 0-100 `score_*`
+ * fields plus `score_bike`, `district`, and `audited_at`.
  */
 export type SegmentProperties = {
   id: string;
@@ -46,6 +52,7 @@ export type SegmentProperties = {
   score_accessibility: number;
   score_drainage: number;
   score_shade: number;
+  score_bike: number;
   audited_at: string;
   demo: boolean;
 };

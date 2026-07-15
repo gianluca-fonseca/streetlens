@@ -113,6 +113,7 @@ function enrichFeature(feature: SegmentFeature): SegmentFeature {
       score_accessibility: p.score_accessibility ?? 0,
       score_drainage: p.score_drainage ?? 0,
       score_shade: p.score_shade ?? 0,
+      score_bike: p.score_bike ?? 0,
       audited_at: p.audited_at ?? DEFAULT_AUDITED_AT,
       demo: p.demo ?? true,
     },
@@ -157,6 +158,7 @@ type ScoreRow = {
   score_accessibility: number;
   score_drainage: number;
   score_shade: number;
+  score_bike: number;
 };
 
 function rowToFeature(row: ScoreRow): SegmentFeature {
@@ -170,6 +172,7 @@ function rowToFeature(row: ScoreRow): SegmentFeature {
       score_accessibility: row.score_accessibility,
       score_drainage: row.score_drainage,
       score_shade: row.score_shade,
+      score_bike: row.score_bike,
       audited_at: row.audited_at,
       demo: row.demo,
     },
@@ -184,7 +187,7 @@ async function liveScoreRows(id?: string): Promise<ScoreRow[] | null> {
     let query = client
       .from("v_segment_scores")
       .select(
-        "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade",
+        "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade,score_bike",
       );
     if (id) query = query.eq("id", id);
     const { data, error } = await query;
@@ -231,6 +234,7 @@ export async function getSegmentDetail(
         accessibility: row.score_accessibility,
         drainage: row.score_drainage,
         shade: row.score_shade,
+        bike: row.score_bike,
       },
       // Observation-level detail comes from a dedicated query in a later unit;
       // the map needs scores + geometry here.
@@ -261,6 +265,7 @@ export async function getSegmentDetail(
       accessibility: feature.properties.score_accessibility,
       drainage: feature.properties.score_drainage,
       shade: feature.properties.score_shade,
+      bike: feature.properties.score_bike,
     },
     audit: audit
       ? {
