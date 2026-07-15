@@ -30,13 +30,16 @@ const CORRIDOR_ID = "esc-sa-corridor";
 // Bounding box for San Antonio de Escazú: [south, west, north, east].
 const BBOX = [9.898, -84.162, 9.922, -84.135];
 
-// Highway classes we turn into auditable segments.
+// Highway classes we turn into auditable segments. `cycleway` ways are dedicated
+// bike infrastructure and auditable in their own right (they carry the strongest
+// bike_infra hint).
 const AUDITABLE = new Set([
   "residential",
   "tertiary",
   "secondary",
   "unclassified",
   "footway",
+  "cycleway",
 ]);
 
 // Broader "street network" set used as the coverage denominator.
@@ -124,6 +127,33 @@ function roundCoord([lon, lat]) {
   return [Number(lon.toFixed(6)), Number(lat.toFixed(6))];
 }
 
+/**
+ * Distil the per-way OSM bike tags into one hint the demo scorer can read:
+ *   cycleway | track | lane | shared | none  (strongest → weakest).
+ * A dedicated `highway=cycleway` way is the strongest signal. Otherwise the
+ * `cycleway[:left|:right|:both]` values classify the on-street infrastructure;
+ * `bicycle=yes` alone is legal access, NOT infrastructure, so it stays `none`.
+ */
+function bikeInfraHint(tags, highway) {
+  if (highway === "cycleway") return "cycleway";
+  const vals = [
+    tags?.cycleway,
+    tags?.["cycleway:both"],
+    tags?.["cycleway:left"],
+    tags?.["cycleway:right"],
+  ]
+    .filter(Boolean)
+    .map((v) => String(v).toLowerCase());
+
+  const has = (...needles) =>
+    vals.some((v) => needles.some((n) => v.includes(n)));
+
+  if (has("track", "sidepath", "separate")) return "track";
+  if (has("lane")) return "lane";
+  if (has("shared", "share_busway")) return "shared";
+  return "none";
+}
+
 function segmentName(tags, highway, index) {
   const named = tags?.name || tags?.["name:es"] || tags?.["name:en"];
   if (named) return named;
@@ -186,6 +216,7 @@ async function main() {
 
   for (const way of ways) {
     const highway = way.tags.highway;
+    const bikeInfra = bikeInfraHint(way.tags, highway);
     const coords = way.geometry.map((g) => roundCoord([g.lon, g.lat]));
 
     if (STREET_NETWORK.has(highway)) {
@@ -208,6 +239,7 @@ async function main() {
           district_id: DISTRICT_ID,
           corridor_id: CORRIDOR_ID,
           highway,
+          bike_infra: bikeInfra,
           length_m: Number(length_m.toFixed(1)),
           osm_way_id: way.id,
         },
