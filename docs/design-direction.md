@@ -36,7 +36,8 @@ Dark mode: near-black warm base `#14140F`, label-stripped basemap, active data l
 - Max 3 elevation levels: base, floating panel, popover/modal.
 - Every interactive element carries a non-shadow affordance: 1px border at ≥3:1 and/or background step.
 - At most one neumorphic micro-control (the layer switcher), only if it passes 3:1 with a label.
-- All text ≥4.5:1 (AA). Optional subtle paper-grain on bone base. No glassmorphism.
+- All text ≥4.5:1 (AA). Optional subtle paper-grain on bone base. No glassmorphism on flat surfaces.
+- Earned glass (rev 3, imagery-backed surfaces only): a floating panel layered directly over map imagery, a live map, or a rendered map render MAY use backdrop-blur with a warm bone tint (`bg-[rgba(244,241,234,0.72)]` light / warm-dark equivalent), `backdrop-blur-md`, a 1px warm border, and the existing soft-depth shadow tokens. Glass is earned, never default: only over imagery, always carrying real data or content, never on a flat bone/field background, and never stacked glass-on-glass. Every other depth rule (AA text, 3 elevation levels, radius system) still applies.
 
 ## Radius system (non-uniform, intentional)
 
@@ -71,3 +72,4 @@ Override every token (base colors, radius per system above, ring = pine green, f
 ## Changelog
 
 - rev 2 (2026-07-15): Space Grotesk replaces Bricolage Grotesque + Hanken Grotesk app-wide, founder direction.
+- rev 3 (2026-07-15): Ban-list item 2 (glassmorphism cards) is narrowed for imagery-backed surfaces only. Founder direction (Genesis-grade art direction): floating panels layered over map imagery, a live map, or a rendered map render MAY be glass (warm bone tint `bg-[rgba(244,241,234,0.72)]` light / warm-dark equivalent, `backdrop-blur-md`, 1px warm border, existing shadow tokens). Glass is earned, not default: only over imagery, always carrying real data or content, never on a flat background, never stacked glass-on-glass. The other 19 ban items and all depth/AA rules stand.
