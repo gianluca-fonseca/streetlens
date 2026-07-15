@@ -62,7 +62,11 @@
     "photosHeading": "Fotos",
     "photoPlaceholder": "Foto pendiente del trabajo de campo",
     "demoNote": "Auditoría de demostración. Los datos de campo reales reemplazan este corredor, tramo por tramo, desde agosto de 2026.",
-    "close": "Cerrar el panel de detalle"
+    "close": "Cerrar el panel de detalle",
+    "communityPending": "Comunidad — pendiente de verificación de campo",
+    "communityNote": "Aporte de la comunidad. Aún sin verificación de campo, por lo que no tiene puntajes de auditoría.",
+    "communityReportsHeading": "Reportes de la comunidad",
+    "communityReportLabel": "Reporte de la comunidad"
   },
   "rubric": {
     "overall": {
@@ -96,6 +100,7 @@
     "nav": {
       "dashboard": "Resumen",
       "queue": "Cola de verificación",
+      "import": "Importación masiva",
       "logout": "Cerrar sesión",
       "publicMap": "Mapa público"
     },
@@ -154,6 +159,42 @@
       "working": "Guardando…",
       "errorGeneric": "No se pudo guardar la revisión. Inténtelo de nuevo.",
       "localNote": "Sin base de datos configurada. Las revisiones se guardan localmente para aplicarlas tras la puesta en marcha de la base de datos."
+    },
+    "import": {
+      "title": "Importación masiva",
+      "subtitle": "Validá la geometría de campo y luego importala. Primero una simulación — no se escribe nada hasta que confirmés.",
+      "fileLabel": "Archivo GeoJSON o CSV",
+      "fileHint": "Un FeatureCollection de GeoJSON con LineStrings, o un CSV con columnas name, highway y coordinates.",
+      "verifiedLabel": "Marcar como verificado en campo",
+      "verifiedHint": "Solo para datos del equipo de campo. Una importación verificada necesita el nombre del auditor.",
+      "auditorLabel": "Auditor",
+      "auditorPlaceholder": "p. ej. J. Rodríguez",
+      "dryRun": "Validar (simulación)",
+      "validating": "Validando…",
+      "emptyState": "Elegí un archivo y ejecutá la validación para ver una vista previa. Todavía no se importa nada.",
+      "previewHeading": "Vista previa de validación",
+      "summaryValid": "{count} válidos",
+      "summaryInvalid": "{count} inválidos",
+      "summaryDuplicate": "{count} duplicados",
+      "summaryOutOfBounds": "{count} fuera de área",
+      "colRow": "Fila",
+      "colName": "Nombre",
+      "colHighway": "Tipo de vía",
+      "colStatus": "Estado",
+      "colIssues": "Problemas",
+      "statusValid": "Válido",
+      "statusInvalid": "Inválido",
+      "statusDuplicate": "Id duplicado",
+      "issueBbox": "Fuera del área de Escazú",
+      "issueDuplicate": "El id ya existe",
+      "commit": "Importar {count} elementos",
+      "committing": "Importando…",
+      "commitSuccess": "Se importaron {count} elementos al conjunto de datos de la comunidad.",
+      "noValid": "No hay elementos válidos para importar. Corregí los errores de arriba y volvé a validar.",
+      "auditorRequired": "Ingresá el nombre del auditor para importar como verificado.",
+      "errorParse": "No se pudo leer el archivo. Subí un FeatureCollection de GeoJSON con LineStrings o un CSV.",
+      "errorGeneric": "Algo salió mal. Inténtelo de nuevo.",
+      "localNote": "Sin base de datos configurada. Las importaciones se escriben en el conjunto de datos local de la comunidad."
     },
     "status": {
       "pending": "Pendiente",

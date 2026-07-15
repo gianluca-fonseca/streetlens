@@ -62,7 +62,11 @@
     "photosHeading": "Photos",
     "photoPlaceholder": "Photo pending fieldwork",
     "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
-    "close": "Close detail panel"
+    "close": "Close detail panel",
+    "communityPending": "Community — pending field verification",
+    "communityNote": "Community-contributed. Not yet field-verified, so it carries no audit scores.",
+    "communityReportsHeading": "Community reports",
+    "communityReportLabel": "Community report"
   },
   "rubric": {
     "overall": {
@@ -96,6 +100,7 @@
     "nav": {
       "dashboard": "Overview",
       "queue": "Verification queue",
+      "import": "Bulk import",
       "logout": "Log out",
       "publicMap": "Public map"
     },
@@ -154,6 +159,42 @@
       "working": "Saving…",
       "errorGeneric": "Could not save the review. Please try again.",
       "localNote": "No database configured. Reviews are staged locally for a post-database apply step."
+    },
+    "import": {
+      "title": "Bulk import",
+      "subtitle": "Validate field geometry, then import. Dry-run first — nothing is written until you confirm.",
+      "fileLabel": "GeoJSON or CSV file",
+      "fileHint": "A GeoJSON FeatureCollection of LineStrings, or a CSV with name, highway, and coordinates columns.",
+      "verifiedLabel": "Mark as field-verified",
+      "verifiedHint": "Only for field-team data. A verified import needs an auditor name.",
+      "auditorLabel": "Auditor",
+      "auditorPlaceholder": "e.g. J. Rodríguez",
+      "dryRun": "Validate (dry run)",
+      "validating": "Validating…",
+      "emptyState": "Choose a file and run validation to see a preview. Nothing is imported yet.",
+      "previewHeading": "Validation preview",
+      "summaryValid": "{count} valid",
+      "summaryInvalid": "{count} invalid",
+      "summaryDuplicate": "{count} duplicate",
+      "summaryOutOfBounds": "{count} out of bounds",
+      "colRow": "Row",
+      "colName": "Name",
+      "colHighway": "Road type",
+      "colStatus": "Status",
+      "colIssues": "Issues",
+      "statusValid": "Valid",
+      "statusInvalid": "Invalid",
+      "statusDuplicate": "Duplicate id",
+      "issueBbox": "Outside the Escazú area",
+      "issueDuplicate": "Id already exists",
+      "commit": "Import {count} features",
+      "committing": "Importing…",
+      "commitSuccess": "Imported {count} features into the community dataset.",
+      "noValid": "No valid features to import. Fix the errors above and re-validate.",
+      "auditorRequired": "Enter an auditor name to import as verified.",
+      "errorParse": "Could not read the file. Upload a GeoJSON FeatureCollection of LineStrings or a CSV.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "localNote": "No database configured. Imports are written to the local community dataset."
     },
     "status": {
       "pending": "Pending",
