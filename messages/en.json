@@ -202,6 +202,7 @@
       "photoSoon": "Photo upload arrives with the field pilot. For now, describe it in your note.",
       "pathPoints": "{count, plural, one {Path traced · # point} other {Path traced · # points}}",
       "redraw": "Re-draw path",
+      "viewTrace": "View my trace",
       "submit": "Submit for review",
       "submitting": "Submitting…",
       "back": "Back",

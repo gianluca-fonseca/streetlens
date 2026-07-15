@@ -202,6 +202,7 @@
       "photoSoon": "La carga de fotos llega con el piloto de campo. Por ahora, describila en tu nota.",
       "pathPoints": "{count, plural, one {Trazado · # punto} other {Trazado · # puntos}}",
       "redraw": "Volver a trazar",
+      "viewTrace": "Ver mi trazo",
       "submit": "Enviar para revisión",
       "submitting": "Enviando…",
       "back": "Atrás",

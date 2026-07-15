@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import {
   Camera,
   Check,
+  Locate,
   MapPin,
   PencilLine,
   Plus,
@@ -159,6 +160,22 @@ function PhotoPlaceholder() {
         </span>
       </div>
     </div>
+  );
+}
+
+function ViewTraceButton({
+  coords,
+  onView,
+}: Readonly<{ coords: readonly unknown[]; onView: () => void }>) {
+  // Secondary action: flies the camera back to the relevant geometry, which
+  // fitBounds places left of the right-docked form. Hidden without geometry.
+  const t = useTranslations("contribute");
+  if (coords.length === 0) return null;
+  return (
+    <button type="button" onClick={onView} className={`${GHOST_BTN} self-start`}>
+      <Locate size={15} strokeWidth={1.75} aria-hidden="true" />
+      {t("form.viewTrace")}
+    </button>
   );
 }
 
@@ -420,6 +437,11 @@ function AddForm({
         <div className="flex flex-col gap-3.5 p-4">
           <HoneypotField value={honeypot} onChange={setHoneypot} />
 
+          <ViewTraceButton
+            coords={coords}
+            onView={() => contribute.flyToCoords(coords)}
+          />
+
           <div>
             <label className={LABEL} htmlFor="add-name">
               {t("form.nameLabel")}
@@ -602,6 +624,13 @@ function UpdateForm({
 
         <div className="flex flex-col gap-3.5 p-4">
           <HoneypotField value={honeypot} onChange={setHoneypot} />
+
+          <ViewTraceButton
+            coords={picked?.coordinates ?? []}
+            onView={() =>
+              picked && contribute.flyToCoords(picked.coordinates)
+            }
+          />
 
           <div>
             <label className={LABEL} htmlFor="upd-name">
