@@ -1,0 +1,48 @@
+Export surface (lib/segments.ts source):
+  [ok ] exports ScoreLayer
+  [ok ] exports SCORE_LAYERS
+  [ok ] exports SegmentProperties
+  [ok ] exports SegmentCollection
+  [ok ] exports SegmentDetail
+  [ok ] exports StreetStats
+  [ok ] exports getSegments
+  [ok ] exports getSegmentDetail
+  [ok ] exports getStats
+  [ok ] no stale `Stats` export name
+Runtime exports (compiled module):
+  [ok ] runtime export SCORE_LAYERS
+  [ok ] runtime export getSegments
+  [ok ] runtime export getSegmentDetail
+  [ok ] runtime export getStats
+  [ok ] SCORE_LAYERS value
+getSegments():
+  [ok ] FeatureCollection
+  [ok ] >= 40 features (535)
+  [ok ] exactly 535 features (535)
+  [ok ] every feature has district
+  [ok ] every feature has audited_at
+  [ok ] every feature has all five score_* in 0..100 (incl. score_bike)
+  [ok ] every feature demo=true
+  [ok ] every geometry is a real LineString
+getStats():
+  -> {"segments":535,"km":76.84,"coveragePct":80.3,"heroPct":29,"communitySegments":0}
+  [ok ] shape {segments,km,coveragePct,heroPct} all numeric
+  [ok ] stats.segments matches collection
+  [ok ] stats.communitySegments is numeric (contract v3)
+  [ok ] stats.communitySegments is 0 with no community store (0)
+getSegmentDetail():
+  [ok ] returns detail for known id (esc-sa-0001)
+  [ok ] detail.district string
+  [ok ] detail.audited_at string
+  [ok ] detail scores for all layers
+  [ok ] detail has observations (static path) (15)
+  [ok ] unknown id returns null
+community store merged in:
+  [ok ] merged collection = 535 + 2 community (537)
+  [ok ] official stats.segments STILL 535 (community excluded) (535)
+  [ok ] stats.communitySegments = 2 (2)
+  [ok ] community feature flagged source/verified
+  [ok ] community feature has NO scores
+  [ok ] official features carry no community source flag
+
+SMOKE PASS
