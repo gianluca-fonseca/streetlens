@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { ImageOff, X } from "lucide-react";
+import { ImageOff, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
 import {
   LAYER_ORDER,
@@ -42,6 +42,19 @@ export default function SegmentDetail({
     score: placeholderItemScore(scores[activeLayer], seed, i),
   }));
 
+  // Community/import segments carry no rubric scores — show provenance + reports
+  // instead of a (fabricated-looking) 0-score breakdown (contract v3, ruling 1).
+  const isCommunity =
+    segment.source === "community" || segment.source === "import";
+  const isUnverified = segment.verified === false;
+  const allReports = [
+    ...(segment.community_report ? [segment.community_report] : []),
+    ...(segment.community_reports ?? []),
+  ];
+  const reportMap = new Map<string, (typeof allReports)[number]>();
+  for (const r of allReports) reportMap.set(r.id, r);
+  const reports = [...reportMap.values()];
+
   return (
     <section
       role="dialog"
@@ -55,11 +68,21 @@ export default function SegmentDetail({
           </h2>
           <p className="mt-0.5 text-[12px] text-neutral-strong">
             {segment.district}
-            <span className="mx-1.5 text-neutral-strong">·</span>
-            <span className="font-mono">
-              {t("auditedLabel")} {segment.audited_at}
-            </span>
+            {!isCommunity && segment.audited_at ? (
+              <>
+                <span className="mx-1.5 text-neutral-strong">·</span>
+                <span className="font-mono">
+                  {t("auditedLabel")} {segment.audited_at}
+                </span>
+              </>
+            ) : null}
           </p>
+          {isUnverified ? (
+            <span className="mt-2 inline-flex items-center gap-1.5 rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-2 py-1 text-[10.5px] font-medium text-neutral-strong">
+              <Users size={12} strokeWidth={1.75} aria-hidden="true" />
+              {t("communityPending")}
+            </span>
+          ) : null}
         </div>
         <button
           type="button"
@@ -72,6 +95,16 @@ export default function SegmentDetail({
       </header>
 
       <div className="flex-1 overflow-y-auto p-4">
+        {isCommunity ? (
+          <div className="mb-4 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken p-3">
+            <p className="text-[12px] leading-snug text-neutral-strong">
+              {t("communityNote")}
+            </p>
+          </div>
+        ) : null}
+
+        {!isCommunity ? (
+          <>
         <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
           {t("scoresHeading")}
         </h3>
@@ -153,13 +186,37 @@ export default function SegmentDetail({
             </div>
           ))}
         </div>
+          </>
+        ) : null}
+
+        {reports.length > 0 ? (
+          <div className={isCommunity ? "" : "mt-4"}>
+            <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+              {t("communityReportsHeading")}
+            </h3>
+            <ul className="flex flex-col divide-y divide-border rounded-[8px] border border-border">
+              {reports.map((r) => (
+                <li key={r.id} className="px-3 py-2">
+                  <p className="font-mono text-[10.5px] text-neutral-strong">
+                    {t("communityReportLabel")} · {r.created_at.slice(0, 10)}
+                  </p>
+                  <p className="mt-0.5 text-[12.5px] leading-snug text-ink">
+                    {r.note}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
 
-      <footer className="border-t border-border bg-surface-sunken px-4 py-2.5">
-        <p className="text-[11px] leading-snug text-neutral-strong">
-          {t("demoNote")}
-        </p>
-      </footer>
+      {!isCommunity ? (
+        <footer className="border-t border-border bg-surface-sunken px-4 py-2.5">
+          <p className="text-[11px] leading-snug text-neutral-strong">
+            {t("demoNote")}
+          </p>
+        </footer>
+      ) : null}
     </section>
   );
 }
