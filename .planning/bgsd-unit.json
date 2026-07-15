@@ -1,26 +1,15 @@
 {
   "run_id": "sesh-1784059200603",
-  "unit_id": "u1-design-map",
+  "unit_id": "u5-trace-routing",
   "scale": "feature",
-  "title": "Design system + map experience",
-  "scope": "Implement docs/design-direction.md across the app: font pairing (Bricolage Grotesque/Hanken Grotesk/IBM Plex Mono via next/font), palette + radius + soft-depth shadow tokens in Tailwind/shadcn theme, full-bleed map-first landing (no marketing hero), muted basemap treatment, four score-layer toggles (overall/accessibility/drainage/shade) with per-layer colorblind-safe ramps + line-width channel, always-visible legend with value bins, floating panel with live hero stat, segment click detail panel with per-item breakdown + photo placeholders, smooth fly-to, bilingual strings via next-intl. MUST consume data ONLY through the adapter contract in lib/segments.ts (getSegments/getSegmentDetail/getStats) — do not restructure data files.",
-  "touched": [
-    "app/[locale]",
-    "components",
-    "app/globals.css",
-    "messages",
-    "tailwind.config.ts",
-    "package.json"
-  ],
-  "deps": [],
-  "advisor_path": "/Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/sesh-1784059200603/advisor/u1-design-map.md",
-  "control_path": "/Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/sesh-1784059200603/control/u1-design-map.json",
+  "advisor_path": "/Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/sesh-1784059200603/advisor/u5-trace-routing.md",
+  "control_path": "/Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/sesh-1784059200603/control/u5-trace-routing.json",
   "control_cli": "node /Users/filippofonseca/.claude/plugins/cache/better-gsd/bgsd/2.0.0/scripts/control.mjs",
   "conventions": {
     "commits": "atomic, explicit pathspecs, as you go",
     "identity": "repo-local (Gianluca) — never override",
     "trailer": "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
     "quality": "npm run build && npm run lint green before done",
-    "branch": "unit/u1-design-map (push allowed), never touch main or next"
+    "branch": "unit/u5-trace-routing (push allowed), never touch main or next"
   }
 }
