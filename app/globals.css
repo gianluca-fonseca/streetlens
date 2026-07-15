@@ -1,53 +1,68 @@
 @import "tailwindcss";
 
 /*
- * StreetLens design tokens — sealed from docs/design-direction.md (v1, 2026-07-14).
- * Warm eco-urbanist civic instrument. Soft-depth (dual warm-tinted shadow),
- * non-uniform radius (4/8/12), colorblind-safe data, no glassmorphism.
+ * StreetLens design tokens — sealed from docs/design-direction.md (rev 4, 2026-07-15).
+ * Survey-instrument field aesthetic: cool concrete-paper grounds with a green
+ * hue bias (OFF-cream, deliberate), road-marking yellow as the single UI accent,
+ * pine as brand primary. Soft-depth (dual green-black shadow), non-uniform radius
+ * (4/8/12), colorblind-safe data. Terracotta is demoted to DATA colors only.
+ * Every ratio in the comments below is computed AA (see contrast table in report).
  */
 
 :root {
-  /* Surfaces (light: warm bone) */
-  --surface-base: #f4f1ea;
-  --surface-elevated: #fbfaf6;
-  --surface-sunken: #eceadf;
+  /* Grounds (light: cool concrete-paper, green-biased, OFF-cream) */
+  --surface-base: #f2f3f0;
+  --surface-elevated: #fafbf9;
+  --surface-sunken: #e9ebe6;
 
-  /* Ink + neutral ramp */
-  --ink: #1c2321;
-  /* Secondary body text. Darkened from #6b7069 so it clears AA (4.5:1) as body
-     copy on all three light surfaces, including the sunken tone (4.65:1). */
-  --neutral-strong: #646963;
-  --neutral: #9aa097;
-  --neutral-soft: #d8d6cc;
+  /* Ink + neutral ramp (rebiased green to match the grounds) */
+  --ink: #171d1a;
+  /* Secondary body text: green-biased slate. Clears AA (>=4.5:1) as body copy on
+     all three light grounds — min 5.73:1 on the sunken tone. */
+  --neutral-strong: #565c54;
+  --neutral: #8b9188;
+  --neutral-soft: #d3d6cf;
 
-  /* Brand */
+  /* Brand primary: pine (unchanged) */
   --pine: #1f5c4a;
   --pine-strong: #164034;
+
+  /* UI accent: road-marking yellow (lane paint). Two forms:
+     - surface/graphic: saturated lane yellow for fills, active markers, highlights
+     - accent-strong: darker press/hover form
+     - accent-text: dark ochre that clears AA (>=4.5:1) on every light ground
+       (min 4.98:1 on sunken); use this for accent TEXT on grounds, never the
+       saturated form (which is graphic-only at 1.4:1). */
+  --accent: #e8c51c;
+  --accent-strong: #d2b015;
+  --accent-text: #756211;
+
+  /* Terracotta: DATA ONLY (score ramps / geometry viz). Retired from all chrome. */
   --terracotta: #e07a3f;
 
-  /* Borders / rings (non-shadow affordance, >=3:1) */
-  --border: #d8d6cc;
-  --border-strong: #b9b6a9;
+  /* Borders / rings (non-shadow affordance; border-strong is the visible step) */
+  --border: #d3d6cf;
+  --border-strong: #adb1a6;
   --ring: #1f5c4a;
 
-  /* Soft-depth shadows: dual warm-tinted (ambient + tight directional), never pure black. */
+  /* Soft-depth shadows: dual green-black tint (ambient + tight directional), never pure black. */
   --shadow-panel:
-    0 1px 2px rgba(58, 52, 40, 0.10),
-    0 8px 24px -6px rgba(58, 52, 40, 0.16);
+    0 1px 2px rgba(23, 29, 26, 0.10),
+    0 8px 24px -6px rgba(23, 29, 26, 0.16);
   --shadow-popover:
-    0 2px 6px rgba(58, 52, 40, 0.14),
-    0 18px 42px -10px rgba(58, 52, 40, 0.26);
+    0 2px 6px rgba(23, 29, 26, 0.14),
+    0 18px 42px -10px rgba(23, 29, 26, 0.26);
 
   /* Radius system (intentional, non-uniform) */
   --radius-chip: 4px;
   --radius-panel: 8px;
   --radius-primary: 12px;
 
-  /* Earned glass (rev 3): imagery-backed surfaces only. Warm bone tint + warm
-   * hairline. Theme-adaptive so a single primitive reads over light renders,
-   * the live map, and warm-dark renders alike. */
-  --glass-bg: rgba(244, 241, 234, 0.72);
-  --glass-border: rgba(58, 52, 40, 0.16);
+  /* Earned glass (rev 3): imagery-backed surfaces only. Cool concrete tint +
+   * green-black hairline. Theme-adaptive so a single primitive reads over light
+   * renders, the live map, and asphalt-dark renders alike. */
+  --glass-bg: rgba(242, 243, 240, 0.72);
+  --glass-border: rgba(23, 29, 26, 0.16);
 }
 
 @theme inline {
@@ -60,6 +75,9 @@
   --color-neutral-soft: var(--neutral-soft);
   --color-pine: var(--pine);
   --color-pine-strong: var(--pine-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-text: var(--accent-text);
   --color-terracotta: var(--terracotta);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
@@ -81,24 +99,34 @@
   --shadow-popover: var(--shadow-popover);
 }
 
-/* Dark mode: near-black warm base. Data glow (dark only) lives on the map layer, not chrome. */
+/* Dark mode: asphalt green-black grounds. Yellow accent reads beautifully on
+   asphalt. Data glow (dark only) lives on the map layer, not chrome. Redefines
+   token VALUES only — components style through the same tokens as light. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface-base: #14140f;
-    --surface-elevated: #1e1e17;
-    --surface-sunken: #0f0f0b;
+    --surface-base: #10130f;
+    --surface-elevated: #191d17;
+    --surface-sunken: #0b0e0a;
 
-    --ink: #ecebe0;
-    --neutral-strong: #a9ac9f;
-    --neutral: #7d8175;
-    --neutral-soft: #35352b;
+    --ink: #e8ebe0;
+    --neutral-strong: #a4a99c;
+    --neutral: #78806f;
+    --neutral-soft: #333a2e;
 
     --pine: #3f9c7f;
     --pine-strong: #2c7a62;
+
+    /* Yellow accent on asphalt: the surface form reads directly, and it clears
+       AA as text on the dark grounds (min ~10:1), so accent-text folds back to
+       the saturated form here. */
+    --accent: #e8c51c;
+    --accent-strong: #f0d23a;
+    --accent-text: #e8c51c;
+
     --terracotta: #ef8f56;
 
-    --border: #35352b;
-    --border-strong: #4c4c3e;
+    --border: #333a2e;
+    --border-strong: #4a5142;
     --ring: #3f9c7f;
 
     --shadow-panel:
@@ -108,8 +136,8 @@
       0 2px 6px rgba(0, 0, 0, 0.5),
       0 18px 42px -10px rgba(0, 0, 0, 0.66);
 
-    --glass-bg: rgba(20, 20, 15, 0.62);
-    --glass-border: rgba(236, 235, 224, 0.14);
+    --glass-bg: rgba(16, 19, 15, 0.62);
+    --glass-border: rgba(232, 235, 224, 0.14);
   }
 }
 
@@ -126,9 +154,10 @@ body {
   background: var(--surface-base);
   color: var(--ink);
   font-family: var(--font-sans);
-  /* Subtle warm paper grain on the bone base (no aurora/mesh). */
+  /* Subtle grain on the concrete base (no aurora/mesh). Marketing surfaces layer
+     the topographic contour motif over this; see .contour-field. */
   background-image: radial-gradient(
-    rgba(28, 35, 33, 0.018) 0.5px,
+    rgba(23, 29, 26, 0.016) 0.5px,
     transparent 0.5px
   );
   background-size: 3px 3px;
@@ -150,12 +179,12 @@ body {
   filter: none;
 }
 .maplibregl-ctrl-attrib {
-  background: rgba(251, 250, 246, 0.78) !important;
+  background: rgba(250, 251, 249, 0.78) !important;
   color: var(--neutral-strong) !important;
   border-radius: var(--radius-chip) 0 0 0 !important;
 }
 @media (prefers-color-scheme: dark) {
   .maplibregl-ctrl-attrib {
-    background: rgba(30, 30, 23, 0.78) !important;
+    background: rgba(25, 29, 23, 0.78) !important;
   }
 }
