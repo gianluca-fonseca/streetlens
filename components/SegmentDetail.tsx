@@ -4,6 +4,10 @@ import { useTranslations } from "next-intl";
 import { ImageOff, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
 import {
+  parseCommunityReport,
+  parseCommunityReports,
+} from "@/lib/parse-feature-props";
+import {
   LAYER_ORDER,
   RUBRIC_ITEMS,
   placeholderItemScore,
@@ -47,9 +51,13 @@ export default function SegmentDetail({
   const isCommunity =
     segment.source === "community" || segment.source === "import";
   const isUnverified = segment.verified === false;
+  // Coerce defensively regardless of upstream: maplibre may deliver these as
+  // JSON strings, and malformed report data must NEVER throw here (the panel has
+  // no error boundary below the page). parse* tolerate string/object/null/junk.
+  const embedded = parseCommunityReport(segment.community_report);
   const allReports = [
-    ...(segment.community_report ? [segment.community_report] : []),
-    ...(segment.community_reports ?? []),
+    ...(embedded ? [embedded] : []),
+    ...parseCommunityReports(segment.community_reports),
   ];
   const reportMap = new Map<string, (typeof allReports)[number]>();
   for (const r of allReports) reportMap.set(r.id, r);
@@ -198,7 +206,10 @@ export default function SegmentDetail({
               {reports.map((r) => (
                 <li key={r.id} className="px-3 py-2">
                   <p className="font-mono text-[10.5px] text-neutral-strong">
-                    {t("communityReportLabel")} · {r.created_at.slice(0, 10)}
+                    {t("communityReportLabel")}
+                    {typeof r.created_at === "string" && r.created_at
+                      ? ` · ${r.created_at.slice(0, 10)}`
+                      : ""}
                   </p>
                   <p className="mt-0.5 text-[12.5px] leading-snug text-ink">
                     {r.note}
