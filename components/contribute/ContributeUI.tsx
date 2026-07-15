@@ -11,6 +11,7 @@ import {
   Plus,
   Route,
   Trash2,
+  TriangleAlert,
   Undo2,
   X,
 } from "lucide-react";
@@ -319,13 +320,57 @@ function InstructionPill({
   );
 }
 
+function FollowStreetsToggle({
+  on,
+  onToggle,
+}: Readonly<{ on: boolean; onToggle: () => void }>) {
+  const t = useTranslations("contribute");
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      onClick={onToggle}
+      className={[
+        "inline-flex items-center gap-2 rounded-[4px] border px-2.5 py-1.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine",
+        on
+          ? "border-pine/30 bg-pine/10 text-pine"
+          : "border-border bg-surface-elevated text-neutral-strong hover:border-border-strong",
+      ].join(" ")}
+    >
+      <Route size={14} strokeWidth={1.75} aria-hidden="true" />
+      <span>{t("followStreets.label")}</span>
+      <span
+        aria-hidden="true"
+        className={[
+          "ml-0.5 inline-flex h-3.5 w-6 items-center rounded-full px-0.5 transition-colors",
+          on ? "bg-pine" : "bg-neutral/40",
+        ].join(" ")}
+      >
+        <span
+          className={[
+            "h-2.5 w-2.5 rounded-full bg-white transition-transform",
+            on ? "translate-x-2.5" : "translate-x-0",
+          ].join(" ")}
+        />
+      </span>
+    </button>
+  );
+}
+
 function TraceControls({
   count,
+  followStreets,
+  hasFallback,
+  onToggleFollow,
   onUndo,
   onClear,
   onFinish,
 }: Readonly<{
   count: number;
+  followStreets: boolean;
+  hasFallback: boolean;
+  onToggleFollow: () => void;
   onUndo: () => void;
   onClear: () => void;
   onFinish: () => void;
@@ -333,39 +378,55 @@ function TraceControls({
   const t = useTranslations("contribute");
   return (
     <SlideUp>
-      <div className="pointer-events-auto flex items-center gap-2 rounded-[8px] border border-border bg-surface-elevated px-3 py-2 shadow-[var(--shadow-panel)]">
-        <span className="font-mono text-[12px] text-neutral-strong">
-          {t("trace.points", { count })}
-        </span>
-        <div className="ml-auto flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={onUndo}
-            disabled={count === 0}
-            className={`${GHOST_BTN} px-2`}
-            aria-label={t("trace.undo")}
-          >
-            <Undo2 size={15} strokeWidth={1.75} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={onClear}
-            disabled={count === 0}
-            className={`${GHOST_BTN} px-2`}
-            aria-label={t("trace.clear")}
-          >
-            <Trash2 size={15} strokeWidth={1.75} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={onFinish}
-            disabled={count < 2}
-            className={PRIMARY_BTN}
-          >
-            <Check size={15} strokeWidth={1.75} aria-hidden="true" />
-            {t("trace.finish")}
-          </button>
+      <div className="pointer-events-auto flex flex-col gap-2 rounded-[8px] border border-border bg-surface-elevated px-3 py-2 shadow-[var(--shadow-panel)]">
+        <div className="flex items-center gap-2">
+          <FollowStreetsToggle on={followStreets} onToggle={onToggleFollow} />
         </div>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[12px] text-neutral-strong">
+            {t("trace.points", { count })}
+          </span>
+          <div className="ml-auto flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={onUndo}
+              disabled={count === 0}
+              className={`${GHOST_BTN} px-2`}
+              aria-label={t("trace.undo")}
+            >
+              <Undo2 size={15} strokeWidth={1.75} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={onClear}
+              disabled={count === 0}
+              className={`${GHOST_BTN} px-2`}
+              aria-label={t("trace.clear")}
+            >
+              <Trash2 size={15} strokeWidth={1.75} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={onFinish}
+              disabled={count < 2}
+              className={PRIMARY_BTN}
+            >
+              <Check size={15} strokeWidth={1.75} aria-hidden="true" />
+              {t("trace.finish")}
+            </button>
+          </div>
+        </div>
+        {followStreets && hasFallback ? (
+          <p className="flex items-start gap-1.5 text-[11px] leading-snug text-neutral-strong">
+            <TriangleAlert
+              size={13}
+              strokeWidth={1.75}
+              className="mt-px shrink-0 text-terracotta"
+              aria-hidden="true"
+            />
+            {t("followStreets.warning")}
+          </p>
+        ) : null}
       </div>
     </SlideUp>
   );
@@ -384,7 +445,8 @@ function AddForm({
   const [honeypot, setHoneypot] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const coords = contribute.verts;
+  // The routed polyline (follows streets when on), not the raw user dots.
+  const coords = contribute.pathCoordinates;
   const canSubmit =
     name.trim().length > 0 && highway !== "" && coords.length >= 2;
   const submitting = contribute.submitState === "submitting";
@@ -441,6 +503,18 @@ function AddForm({
             coords={coords}
             onView={() => contribute.flyToCoords(coords)}
           />
+
+          {contribute.hasFallback ? (
+            <p className="flex items-start gap-1.5 rounded-[4px] border border-terracotta/40 bg-terracotta/10 px-2.5 py-1.5 text-[11px] leading-snug text-ink">
+              <TriangleAlert
+                size={13}
+                strokeWidth={1.75}
+                className="mt-px shrink-0 text-terracotta"
+                aria-hidden="true"
+              />
+              {t("followStreets.warning")}
+            </p>
+          ) : null}
 
           <div>
             <label className={LABEL} htmlFor="add-name">
@@ -830,7 +904,10 @@ export default function ContributeUI({
           />
         ) : mode === "trace" ? (
           <TraceControls
-            count={contribute.verts.length}
+            count={contribute.dots.length}
+            followStreets={contribute.followStreets}
+            hasFallback={contribute.hasFallback}
+            onToggleFollow={contribute.toggleFollowStreets}
             onUndo={contribute.undo}
             onClear={contribute.clear}
             onFinish={contribute.finishTrace}
