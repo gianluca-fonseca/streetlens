@@ -8,8 +8,7 @@ A warm, eco-urbanist civic instrument. Map-first like mcbroken, credible like Tr
 
 ## Type (Google Fonts)
 
-- Display/headlines: **Bricolage Grotesque**
-- UI/body: **Hanken Grotesk**
+- Display/headlines and UI/body: **Space Grotesk** (single app-wide typeface)
 - Numeric readouts, scores, coordinates: **IBM Plex Mono**
 - Inter/Roboto/Open Sans are prohibited as primary faces.
 
@@ -68,3 +67,7 @@ Purple/indigo gradients · glassmorphism cards · gradient-mesh/aurora backgroun
 ## shadcn rule
 
 Override every token (base colors, radius per system above, ring = pine green, fonts, custom shadow tokens). Nothing ships looking default.
+
+## Changelog
+
+- rev 2 (2026-07-15): Space Grotesk replaces Bricolage Grotesque + Hanken Grotesk app-wide, founder direction.
