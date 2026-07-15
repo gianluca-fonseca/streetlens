@@ -28,6 +28,10 @@
     "shade": {
       "name": "Sombra",
       "short": "Copa arbórea y cobertura"
+    },
+    "bike": {
+      "name": "Bici",
+      "short": "Infraestructura ciclista"
     }
   },
   "legend": {
@@ -80,6 +84,11 @@
       "canopy": "Copa arbórea",
       "awning": "Toldos y cobertura",
       "exposure": "Exposición al sol"
+    },
+    "bike": {
+      "lane": "Carril o vía ciclista",
+      "separation": "Separación del tráfico",
+      "connectivity": "Conectividad de la red"
     }
   },
   "admin": {
@@ -244,6 +253,15 @@
           "fair": "Algo de sombra",
           "poor": "Poca o ninguna sombra",
           "unsure": "No estoy seguro"
+        }
+      },
+      "bike": {
+        "label": "Infraestructura ciclista",
+        "options": {
+          "protected": "Carril ciclista protegido",
+          "lane": "Carril ciclista pintado",
+          "shared": "Compartido con el tráfico",
+          "none": "Sin infraestructura ciclista"
         }
       }
     },

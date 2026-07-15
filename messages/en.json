@@ -28,6 +28,10 @@
     "shade": {
       "name": "Shade",
       "short": "Tree canopy and cover"
+    },
+    "bike": {
+      "name": "Bike",
+      "short": "Bike infrastructure"
     }
   },
   "legend": {
@@ -80,6 +84,11 @@
       "canopy": "Tree canopy",
       "awning": "Awnings and cover",
       "exposure": "Sun exposure"
+    },
+    "bike": {
+      "lane": "Bike lane or path",
+      "separation": "Separation from traffic",
+      "connectivity": "Network connectivity"
     }
   },
   "admin": {
@@ -244,6 +253,15 @@
           "fair": "Some shade",
           "poor": "Little or no shade",
           "unsure": "Not sure"
+        }
+      },
+      "bike": {
+        "label": "Bike infrastructure",
+        "options": {
+          "protected": "Protected bike lane",
+          "lane": "Painted bike lane",
+          "shared": "Shared with traffic",
+          "none": "No bike infrastructure"
         }
       }
     },
