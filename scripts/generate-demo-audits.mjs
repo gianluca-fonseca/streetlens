@@ -65,6 +65,9 @@ const RUBRIC_ITEMS = [
   { key: "midday_shade", layer: "shade", response_type: "scale_0_4", label_en: "Shade at midday", label_es: "Sombra al mediodía" },
   { key: "lighting", layer: "overall", response_type: "scale_0_4", label_en: "Street lighting", label_es: "Iluminación pública" },
   { key: "crossing_safety", layer: "overall", response_type: "scale_0_4", label_en: "Crossing safety", label_es: "Seguridad en cruces" },
+  { key: "bike_lane_present", layer: "bike", response_type: "boolean", label_en: "Dedicated bike lane or path", label_es: "Carril o vía ciclista dedicada" },
+  { key: "bike_separation", layer: "bike", response_type: "scale_0_4", label_en: "Separation from motor traffic", label_es: "Separación del tráfico motorizado" },
+  { key: "bike_surface", layer: "bike", response_type: "scale_0_4", label_en: "Cycling surface quality", label_es: "Calidad de la superficie ciclable" },
 ];
 
 /* -------------------------------------------------------------- *
@@ -141,6 +144,39 @@ function nearestQuebradaMeters([lon, lat]) {
 /* -------------------------------------------------------------- *
  * Scoring model
  * -------------------------------------------------------------- */
+// Plausible baseline bike-infrastructure score by road class. Most residential
+// Costa Rican streets have no cycling provision (near-zero); through-roads are
+// where a bike lane would plausibly go (modest); a dedicated cycleway is high.
+const BIKE_CLASS_BASE = {
+  residential: 12,
+  footway: 12,
+  path: 12,
+  unclassified: 24,
+  tertiary: 30,
+  secondary: 34,
+  cycleway: 88,
+};
+// Bonus for a real OSM bike_infra hint (importer-derived). `none` adds nothing.
+const BIKE_INFRA_BONUS = {
+  none: 0,
+  shared: 16,
+  lane: 32,
+  track: 48,
+  cycleway: 60,
+};
+
+function bikeScore(feature, lon, lat) {
+  const highway = feature.properties.highway;
+  const infra = feature.properties.bike_infra || "none";
+  let base = BIKE_CLASS_BASE[highway] ?? 16;
+  base += BIKE_INFRA_BONUS[infra] ?? 0;
+  // A dedicated cycleway (by class or hint) is unambiguously good bike infra.
+  if (infra === "cycleway" || highway === "cycleway") base = Math.max(base, 85);
+  // Smooth spatial autocorrelation so nearby segments read as a coherent network.
+  const nBike = valueNoise(lon, lat, 71);
+  return clamp(base + 22 * (nBike - 0.5));
+}
+
 function scoreSegment(feature) {
   const coords = feature.geometry.coordinates;
   const mid = midpoint(coords);
@@ -171,11 +207,16 @@ function scoreSegment(feature) {
     0.45 * accessibility + 0.3 * drainage + 0.25 * shade,
   );
 
+  // Bike is its own lens (not folded into overall — overall stays the composite
+  // sidewalk score, and the hero/Ley 7600 stat is unaffected).
+  const bike = bikeScore(feature, lon, lat);
+
   return {
     overall: Math.round(overall),
     accessibility: Math.round(accessibility),
     drainage: Math.round(drainage),
     shade: Math.round(shade),
+    bike: Math.round(bike),
   };
 }
 
@@ -241,6 +282,7 @@ async function main() {
         score_accessibility: scores.accessibility,
         score_drainage: scores.drainage,
         score_shade: scores.shade,
+        score_bike: scores.bike,
         audited_at: AUDIT_DATE,
         demo: true,
       },
