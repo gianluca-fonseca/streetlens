@@ -34,6 +34,7 @@ export default function SegmentDetail({
     accessibility: segment.score_accessibility,
     drainage: segment.score_drainage,
     shade: segment.score_shade,
+    bike: segment.score_bike,
   };
   const seed = seedFromId(segment.id);
   const items = RUBRIC_ITEMS[activeLayer].map((key, i) => ({

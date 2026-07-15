@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Accessibility, Droplets, Route, TreePine } from "lucide-react";
+import { Accessibility, Bike, Droplets, Route, TreePine } from "lucide-react";
 import type { ScoreLayer } from "@/lib/segments";
 import { LAYER_ORDER } from "@/components/mapConfig";
 
@@ -17,6 +17,7 @@ const ICONS: Record<ScoreLayer, typeof Route> = {
   accessibility: Accessibility,
   drainage: Droplets,
   shade: TreePine,
+  bike: Bike,
 };
 
 export default function LayerSwitcher({
