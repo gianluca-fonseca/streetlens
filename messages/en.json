@@ -333,5 +333,141 @@
       "invalid": "Please check the highlighted fields and try again.",
       "network": "Couldn't reach the server. Check your connection and try again."
     }
+  },
+  "landing": {
+    "meta": {
+      "title": "StreetLens: every sidewalk in Escazú, measured in the open",
+      "description": "An open audit of sidewalk quality, accessibility, drainage, and shade across Escazú, Costa Rica. Real street geometry, an honest method, and demo data until field collection begins in August 2026.",
+      "ogTitle": "Every sidewalk in Escazú, measured in the open",
+      "ogDescription": "An open audit of street quality, accessibility, drainage, and shade across Escazú, Costa Rica. Demo data over real geometry until fieldwork begins in August 2026."
+    },
+    "hero": {
+      "eyebrow": "Escazú pilot",
+      "headline": "Every sidewalk in Escazú, measured in the open.",
+      "support": "An open audit of street quality, accessibility, drainage, and shade across San Antonio de Escazú, one segment at a time.",
+      "ctaExplore": "Explore the map",
+      "ctaMethod": "How we score",
+      "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",
+      "heroStatDemo": "Demo figure over real geometry. Not a real measurement.",
+      "statSegments": "Segments audited",
+      "statKm": "Corridor km",
+      "statCoverage": "Pilot coverage"
+    },
+    "gap": {
+      "eyebrow": "Why this matters",
+      "heading": "Ley 7600 turned 30. No municipality had mapped whether the sidewalks comply.",
+      "lead": "Costa Rica has guaranteed accessible pedestrian space by law since 1996. Three decades on, there is still no public map of which sidewalks meet the minimum. StreetLens is building it.",
+      "stat1Value": "1,601",
+      "stat1Label": "pedestrians run over in Costa Rica in 2024",
+      "stat1Note": "COSEVI road-safety data.",
+      "stat2Value": "30",
+      "stat2Label": "years of Ley 7600, still with no municipal compliance map",
+      "stat2Note": "Ley 7600 took effect in 1996.",
+      "stat3Label": "of audited segments fail the accessibility minimum",
+      "stat3Note": "Demo figure over real geometry. Not a real measurement."
+    },
+    "lenses": {
+      "eyebrow": "Four lenses on one street",
+      "heading": "One corridor, read four ways.",
+      "lead": "The same audited segments, recolored by each rubric layer. Every ramp is colorblind-safe and paired with a line-width channel, and the legend always shows the value bins.",
+      "scrollHint": "Scroll to change the layer",
+      "items": {
+        "accessibility": "Curb ramps, tactile paving, and safe crossings, scored against Ley 7600.",
+        "drainage": "Grates, cross slope, and ponding history, from well-drained to flood-prone.",
+        "shade": "Tree canopy and cover, from exposed pavement to full canopy.",
+        "bike": "Bike lanes and separation, from none to protected."
+      }
+    },
+    "method": {
+      "eyebrow": "How a segment gets scored",
+      "heading": "A field method, not a guess.",
+      "lead": "Each segment is audited against an established rubric. When fieldwork begins, an auditor walks the segment, records each item, and the scores are computed from those observations. Nothing is inferred from a desk.",
+      "items": {
+        "maps": {
+          "title": "MAPS-Mini",
+          "desc": "A validated microscale audit of pedestrian streetscapes: sidewalks, crossings, and buffers."
+        },
+        "lanamme": {
+          "title": "LANAMME-UCR",
+          "desc": "Costa Rica's national road-materials laboratory at the University of Costa Rica, for pavement and condition standards."
+        },
+        "ley": {
+          "title": "Ley 7600",
+          "desc": "Costa Rica's equal-opportunity law, which sets the accessibility minimums a sidewalk must meet."
+        },
+        "field": {
+          "title": "Field audit",
+          "desc": "Every score traces to an on-site observation and, in time, a photo. The example shows the segment-detail anatomy."
+        }
+      },
+      "anatomyLabel": "Example segment. Demo audit over real OSM geometry, not a real measurement."
+    },
+    "grounding": {
+      "eyebrow": "Built to be checked",
+      "heading": "Grounded in public standards and open data.",
+      "lead": "StreetLens is not a black box. It leans on established rubrics and open datasets, and the code is public.",
+      "items": {
+        "maps": {
+          "name": "MAPS-Mini",
+          "note": "Microscale Audit of Pedestrian Streetscapes"
+        },
+        "lanamme": {
+          "name": "LANAMME-UCR",
+          "note": "National road-materials laboratory, University of Costa Rica"
+        },
+        "ley": {
+          "name": "Ley 7600",
+          "note": "Equal Opportunities for Persons with Disabilities Act"
+        },
+        "osm": {
+          "name": "OpenStreetMap",
+          "note": "Street geometry, under ODbL 1.0"
+        },
+        "cosevi": {
+          "name": "COSEVI",
+          "note": "National Road Safety Council road-safety data"
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "heading": "Honest answers.",
+      "items": {
+        "real": {
+          "q": "Is this real data?",
+          "a": "Not yet. Every score you see today is demo data generated over real OpenStreetMap geometry, so the map behaves exactly as it will with field data. Real measurements replace it corridor by corridor once fieldwork begins in August 2026."
+        },
+        "scores": {
+          "q": "How are scores computed?",
+          "a": "Each layer is scored 0 to 100 from a rubric of observed items, where higher is better. The map pairs a colorblind-safe color ramp with a line-width channel, and the legend always shows the value bins. Every score ships with its formula."
+        },
+        "fieldwork": {
+          "q": "When does fieldwork start?",
+          "a": "Field collection in San Antonio de Escazú is planned for August 2026. Until then the pilot runs on demo data over the real corridor."
+        },
+        "contribute": {
+          "q": "Can I contribute?",
+          "a": "Yes. You can add a street we missed or flag a correction from the map. A reviewer checks every submission before anything on the public map changes."
+        },
+        "who": {
+          "q": "Who is behind this?",
+          "a": "StreetLens is a project of CUSP, the Collective for Urbanism and Sustainable Progress, led by Gianluca Fonseca. It is open source and built in the open."
+        }
+      }
+    },
+    "cta": {
+      "eyebrow": "Escazú pilot",
+      "heading": "Read the street for yourself.",
+      "support": "Open the live map, or add a street you know.",
+      "explore": "Explore the map",
+      "contribute": "Contribute a street"
+    },
+    "footer": {
+      "tagline": "Open street audits for Escazú, Costa Rica.",
+      "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins.",
+      "github": "GitHub",
+      "localeLabel": "Language",
+      "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress."
+    }
   }
 }

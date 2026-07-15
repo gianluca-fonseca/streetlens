@@ -333,5 +333,141 @@
       "invalid": "Revisá los campos señalados e intentá de nuevo.",
       "network": "No se pudo contactar al servidor. Revisá tu conexión e intentá de nuevo."
     }
+  },
+  "landing": {
+    "meta": {
+      "title": "StreetLens: cada acera de Escazú, medida de forma abierta",
+      "description": "Una auditoría abierta de la calidad, accesibilidad, drenaje y sombra de las aceras de Escazú, Costa Rica. Geometría real de las calles, un método honesto y datos de demostración hasta que inicie el trabajo de campo en agosto de 2026.",
+      "ogTitle": "Cada acera de Escazú, medida de forma abierta",
+      "ogDescription": "Una auditoría abierta de la calidad, accesibilidad, drenaje y sombra de las calles de Escazú, Costa Rica. Datos de demostración sobre geometría real hasta que inicie el trabajo de campo en agosto de 2026."
+    },
+    "hero": {
+      "eyebrow": "Piloto de Escazú",
+      "headline": "Cada acera de Escazú, medida de forma abierta.",
+      "support": "Una auditoría abierta de la calidad, accesibilidad, drenaje y sombra de las calles de San Antonio de Escazú, segmento por segmento.",
+      "ctaExplore": "Explorar el mapa",
+      "ctaMethod": "Cómo calificamos",
+      "heroStat": "{pct}% de los segmentos auditados no cumple los mínimos de accesibilidad de la Ley 7600",
+      "heroStatDemo": "Cifra de demostración sobre geometría real. No es una medición real.",
+      "statSegments": "Segmentos auditados",
+      "statKm": "Km del corredor",
+      "statCoverage": "Cobertura del piloto"
+    },
+    "gap": {
+      "eyebrow": "Por qué importa",
+      "heading": "La Ley 7600 cumplió 30 años. Ninguna municipalidad había mapeado si las aceras cumplen.",
+      "lead": "Costa Rica garantiza por ley un espacio peatonal accesible desde 1996. Tres décadas después, todavía no existe un mapa público de cuáles aceras cumplen el mínimo. StreetLens lo está construyendo.",
+      "stat1Value": "1,601",
+      "stat1Label": "personas atropelladas en Costa Rica en 2024",
+      "stat1Note": "Datos de seguridad vial del COSEVI.",
+      "stat2Value": "30",
+      "stat2Label": "años de la Ley 7600, aún sin un mapa municipal de cumplimiento",
+      "stat2Note": "La Ley 7600 entró en vigencia en 1996.",
+      "stat3Label": "de los segmentos auditados no cumple el mínimo de accesibilidad",
+      "stat3Note": "Cifra de demostración sobre geometría real. No es una medición real."
+    },
+    "lenses": {
+      "eyebrow": "Cuatro miradas sobre una misma calle",
+      "heading": "Un corredor, leído de cuatro formas.",
+      "lead": "Los mismos segmentos auditados, recoloreados por cada capa del rubro. Cada rampa de color es segura para el daltonismo y se acompaña de un canal de grosor de línea, y la leyenda siempre muestra los rangos de valores.",
+      "scrollHint": "Desplácese para cambiar de capa",
+      "items": {
+        "accessibility": "Rampas, superficie podotáctil y cruces seguros, calificados según la Ley 7600.",
+        "drainage": "Rejillas, pendiente transversal e historial de encharcamiento, de bien drenado a propenso a inundarse.",
+        "shade": "Copa arbórea y cobertura, de pavimento expuesto a sombra plena.",
+        "bike": "Ciclovías y separación, de ninguna a protegida."
+      }
+    },
+    "method": {
+      "eyebrow": "Cómo se califica un segmento",
+      "heading": "Un método de campo, no una suposición.",
+      "lead": "Cada segmento se audita con un rubro establecido. Cuando inicie el trabajo de campo, una persona auditora recorre el segmento, registra cada ítem y las calificaciones se calculan a partir de esas observaciones. Nada se infiere desde un escritorio.",
+      "items": {
+        "maps": {
+          "title": "MAPS-Mini",
+          "desc": "Una auditoría microescala validada del entorno peatonal: aceras, cruces y franjas de amortiguamiento."
+        },
+        "lanamme": {
+          "title": "LANAMME-UCR",
+          "desc": "El laboratorio nacional de materiales y vías de la Universidad de Costa Rica, para estándares de pavimento y condición."
+        },
+        "ley": {
+          "title": "Ley 7600",
+          "desc": "La ley de igualdad de oportunidades de Costa Rica, que fija los mínimos de accesibilidad que debe cumplir una acera."
+        },
+        "field": {
+          "title": "Auditoría de campo",
+          "desc": "Cada calificación se remite a una observación en sitio y, con el tiempo, a una foto. El ejemplo muestra la anatomía del detalle de un segmento."
+        }
+      },
+      "anatomyLabel": "Segmento de ejemplo. Auditoría de demostración sobre geometría real de OSM, no es una medición real."
+    },
+    "grounding": {
+      "eyebrow": "Hecho para ser verificado",
+      "heading": "Basado en estándares públicos y datos abiertos.",
+      "lead": "StreetLens no es una caja negra. Se apoya en rubros establecidos y conjuntos de datos abiertos, y el código es público.",
+      "items": {
+        "maps": {
+          "name": "MAPS-Mini",
+          "note": "Auditoría microescala del entorno peatonal"
+        },
+        "lanamme": {
+          "name": "LANAMME-UCR",
+          "note": "Laboratorio nacional de materiales y vías, Universidad de Costa Rica"
+        },
+        "ley": {
+          "name": "Ley 7600",
+          "note": "Ley de Igualdad de Oportunidades para las Personas con Discapacidad"
+        },
+        "osm": {
+          "name": "OpenStreetMap",
+          "note": "Geometría de las calles, bajo ODbL 1.0"
+        },
+        "cosevi": {
+          "name": "COSEVI",
+          "note": "Consejo de Seguridad Vial, datos de seguridad vial"
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "Preguntas",
+      "heading": "Respuestas honestas.",
+      "items": {
+        "real": {
+          "q": "¿Son datos reales?",
+          "a": "Todavía no. Cada calificación que ve hoy es un dato de demostración generado sobre geometría real de OpenStreetMap, de modo que el mapa se comporta igual que lo hará con datos de campo. Las mediciones reales lo reemplazan corredor por corredor cuando inicie el trabajo de campo en agosto de 2026."
+        },
+        "scores": {
+          "q": "¿Cómo se calculan las calificaciones?",
+          "a": "Cada capa se califica de 0 a 100 a partir de un rubro de ítems observados, donde más alto es mejor. El mapa combina una rampa de color segura para el daltonismo con un canal de grosor de línea, y la leyenda siempre muestra los rangos de valores. Cada calificación se publica con su fórmula."
+        },
+        "fieldwork": {
+          "q": "¿Cuándo inicia el trabajo de campo?",
+          "a": "La recolección en campo en San Antonio de Escazú está prevista para agosto de 2026. Hasta entonces, el piloto funciona con datos de demostración sobre el corredor real."
+        },
+        "contribute": {
+          "q": "¿Puedo contribuir?",
+          "a": "Sí. Puede agregar una calle que faltó o señalar una corrección desde el mapa. Una persona revisora verifica cada envío antes de que algo cambie en el mapa público."
+        },
+        "who": {
+          "q": "¿Quién está detrás de esto?",
+          "a": "StreetLens es un proyecto de CUSP, el Collective for Urbanism and Sustainable Progress, liderado por Gianluca Fonseca. Es de código abierto y se construye de forma pública."
+        }
+      }
+    },
+    "cta": {
+      "eyebrow": "Piloto de Escazú",
+      "heading": "Lea la calle usted mismo.",
+      "support": "Abra el mapa en vivo o agregue una calle que conozca.",
+      "explore": "Explorar el mapa",
+      "contribute": "Contribuir una calle"
+    },
+    "footer": {
+      "tagline": "Auditorías abiertas de las calles de Escazú, Costa Rica.",
+      "openData": "Geometría de las calles de OpenStreetMap, bajo ODbL 1.0. Las calificaciones son datos de demostración hasta que inicie la recolección en campo.",
+      "github": "GitHub",
+      "localeLabel": "Idioma",
+      "built": "Un proyecto de CUSP, el Collective for Urbanism and Sustainable Progress."
+    }
   }
 }
