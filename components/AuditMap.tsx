@@ -47,6 +47,25 @@ function prefersDark(): boolean {
   );
 }
 
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/** Hero camera signature: one gentle scripted glide across the Escazú corridor. */
+const HERO_START: { center: [number, number]; zoom: number; bearing: number } = {
+  center: [-84.15, 9.9],
+  zoom: 13.0,
+  bearing: -6,
+};
+const HERO_END: { center: [number, number]; zoom: number; bearing: number } = {
+  center: [-84.137, 9.915],
+  zoom: 14.1,
+  bearing: 4,
+};
+
 /** Strip POIs / most labels and recolor Liberty to a calm warm-neutral basemap. */
 function muteBasemap(map: maplibregl.Map, dark: boolean) {
   const pal = dark ? BASEMAP.dark : BASEMAP.light;
@@ -197,19 +216,33 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
   }
 }
 
+export type AuditMapVariant = "app" | "hero";
+
 export default function AuditMap({
   segments,
   stats,
+  variant = "app",
+  activeLayer: controlledLayer,
+  flyOnLoad = false,
 }: Readonly<{
   segments: SegmentCollection;
-  stats: StreetStats;
+  stats?: StreetStats;
+  variant?: AuditMapVariant;
+  /** Externally controlled score layer (hero / scrollytelling). */
+  activeLayer?: ScoreLayer;
+  /** Run the gentle corridor fly-to on load (hero only, reduced-motion safe). */
+  flyOnLoad?: boolean;
 }>) {
   const t = useTranslations("map");
+  const isHero = variant === "hero";
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const readyRef = useRef(false);
 
-  const [activeLayer, setActiveLayer] = useState<ScoreLayer>("overall");
+  // In hero/scrollytelling mode the active layer is driven from outside; the
+  // app surface keeps its own internal state via the layer switcher.
+  const [internalLayer, setActiveLayer] = useState<ScoreLayer>("overall");
+  const activeLayer = controlledLayer ?? internalLayer;
   const [selected, setSelected] = useState<SegmentProperties | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
@@ -223,10 +256,16 @@ export default function AuditMap({
   // Keep the latest contribute API reachable from the once-created map handlers
   // without re-running the map-init effect.
   const contributeRef = useRef(contribute);
+  // Variant flags are fixed per mount but read inside the once-created map
+  // effect through refs, matching how the rest of that effect avoids props.
+  const isHeroRef = useRef(isHero);
+  const flyOnLoadRef = useRef(flyOnLoad);
   useEffect(() => {
     activeLayerRef.current = activeLayer;
     segmentsRef.current = segments;
     contributeRef.current = contribute;
+    isHeroRef.current = isHero;
+    flyOnLoadRef.current = flyOnLoad;
   });
 
   // Create the map exactly once.
@@ -234,15 +273,24 @@ export default function AuditMap({
     const container = containerRef.current;
     if (!container) return;
 
+    const hero = isHeroRef.current;
     const map = new maplibregl.Map({
       container,
       style: LIBERTY_STYLE_URL,
-      center: ESCAZU_CENTER,
-      zoom: INITIAL_ZOOM,
+      center: hero ? HERO_START.center : ESCAZU_CENTER,
+      zoom: hero ? HERO_START.zoom : INITIAL_ZOOM,
+      bearing: hero ? HERO_START.bearing : 0,
       attributionControl: { compact: true },
+      // Hero is a calm backdrop: never hijack the page scroll.
+      scrollZoom: !hero,
     });
     mapRef.current = map;
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    if (!hero) {
+      map.addControl(
+        new maplibregl.NavigationControl({ showCompass: false }),
+        "top-right",
+      );
+    }
 
     let styleLoaded = false;
     let fallbackApplied = false;
@@ -264,6 +312,29 @@ export default function AuditMap({
       applyLayer(map, activeLayerRef.current, dark);
       readyRef.current = true;
       setMapReady(true);
+
+      // Hero camera signature: one slow glide along the corridor, or a composed
+      // static framing when reduced motion is requested (or no fly is wanted).
+      if (hero) {
+        if (flyOnLoadRef.current && !prefersReducedMotion()) {
+          window.setTimeout(() => {
+            map.flyTo({
+              center: HERO_END.center,
+              zoom: HERO_END.zoom,
+              bearing: HERO_END.bearing,
+              duration: 5200,
+              curve: 1.35,
+              essential: true,
+            });
+          }, 650);
+        } else {
+          map.jumpTo({
+            center: HERO_END.center,
+            zoom: HERO_END.zoom,
+            bearing: HERO_END.bearing,
+          });
+        }
+      }
 
       map.on("mousemove", INTERACTIVE_LAYER_IDS, (e) => {
         const f = e.features?.[0];
@@ -290,30 +361,33 @@ export default function AuditMap({
         }
       });
 
-      map.on("click", INTERACTIVE_LAYER_IDS, (e) => {
-        const f = e.features?.[0];
-        if (!f) return;
-        // maplibre serializes community_report/community_reports to JSON strings
-        // at the worker boundary; normalize them here so both the ramp and the
-        // community casing layer hand SegmentDetail well-formed props.
-        const props = parseFeatureProps(f.properties);
-        // Gate for the contribution flow: swallow the click while tracing,
-        // and route it to the correction form while picking a segment.
-        const contrib = contributeRef.current;
-        const cmode = contrib.modeRef.current;
-        if (cmode === "trace") return;
-        if (cmode === "select") {
-          const geom = f.geometry;
-          const coordinates =
-            geom.type === "LineString"
-              ? (geom.coordinates as [number, number][])
-              : [];
-          contrib.pickSegment({ id: props.id, name: props.name, coordinates });
-          return;
-        }
-        selectFeature(map, props, f.geometry);
-        setSelected(props);
-      });
+      // Read-only hero has no selection popover; the app surface keeps it.
+      if (!hero) {
+        map.on("click", INTERACTIVE_LAYER_IDS, (e) => {
+          const f = e.features?.[0];
+          if (!f) return;
+          // maplibre serializes community_report/community_reports to JSON
+          // strings at the worker boundary; normalize them here so both the ramp
+          // and the community casing layer hand SegmentDetail well-formed props.
+          const props = parseFeatureProps(f.properties);
+          // Gate for the contribution flow: swallow the click while tracing,
+          // and route it to the correction form while picking a segment.
+          const contrib = contributeRef.current;
+          const cmode = contrib.modeRef.current;
+          if (cmode === "trace") return;
+          if (cmode === "select") {
+            const geom = f.geometry;
+            const coordinates =
+              geom.type === "LineString"
+                ? (geom.coordinates as [number, number][])
+                : [];
+            contrib.pickSegment({ id: props.id, name: props.name, coordinates });
+            return;
+          }
+          selectFeature(map, props, f.geometry);
+          setSelected(props);
+        });
+      }
     };
     map.on("load", onLoad);
 
@@ -364,6 +438,21 @@ export default function AuditMap({
     setSelected(null);
   };
 
+  if (isHero) {
+    // Calm read-only backdrop: no chrome, no popover, no contribute FAB. The
+    // overlay panel is composed by the landing Hero section, over this canvas.
+    return (
+      <div className="absolute inset-0">
+        <div
+          ref={containerRef}
+          role="application"
+          aria-label={t("ariaLabel")}
+          className="h-full w-full"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="absolute inset-0">
       <div
@@ -375,11 +464,13 @@ export default function AuditMap({
 
       <div className="pointer-events-none absolute inset-0 flex items-start justify-between gap-3 p-3 sm:p-4">
         <div className="pointer-events-none">
-          <MapPanel
-            stats={stats}
-            activeLayer={activeLayer}
-            onSelectLayer={setActiveLayer}
-          />
+          {stats ? (
+            <MapPanel
+              stats={stats}
+              activeLayer={activeLayer}
+              onSelectLayer={setActiveLayer}
+            />
+          ) : null}
         </div>
         {selected ? (
           <div className="pointer-events-none">
