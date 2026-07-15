@@ -21,7 +21,7 @@ export default function GlassPanel({
   className?: string;
   radius?: "panel" | "primary";
   elevation?: "panel" | "popover";
-  as?: "div" | "section" | "article" | "aside";
+  as?: "div" | "section" | "article" | "aside" | "figcaption";
 }>) {
   return (
     <Tag
