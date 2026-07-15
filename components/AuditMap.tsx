@@ -19,6 +19,7 @@ import {
   lineColorExpression,
   lineWidthExpression,
 } from "@/components/mapConfig";
+import { parseFeatureProps } from "@/lib/parse-feature-props";
 import MapPanel from "@/components/MapPanel";
 import SegmentDetail from "@/components/SegmentDetail";
 import ContributeUI from "@/components/contribute/ContributeUI";
@@ -292,7 +293,10 @@ export default function AuditMap({
       map.on("click", INTERACTIVE_LAYER_IDS, (e) => {
         const f = e.features?.[0];
         if (!f) return;
-        const props = f.properties as SegmentProperties;
+        // maplibre serializes community_report/community_reports to JSON strings
+        // at the worker boundary; normalize them here so both the ramp and the
+        // community casing layer hand SegmentDetail well-formed props.
+        const props = parseFeatureProps(f.properties);
         // Gate for the contribution flow: swallow the click while tracing,
         // and route it to the correction form while picking a segment.
         const contrib = contributeRef.current;
