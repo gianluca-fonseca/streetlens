@@ -183,6 +183,10 @@
       "needMore": "Agregá al menos dos puntos para continuar.",
       "cancel": "Cancelar"
     },
+    "followStreets": {
+      "label": "Seguir calles",
+      "warning": "No se pudo seguir las calles en parte de este trazo. Esos tramos se muestran punteados."
+    },
     "select": {
       "title": "Elegí un segmento",
       "hint": "Hacé clic en cualquier calle mapeada para proponerle una corrección.",

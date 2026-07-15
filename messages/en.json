@@ -183,6 +183,10 @@
       "needMore": "Add at least two points to continue.",
       "cancel": "Cancel"
     },
+    "followStreets": {
+      "label": "Follow streets",
+      "warning": "Couldn't follow streets for part of this path. Those spans are drawn dashed."
+    },
     "select": {
       "title": "Pick a segment",
       "hint": "Click any mapped street to propose a correction to it.",
