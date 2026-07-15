@@ -249,3 +249,66 @@ export const BASEMAP = {
     boundary: "#2c2c22",
   },
 } as const;
+
+/* ------------------------------------------------------------------ *
+ * 3D mode (u8) — native MapLibre terrain, always-on hillshade, and
+ * OSM building extrusions. Presentational only: this block adds NO score
+ * semantics and leaves RAMP + the line color/width expressions untouched.
+ * Implements the ratified research sketch (AWS Terrarium DEM, coalesced
+ * building heights) exactly.
+ * ------------------------------------------------------------------ */
+
+/** AWS Open Data Terrarium DEM — public-domain composite (USGS 3DEP/SRTM/GMTED
+ * + Copernicus EU-DEM). `encoding: "terrarium"` is mandatory (MapLibre defaults
+ * to mapbox). No SLA on the S3 bucket; acceptable for a subtle relief effect. */
+export const TERRAIN = {
+  sourceId: "terrain-dem",
+  tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+  encoding: "terrarium" as const,
+  tileSize: 256,
+  maxzoom: 15,
+  /** Combined USGS/Copernicus credit, shown alongside the OSM/OpenFreeMap line. */
+  attribution:
+    'Elevation: <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">Terrarium</a> (USGS 3DEP, SRTM, GMTED2010; Copernicus EU-DEM)',
+  /** Vertical exaggeration when 3D is enabled — hilly Escazú reads well at ~1.4. */
+  exaggeration: 1.4,
+} as const;
+
+/** Always-on hillshade layer id (subtle relief under the muted basemap). */
+export const HILLSHADE_LAYER_ID = "terrain-hillshade";
+
+/** Hillshade paint tuned to the warm muted palette so it never fights the score
+ * ramps in 2D: low exaggeration, warm shadow/highlight, restrained alpha. */
+export const HILLSHADE_PAINT = {
+  light: {
+    "hillshade-shadow-color": "rgba(74, 66, 54, 0.22)",
+    "hillshade-highlight-color": "rgba(251, 250, 246, 0.30)",
+    "hillshade-accent-color": "rgba(107, 112, 105, 0.12)",
+    "hillshade-exaggeration": 0.32,
+  },
+  dark: {
+    "hillshade-shadow-color": "rgba(0, 0, 0, 0.45)",
+    "hillshade-highlight-color": "rgba(154, 160, 151, 0.16)",
+    "hillshade-accent-color": "rgba(20, 20, 15, 0.20)",
+    "hillshade-exaggeration": 0.4,
+  },
+} as const;
+
+/** OSM building extrusions (reuse Liberty's `building-3d` fill-extrusion; fall
+ * back to any building extrusion layer present). Visible ONLY in 3D mode. */
+export const BUILDINGS = {
+  /** Candidate layer ids in the Liberty style, most specific first. */
+  layerIdCandidates: ["building-3d", "building"] as const,
+  minzoom: 14,
+  color: { light: "#d6d2c5", dark: "#26261b" } as const,
+  opacity: 0.88,
+  /** Coalesce the ~95% of Escazú footprints with no real height to a nicer
+   * nominal box (9 m); keep genuinely tagged tall buildings/parts correct. */
+  heightExpression: [
+    "case",
+    [">", ["get", "render_height"], 5],
+    ["get", "render_height"],
+    9,
+  ] as unknown as ExpressionSpecification,
+  baseExpression: ["get", "render_min_height"] as unknown as ExpressionSpecification,
+} as const;
