@@ -1,24 +1,25 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { LayoutGrid, ListChecks, Map } from "lucide-react";
+import { LayoutGrid, ListChecks, Map, Upload } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
 import LogoutButton from "./LogoutButton";
 
 /**
- * Admin top bar: brand, primary nav (overview / queue), locale toggle, a link
- * back to the public map, and logout. Server component; the only client island
- * is the logout button.
+ * Admin top bar: brand, primary nav (overview / queue / import), locale toggle,
+ * a link back to the public map, and logout. Server component; the only client
+ * island is the logout button.
  */
 export default async function AdminHeader({
   locale,
   active,
 }: Readonly<{
   locale: Locale;
-  active: "dashboard" | "queue";
+  active: "dashboard" | "queue" | "import";
 }>) {
   const t = await getTranslations({ locale, namespace: "admin" });
   const other: Locale = locale === "en" ? "es" : "en";
-  const suffix = active === "queue" ? "/queue" : "";
+  const suffix =
+    active === "queue" ? "/queue" : active === "import" ? "/import" : "";
 
   const nav = [
     {
@@ -32,6 +33,12 @@ export default async function AdminHeader({
       href: `/${locale}/admin/queue`,
       label: t("nav.queue"),
       Icon: ListChecks,
+    },
+    {
+      key: "import" as const,
+      href: `/${locale}/admin/import`,
+      label: t("nav.import"),
+      Icon: Upload,
     },
   ];
 
