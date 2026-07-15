@@ -13,6 +13,7 @@ export const CONDITION_KEYS = [
   "accessibility",
   "drainage",
   "shade",
+  "bike",
 ] as const;
 
 export type ConditionKey = (typeof CONDITION_KEYS)[number];
@@ -23,6 +24,7 @@ export const CONDITION_OPTIONS: Record<ConditionKey, readonly string[]> = {
   accessibility: ["good", "partial", "poor", "unsure"],
   drainage: ["good", "fair", "poor", "unsure"],
   shade: ["good", "fair", "poor", "unsure"],
+  bike: ["protected", "lane", "shared", "none"],
 } as const;
 
 /** A tier that carries no signal (unanswered) — excluded from the report. */
