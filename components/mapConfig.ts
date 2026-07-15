@@ -143,6 +143,49 @@ export function lineWidthExpression(layer: ScoreLayer): ExpressionSpecification 
   ] as unknown as ExpressionSpecification;
 }
 
+/* ------------------------------------------------------------------ *
+ * Community / import segments (contract v3, u7)
+ *
+ * A SEPARATE, fixed-color, dashed neutral casing — deliberately NOT a score
+ * ramp. Unverified community contributions must not borrow a score color until
+ * a field audit verifies them (advisor ruling 1). Warm neutral grey from the
+ * design direction (#6B7069 / #9AA097). The score-ramp layers stay untouched.
+ * ------------------------------------------------------------------ */
+
+export const COMMUNITY_CASING = {
+  /** Warm neutral grey; the lighter step reads better on the dark basemap. */
+  color: "#6B7069",
+  colorDark: "#9AA097",
+  /** Dashed so it reads as provisional / pending field verification. */
+  dash: [2, 1.6] as [number, number],
+  width: 3,
+  widthSelected: 4.5,
+} as const;
+
+/** Sources rendered with the community casing rather than the score ramp. */
+const COMMUNITY_SOURCES = ["community", "import"] as const;
+
+/** Score-ramp layers draw everything EXCEPT community/import features. */
+export const RAMP_LAYER_FILTER = [
+  "!",
+  ["in", ["get", "source"], ["literal", COMMUNITY_SOURCES]],
+] as unknown as ExpressionSpecification;
+
+/** The community casing layer draws ONLY community/import features. */
+export const COMMUNITY_LAYER_FILTER = [
+  "in",
+  ["get", "source"],
+  ["literal", COMMUNITY_SOURCES],
+] as unknown as ExpressionSpecification;
+
+/** Community casing width, thicker when this feature is selected. */
+export const communityWidthExpression = [
+  "case",
+  ["boolean", ["feature-state", "selected"], false],
+  COMMUNITY_CASING.widthSelected,
+  COMMUNITY_CASING.width,
+] as unknown as ExpressionSpecification;
+
 /** Explicit legend value bins (never color-only encoding). */
 export const BINS = [
   { key: "excellent", min: 80, max: 100, mid: 90 },

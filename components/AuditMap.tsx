@@ -12,6 +12,10 @@ import type {
 } from "@/lib/segments";
 import {
   BASEMAP,
+  COMMUNITY_CASING,
+  COMMUNITY_LAYER_FILTER,
+  RAMP_LAYER_FILTER,
+  communityWidthExpression,
   lineColorExpression,
   lineWidthExpression,
 } from "@/components/mapConfig";
@@ -31,6 +35,9 @@ const INITIAL_ZOOM = 13.4;
 const SOURCE_ID = "segments";
 const LINE_LAYER_ID = "segments-line";
 const GLOW_LAYER_ID = "segments-glow";
+const COMMUNITY_LAYER_ID = "segments-community";
+/** Layers that respond to hover / click (score ramp + community casing). */
+const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID];
 
 function prefersDark(): boolean {
   return (
@@ -105,11 +112,14 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
   const glowWidth = ["+", width, 7] as unknown as ExpressionSpecification;
 
   // Glow sits UNDER the main line and only shows in dark mode (data-only glow).
+  // The score-ramp layers draw the audited set only; community/import segments
+  // are excluded here and drawn by the neutral casing layer below.
   if (!map.getLayer(GLOW_LAYER_ID)) {
     map.addLayer({
       id: GLOW_LAYER_ID,
       type: "line",
       source: SOURCE_ID,
+      filter: RAMP_LAYER_FILTER,
       layout: { "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": color,
@@ -125,6 +135,7 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
       id: LINE_LAYER_ID,
       type: "line",
       source: SOURCE_ID,
+      filter: RAMP_LAYER_FILTER,
       layout: { "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": color,
@@ -134,6 +145,29 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
           ["boolean", ["feature-state", "selected"], false],
           1,
           0.82,
+        ],
+      },
+    });
+  }
+
+  // Community / import segments: fixed neutral warm-grey dashed casing, never a
+  // score color (contract v3, ruling 1). Verified in applyLayer for dark mode.
+  if (!map.getLayer(COMMUNITY_LAYER_ID)) {
+    map.addLayer({
+      id: COMMUNITY_LAYER_ID,
+      type: "line",
+      source: SOURCE_ID,
+      filter: COMMUNITY_LAYER_FILTER,
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: {
+        "line-color": COMMUNITY_CASING.color,
+        "line-width": communityWidthExpression,
+        "line-dasharray": COMMUNITY_CASING.dash,
+        "line-opacity": [
+          "case",
+          ["boolean", ["feature-state", "selected"], false],
+          1,
+          0.85,
         ],
       },
     });
@@ -151,6 +185,12 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
     map.setPaintProperty(GLOW_LAYER_ID, "line-color", color);
     map.setPaintProperty(GLOW_LAYER_ID, "line-width", glowWidth);
     map.setPaintProperty(GLOW_LAYER_ID, "line-opacity", dark ? 0.5 : 0);
+    // Community casing is score-independent; only its neutral hue tracks theme.
+    map.setPaintProperty(
+      COMMUNITY_LAYER_ID,
+      "line-color",
+      dark ? COMMUNITY_CASING.colorDark : COMMUNITY_CASING.color,
+    );
   } catch {
     /* layers not ready yet */
   }
@@ -224,7 +264,7 @@ export default function AuditMap({
       readyRef.current = true;
       setMapReady(true);
 
-      map.on("mousemove", LINE_LAYER_ID, (e) => {
+      map.on("mousemove", INTERACTIVE_LAYER_IDS, (e) => {
         const f = e.features?.[0];
         if (!f) return;
         map.getCanvas().style.cursor = "pointer";
@@ -238,7 +278,7 @@ export default function AuditMap({
         hoveredIdRef.current = id;
         map.setFeatureState({ source: SOURCE_ID, id }, { hover: true });
       });
-      map.on("mouseleave", LINE_LAYER_ID, () => {
+      map.on("mouseleave", INTERACTIVE_LAYER_IDS, () => {
         map.getCanvas().style.cursor = "";
         if (hoveredIdRef.current) {
           map.setFeatureState(
@@ -249,7 +289,7 @@ export default function AuditMap({
         }
       });
 
-      map.on("click", LINE_LAYER_ID, (e) => {
+      map.on("click", INTERACTIVE_LAYER_IDS, (e) => {
         const f = e.features?.[0];
         if (!f) return;
         const props = f.properties as SegmentProperties;
