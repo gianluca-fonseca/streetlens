@@ -2,7 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import type { ScoreLayer } from "@/lib/segments";
-import { BINS, sampleRamp, widthForValue } from "@/components/mapConfig";
+import {
+  BINS,
+  COMMUNITY_CASING,
+  sampleRamp,
+  widthForValue,
+} from "@/components/mapConfig";
 
 /**
  * Always-visible legend with explicit value bins (never color-only encoding).
@@ -11,8 +16,11 @@ import { BINS, sampleRamp, widthForValue } from "@/components/mapConfig";
  */
 export default function Legend({
   layer,
+  communitySegments,
 }: Readonly<{
   layer: ScoreLayer;
+  /** Count of community/import segments in the current data; drives the extra entry. */
+  communitySegments: number;
 }>) {
   const t = useTranslations("legend");
   const tl = useTranslations("layers");
@@ -53,6 +61,30 @@ export default function Legend({
           </li>
         ))}
       </ul>
+
+      {communitySegments > 0 && (
+        <div className="mt-2.5 flex items-center gap-2.5 border-t border-border pt-2">
+          <svg
+            width={22}
+            height={COMMUNITY_CASING.width}
+            className="shrink-0"
+            aria-hidden="true"
+          >
+            <line
+              x1={0}
+              y1={COMMUNITY_CASING.width / 2}
+              x2={22}
+              y2={COMMUNITY_CASING.width / 2}
+              stroke={COMMUNITY_CASING.color}
+              strokeWidth={COMMUNITY_CASING.width}
+              strokeDasharray={COMMUNITY_CASING.dash.join(" ")}
+            />
+          </svg>
+          <span className="text-[12px] font-medium text-ink">
+            {t("community")}
+          </span>
+        </div>
+      )}
 
       <p className="mt-2.5 border-t border-border pt-2 text-[11px] leading-snug text-neutral-strong">
         {t("widthNote")}

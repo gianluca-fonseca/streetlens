@@ -37,6 +37,7 @@
   "legend": {
     "title": "Legend",
     "scaleHint": "Higher is better (0–100)",
+    "community": "Community — unverified",
     "widthNote": "Thicker lines mark lower-scoring segments.",
     "bins": {
       "poor": "Poor",

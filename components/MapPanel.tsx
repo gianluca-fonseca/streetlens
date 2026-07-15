@@ -79,7 +79,10 @@ export default function MapPanel({
 
       <LayerSwitcher active={activeLayer} onSelect={onSelectLayer} />
 
-      <Legend layer={activeLayer} />
+      <Legend
+        layer={activeLayer}
+        communitySegments={stats.communitySegments}
+      />
     </section>
   );
 }
