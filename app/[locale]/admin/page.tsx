@@ -96,7 +96,7 @@ export default async function AdminDashboardPage({
 
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.09em] text-neutral-strong">
+            <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
               {t("pending")} · {t("approved")} · {t("rejected")}
             </h2>
             <Link
@@ -111,13 +111,13 @@ export default async function AdminDashboardPage({
         </section>
 
         <section className="flex flex-col gap-2.5">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.09em] text-neutral-strong">
+          <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
             {t("districtHeading")}
           </h2>
           <div className="overflow-x-auto rounded-[8px] border border-border bg-surface-elevated shadow-[var(--shadow-panel)]">
             <table className="w-full border-collapse text-[13px]">
               <thead>
-                <tr className="border-b border-border text-left text-[10.5px] uppercase tracking-[0.06em] text-neutral-strong">
+                <tr className="border-b border-border text-left text-[10.5px] font-mono uppercase tracking-[0.14em] text-neutral-strong">
                   <th className="px-4 py-2.5 font-semibold">
                     {t("colDistrict")}
                   </th>

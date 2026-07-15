@@ -82,7 +82,7 @@ export default function Hero({
             className="w-full max-w-md p-6 sm:p-7"
           >
             <Eyebrow>{t("eyebrow")}</Eyebrow>
-            <h1 className="mt-2.5 font-display text-[clamp(1.95rem,4.6vw,3rem)] font-semibold leading-[1.05] tracking-tight text-ink">
+            <h1 className="mt-2.5 font-display text-[clamp(2.05rem,4.7vw,3.15rem)] font-bold leading-[1.02] tracking-[-0.03em] text-ink">
               {t("headline")}
             </h1>
             <p className="mt-3 text-[1.02rem] leading-relaxed text-neutral-strong">

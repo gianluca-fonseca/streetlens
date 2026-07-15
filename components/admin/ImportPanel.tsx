@@ -134,7 +134,7 @@ export default function ImportPanel({
 
       {/* Upload + options */}
       <section className="rounded-[8px] border border-border bg-surface-elevated p-4 shadow-[var(--shadow-panel)]">
-        <label className="block text-[11px] font-semibold uppercase tracking-[0.09em] text-neutral-strong">
+        <label className="block text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
           {t("fileLabel")}
         </label>
         <p className="mt-1 mb-3 text-[12px] text-neutral-strong">{t("fileHint")}</p>
@@ -175,7 +175,7 @@ export default function ImportPanel({
           <p className="text-[11.5px] text-neutral-strong">{t("verifiedHint")}</p>
           {verified ? (
             <div className="mt-1">
-              <label className="block text-[11px] font-semibold uppercase tracking-[0.09em] text-neutral-strong">
+              <label className="block text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
                 {t("auditorLabel")}
               </label>
               <input
@@ -219,7 +219,7 @@ export default function ImportPanel({
       ) : (
         <section className="rounded-[8px] border border-border bg-surface-elevated p-4 shadow-[var(--shadow-panel)]">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.09em] text-neutral-strong">
+            <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
               {t("previewHeading")}
             </h2>
             <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
@@ -239,7 +239,7 @@ export default function ImportPanel({
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-[12.5px]">
               <thead>
-                <tr className="border-b border-border text-left text-[11px] uppercase tracking-[0.06em] text-neutral-strong">
+                <tr className="border-b border-border text-left text-[11px] font-mono uppercase tracking-[0.14em] text-neutral-strong">
                   <th className="py-1.5 pr-3 font-semibold">{t("colRow")}</th>
                   <th className="py-1.5 pr-3 font-semibold">{t("colName")}</th>
                   <th className="py-1.5 pr-3 font-semibold">{t("colHighway")}</th>

@@ -73,7 +73,7 @@ function LoginForm() {
             <Lock size={17} strokeWidth={1.75} aria-hidden="true" />
           </span>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-pine">
+            <p className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-pine">
               StreetLens
             </p>
             <h1 className="font-display text-[1.15rem] font-semibold leading-tight text-ink">

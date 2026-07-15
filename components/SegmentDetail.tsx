@@ -113,7 +113,7 @@ export default function SegmentDetail({
 
         {!isCommunity ? (
           <>
-        <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+        <h3 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
           {t("scoresHeading")}
         </h3>
         <ul className="mb-4 grid grid-cols-2 gap-2">
@@ -148,7 +148,7 @@ export default function SegmentDetail({
           })}
         </ul>
 
-        <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+        <h3 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
           {t("breakdownHeading")}
           <span className="ml-1.5 font-sans font-normal normal-case tracking-normal text-neutral-strong">
             · {tl(`${activeLayer}.name`)}
@@ -173,7 +173,7 @@ export default function SegmentDetail({
           ))}
         </ul>
 
-        <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+        <h3 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
           {t("photosHeading")}
         </h3>
         <div className="grid grid-cols-3 gap-2">
@@ -199,7 +199,7 @@ export default function SegmentDetail({
 
         {reports.length > 0 ? (
           <div className={isCommunity ? "" : "mt-4"}>
-            <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+            <h3 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
               {t("communityReportsHeading")}
             </h3>
             <ul className="flex flex-col divide-y divide-border rounded-[8px] border border-border">

@@ -45,7 +45,7 @@ export default function MapPanel({
       className="pointer-events-auto flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 rounded-[12px] border border-border bg-surface-elevated p-4 shadow-[var(--shadow-panel)]"
     >
       <header>
-        <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-pine">
+        <p className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-pine">
           {t("eyebrow")}
         </p>
         <p className="font-mono text-[2.15rem] font-medium leading-none tracking-tight text-terracotta">

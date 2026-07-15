@@ -39,7 +39,7 @@ export default function StatusBadge({
   const s = STYLES[status];
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-[4px] border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]"
+      className="inline-flex items-center gap-1.5 rounded-[4px] border px-2 py-0.5 text-[11px] font-mono font-medium uppercase tracking-[0.14em]"
       style={{ backgroundColor: s.bg, borderColor: s.border, color: s.text }}
     >
       <span

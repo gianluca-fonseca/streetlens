@@ -20,7 +20,7 @@ export default function RoadmapSection() {
     <Section id="roadmap" tone="bone">
       <Reveal className="max-w-3xl">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <h2 className="mt-3 font-display text-[clamp(1.7rem,3.8vw,2.6rem)] font-semibold leading-[1.12] tracking-tight text-ink">
+        <h2 className="mt-3 font-display text-[clamp(1.85rem,3.9vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink">
           {t("heading")}
         </h2>
         <p className="mt-4 max-w-2xl text-[1.05rem] leading-relaxed text-neutral-strong">
@@ -54,7 +54,7 @@ export default function RoadmapSection() {
                 </span>
                 <span
                   className={
-                    "rounded-[4px] border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] " +
+                    "rounded-[4px] border px-2 py-0.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] " +
                     (isNow
                       ? "border-terracotta text-terracotta"
                       : "border-border text-pine")

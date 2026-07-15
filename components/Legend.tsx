@@ -28,7 +28,7 @@ export default function Legend({
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+        <h3 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
           {t("title")}
         </h3>
         <span className="font-mono text-[10px] text-neutral-strong">

@@ -34,7 +34,7 @@ export default function CtaSection() {
         <Reveal className="max-w-xl">
           <GlassPanel as="section" radius="primary" elevation="popover" className="p-8 sm:p-10">
             <Eyebrow tone="muted">{t("eyebrow")}</Eyebrow>
-            <h2 className="mt-3 font-display text-[clamp(1.7rem,3.8vw,2.6rem)] font-semibold leading-[1.12] tracking-tight text-ink">
+            <h2 className="mt-3 font-display text-[clamp(1.85rem,3.9vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink">
               {t("heading")}
             </h2>
             <p className="mt-4 text-[1.05rem] leading-relaxed text-neutral-strong">

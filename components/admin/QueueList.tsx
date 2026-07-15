@@ -155,12 +155,12 @@ export default function QueueList({
                   </dl>
                 ) : (
                   <div>
-                    <h3 className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+                    <h3 className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
                       {t("diffHeading")}
                     </h3>
                     <table className="w-full border-collapse text-[12.5px]">
                       <thead>
-                        <tr className="text-left text-[10.5px] uppercase tracking-[0.06em] text-neutral">
+                        <tr className="text-left text-[10.5px] font-mono uppercase tracking-[0.14em] text-neutral">
                           <th className="pb-1 pr-3 font-semibold" />
                           <th className="pb-1 pr-3 font-semibold">
                             {t("current")}
@@ -221,7 +221,7 @@ export default function QueueList({
 
             <div className="mt-3 border-t border-border pt-3">
               <label className="flex flex-col gap-1">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-strong">
+                <span className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
                   {t("reasonLabel")}
                 </span>
                 <textarea
