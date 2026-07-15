@@ -82,3 +82,52 @@ export type Submission = z.infer<typeof submissionSchema>;
 export function parseSubmission(input: unknown): Submission {
   return submissionSchema.parse(input);
 }
+
+/* ------------------------------------------------------------------ *
+ * Bulk import (u7)
+ *
+ * Admin bulk import accepts a GeoJSON FeatureCollection of LineStrings or a CSV.
+ * Both normalize to the same per-feature shape below, validated one feature at a
+ * time so the dry-run can report per-row errors without failing the whole file.
+ * ------------------------------------------------------------------ */
+
+/** A single import feature after normalization (GeoJSON or CSV row). */
+export const importFeatureSchema = z.object({
+  /** Optional stable id; deduped against existing segments in the dry-run. */
+  id: z.string().trim().min(1).max(64).optional(),
+  name: z.string().trim().min(1).max(160),
+  highway: highwaySchema,
+  coordinates: lineStringCoordsSchema,
+});
+export type ImportFeature = z.infer<typeof importFeatureSchema>;
+
+/** GeoJSON LineString geometry as it arrives in an uploaded FeatureCollection. */
+export const geoJsonLineStringSchema = z.object({
+  type: z.literal("LineString"),
+  coordinates: lineStringCoordsSchema,
+});
+
+/** One raw GeoJSON Feature (LineString) prior to normalization. */
+export const geoJsonFeatureSchema = z.object({
+  type: z.literal("Feature"),
+  properties: z
+    .object({
+      id: z.union([z.string(), z.number()]).optional(),
+      name: z.string().optional(),
+      highway: z.string().optional(),
+    })
+    .passthrough()
+    .nullable()
+    .optional(),
+  geometry: geoJsonLineStringSchema,
+});
+
+/**
+ * The uploaded FeatureCollection envelope. Only the envelope shape is validated
+ * here; each feature is validated individually (see `importFeatureSchema`) so
+ * mixed/invalid files yield per-row errors instead of a single opaque failure.
+ */
+export const geoJsonFeatureCollectionSchema = z.object({
+  type: z.literal("FeatureCollection"),
+  features: z.array(z.unknown()).min(1, "The file has no features"),
+});

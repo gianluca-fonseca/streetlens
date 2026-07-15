@@ -40,9 +40,35 @@ export const SCORE_LAYERS: readonly ScoreLayer[] = [
 export const LEY_7600_MIN_SCORE = 50;
 
 /**
+ * Provenance of a segment. `audit` is the rubric-audited reference dataset;
+ * `community` is an approved anonymous contribution; `import` is an admin bulk
+ * import. Community (and unverified import) segments carry NO rubric scores.
+ */
+export type SegmentSource = "audit" | "community" | "import";
+
+/**
+ * A community report: a qualitative note attached to a segment. Produced by an
+ * approved `update_segment` submission (attached to the target segment) or by an
+ * approved `add_segment` (embedded on the new community segment). NEVER a score.
+ */
+export type CommunityReport = {
+  id: string;
+  /** The segment this report is about (an existing id, or the community add's own id). */
+  segment_id: string;
+  note: string;
+  /** Provenance back to the originating submission, when applicable. */
+  submission_id: string | null;
+  created_at: string;
+};
+
+/**
  * Properties carried on every segment GeoJSON feature. Consumed by AuditMap.
  * Flat shape (contract v2, advisor rev 1 u6): the four original 0-100 `score_*`
  * fields plus `score_bike`, `district`, and `audited_at`.
+ *
+ * Contract v3 (u7, adjudicated): additive OPTIONAL provenance fields. Existing
+ * audited features leave them unset (or `source:"audit", verified:true`);
+ * community/import features set them. Nothing that read v2 breaks.
  */
 export type SegmentProperties = {
   id: string;
@@ -55,6 +81,14 @@ export type SegmentProperties = {
   score_bike: number;
   audited_at: string;
   demo: boolean;
+  /** Provenance; absent (or "audit") on the reference dataset. */
+  source?: SegmentSource;
+  /** Whether the segment is field-verified. Community adds are always false. */
+  verified?: boolean;
+  /** Embedded report for a community add (its own condition note, not a score). */
+  community_report?: CommunityReport | null;
+  /** Reports contributed against this segment (community update_segment approvals). */
+  community_reports?: CommunityReport[];
 };
 
 export type SegmentFeature = Feature<LineString, SegmentProperties>;
@@ -106,6 +140,30 @@ export type StreetStats = {
   coveragePct: number;
   /** Headline figure: percent of audited segments failing Ley 7600 minimums. */
   heroPct: number;
+};
+
+/**
+ * A community/import segment as persisted in `data/community-segments.local.json`
+ * (local mode) or the `community_segments` table (DB mode). Carries geometry and
+ * provenance but NO rubric scores — it renders with the neutral community casing
+ * until a field audit verifies it.
+ */
+export type CommunitySegment = {
+  id: string;
+  name: string;
+  highway: string;
+  district: string;
+  source: Extract<SegmentSource, "community" | "import">;
+  verified: boolean;
+  /** Auditor name for a verified field-team import; null otherwise. */
+  auditor: string | null;
+  /** Provenance back to the originating submission (community adds); null for imports. */
+  submission_id: string | null;
+  /** LineString positions [lng, lat]. */
+  coordinates: [number, number][];
+  /** The contributor's condition note as a report (community adds); null for imports. */
+  community_report: CommunityReport | null;
+  created_at: string;
 };
 
 /* ------------------------------------------------------------------ *
