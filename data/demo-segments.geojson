@@ -13,7 +13,7 @@
       9.922,
       -84.135
     ],
-    "generated_at": "2026-07-14T20:15:42.925Z",
+    "generated_at": "2026-07-15T01:28:00.947Z",
     "segment_count": 535,
     "audited_km": 76.84,
     "network_km": 95.69,
@@ -21,7 +21,7 @@
     "demo": true,
     "note": "Synthetic demo scores over real OSM geometry. Not real measurements.",
     "rubric_version_id": "v0.1",
-    "scored_at": "2026-07-14T20:32:40.209Z"
+    "scored_at": "2026-07-15T01:28:00.992Z"
   },
   "features": [
     {
@@ -34,6 +34,7 @@
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 72,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -65,6 +66,7 @@
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 64,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -96,6 +98,7 @@
         "score_accessibility": 69,
         "score_drainage": 86,
         "score_shade": 86,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -127,6 +130,7 @@
         "score_accessibility": 68,
         "score_drainage": 85,
         "score_shade": 74,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -158,6 +162,7 @@
         "score_accessibility": 65,
         "score_drainage": 84,
         "score_shade": 58,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -189,6 +194,7 @@
         "score_accessibility": 62,
         "score_drainage": 84,
         "score_shade": 59,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -216,6 +222,7 @@
         "score_accessibility": 75,
         "score_drainage": 78,
         "score_shade": 73,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -243,6 +250,7 @@
         "score_accessibility": 74,
         "score_drainage": 79,
         "score_shade": 67,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -274,6 +282,7 @@
         "score_accessibility": 79,
         "score_drainage": 75,
         "score_shade": 69,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -309,6 +318,7 @@
         "score_accessibility": 80,
         "score_drainage": 74,
         "score_shade": 61,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -340,6 +350,7 @@
         "score_accessibility": 80,
         "score_drainage": 73,
         "score_shade": 53,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -367,6 +378,7 @@
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 67,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -398,6 +410,7 @@
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 72,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -429,6 +442,7 @@
         "score_accessibility": 75,
         "score_drainage": 64,
         "score_shade": 79,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -460,6 +474,7 @@
         "score_accessibility": 68,
         "score_drainage": 53,
         "score_shade": 74,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -487,6 +502,7 @@
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 51,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -514,6 +530,7 @@
         "score_accessibility": 71,
         "score_drainage": 72,
         "score_shade": 65,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -553,6 +570,7 @@
         "score_accessibility": 49,
         "score_drainage": 81,
         "score_shade": 55,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -596,6 +614,7 @@
         "score_accessibility": 50,
         "score_drainage": 82,
         "score_shade": 61,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -639,6 +658,7 @@
         "score_accessibility": 48,
         "score_drainage": 82,
         "score_shade": 59,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -674,6 +694,7 @@
         "score_accessibility": 59,
         "score_drainage": 67,
         "score_shade": 66,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -721,6 +742,7 @@
         "score_accessibility": 58,
         "score_drainage": 60,
         "score_shade": 65,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -776,6 +798,7 @@
         "score_accessibility": 53,
         "score_drainage": 59,
         "score_shade": 62,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -811,6 +834,7 @@
         "score_accessibility": 57,
         "score_drainage": 50,
         "score_shade": 65,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -858,6 +882,7 @@
         "score_accessibility": 56,
         "score_drainage": 48,
         "score_shade": 67,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -893,6 +918,7 @@
         "score_accessibility": 60,
         "score_drainage": 51,
         "score_shade": 69,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -948,6 +974,7 @@
         "score_accessibility": 71,
         "score_drainage": 60,
         "score_shade": 79,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -979,6 +1006,7 @@
         "score_accessibility": 62,
         "score_drainage": 79,
         "score_shade": 68,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1018,6 +1046,7 @@
         "score_accessibility": 70,
         "score_drainage": 54,
         "score_shade": 78,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1045,6 +1074,7 @@
         "score_accessibility": 62,
         "score_drainage": 67,
         "score_shade": 66,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1080,6 +1110,7 @@
         "score_accessibility": 60,
         "score_drainage": 83,
         "score_shade": 66,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1147,6 +1178,7 @@
         "score_accessibility": 59,
         "score_drainage": 74,
         "score_shade": 67,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1198,6 +1230,7 @@
         "score_accessibility": 59,
         "score_drainage": 69,
         "score_shade": 72,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1249,6 +1282,7 @@
         "score_accessibility": 56,
         "score_drainage": 80,
         "score_shade": 67,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1292,6 +1326,7 @@
         "score_accessibility": 53,
         "score_drainage": 80,
         "score_shade": 58,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1331,6 +1366,7 @@
         "score_accessibility": 55,
         "score_drainage": 70,
         "score_shade": 66,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1366,6 +1402,7 @@
         "score_accessibility": 57,
         "score_drainage": 51,
         "score_shade": 68,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1405,6 +1442,7 @@
         "score_accessibility": 45,
         "score_drainage": 76,
         "score_shade": 53,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1464,6 +1502,7 @@
         "score_accessibility": 41,
         "score_drainage": 77,
         "score_shade": 46,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1523,6 +1562,7 @@
         "score_accessibility": 35,
         "score_drainage": 74,
         "score_shade": 43,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1610,6 +1650,7 @@
         "score_accessibility": 33,
         "score_drainage": 73,
         "score_shade": 44,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1693,6 +1734,7 @@
         "score_accessibility": 35,
         "score_drainage": 75,
         "score_shade": 50,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1748,6 +1790,7 @@
         "score_accessibility": 41,
         "score_drainage": 77,
         "score_shade": 62,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1803,6 +1846,7 @@
         "score_accessibility": 47,
         "score_drainage": 79,
         "score_shade": 69,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1854,6 +1898,7 @@
         "score_accessibility": 51,
         "score_drainage": 78,
         "score_shade": 71,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1901,6 +1946,7 @@
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 69,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1960,6 +2006,7 @@
         "score_accessibility": 51,
         "score_drainage": 83,
         "score_shade": 64,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -1995,6 +2042,7 @@
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 65,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2038,6 +2086,7 @@
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 65,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2069,6 +2118,7 @@
         "score_accessibility": 62,
         "score_drainage": 88,
         "score_shade": 65,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2116,6 +2166,7 @@
         "score_accessibility": 71,
         "score_drainage": 72,
         "score_shade": 62,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2143,6 +2194,7 @@
         "score_accessibility": 57,
         "score_drainage": 64,
         "score_shade": 64,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2198,6 +2250,7 @@
         "score_accessibility": 63,
         "score_drainage": 88,
         "score_shade": 66,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2249,6 +2302,7 @@
         "score_accessibility": 59,
         "score_drainage": 78,
         "score_shade": 63,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2316,6 +2370,7 @@
         "score_accessibility": 59,
         "score_drainage": 83,
         "score_shade": 61,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2371,6 +2426,7 @@
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 54,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2422,6 +2478,7 @@
         "score_accessibility": 48,
         "score_drainage": 84,
         "score_shade": 58,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2461,6 +2518,7 @@
         "score_accessibility": 54,
         "score_drainage": 87,
         "score_shade": 57,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2516,6 +2574,7 @@
         "score_accessibility": 58,
         "score_drainage": 88,
         "score_shade": 55,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2567,6 +2626,7 @@
         "score_accessibility": 59,
         "score_drainage": 88,
         "score_shade": 58,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2646,6 +2706,7 @@
         "score_accessibility": 58,
         "score_drainage": 85,
         "score_shade": 55,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2677,6 +2738,7 @@
         "score_accessibility": 47,
         "score_drainage": 89,
         "score_shade": 64,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2728,6 +2790,7 @@
         "score_accessibility": 48,
         "score_drainage": 89,
         "score_shade": 66,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2787,6 +2850,7 @@
         "score_accessibility": 47,
         "score_drainage": 90,
         "score_shade": 67,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2822,6 +2886,7 @@
         "score_accessibility": 44,
         "score_drainage": 88,
         "score_shade": 56,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2849,6 +2914,7 @@
         "score_accessibility": 52,
         "score_drainage": 81,
         "score_shade": 58,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2908,6 +2974,7 @@
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 55,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2951,6 +3018,7 @@
         "score_accessibility": 69,
         "score_drainage": 82,
         "score_shade": 59,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -2978,6 +3046,7 @@
         "score_accessibility": 74,
         "score_drainage": 67,
         "score_shade": 73,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3009,6 +3078,7 @@
         "score_accessibility": 76,
         "score_drainage": 71,
         "score_shade": 73,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3036,6 +3106,7 @@
         "score_accessibility": 68,
         "score_drainage": 80,
         "score_shade": 63,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3079,6 +3150,7 @@
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 50,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3110,6 +3182,7 @@
         "score_accessibility": 70,
         "score_drainage": 81,
         "score_shade": 76,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3137,6 +3210,7 @@
         "score_accessibility": 69,
         "score_drainage": 80,
         "score_shade": 75,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3180,6 +3254,7 @@
         "score_accessibility": 62,
         "score_drainage": 77,
         "score_shade": 50,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3219,6 +3294,7 @@
         "score_accessibility": 61,
         "score_drainage": 77,
         "score_shade": 46,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3262,6 +3338,7 @@
         "score_accessibility": 62,
         "score_drainage": 76,
         "score_shade": 58,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3313,6 +3390,7 @@
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 59,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3360,6 +3438,7 @@
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 70,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3407,6 +3486,7 @@
         "score_accessibility": 64,
         "score_drainage": 73,
         "score_shade": 68,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3462,6 +3542,7 @@
         "score_accessibility": 64,
         "score_drainage": 73,
         "score_shade": 71,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3521,6 +3602,7 @@
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 72,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3580,6 +3662,7 @@
         "score_accessibility": 64,
         "score_drainage": 76,
         "score_shade": 63,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3643,6 +3726,7 @@
         "score_accessibility": 64,
         "score_drainage": 76,
         "score_shade": 59,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3722,6 +3806,7 @@
         "score_accessibility": 64,
         "score_drainage": 76,
         "score_shade": 68,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3769,6 +3854,7 @@
         "score_accessibility": 67,
         "score_drainage": 80,
         "score_shade": 70,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3820,6 +3906,7 @@
         "score_accessibility": 68,
         "score_drainage": 80,
         "score_shade": 71,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3875,6 +3962,7 @@
         "score_accessibility": 69,
         "score_drainage": 84,
         "score_shade": 76,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3914,6 +4002,7 @@
         "score_accessibility": 63,
         "score_drainage": 76,
         "score_shade": 61,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -3945,6 +4034,7 @@
         "score_accessibility": 62,
         "score_drainage": 36,
         "score_shade": 74,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4016,6 +4106,7 @@
         "score_accessibility": 57,
         "score_drainage": 59,
         "score_shade": 70,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4091,6 +4182,7 @@
         "score_accessibility": 65,
         "score_drainage": 55,
         "score_shade": 73,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4122,6 +4214,7 @@
         "score_accessibility": 60,
         "score_drainage": 80,
         "score_shade": 63,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4149,6 +4242,7 @@
         "score_accessibility": 73,
         "score_drainage": 73,
         "score_shade": 61,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4176,6 +4270,7 @@
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 63,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4207,6 +4302,7 @@
         "score_accessibility": 61,
         "score_drainage": 75,
         "score_shade": 67,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4234,6 +4330,7 @@
         "score_accessibility": 60,
         "score_drainage": 75,
         "score_shade": 70,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4305,6 +4402,7 @@
         "score_accessibility": 60,
         "score_drainage": 76,
         "score_shade": 78,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4372,6 +4470,7 @@
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 76,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4399,6 +4498,7 @@
         "score_accessibility": 69,
         "score_drainage": 76,
         "score_shade": 81,
+        "score_bike": 3,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4470,6 +4570,7 @@
         "score_accessibility": 70,
         "score_drainage": 79,
         "score_shade": 80,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4537,6 +4638,7 @@
         "score_accessibility": 71,
         "score_drainage": 82,
         "score_shade": 76,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4576,6 +4678,7 @@
         "score_accessibility": 59,
         "score_drainage": 61,
         "score_shade": 69,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4623,6 +4726,7 @@
         "score_accessibility": 54,
         "score_drainage": 63,
         "score_shade": 66,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4674,6 +4778,7 @@
         "score_accessibility": 52,
         "score_drainage": 81,
         "score_shade": 59,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4729,6 +4834,7 @@
         "score_accessibility": 49,
         "score_drainage": 81,
         "score_shade": 64,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4760,6 +4866,7 @@
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 68,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4807,6 +4914,7 @@
         "score_accessibility": 51,
         "score_drainage": 80,
         "score_shade": 65,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4862,6 +4970,7 @@
         "score_accessibility": 51,
         "score_drainage": 81,
         "score_shade": 68,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4897,6 +5006,7 @@
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 49,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -4952,6 +5062,7 @@
         "score_accessibility": 44,
         "score_drainage": 79,
         "score_shade": 44,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5007,6 +5118,7 @@
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 47,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5058,6 +5170,7 @@
         "score_accessibility": 41,
         "score_drainage": 84,
         "score_shade": 55,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5113,6 +5226,7 @@
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 51,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5176,6 +5290,7 @@
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 50,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5219,6 +5334,7 @@
         "score_accessibility": 38,
         "score_drainage": 84,
         "score_shade": 63,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5278,6 +5394,7 @@
         "score_accessibility": 38,
         "score_drainage": 83,
         "score_shade": 66,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5317,6 +5434,7 @@
         "score_accessibility": 39,
         "score_drainage": 85,
         "score_shade": 56,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5376,6 +5494,7 @@
         "score_accessibility": 40,
         "score_drainage": 85,
         "score_shade": 53,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5467,6 +5586,7 @@
         "score_accessibility": 43,
         "score_drainage": 84,
         "score_shade": 47,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5498,6 +5618,7 @@
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 49,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5537,6 +5658,7 @@
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 51,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5592,6 +5714,7 @@
         "score_accessibility": 45,
         "score_drainage": 75,
         "score_shade": 39,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5623,6 +5746,7 @@
         "score_accessibility": 47,
         "score_drainage": 77,
         "score_shade": 45,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5658,6 +5782,7 @@
         "score_accessibility": 42,
         "score_drainage": 81,
         "score_shade": 50,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5689,6 +5814,7 @@
         "score_accessibility": 35,
         "score_drainage": 82,
         "score_shade": 45,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5760,6 +5886,7 @@
         "score_accessibility": 34,
         "score_drainage": 82,
         "score_shade": 47,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5827,6 +5954,7 @@
         "score_accessibility": 33,
         "score_drainage": 81,
         "score_shade": 54,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5858,6 +5986,7 @@
         "score_accessibility": 35,
         "score_drainage": 80,
         "score_shade": 57,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5925,6 +6054,7 @@
         "score_accessibility": 39,
         "score_drainage": 78,
         "score_shade": 64,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -5976,6 +6106,7 @@
         "score_accessibility": 43,
         "score_drainage": 75,
         "score_shade": 70,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6019,6 +6150,7 @@
         "score_accessibility": 57,
         "score_drainage": 73,
         "score_shade": 63,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6054,6 +6186,7 @@
         "score_accessibility": 54,
         "score_drainage": 85,
         "score_shade": 62,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6097,6 +6230,7 @@
         "score_accessibility": 58,
         "score_drainage": 85,
         "score_shade": 63,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6140,6 +6274,7 @@
         "score_accessibility": 61,
         "score_drainage": 88,
         "score_shade": 65,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6207,6 +6342,7 @@
         "score_accessibility": 49,
         "score_drainage": 79,
         "score_shade": 50,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6254,6 +6390,7 @@
         "score_accessibility": 51,
         "score_drainage": 81,
         "score_shade": 57,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6297,6 +6434,7 @@
         "score_accessibility": 48,
         "score_drainage": 80,
         "score_shade": 58,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6380,6 +6518,7 @@
         "score_accessibility": 33,
         "score_drainage": 78,
         "score_shade": 60,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6407,6 +6546,7 @@
         "score_accessibility": 32,
         "score_drainage": 78,
         "score_shade": 60,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6470,6 +6610,7 @@
         "score_accessibility": 34,
         "score_drainage": 78,
         "score_shade": 61,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6517,6 +6658,7 @@
         "score_accessibility": 40,
         "score_drainage": 79,
         "score_shade": 62,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6556,6 +6698,7 @@
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 61,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6587,6 +6730,7 @@
         "score_accessibility": 46,
         "score_drainage": 81,
         "score_shade": 58,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6626,6 +6770,7 @@
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 53,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6673,6 +6818,7 @@
         "score_accessibility": 47,
         "score_drainage": 80,
         "score_shade": 51,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6704,6 +6850,7 @@
         "score_accessibility": 81,
         "score_drainage": 76,
         "score_shade": 60,
+        "score_bike": 36,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6751,6 +6898,7 @@
         "score_accessibility": 81,
         "score_drainage": 75,
         "score_shade": 57,
+        "score_bike": 34,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6782,6 +6930,7 @@
         "score_accessibility": 80,
         "score_drainage": 76,
         "score_shade": 56,
+        "score_bike": 34,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6825,6 +6974,7 @@
         "score_accessibility": 81,
         "score_drainage": 75,
         "score_shade": 57,
+        "score_bike": 34,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6852,6 +7002,7 @@
         "score_accessibility": 78,
         "score_drainage": 72,
         "score_shade": 49,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6899,6 +7050,7 @@
         "score_accessibility": 75,
         "score_drainage": 73,
         "score_shade": 50,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6934,6 +7086,7 @@
         "score_accessibility": 69,
         "score_drainage": 83,
         "score_shade": 65,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -6977,6 +7130,7 @@
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 61,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7004,6 +7158,7 @@
         "score_accessibility": 62,
         "score_drainage": 85,
         "score_shade": 55,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7039,6 +7194,7 @@
         "score_accessibility": 63,
         "score_drainage": 84,
         "score_shade": 59,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7114,6 +7270,7 @@
         "score_accessibility": 75,
         "score_drainage": 78,
         "score_shade": 63,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7145,6 +7302,7 @@
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 58,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7188,6 +7346,7 @@
         "score_accessibility": 68,
         "score_drainage": 79,
         "score_shade": 64,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7231,6 +7390,7 @@
         "score_accessibility": 66,
         "score_drainage": 79,
         "score_shade": 71,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7266,6 +7426,7 @@
         "score_accessibility": 48,
         "score_drainage": 81,
         "score_shade": 56,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7301,6 +7462,7 @@
         "score_accessibility": 49,
         "score_drainage": 80,
         "score_shade": 59,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7328,6 +7490,7 @@
         "score_accessibility": 70,
         "score_drainage": 74,
         "score_shade": 61,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7363,6 +7526,7 @@
         "score_accessibility": 70,
         "score_drainage": 76,
         "score_shade": 62,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7394,6 +7558,7 @@
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 60,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7425,6 +7590,7 @@
         "score_accessibility": 73,
         "score_drainage": 74,
         "score_shade": 62,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7460,6 +7626,7 @@
         "score_accessibility": 67,
         "score_drainage": 83,
         "score_shade": 64,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7511,6 +7678,7 @@
         "score_accessibility": 63,
         "score_drainage": 88,
         "score_shade": 66,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7546,6 +7714,7 @@
         "score_accessibility": 62,
         "score_drainage": 89,
         "score_shade": 65,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7577,6 +7746,7 @@
         "score_accessibility": 50,
         "score_drainage": 84,
         "score_shade": 62,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7612,6 +7782,7 @@
         "score_accessibility": 47,
         "score_drainage": 83,
         "score_shade": 62,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7643,6 +7814,7 @@
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 49,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7682,6 +7854,7 @@
         "score_accessibility": 46,
         "score_drainage": 80,
         "score_shade": 50,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7717,6 +7890,7 @@
         "score_accessibility": 46,
         "score_drainage": 81,
         "score_shade": 53,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7756,6 +7930,7 @@
         "score_accessibility": 45,
         "score_drainage": 82,
         "score_shade": 56,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7799,6 +7974,7 @@
         "score_accessibility": 40,
         "score_drainage": 85,
         "score_shade": 55,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7846,6 +8022,7 @@
         "score_accessibility": 36,
         "score_drainage": 87,
         "score_shade": 61,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7885,6 +8062,7 @@
         "score_accessibility": 34,
         "score_drainage": 89,
         "score_shade": 64,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7936,6 +8114,7 @@
         "score_accessibility": 36,
         "score_drainage": 85,
         "score_shade": 66,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -7983,6 +8162,7 @@
         "score_accessibility": 61,
         "score_drainage": 81,
         "score_shade": 67,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8010,6 +8190,7 @@
         "score_accessibility": 51,
         "score_drainage": 83,
         "score_shade": 64,
+        "score_bike": 33,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8041,6 +8222,7 @@
         "score_accessibility": 51,
         "score_drainage": 77,
         "score_shade": 72,
+        "score_bike": 28,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8068,6 +8250,7 @@
         "score_accessibility": 48,
         "score_drainage": 39,
         "score_shade": 81,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8119,6 +8302,7 @@
         "score_accessibility": 48,
         "score_drainage": 50,
         "score_shade": 75,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8154,6 +8338,7 @@
         "score_accessibility": 53,
         "score_drainage": 82,
         "score_shade": 54,
+        "score_bike": 30,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8209,6 +8394,7 @@
         "score_accessibility": 48,
         "score_drainage": 81,
         "score_shade": 53,
+        "score_bike": 27,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8260,6 +8446,7 @@
         "score_accessibility": 55,
         "score_drainage": 79,
         "score_shade": 53,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8319,6 +8506,7 @@
         "score_accessibility": 57,
         "score_drainage": 77,
         "score_shade": 55,
+        "score_bike": 31,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8378,6 +8566,7 @@
         "score_accessibility": 56,
         "score_drainage": 75,
         "score_shade": 53,
+        "score_bike": 33,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8437,6 +8626,7 @@
         "score_accessibility": 52,
         "score_drainage": 76,
         "score_shade": 50,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8488,6 +8678,7 @@
         "score_accessibility": 41,
         "score_drainage": 75,
         "score_shade": 61,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8515,6 +8706,7 @@
         "score_accessibility": 40,
         "score_drainage": 75,
         "score_shade": 62,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8558,6 +8750,7 @@
         "score_accessibility": 41,
         "score_drainage": 74,
         "score_shade": 65,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8589,6 +8782,7 @@
         "score_accessibility": 58,
         "score_drainage": 75,
         "score_shade": 71,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8632,6 +8826,7 @@
         "score_accessibility": 60,
         "score_drainage": 76,
         "score_shade": 75,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8679,6 +8874,7 @@
         "score_accessibility": 61,
         "score_drainage": 76,
         "score_shade": 80,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8726,6 +8922,7 @@
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 77,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8793,6 +8990,7 @@
         "score_accessibility": 62,
         "score_drainage": 76,
         "score_shade": 73,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8848,6 +9046,7 @@
         "score_accessibility": 58,
         "score_drainage": 73,
         "score_shade": 70,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8891,6 +9090,7 @@
         "score_accessibility": 70,
         "score_drainage": 84,
         "score_shade": 76,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8950,6 +9150,7 @@
         "score_accessibility": 68,
         "score_drainage": 82,
         "score_shade": 68,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -8985,6 +9186,7 @@
         "score_accessibility": 76,
         "score_drainage": 84,
         "score_shade": 74,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9024,6 +9226,7 @@
         "score_accessibility": 74,
         "score_drainage": 85,
         "score_shade": 78,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9067,6 +9270,7 @@
         "score_accessibility": 76,
         "score_drainage": 81,
         "score_shade": 78,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9126,6 +9330,7 @@
         "score_accessibility": 76,
         "score_drainage": 73,
         "score_shade": 72,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9169,6 +9374,7 @@
         "score_accessibility": 75,
         "score_drainage": 72,
         "score_shade": 72,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9212,6 +9418,7 @@
         "score_accessibility": 75,
         "score_drainage": 76,
         "score_shade": 71,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9247,6 +9454,7 @@
         "score_accessibility": 74,
         "score_drainage": 80,
         "score_shade": 71,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9310,6 +9518,7 @@
         "score_accessibility": 72,
         "score_drainage": 80,
         "score_shade": 70,
+        "score_bike": 2,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9365,6 +9574,7 @@
         "score_accessibility": 67,
         "score_drainage": 81,
         "score_shade": 68,
+        "score_bike": 3,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9412,6 +9622,7 @@
         "score_accessibility": 57,
         "score_drainage": 76,
         "score_shade": 73,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9443,6 +9654,7 @@
         "score_accessibility": 57,
         "score_drainage": 75,
         "score_shade": 74,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9490,6 +9702,7 @@
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 82,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9561,6 +9774,7 @@
         "score_accessibility": 47,
         "score_drainage": 80,
         "score_shade": 78,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9620,6 +9834,7 @@
         "score_accessibility": 64,
         "score_drainage": 81,
         "score_shade": 70,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9651,6 +9866,7 @@
         "score_accessibility": 64,
         "score_drainage": 81,
         "score_shade": 68,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9714,6 +9930,7 @@
         "score_accessibility": 68,
         "score_drainage": 78,
         "score_shade": 77,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9769,6 +9986,7 @@
         "score_accessibility": 44,
         "score_drainage": 78,
         "score_shade": 42,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9800,6 +10018,7 @@
         "score_accessibility": 46,
         "score_drainage": 80,
         "score_shade": 64,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9839,6 +10058,7 @@
         "score_accessibility": 43,
         "score_drainage": 80,
         "score_shade": 61,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9878,6 +10098,7 @@
         "score_accessibility": 48,
         "score_drainage": 81,
         "score_shade": 57,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9941,6 +10162,7 @@
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 62,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9968,6 +10190,7 @@
         "score_accessibility": 73,
         "score_drainage": 59,
         "score_shade": 81,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -9999,6 +10222,7 @@
         "score_accessibility": 79,
         "score_drainage": 76,
         "score_shade": 62,
+        "score_bike": 34,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10050,6 +10274,7 @@
         "score_accessibility": 76,
         "score_drainage": 72,
         "score_shade": 55,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10081,6 +10306,7 @@
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 64,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10112,6 +10338,7 @@
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 70,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10147,6 +10374,7 @@
         "score_accessibility": 72,
         "score_drainage": 77,
         "score_shade": 65,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10174,6 +10402,7 @@
         "score_accessibility": 74,
         "score_drainage": 73,
         "score_shade": 58,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10213,6 +10442,7 @@
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 57,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10252,6 +10482,7 @@
         "score_accessibility": 64,
         "score_drainage": 86,
         "score_shade": 57,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10283,6 +10514,7 @@
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 70,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10318,6 +10550,7 @@
         "score_accessibility": 75,
         "score_drainage": 64,
         "score_shade": 79,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10349,6 +10582,7 @@
         "score_accessibility": 71,
         "score_drainage": 60,
         "score_shade": 79,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10376,6 +10610,7 @@
         "score_accessibility": 69,
         "score_drainage": 49,
         "score_shade": 77,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10403,6 +10638,7 @@
         "score_accessibility": 80,
         "score_drainage": 75,
         "score_shade": 59,
+        "score_bike": 33,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10438,6 +10674,7 @@
         "score_accessibility": 77,
         "score_drainage": 72,
         "score_shade": 58,
+        "score_bike": 31,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10469,6 +10706,7 @@
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 54,
+        "score_bike": 30,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10496,6 +10734,7 @@
         "score_accessibility": 75,
         "score_drainage": 71,
         "score_shade": 78,
+        "score_bike": 41,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10527,6 +10766,7 @@
         "score_accessibility": 71,
         "score_drainage": 72,
         "score_shade": 78,
+        "score_bike": 41,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10554,6 +10794,7 @@
         "score_accessibility": 80,
         "score_drainage": 74,
         "score_shade": 66,
+        "score_bike": 34,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10585,6 +10826,7 @@
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 65,
+        "score_bike": 35,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10612,6 +10854,7 @@
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 58,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10639,6 +10882,7 @@
         "score_accessibility": 68,
         "score_drainage": 80,
         "score_shade": 74,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10666,6 +10910,7 @@
         "score_accessibility": 78,
         "score_drainage": 74,
         "score_shade": 51,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10709,6 +10954,7 @@
         "score_accessibility": 75,
         "score_drainage": 74,
         "score_shade": 50,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10752,6 +10998,7 @@
         "score_accessibility": 73,
         "score_drainage": 75,
         "score_shade": 55,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10807,6 +11054,7 @@
         "score_accessibility": 74,
         "score_drainage": 76,
         "score_shade": 63,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10846,6 +11094,7 @@
         "score_accessibility": 71,
         "score_drainage": 78,
         "score_shade": 63,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10897,6 +11146,7 @@
         "score_accessibility": 64,
         "score_drainage": 84,
         "score_shade": 64,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10944,6 +11194,7 @@
         "score_accessibility": 61,
         "score_drainage": 88,
         "score_shade": 64,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -10979,6 +11230,7 @@
         "score_accessibility": 69,
         "score_drainage": 45,
         "score_shade": 78,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11010,6 +11262,7 @@
         "score_accessibility": 69,
         "score_drainage": 75,
         "score_shade": 75,
+        "score_bike": 41,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11045,6 +11298,7 @@
         "score_accessibility": 73,
         "score_drainage": 78,
         "score_shade": 62,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11076,6 +11330,7 @@
         "score_accessibility": 62,
         "score_drainage": 73,
         "score_shade": 64,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11139,6 +11394,7 @@
         "score_accessibility": 59,
         "score_drainage": 58,
         "score_shade": 70,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11194,6 +11450,7 @@
         "score_accessibility": 74,
         "score_drainage": 72,
         "score_shade": 58,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11221,6 +11478,7 @@
         "score_accessibility": 81,
         "score_drainage": 77,
         "score_shade": 61,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11288,6 +11546,7 @@
         "score_accessibility": 64,
         "score_drainage": 79,
         "score_shade": 59,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11363,6 +11622,7 @@
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 45,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11450,6 +11710,7 @@
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 42,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11545,6 +11806,7 @@
         "score_accessibility": 66,
         "score_drainage": 79,
         "score_shade": 48,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11580,6 +11842,7 @@
         "score_accessibility": 60,
         "score_drainage": 81,
         "score_shade": 78,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11623,6 +11886,7 @@
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 76,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11654,6 +11918,7 @@
         "score_accessibility": 63,
         "score_drainage": 83,
         "score_shade": 63,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11689,6 +11954,7 @@
         "score_accessibility": 66,
         "score_drainage": 41,
         "score_shade": 76,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11720,6 +11986,7 @@
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 73,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11767,6 +12034,7 @@
         "score_accessibility": 61,
         "score_drainage": 86,
         "score_shade": 76,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11806,6 +12074,7 @@
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 71,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11845,6 +12114,7 @@
         "score_accessibility": 63,
         "score_drainage": 82,
         "score_shade": 67,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11892,6 +12162,7 @@
         "score_accessibility": 61,
         "score_drainage": 86,
         "score_shade": 75,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11943,6 +12214,7 @@
         "score_accessibility": 62,
         "score_drainage": 83,
         "score_shade": 71,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -11998,6 +12270,7 @@
         "score_accessibility": 69,
         "score_drainage": 85,
         "score_shade": 77,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12057,6 +12330,7 @@
         "score_accessibility": 68,
         "score_drainage": 81,
         "score_shade": 72,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12120,6 +12394,7 @@
         "score_accessibility": 67,
         "score_drainage": 74,
         "score_shade": 64,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12159,6 +12434,7 @@
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 81,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12210,6 +12486,7 @@
         "score_accessibility": 50,
         "score_drainage": 81,
         "score_shade": 54,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12241,6 +12518,7 @@
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 64,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12276,6 +12554,7 @@
         "score_accessibility": 67,
         "score_drainage": 62,
         "score_shade": 70,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12303,6 +12582,7 @@
         "score_accessibility": 70,
         "score_drainage": 80,
         "score_shade": 78,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12370,6 +12650,7 @@
         "score_accessibility": 69,
         "score_drainage": 78,
         "score_shade": 78,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12441,6 +12722,7 @@
         "score_accessibility": 67,
         "score_drainage": 77,
         "score_shade": 79,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12508,6 +12790,7 @@
         "score_accessibility": 60,
         "score_drainage": 80,
         "score_shade": 63,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12539,6 +12822,7 @@
         "score_accessibility": 60,
         "score_drainage": 76,
         "score_shade": 46,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12586,6 +12870,7 @@
         "score_accessibility": 62,
         "score_drainage": 83,
         "score_shade": 68,
+        "score_bike": 39,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12617,6 +12902,7 @@
         "score_accessibility": 59,
         "score_drainage": 69,
         "score_shade": 66,
+        "score_bike": 39,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12664,6 +12950,7 @@
         "score_accessibility": 58,
         "score_drainage": 41,
         "score_shade": 68,
+        "score_bike": 35,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12715,6 +13002,7 @@
         "score_accessibility": 62,
         "score_drainage": 84,
         "score_shade": 67,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12754,6 +13042,7 @@
         "score_accessibility": 64,
         "score_drainage": 86,
         "score_shade": 66,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12797,6 +13086,7 @@
         "score_accessibility": 59,
         "score_drainage": 79,
         "score_shade": 66,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12844,6 +13134,7 @@
         "score_accessibility": 61,
         "score_drainage": 51,
         "score_shade": 72,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12895,6 +13186,7 @@
         "score_accessibility": 67,
         "score_drainage": 45,
         "score_shade": 76,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12942,6 +13234,7 @@
         "score_accessibility": 63,
         "score_drainage": 81,
         "score_shade": 69,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -12981,6 +13274,7 @@
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 75,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13024,6 +13318,7 @@
         "score_accessibility": 58,
         "score_drainage": 81,
         "score_shade": 77,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13059,6 +13354,7 @@
         "score_accessibility": 60,
         "score_drainage": 79,
         "score_shade": 80,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13106,6 +13402,7 @@
         "score_accessibility": 66,
         "score_drainage": 81,
         "score_shade": 68,
+        "score_bike": 2,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13137,6 +13434,7 @@
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 74,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13164,6 +13462,7 @@
         "score_accessibility": 47,
         "score_drainage": 76,
         "score_shade": 74,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13199,6 +13498,7 @@
         "score_accessibility": 41,
         "score_drainage": 75,
         "score_shade": 74,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13238,6 +13538,7 @@
         "score_accessibility": 34,
         "score_drainage": 79,
         "score_shade": 73,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13285,6 +13586,7 @@
         "score_accessibility": 36,
         "score_drainage": 75,
         "score_shade": 66,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13320,6 +13622,7 @@
         "score_accessibility": 38,
         "score_drainage": 72,
         "score_shade": 51,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13355,6 +13658,7 @@
         "score_accessibility": 45,
         "score_drainage": 79,
         "score_shade": 53,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13414,6 +13718,7 @@
         "score_accessibility": 46,
         "score_drainage": 71,
         "score_shade": 69,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13445,6 +13750,7 @@
         "score_accessibility": 32,
         "score_drainage": 79,
         "score_shade": 58,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13520,6 +13826,7 @@
         "score_accessibility": 35,
         "score_drainage": 80,
         "score_shade": 59,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13559,6 +13866,7 @@
         "score_accessibility": 38,
         "score_drainage": 78,
         "score_shade": 62,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13602,6 +13910,7 @@
         "score_accessibility": 44,
         "score_drainage": 61,
         "score_shade": 67,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13633,6 +13942,7 @@
         "score_accessibility": 46,
         "score_drainage": 50,
         "score_shade": 70,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13664,6 +13974,7 @@
         "score_accessibility": 46,
         "score_drainage": 61,
         "score_shade": 63,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13707,6 +14018,7 @@
         "score_accessibility": 50,
         "score_drainage": 80,
         "score_shade": 76,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13750,6 +14062,7 @@
         "score_accessibility": 50,
         "score_drainage": 80,
         "score_shade": 69,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13805,6 +14118,7 @@
         "score_accessibility": 48,
         "score_drainage": 74,
         "score_shade": 63,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13844,6 +14158,7 @@
         "score_accessibility": 46,
         "score_drainage": 70,
         "score_shade": 81,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13903,6 +14218,7 @@
         "score_accessibility": 48,
         "score_drainage": 74,
         "score_shade": 72,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13942,6 +14258,7 @@
         "score_accessibility": 54,
         "score_drainage": 67,
         "score_shade": 65,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -13969,6 +14286,7 @@
         "score_accessibility": 47,
         "score_drainage": 71,
         "score_shade": 65,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14004,6 +14322,7 @@
         "score_accessibility": 49,
         "score_drainage": 45,
         "score_shade": 82,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14051,6 +14370,7 @@
         "score_accessibility": 47,
         "score_drainage": 51,
         "score_shade": 80,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14110,6 +14430,7 @@
         "score_accessibility": 47,
         "score_drainage": 41,
         "score_shade": 78,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14169,6 +14490,7 @@
         "score_accessibility": 47,
         "score_drainage": 50,
         "score_shade": 69,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14212,6 +14534,7 @@
         "score_accessibility": 47,
         "score_drainage": 67,
         "score_shade": 62,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14267,6 +14590,7 @@
         "score_accessibility": 46,
         "score_drainage": 75,
         "score_shade": 59,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14330,6 +14654,7 @@
         "score_accessibility": 43,
         "score_drainage": 73,
         "score_shade": 47,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14381,6 +14706,7 @@
         "score_accessibility": 40,
         "score_drainage": 84,
         "score_shade": 39,
+        "score_bike": 22,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14444,6 +14770,7 @@
         "score_accessibility": 40,
         "score_drainage": 85,
         "score_shade": 41,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14487,6 +14814,7 @@
         "score_accessibility": 45,
         "score_drainage": 88,
         "score_shade": 58,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14570,6 +14898,7 @@
         "score_accessibility": 45,
         "score_drainage": 80,
         "score_shade": 50,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14609,6 +14938,7 @@
         "score_accessibility": 54,
         "score_drainage": 81,
         "score_shade": 76,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14648,6 +14978,7 @@
         "score_accessibility": 45,
         "score_drainage": 82,
         "score_shade": 48,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14695,6 +15026,7 @@
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 51,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14722,6 +15054,7 @@
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 47,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14753,6 +15086,7 @@
         "score_accessibility": 62,
         "score_drainage": 82,
         "score_shade": 66,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14824,6 +15158,7 @@
         "score_accessibility": 60,
         "score_drainage": 69,
         "score_shade": 66,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14859,6 +15194,7 @@
         "score_accessibility": 59,
         "score_drainage": 66,
         "score_shade": 65,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14910,6 +15246,7 @@
         "score_accessibility": 60,
         "score_drainage": 71,
         "score_shade": 65,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14937,6 +15274,7 @@
         "score_accessibility": 79,
         "score_drainage": 75,
         "score_shade": 69,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14968,6 +15306,7 @@
         "score_accessibility": 80,
         "score_drainage": 73,
         "score_shade": 56,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -14995,6 +15334,7 @@
         "score_accessibility": 70,
         "score_drainage": 87,
         "score_shade": 84,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15026,6 +15366,7 @@
         "score_accessibility": 69,
         "score_drainage": 86,
         "score_shade": 77,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15077,6 +15418,7 @@
         "score_accessibility": 68,
         "score_drainage": 84,
         "score_shade": 72,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15112,6 +15454,7 @@
         "score_accessibility": 61,
         "score_drainage": 89,
         "score_shade": 65,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15151,6 +15494,7 @@
         "score_accessibility": 62,
         "score_drainage": 81,
         "score_shade": 69,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15182,6 +15526,7 @@
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 67,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15237,6 +15582,7 @@
         "score_accessibility": 64,
         "score_drainage": 75,
         "score_shade": 63,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15284,6 +15630,7 @@
         "score_accessibility": 65,
         "score_drainage": 73,
         "score_shade": 61,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15319,6 +15666,7 @@
         "score_accessibility": 66,
         "score_drainage": 74,
         "score_shade": 57,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15382,6 +15730,7 @@
         "score_accessibility": 66,
         "score_drainage": 78,
         "score_shade": 53,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15421,6 +15770,7 @@
         "score_accessibility": 65,
         "score_drainage": 79,
         "score_shade": 56,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15496,6 +15846,7 @@
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 65,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15571,6 +15922,7 @@
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 71,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15654,6 +16006,7 @@
         "score_accessibility": 62,
         "score_drainage": 77,
         "score_shade": 76,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15697,6 +16050,7 @@
         "score_accessibility": 60,
         "score_drainage": 82,
         "score_shade": 65,
+        "score_bike": 1,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15736,6 +16090,7 @@
         "score_accessibility": 59,
         "score_drainage": 82,
         "score_shade": 65,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15763,6 +16118,7 @@
         "score_accessibility": 61,
         "score_drainage": 82,
         "score_shade": 68,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15798,6 +16154,7 @@
         "score_accessibility": 62,
         "score_drainage": 77,
         "score_shade": 77,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15877,6 +16234,7 @@
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 80,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15924,6 +16282,7 @@
         "score_accessibility": 79,
         "score_drainage": 72,
         "score_shade": 60,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15955,6 +16314,7 @@
         "score_accessibility": 78,
         "score_drainage": 72,
         "score_shade": 68,
+        "score_bike": 37,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -15986,6 +16346,7 @@
         "score_accessibility": 74,
         "score_drainage": 81,
         "score_shade": 76,
+        "score_bike": 30,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16041,6 +16402,7 @@
         "score_accessibility": 75,
         "score_drainage": 80,
         "score_shade": 75,
+        "score_bike": 31,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16080,6 +16442,7 @@
         "score_accessibility": 76,
         "score_drainage": 77,
         "score_shade": 72,
+        "score_bike": 29,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16139,6 +16502,7 @@
         "score_accessibility": 76,
         "score_drainage": 77,
         "score_shade": 74,
+        "score_bike": 30,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16206,6 +16570,7 @@
         "score_accessibility": 77,
         "score_drainage": 74,
         "score_shade": 71,
+        "score_bike": 29,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16241,6 +16606,7 @@
         "score_accessibility": 89,
         "score_drainage": 73,
         "score_shade": 66,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16284,6 +16650,7 @@
         "score_accessibility": 89,
         "score_drainage": 73,
         "score_shade": 66,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16323,6 +16690,7 @@
         "score_accessibility": 88,
         "score_drainage": 74,
         "score_shade": 65,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16358,6 +16726,7 @@
         "score_accessibility": 88,
         "score_drainage": 73,
         "score_shade": 66,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16417,6 +16786,7 @@
         "score_accessibility": 88,
         "score_drainage": 73,
         "score_shade": 65,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16460,6 +16830,7 @@
         "score_accessibility": 59,
         "score_drainage": 87,
         "score_shade": 64,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16487,6 +16858,7 @@
         "score_accessibility": 78,
         "score_drainage": 74,
         "score_shade": 65,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16514,6 +16886,7 @@
         "score_accessibility": 61,
         "score_drainage": 85,
         "score_shade": 58,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16557,6 +16930,7 @@
         "score_accessibility": 76,
         "score_drainage": 77,
         "score_shade": 71,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16592,6 +16966,7 @@
         "score_accessibility": 58,
         "score_drainage": 83,
         "score_shade": 76,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16699,6 +17074,7 @@
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 76,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16738,6 +17114,7 @@
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 76,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16769,6 +17146,7 @@
         "score_accessibility": 57,
         "score_drainage": 76,
         "score_shade": 72,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16828,6 +17206,7 @@
         "score_accessibility": 76,
         "score_drainage": 71,
         "score_shade": 69,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16859,6 +17238,7 @@
         "score_accessibility": 74,
         "score_drainage": 71,
         "score_shade": 64,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16894,6 +17274,7 @@
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 59,
+        "score_bike": 29,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16925,6 +17306,7 @@
         "score_accessibility": 63,
         "score_drainage": 76,
         "score_shade": 64,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -16960,6 +17342,7 @@
         "score_accessibility": 56,
         "score_drainage": 78,
         "score_shade": 70,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17011,6 +17394,7 @@
         "score_accessibility": 52,
         "score_drainage": 80,
         "score_shade": 76,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17058,6 +17442,7 @@
         "score_accessibility": 51,
         "score_drainage": 81,
         "score_shade": 78,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17089,6 +17474,7 @@
         "score_accessibility": 81,
         "score_drainage": 73,
         "score_shade": 66,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17124,6 +17510,7 @@
         "score_accessibility": 80,
         "score_drainage": 72,
         "score_shade": 59,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17155,6 +17542,7 @@
         "score_accessibility": 78,
         "score_drainage": 76,
         "score_shade": 66,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17182,6 +17570,7 @@
         "score_accessibility": 73,
         "score_drainage": 71,
         "score_shade": 74,
+        "score_bike": 37,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17209,6 +17598,7 @@
         "score_accessibility": 71,
         "score_drainage": 48,
         "score_shade": 79,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17244,6 +17634,7 @@
         "score_accessibility": 74,
         "score_drainage": 67,
         "score_shade": 73,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17275,6 +17666,7 @@
         "score_accessibility": 79,
         "score_drainage": 74,
         "score_shade": 65,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17318,6 +17710,7 @@
         "score_accessibility": 64,
         "score_drainage": 60,
         "score_shade": 72,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17353,6 +17746,7 @@
         "score_accessibility": 57,
         "score_drainage": 66,
         "score_shade": 70,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17432,6 +17826,7 @@
         "score_accessibility": 58,
         "score_drainage": 80,
         "score_shade": 72,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17483,6 +17878,7 @@
         "score_accessibility": 58,
         "score_drainage": 81,
         "score_shade": 76,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17514,6 +17910,7 @@
         "score_accessibility": 46,
         "score_drainage": 82,
         "score_shade": 58,
+        "score_bike": 25,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17577,6 +17974,7 @@
         "score_accessibility": 48,
         "score_drainage": 85,
         "score_shade": 54,
+        "score_bike": 30,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17632,6 +18030,7 @@
         "score_accessibility": 42,
         "score_drainage": 81,
         "score_shade": 55,
+        "score_bike": 29,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17679,6 +18078,7 @@
         "score_accessibility": 38,
         "score_drainage": 82,
         "score_shade": 49,
+        "score_bike": 26,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17734,6 +18134,7 @@
         "score_accessibility": 38,
         "score_drainage": 83,
         "score_shade": 46,
+        "score_bike": 25,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17785,6 +18186,7 @@
         "score_accessibility": 41,
         "score_drainage": 85,
         "score_shade": 48,
+        "score_bike": 25,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17840,6 +18242,7 @@
         "score_accessibility": 39,
         "score_drainage": 82,
         "score_shade": 57,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17915,6 +18318,7 @@
         "score_accessibility": 40,
         "score_drainage": 84,
         "score_shade": 58,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -17986,6 +18390,7 @@
         "score_accessibility": 40,
         "score_drainage": 81,
         "score_shade": 66,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18053,6 +18458,7 @@
         "score_accessibility": 40,
         "score_drainage": 81,
         "score_shade": 66,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18108,6 +18514,7 @@
         "score_accessibility": 44,
         "score_drainage": 82,
         "score_shade": 63,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18171,6 +18578,7 @@
         "score_accessibility": 53,
         "score_drainage": 83,
         "score_shade": 55,
+        "score_bike": 29,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18214,6 +18622,7 @@
         "score_accessibility": 56,
         "score_drainage": 83,
         "score_shade": 54,
+        "score_bike": 31,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18245,6 +18654,7 @@
         "score_accessibility": 38,
         "score_drainage": 75,
         "score_shade": 62,
+        "score_bike": 23,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18300,6 +18710,7 @@
         "score_accessibility": 44,
         "score_drainage": 83,
         "score_shade": 45,
+        "score_bike": 28,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18331,6 +18742,7 @@
         "score_accessibility": 38,
         "score_drainage": 77,
         "score_shade": 61,
+        "score_bike": 23,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18358,6 +18770,7 @@
         "score_accessibility": 47,
         "score_drainage": 83,
         "score_shade": 42,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18409,6 +18822,7 @@
         "score_accessibility": 48,
         "score_drainage": 84,
         "score_shade": 38,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18452,6 +18866,7 @@
         "score_accessibility": 47,
         "score_drainage": 83,
         "score_shade": 38,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18495,6 +18910,7 @@
         "score_accessibility": 45,
         "score_drainage": 83,
         "score_shade": 38,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18546,6 +18962,7 @@
         "score_accessibility": 42,
         "score_drainage": 82,
         "score_shade": 36,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18593,6 +19010,7 @@
         "score_accessibility": 39,
         "score_drainage": 81,
         "score_shade": 37,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18660,6 +19078,7 @@
         "score_accessibility": 37,
         "score_drainage": 80,
         "score_shade": 41,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18699,6 +19118,7 @@
         "score_accessibility": 36,
         "score_drainage": 80,
         "score_shade": 36,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18738,6 +19158,7 @@
         "score_accessibility": 34,
         "score_drainage": 80,
         "score_shade": 45,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18777,6 +19198,7 @@
         "score_accessibility": 38,
         "score_drainage": 83,
         "score_shade": 47,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18820,6 +19242,7 @@
         "score_accessibility": 35,
         "score_drainage": 81,
         "score_shade": 45,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18863,6 +19286,7 @@
         "score_accessibility": 33,
         "score_drainage": 80,
         "score_shade": 44,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18906,6 +19330,7 @@
         "score_accessibility": 35,
         "score_drainage": 81,
         "score_shade": 45,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -18961,6 +19386,7 @@
         "score_accessibility": 39,
         "score_drainage": 81,
         "score_shade": 60,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19004,6 +19430,7 @@
         "score_accessibility": 47,
         "score_drainage": 82,
         "score_shade": 59,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19051,6 +19478,7 @@
         "score_accessibility": 49,
         "score_drainage": 82,
         "score_shade": 61,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19090,6 +19518,7 @@
         "score_accessibility": 72,
         "score_drainage": 80,
         "score_shade": 74,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19121,6 +19550,7 @@
         "score_accessibility": 73,
         "score_drainage": 71,
         "score_shade": 59,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19164,6 +19594,7 @@
         "score_accessibility": 73,
         "score_drainage": 71,
         "score_shade": 59,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19191,6 +19622,7 @@
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 61,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19218,6 +19650,7 @@
         "score_accessibility": 62,
         "score_drainage": 79,
         "score_shade": 55,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19269,6 +19702,7 @@
         "score_accessibility": 66,
         "score_drainage": 80,
         "score_shade": 61,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19320,6 +19754,7 @@
         "score_accessibility": 63,
         "score_drainage": 82,
         "score_shade": 67,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19359,6 +19794,7 @@
         "score_accessibility": 62,
         "score_drainage": 78,
         "score_shade": 51,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19398,6 +19834,7 @@
         "score_accessibility": 65,
         "score_drainage": 77,
         "score_shade": 67,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19441,6 +19878,7 @@
         "score_accessibility": 64,
         "score_drainage": 77,
         "score_shade": 65,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19476,6 +19914,7 @@
         "score_accessibility": 64,
         "score_drainage": 78,
         "score_shade": 78,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19523,6 +19962,7 @@
         "score_accessibility": 66,
         "score_drainage": 79,
         "score_shade": 78,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19594,6 +20034,7 @@
         "score_accessibility": 64,
         "score_drainage": 81,
         "score_shade": 70,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19641,6 +20082,7 @@
         "score_accessibility": 58,
         "score_drainage": 88,
         "score_shade": 59,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19684,6 +20126,7 @@
         "score_accessibility": 54,
         "score_drainage": 89,
         "score_shade": 61,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19715,6 +20158,7 @@
         "score_accessibility": 67,
         "score_drainage": 60,
         "score_shade": 68,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19742,6 +20186,7 @@
         "score_accessibility": 67,
         "score_drainage": 55,
         "score_shade": 69,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19769,6 +20214,7 @@
         "score_accessibility": 47,
         "score_drainage": 82,
         "score_shade": 61,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19836,6 +20282,7 @@
         "score_accessibility": 52,
         "score_drainage": 79,
         "score_shade": 70,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19879,6 +20326,7 @@
         "score_accessibility": 53,
         "score_drainage": 77,
         "score_shade": 73,
+        "score_bike": 3,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19922,6 +20370,7 @@
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 66,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -19957,6 +20406,7 @@
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 79,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20000,6 +20450,7 @@
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 82,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20039,6 +20490,7 @@
         "score_accessibility": 58,
         "score_drainage": 77,
         "score_shade": 76,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20098,6 +20550,7 @@
         "score_accessibility": 61,
         "score_drainage": 77,
         "score_shade": 78,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20157,6 +20610,7 @@
         "score_accessibility": 60,
         "score_drainage": 75,
         "score_shade": 67,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20196,6 +20650,7 @@
         "score_accessibility": 47,
         "score_drainage": 80,
         "score_shade": 80,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20255,6 +20710,7 @@
         "score_accessibility": 46,
         "score_drainage": 79,
         "score_shade": 81,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20314,6 +20770,7 @@
         "score_accessibility": 46,
         "score_drainage": 80,
         "score_shade": 81,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20389,6 +20846,7 @@
         "score_accessibility": 49,
         "score_drainage": 55,
         "score_shade": 72,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20428,6 +20886,7 @@
         "score_accessibility": 49,
         "score_drainage": 57,
         "score_shade": 73,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20459,6 +20918,7 @@
         "score_accessibility": 55,
         "score_drainage": 77,
         "score_shade": 69,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20510,6 +20970,7 @@
         "score_accessibility": 52,
         "score_drainage": 61,
         "score_shade": 67,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20549,6 +21010,7 @@
         "score_accessibility": 47,
         "score_drainage": 55,
         "score_shade": 58,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20576,6 +21038,7 @@
         "score_accessibility": 71,
         "score_drainage": 81,
         "score_shade": 67,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20627,6 +21090,7 @@
         "score_accessibility": 62,
         "score_drainage": 85,
         "score_shade": 61,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20666,6 +21130,7 @@
         "score_accessibility": 61,
         "score_drainage": 86,
         "score_shade": 67,
+        "score_bike": 23,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20725,6 +21190,7 @@
         "score_accessibility": 60,
         "score_drainage": 87,
         "score_shade": 66,
+        "score_bike": 25,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20784,6 +21250,7 @@
         "score_accessibility": 59,
         "score_drainage": 83,
         "score_shade": 60,
+        "score_bike": 25,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20835,6 +21302,7 @@
         "score_accessibility": 59,
         "score_drainage": 77,
         "score_shade": 54,
+        "score_bike": 24,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20886,6 +21354,7 @@
         "score_accessibility": 61,
         "score_drainage": 81,
         "score_shade": 77,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20913,6 +21382,7 @@
         "score_accessibility": 72,
         "score_drainage": 71,
         "score_shade": 66,
+        "score_bike": 32,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20944,6 +21414,7 @@
         "score_accessibility": 62,
         "score_drainage": 84,
         "score_shade": 59,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -20971,6 +21442,7 @@
         "score_accessibility": 70,
         "score_drainage": 65,
         "score_shade": 70,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21006,6 +21478,7 @@
         "score_accessibility": 73,
         "score_drainage": 78,
         "score_shade": 62,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21033,6 +21506,7 @@
         "score_accessibility": 69,
         "score_drainage": 49,
         "score_shade": 77,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21060,6 +21534,7 @@
         "score_accessibility": 72,
         "score_drainage": 81,
         "score_shade": 73,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21091,6 +21566,7 @@
         "score_accessibility": 48,
         "score_drainage": 80,
         "score_shade": 78,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21118,6 +21594,7 @@
         "score_accessibility": 58,
         "score_drainage": 75,
         "score_shade": 66,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21161,6 +21638,7 @@
         "score_accessibility": 49,
         "score_drainage": 79,
         "score_shade": 72,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21208,6 +21686,7 @@
         "score_accessibility": 52,
         "score_drainage": 81,
         "score_shade": 71,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21259,6 +21738,7 @@
         "score_accessibility": 63,
         "score_drainage": 86,
         "score_shade": 62,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21342,6 +21822,7 @@
         "score_accessibility": 70,
         "score_drainage": 86,
         "score_shade": 79,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21369,6 +21850,7 @@
         "score_accessibility": 73,
         "score_drainage": 83,
         "score_shade": 76,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21412,6 +21894,7 @@
         "score_accessibility": 74,
         "score_drainage": 79,
         "score_shade": 73,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21447,6 +21930,7 @@
         "score_accessibility": 72,
         "score_drainage": 81,
         "score_shade": 75,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21482,6 +21966,7 @@
         "score_accessibility": 70,
         "score_drainage": 82,
         "score_shade": 75,
+        "score_bike": 19,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21533,6 +22018,7 @@
         "score_accessibility": 70,
         "score_drainage": 81,
         "score_shade": 75,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21604,6 +22090,7 @@
         "score_accessibility": 69,
         "score_drainage": 83,
         "score_shade": 75,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21643,6 +22130,7 @@
         "score_accessibility": 48,
         "score_drainage": 45,
         "score_shade": 79,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21706,6 +22194,7 @@
         "score_accessibility": 66,
         "score_drainage": 86,
         "score_shade": 66,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21745,6 +22234,7 @@
         "score_accessibility": 65,
         "score_drainage": 84,
         "score_shade": 61,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21772,6 +22262,7 @@
         "score_accessibility": 75,
         "score_drainage": 78,
         "score_shade": 63,
+        "score_bike": 16,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21799,6 +22290,7 @@
         "score_accessibility": 67,
         "score_drainage": 82,
         "score_shade": 69,
+        "score_bike": 21,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21862,6 +22354,7 @@
         "score_accessibility": 35,
         "score_drainage": 77,
         "score_shade": 63,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21889,6 +22382,7 @@
         "score_accessibility": 36,
         "score_drainage": 77,
         "score_shade": 63,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21932,6 +22426,7 @@
         "score_accessibility": 48,
         "score_drainage": 58,
         "score_shade": 75,
+        "score_bike": 11,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -21979,6 +22474,7 @@
         "score_accessibility": 48,
         "score_drainage": 38,
         "score_shade": 82,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22050,6 +22546,7 @@
         "score_accessibility": 51,
         "score_drainage": 83,
         "score_shade": 62,
+        "score_bike": 33,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22077,6 +22574,7 @@
         "score_accessibility": 72,
         "score_drainage": 77,
         "score_shade": 65,
+        "score_bike": 17,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22104,6 +22602,7 @@
         "score_accessibility": 70,
         "score_drainage": 83,
         "score_shade": 76,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22151,6 +22650,7 @@
         "score_accessibility": 68,
         "score_drainage": 84,
         "score_shade": 71,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22186,6 +22686,7 @@
         "score_accessibility": 48,
         "score_drainage": 79,
         "score_shade": 51,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22225,6 +22726,7 @@
         "score_accessibility": 48,
         "score_drainage": 72,
         "score_shade": 58,
+        "score_bike": 3,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22268,6 +22770,7 @@
         "score_accessibility": 47,
         "score_drainage": 82,
         "score_shade": 58,
+        "score_bike": 3,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22299,6 +22802,7 @@
         "score_accessibility": 73,
         "score_drainage": 78,
         "score_shade": 68,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22334,6 +22838,7 @@
         "score_accessibility": 75,
         "score_drainage": 80,
         "score_shade": 72,
+        "score_bike": 2,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22389,6 +22894,7 @@
         "score_accessibility": 75,
         "score_drainage": 79,
         "score_shade": 72,
+        "score_bike": 3,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22444,6 +22950,7 @@
         "score_accessibility": 75,
         "score_drainage": 80,
         "score_shade": 72,
+        "score_bike": 3,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22511,6 +23018,7 @@
         "score_accessibility": 74,
         "score_drainage": 78,
         "score_shade": 70,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22542,6 +23050,7 @@
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 64,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22577,6 +23086,7 @@
         "score_accessibility": 62,
         "score_drainage": 75,
         "score_shade": 64,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22616,6 +23126,7 @@
         "score_accessibility": 62,
         "score_drainage": 76,
         "score_shade": 65,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22667,6 +23178,7 @@
         "score_accessibility": 63,
         "score_drainage": 75,
         "score_shade": 64,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22718,6 +23230,7 @@
         "score_accessibility": 57,
         "score_drainage": 83,
         "score_shade": 54,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22749,6 +23262,7 @@
         "score_accessibility": 64,
         "score_drainage": 77,
         "score_shade": 65,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22792,6 +23306,7 @@
         "score_accessibility": 67,
         "score_drainage": 77,
         "score_shade": 80,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22839,6 +23354,7 @@
         "score_accessibility": 66,
         "score_drainage": 78,
         "score_shade": 81,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22870,6 +23386,7 @@
         "score_accessibility": 68,
         "score_drainage": 78,
         "score_shade": 79,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22921,6 +23438,7 @@
         "score_accessibility": 61,
         "score_drainage": 77,
         "score_shade": 69,
+        "score_bike": 18,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22956,6 +23474,7 @@
         "score_accessibility": 52,
         "score_drainage": 78,
         "score_shade": 75,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -22983,6 +23502,7 @@
         "score_accessibility": 50,
         "score_drainage": 78,
         "score_shade": 77,
+        "score_bike": 15,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23022,6 +23542,7 @@
         "score_accessibility": 49,
         "score_drainage": 79,
         "score_shade": 79,
+        "score_bike": 14,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23049,6 +23570,7 @@
         "score_accessibility": 45,
         "score_drainage": 81,
         "score_shade": 49,
+        "score_bike": 13,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23096,6 +23618,7 @@
         "score_accessibility": 41,
         "score_drainage": 79,
         "score_shade": 66,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23135,6 +23658,7 @@
         "score_accessibility": 39,
         "score_drainage": 82,
         "score_shade": 62,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23186,6 +23710,7 @@
         "score_accessibility": 62,
         "score_drainage": 80,
         "score_shade": 66,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23213,6 +23738,7 @@
         "score_accessibility": 55,
         "score_drainage": 60,
         "score_shade": 65,
+        "score_bike": 12,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23252,6 +23778,7 @@
         "score_accessibility": 51,
         "score_drainage": 82,
         "score_shade": 61,
+        "score_bike": 9,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23279,6 +23806,7 @@
         "score_accessibility": 47,
         "score_drainage": 89,
         "score_shade": 64,
+        "score_bike": 6,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23306,6 +23834,7 @@
         "score_accessibility": 62,
         "score_drainage": 80,
         "score_shade": 77,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23333,6 +23862,7 @@
         "score_accessibility": 63,
         "score_drainage": 78,
         "score_shade": 74,
+        "score_bike": 8,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23432,6 +23962,7 @@
         "score_accessibility": 60,
         "score_drainage": 77,
         "score_shade": 44,
+        "score_bike": 20,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23467,6 +23998,7 @@
         "score_accessibility": 50,
         "score_drainage": 79,
         "score_shade": 65,
+        "score_bike": 7,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23502,6 +24034,7 @@
         "score_accessibility": 52,
         "score_drainage": 77,
         "score_shade": 71,
+        "score_bike": 4,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23537,6 +24070,7 @@
         "score_accessibility": 49,
         "score_drainage": 89,
         "score_shade": 66,
+        "score_bike": 5,
         "audited_at": "2026-07-10",
         "demo": true
       },
@@ -23572,6 +24106,7 @@
         "score_accessibility": 49,
         "score_drainage": 81,
         "score_shade": 56,
+        "score_bike": 10,
         "audited_at": "2026-07-10",
         "demo": true
       },

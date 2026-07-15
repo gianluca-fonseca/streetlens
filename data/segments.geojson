@@ -13,7 +13,7 @@
       9.922,
       -84.135
     ],
-    "generated_at": "2026-07-14T20:15:42.925Z",
+    "generated_at": "2026-07-15T01:28:00.947Z",
     "segment_count": 535,
     "audited_km": 76.84,
     "network_km": 95.69,
@@ -29,6 +29,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 191.1,
         "osm_way_id": 25079191
       },
@@ -59,6 +60,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 196.6,
         "osm_way_id": 25079191
       },
@@ -89,6 +91,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 189.6,
         "osm_way_id": 25079196
       },
@@ -119,6 +122,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 182.7,
         "osm_way_id": 25079196
       },
@@ -149,6 +153,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 198.1,
         "osm_way_id": 25079196
       },
@@ -179,6 +184,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 100.6,
         "osm_way_id": 25079196
       },
@@ -205,6 +211,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 96.8,
         "osm_way_id": 25079199
       },
@@ -231,6 +238,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.7,
         "osm_way_id": 25079200
       },
@@ -261,6 +269,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.3,
         "osm_way_id": 25079200
       },
@@ -295,6 +304,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 189.1,
         "osm_way_id": 25079200
       },
@@ -325,6 +335,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 84.3,
         "osm_way_id": 25079200
       },
@@ -351,6 +362,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 188,
         "osm_way_id": 25079202
       },
@@ -381,6 +393,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 200.4,
         "osm_way_id": 25079206
       },
@@ -411,6 +424,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 191.5,
         "osm_way_id": 25079206
       },
@@ -441,6 +455,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 92.9,
         "osm_way_id": 25079206
       },
@@ -467,6 +482,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 97.1,
         "osm_way_id": 25414466
       },
@@ -493,6 +509,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 189.8,
         "osm_way_id": 25414508
       },
@@ -531,6 +548,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 144.4,
         "osm_way_id": 25414586
       },
@@ -573,6 +591,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.4,
         "osm_way_id": 25414616
       },
@@ -615,6 +634,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 96.1,
         "osm_way_id": 25414616
       },
@@ -649,6 +669,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.9,
         "osm_way_id": 25414652
       },
@@ -695,6 +716,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 175.4,
         "osm_way_id": 25414652
       },
@@ -749,6 +771,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 72.4,
         "osm_way_id": 25414652
       },
@@ -783,6 +806,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151,
         "osm_way_id": 25414661
       },
@@ -829,6 +853,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 67.1,
         "osm_way_id": 25414661
       },
@@ -863,6 +888,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 220,
         "osm_way_id": 25418733
       },
@@ -917,6 +943,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 139.4,
         "osm_way_id": 25418747
       },
@@ -947,6 +974,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.5,
         "osm_way_id": 25418749
       },
@@ -985,6 +1013,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 71.2,
         "osm_way_id": 25418749
       },
@@ -1011,6 +1040,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.2,
         "osm_way_id": 25418755
       },
@@ -1045,6 +1075,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.2,
         "osm_way_id": 25418757
       },
@@ -1111,6 +1142,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 219.3,
         "osm_way_id": 25418780
       },
@@ -1161,6 +1193,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 198.6,
         "osm_way_id": 25418780
       },
@@ -1211,6 +1244,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 169.6,
         "osm_way_id": 25418780
       },
@@ -1253,6 +1287,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 74.7,
         "osm_way_id": 25418780
       },
@@ -1291,6 +1326,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.8,
         "osm_way_id": 25418782
       },
@@ -1325,6 +1361,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160.7,
         "osm_way_id": 25418782
       },
@@ -1363,6 +1400,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 167.6,
         "osm_way_id": 25418876
       },
@@ -1421,6 +1459,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 165,
         "osm_way_id": 25418876
       },
@@ -1479,6 +1518,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.6,
         "osm_way_id": 25418876
       },
@@ -1565,6 +1605,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 193.4,
         "osm_way_id": 25418876
       },
@@ -1647,6 +1688,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.2,
         "osm_way_id": 25418876
       },
@@ -1701,6 +1743,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160.5,
         "osm_way_id": 25418876
       },
@@ -1755,6 +1798,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 165.3,
         "osm_way_id": 25418876
       },
@@ -1805,6 +1849,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.4,
         "osm_way_id": 25418876
       },
@@ -1851,6 +1896,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161.9,
         "osm_way_id": 25418876
       },
@@ -1909,6 +1955,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.1,
         "osm_way_id": 25418879
       },
@@ -1943,6 +1990,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 94.4,
         "osm_way_id": 25418879
       },
@@ -1985,6 +2033,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 69.2,
         "osm_way_id": 25418884
       },
@@ -2015,6 +2064,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.2,
         "osm_way_id": 25419019
       },
@@ -2061,6 +2111,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 47.6,
         "osm_way_id": 25419041
       },
@@ -2087,6 +2138,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 172.5,
         "osm_way_id": 30010702
       },
@@ -2141,6 +2193,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 194.2,
         "osm_way_id": 30010702
       },
@@ -2191,6 +2244,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 163.5,
         "osm_way_id": 30095203
       },
@@ -2257,6 +2311,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 163.8,
         "osm_way_id": 30095203
       },
@@ -2311,6 +2366,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 136.9,
         "osm_way_id": 30095203
       },
@@ -2361,6 +2417,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155.5,
         "osm_way_id": 30095540
       },
@@ -2399,6 +2456,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 166.3,
         "osm_way_id": 30095540
       },
@@ -2453,6 +2511,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155,
         "osm_way_id": 30095540
       },
@@ -2503,6 +2562,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.8,
         "osm_way_id": 30095540
       },
@@ -2581,6 +2641,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 61.9,
         "osm_way_id": 30095540
       },
@@ -2611,6 +2672,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 272.8,
         "osm_way_id": 30854080
       },
@@ -2661,6 +2723,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 150.3,
         "osm_way_id": 30854100
       },
@@ -2719,6 +2782,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 43,
         "osm_way_id": 30854100
       },
@@ -2753,6 +2817,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 75.9,
         "osm_way_id": 30854121
       },
@@ -2779,6 +2844,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 182.6,
         "osm_way_id": 30854258
       },
@@ -2837,6 +2903,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 81,
         "osm_way_id": 30854258
       },
@@ -2879,6 +2946,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 71.9,
         "osm_way_id": 31133688
       },
@@ -2905,6 +2973,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 186,
         "osm_way_id": 31133843
       },
@@ -2935,6 +3004,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 96.7,
         "osm_way_id": 31133843
       },
@@ -2961,6 +3031,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 249.7,
         "osm_way_id": 31492513
       },
@@ -3003,6 +3074,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 99,
         "osm_way_id": 31493088
       },
@@ -3033,6 +3105,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.7,
         "osm_way_id": 31771362
       },
@@ -3059,6 +3132,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.4,
         "osm_way_id": 31771362
       },
@@ -3101,6 +3175,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 187.9,
         "osm_way_id": 31771362
       },
@@ -3139,6 +3214,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 72.9,
         "osm_way_id": 31771362
       },
@@ -3181,6 +3257,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 43.9,
         "osm_way_id": 31771363
       },
@@ -3231,6 +3308,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 42.2,
         "osm_way_id": 31771364
       },
@@ -3277,6 +3355,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 154.7,
         "osm_way_id": 31771365
       },
@@ -3323,6 +3402,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.7,
         "osm_way_id": 31771365
       },
@@ -3377,6 +3457,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 153.1,
         "osm_way_id": 31771365
       },
@@ -3435,6 +3516,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159,
         "osm_way_id": 31771365
       },
@@ -3493,6 +3575,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.1,
         "osm_way_id": 31771365
       },
@@ -3555,6 +3638,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157,
         "osm_way_id": 31771365
       },
@@ -3633,6 +3717,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 154.4,
         "osm_way_id": 31771365
       },
@@ -3679,6 +3764,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 154.2,
         "osm_way_id": 31771365
       },
@@ -3729,6 +3815,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.6,
         "osm_way_id": 31771365
       },
@@ -3783,6 +3870,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 83.5,
         "osm_way_id": 31771365
       },
@@ -3821,6 +3909,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 72.2,
         "osm_way_id": 31771367
       },
@@ -3851,6 +3940,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 177.5,
         "osm_way_id": 31771369
       },
@@ -3921,6 +4011,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 193.6,
         "osm_way_id": 31771371
       },
@@ -3995,6 +4086,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 111.7,
         "osm_way_id": 31771374
       },
@@ -4025,6 +4117,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 41,
         "osm_way_id": 31771376
       },
@@ -4051,6 +4144,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 61.9,
         "osm_way_id": 31771385
       },
@@ -4077,6 +4171,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 117.2,
         "osm_way_id": 31771386
       },
@@ -4107,6 +4202,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 103.3,
         "osm_way_id": 31771387
       },
@@ -4133,6 +4229,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 183.7,
         "osm_way_id": 31771389
       },
@@ -4203,6 +4300,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 172.5,
         "osm_way_id": 31771389
       },
@@ -4269,6 +4367,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 75.6,
         "osm_way_id": 31771390
       },
@@ -4295,6 +4394,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161,
         "osm_way_id": 31771391
       },
@@ -4365,6 +4465,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.1,
         "osm_way_id": 31771391
       },
@@ -4431,6 +4532,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 112.5,
         "osm_way_id": 31771391
       },
@@ -4469,6 +4571,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157,
         "osm_way_id": 31771395
       },
@@ -4515,6 +4618,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 168.2,
         "osm_way_id": 31771396
       },
@@ -4565,6 +4669,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 196.7,
         "osm_way_id": 31771396
       },
@@ -4619,6 +4724,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190.9,
         "osm_way_id": 31771399
       },
@@ -4649,6 +4755,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 191.3,
         "osm_way_id": 31771401
       },
@@ -4695,6 +4802,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.2,
         "osm_way_id": 31771402
       },
@@ -4749,6 +4857,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 85,
         "osm_way_id": 31771402
       },
@@ -4783,6 +4892,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 200.6,
         "osm_way_id": 31771404
       },
@@ -4837,6 +4947,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 197.8,
         "osm_way_id": 31771404
       },
@@ -4891,6 +5002,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 195.2,
         "osm_way_id": 31771406
       },
@@ -4941,6 +5053,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 166.7,
         "osm_way_id": 31771407
       },
@@ -4995,6 +5108,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 150.8,
         "osm_way_id": 31771407
       },
@@ -5057,6 +5171,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 70,
         "osm_way_id": 31771407
       },
@@ -5099,6 +5214,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.7,
         "osm_way_id": 31771413
       },
@@ -5157,6 +5273,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 120.9,
         "osm_way_id": 31771413
       },
@@ -5195,6 +5312,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.4,
         "osm_way_id": 31771415
       },
@@ -5253,6 +5371,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 139,
         "osm_way_id": 31771415
       },
@@ -5343,6 +5462,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 230.8,
         "osm_way_id": 31771423
       },
@@ -5373,6 +5493,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161.3,
         "osm_way_id": 31771423
       },
@@ -5411,6 +5532,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 172.3,
         "osm_way_id": 31771426
       },
@@ -5465,6 +5587,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 222.5,
         "osm_way_id": 31771426
       },
@@ -5495,6 +5618,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 305.9,
         "osm_way_id": 31771426
       },
@@ -5529,6 +5653,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 164.5,
         "osm_way_id": 31771426
       },
@@ -5559,6 +5684,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.2,
         "osm_way_id": 31771426
       },
@@ -5629,6 +5755,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 209.6,
         "osm_way_id": 31771426
       },
@@ -5695,6 +5822,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 171.2,
         "osm_way_id": 31771426
       },
@@ -5725,6 +5853,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 169.2,
         "osm_way_id": 31771426
       },
@@ -5791,6 +5920,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.4,
         "osm_way_id": 31771426
       },
@@ -5841,6 +5971,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 178,
         "osm_way_id": 31771426
       },
@@ -5883,6 +6014,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 191.6,
         "osm_way_id": 31771429
       },
@@ -5917,6 +6049,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 65.5,
         "osm_way_id": 31771429
       },
@@ -5959,6 +6092,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.8,
         "osm_way_id": 31771430
       },
@@ -6001,6 +6135,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 115.9,
         "osm_way_id": 31771431
       },
@@ -6067,6 +6202,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 182.8,
         "osm_way_id": 61155434
       },
@@ -6113,6 +6249,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.7,
         "osm_way_id": 61155434
       },
@@ -6155,6 +6292,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 172.2,
         "osm_way_id": 61155434
       },
@@ -6237,6 +6375,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 220.2,
         "osm_way_id": 61155434
       },
@@ -6263,6 +6402,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.1,
         "osm_way_id": 61155434
       },
@@ -6325,6 +6465,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159,
         "osm_way_id": 61155434
       },
@@ -6371,6 +6512,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 213.5,
         "osm_way_id": 61155434
       },
@@ -6409,6 +6551,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 198.4,
         "osm_way_id": 61155434
       },
@@ -6439,6 +6582,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.3,
         "osm_way_id": 61155434
       },
@@ -6477,6 +6621,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 78.7,
         "osm_way_id": 61155434
       },
@@ -6523,6 +6668,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 127,
         "osm_way_id": 61359414
       },
@@ -6553,6 +6699,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 136.5,
         "osm_way_id": 65646119
       },
@@ -6599,6 +6746,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 43.9,
         "osm_way_id": 66007403
       },
@@ -6629,6 +6777,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 182.4,
         "osm_way_id": 66007404
       },
@@ -6671,6 +6820,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 57.6,
         "osm_way_id": 66007404
       },
@@ -6697,6 +6847,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 181.8,
         "osm_way_id": 66007406
       },
@@ -6743,6 +6894,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 201.8,
         "osm_way_id": 66007407
       },
@@ -6777,6 +6929,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 187.3,
         "osm_way_id": 66022489
       },
@@ -6819,6 +6972,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 95.7,
         "osm_way_id": 66022499
       },
@@ -6845,6 +6999,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160.2,
         "osm_way_id": 66022509
       },
@@ -6879,6 +7034,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 143.9,
         "osm_way_id": 66022509
       },
@@ -6953,6 +7109,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 178.8,
         "osm_way_id": 66022524
       },
@@ -6983,6 +7140,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 96,
         "osm_way_id": 66022527
       },
@@ -7025,6 +7183,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190.4,
         "osm_way_id": 66040712
       },
@@ -7067,6 +7226,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 154.1,
         "osm_way_id": 66040712
       },
@@ -7101,6 +7261,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.9,
         "osm_way_id": 66040717
       },
@@ -7135,6 +7296,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 50.2,
         "osm_way_id": 66040717
       },
@@ -7161,6 +7323,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.1,
         "osm_way_id": 66040719
       },
@@ -7195,6 +7358,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 165.8,
         "osm_way_id": 66040719
       },
@@ -7225,6 +7389,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151,
         "osm_way_id": 66040722
       },
@@ -7255,6 +7420,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 185.5,
         "osm_way_id": 66040722
       },
@@ -7289,6 +7455,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.2,
         "osm_way_id": 66040726
       },
@@ -7339,6 +7506,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 163,
         "osm_way_id": 66040726
       },
@@ -7373,6 +7541,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 168.5,
         "osm_way_id": 66040726
       },
@@ -7403,6 +7572,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 232.9,
         "osm_way_id": 66040726
       },
@@ -7437,6 +7607,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 67.5,
         "osm_way_id": 66040726
       },
@@ -7467,6 +7638,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 224.6,
         "osm_way_id": 66040735
       },
@@ -7505,6 +7677,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.9,
         "osm_way_id": 66040735
       },
@@ -7539,6 +7712,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 174.6,
         "osm_way_id": 66040735
       },
@@ -7577,6 +7751,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.7,
         "osm_way_id": 66040735
       },
@@ -7619,6 +7794,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 164.6,
         "osm_way_id": 66040735
       },
@@ -7665,6 +7841,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.2,
         "osm_way_id": 66040735
       },
@@ -7703,6 +7880,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 193.9,
         "osm_way_id": 66040735
       },
@@ -7753,6 +7931,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.7,
         "osm_way_id": 66040735
       },
@@ -7799,6 +7978,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 77.6,
         "osm_way_id": 70363857
       },
@@ -7825,6 +8005,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 179.3,
         "osm_way_id": 70363863
       },
@@ -7855,6 +8036,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 97.7,
         "osm_way_id": 70363863
       },
@@ -7881,6 +8063,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 164.7,
         "osm_way_id": 89365972
       },
@@ -7931,6 +8114,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 75.5,
         "osm_way_id": 89365972
       },
@@ -7965,6 +8149,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 172,
         "osm_way_id": 89365992
       },
@@ -8019,6 +8204,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 171.1,
         "osm_way_id": 89365992
       },
@@ -8069,6 +8255,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 159.5,
         "osm_way_id": 89365992
       },
@@ -8127,6 +8314,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 159.6,
         "osm_way_id": 89365992
       },
@@ -8185,6 +8373,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 155.4,
         "osm_way_id": 89365992
       },
@@ -8243,6 +8432,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 147.7,
         "osm_way_id": 89365992
       },
@@ -8293,6 +8483,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 195.2,
         "osm_way_id": 89366020
       },
@@ -8319,6 +8510,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 167.8,
         "osm_way_id": 89366020
       },
@@ -8361,6 +8553,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151,
         "osm_way_id": 89366020
       },
@@ -8391,6 +8584,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 169.3,
         "osm_way_id": 104334826
       },
@@ -8433,6 +8627,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 174.1,
         "osm_way_id": 104334826
       },
@@ -8479,6 +8674,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 296.1,
         "osm_way_id": 104334826
       },
@@ -8525,6 +8721,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155.2,
         "osm_way_id": 104334826
       },
@@ -8591,6 +8788,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 185.1,
         "osm_way_id": 104334826
       },
@@ -8645,6 +8843,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 122.6,
         "osm_way_id": 104334826
       },
@@ -8687,6 +8886,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 213.9,
         "osm_way_id": 104334827
       },
@@ -8745,6 +8945,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 114,
         "osm_way_id": 104334827
       },
@@ -8779,6 +8980,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 184.6,
         "osm_way_id": 104334829
       },
@@ -8817,6 +9019,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 178,
         "osm_way_id": 104334829
       },
@@ -8859,6 +9062,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 203.3,
         "osm_way_id": 104334829
       },
@@ -8917,6 +9121,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 153.8,
         "osm_way_id": 104334829
       },
@@ -8959,6 +9164,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.4,
         "osm_way_id": 104334829
       },
@@ -9001,6 +9207,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155.1,
         "osm_way_id": 104334829
       },
@@ -9035,6 +9242,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 170.8,
         "osm_way_id": 104334829
       },
@@ -9097,6 +9305,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.6,
         "osm_way_id": 104334829
       },
@@ -9151,6 +9360,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 89.5,
         "osm_way_id": 104334829
       },
@@ -9197,6 +9407,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 133.7,
         "osm_way_id": 104465637
       },
@@ -9227,6 +9438,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 82.5,
         "osm_way_id": 104465638
       },
@@ -9273,6 +9485,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155.9,
         "osm_way_id": 104465645
       },
@@ -9343,6 +9556,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.2,
         "osm_way_id": 104465645
       },
@@ -9401,6 +9615,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 48.4,
         "osm_way_id": 104465647
       },
@@ -9431,6 +9646,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 86.9,
         "osm_way_id": 117853100
       },
@@ -9493,6 +9709,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 183.4,
         "osm_way_id": 117853134
       },
@@ -9547,6 +9764,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 116.7,
         "osm_way_id": 119297998
       },
@@ -9577,6 +9795,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 89.4,
         "osm_way_id": 119298001
       },
@@ -9615,6 +9834,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 185.5,
         "osm_way_id": 119298002
       },
@@ -9653,6 +9873,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.4,
         "osm_way_id": 142397798
       },
@@ -9715,6 +9936,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 60.4,
         "osm_way_id": 172341211
       },
@@ -9741,6 +9963,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 191.8,
         "osm_way_id": 172341212
       },
@@ -9771,6 +9994,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 227,
         "osm_way_id": 172341213
       },
@@ -9821,6 +10045,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 119.9,
         "osm_way_id": 172341215
       },
@@ -9851,6 +10076,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 188.7,
         "osm_way_id": 172341216
       },
@@ -9881,6 +10107,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 188.9,
         "osm_way_id": 172341216
       },
@@ -9915,6 +10142,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 92.9,
         "osm_way_id": 172341216
       },
@@ -9941,6 +10169,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 205,
         "osm_way_id": 172341217
       },
@@ -9979,6 +10208,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 74.1,
         "osm_way_id": 172341217
       },
@@ -10017,6 +10247,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 182.9,
         "osm_way_id": 172341218
       },
@@ -10047,6 +10278,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 191.2,
         "osm_way_id": 172341219
       },
@@ -10081,6 +10313,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 196,
         "osm_way_id": 172341219
       },
@@ -10111,6 +10344,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 101,
         "osm_way_id": 172341219
       },
@@ -10137,6 +10371,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 49.9,
         "osm_way_id": 172341220
       },
@@ -10163,6 +10398,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 79.8,
         "osm_way_id": 172341221
       },
@@ -10197,6 +10433,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 195.6,
         "osm_way_id": 172341222
       },
@@ -10227,6 +10464,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 92.5,
         "osm_way_id": 172341222
       },
@@ -10253,6 +10491,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 192,
         "osm_way_id": 172341223
       },
@@ -10283,6 +10522,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 99.1,
         "osm_way_id": 172341223
       },
@@ -10309,6 +10549,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 189.6,
         "osm_way_id": 172341224
       },
@@ -10339,6 +10580,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 93.5,
         "osm_way_id": 172341224
       },
@@ -10365,6 +10607,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 111.2,
         "osm_way_id": 172341231
       },
@@ -10391,6 +10634,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 169.5,
         "osm_way_id": 172341232
       },
@@ -10417,6 +10661,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 170.3,
         "osm_way_id": 172341234
       },
@@ -10459,6 +10704,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 208.7,
         "osm_way_id": 172341234
       },
@@ -10501,6 +10747,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.7,
         "osm_way_id": 172341234
       },
@@ -10555,6 +10802,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.2,
         "osm_way_id": 172341234
       },
@@ -10593,6 +10841,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 174.5,
         "osm_way_id": 172341234
       },
@@ -10643,6 +10892,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.9,
         "osm_way_id": 172341234
       },
@@ -10689,6 +10939,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 47.6,
         "osm_way_id": 172341234
       },
@@ -10723,6 +10974,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 70.4,
         "osm_way_id": 172341237
       },
@@ -10753,6 +11005,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 145.7,
         "osm_way_id": 172341238
       },
@@ -10787,6 +11040,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 105.4,
         "osm_way_id": 172346233
       },
@@ -10817,6 +11071,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 173.3,
         "osm_way_id": 172346254
       },
@@ -10879,6 +11134,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 227.5,
         "osm_way_id": 172346254
       },
@@ -10933,6 +11189,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 94.5,
         "osm_way_id": 172346257
       },
@@ -10959,6 +11216,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 188.7,
         "osm_way_id": 172346267
       },
@@ -11025,6 +11283,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.3,
         "osm_way_id": 222591221
       },
@@ -11099,6 +11358,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 154.1,
         "osm_way_id": 222591221
       },
@@ -11185,6 +11445,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158,
         "osm_way_id": 222591221
       },
@@ -11279,6 +11540,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 47.4,
         "osm_way_id": 222591221
       },
@@ -11313,6 +11575,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 164.8,
         "osm_way_id": 240655525
       },
@@ -11355,6 +11618,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 74.3,
         "osm_way_id": 240655525
       },
@@ -11385,6 +11649,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 104.8,
         "osm_way_id": 240655539
       },
@@ -11419,6 +11684,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 88.2,
         "osm_way_id": 240706792
       },
@@ -11449,6 +11715,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 208.8,
         "osm_way_id": 240707367
       },
@@ -11495,6 +11762,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 203.1,
         "osm_way_id": 240707367
       },
@@ -11533,6 +11801,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.4,
         "osm_way_id": 240707367
       },
@@ -11571,6 +11840,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160.6,
         "osm_way_id": 240707367
       },
@@ -11617,6 +11887,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 172.4,
         "osm_way_id": 240707373
       },
@@ -11667,6 +11938,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 90.4,
         "osm_way_id": 240707373
       },
@@ -11721,6 +11993,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 150.5,
         "osm_way_id": 240707378
       },
@@ -11779,6 +12052,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.2,
         "osm_way_id": 240707378
       },
@@ -11841,6 +12115,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 52,
         "osm_way_id": 240707378
       },
@@ -11879,6 +12154,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 193.7,
         "osm_way_id": 240707381
       },
@@ -11929,6 +12205,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 183.3,
         "osm_way_id": 240894230
       },
@@ -11959,6 +12236,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 51.6,
         "osm_way_id": 240894239
       },
@@ -11993,6 +12271,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 89.6,
         "osm_way_id": 240975207
       },
@@ -12019,6 +12298,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.9,
         "osm_way_id": 303261962
       },
@@ -12085,6 +12365,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 171.5,
         "osm_way_id": 303261963
       },
@@ -12155,6 +12436,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 224.3,
         "osm_way_id": 303261963
       },
@@ -12221,6 +12503,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 138.1,
         "osm_way_id": 303261968
       },
@@ -12251,6 +12534,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 226.3,
         "osm_way_id": 303262097
       },
@@ -12297,6 +12581,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 203.3,
         "osm_way_id": 303364169
       },
@@ -12327,6 +12612,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 182.1,
         "osm_way_id": 303364169
       },
@@ -12373,6 +12659,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 210.2,
         "osm_way_id": 303364169
       },
@@ -12423,6 +12710,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155.7,
         "osm_way_id": 303364332
       },
@@ -12461,6 +12749,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 93.8,
         "osm_way_id": 303364332
       },
@@ -12503,6 +12792,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 168.4,
         "osm_way_id": 303364425
       },
@@ -12549,6 +12839,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 122.7,
         "osm_way_id": 303366798
       },
@@ -12599,6 +12890,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 107,
         "osm_way_id": 303366799
       },
@@ -12645,6 +12937,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 216.3,
         "osm_way_id": 303367276
       },
@@ -12683,6 +12976,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.5,
         "osm_way_id": 303367276
       },
@@ -12725,6 +13019,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.8,
         "osm_way_id": 303367276
       },
@@ -12759,6 +13054,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 176.4,
         "osm_way_id": 303367276
       },
@@ -12805,6 +13101,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 94.2,
         "osm_way_id": 303367622
       },
@@ -12835,6 +13132,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 101.7,
         "osm_way_id": 303367670
       },
@@ -12861,6 +13159,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 174.5,
         "osm_way_id": 303381454
       },
@@ -12895,6 +13194,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 232,
         "osm_way_id": 303381454
       },
@@ -12933,6 +13233,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 153.5,
         "osm_way_id": 303381454
       },
@@ -12979,6 +13280,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.7,
         "osm_way_id": 303381454
       },
@@ -13013,6 +13315,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 185.8,
         "osm_way_id": 303381454
       },
@@ -13047,6 +13350,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 169.2,
         "osm_way_id": 303381455
       },
@@ -13105,6 +13409,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 67.5,
         "osm_way_id": 303381455
       },
@@ -13135,6 +13440,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 219.4,
         "osm_way_id": 303381456
       },
@@ -13209,6 +13515,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.1,
         "osm_way_id": 303381456
       },
@@ -13247,6 +13554,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 59,
         "osm_way_id": 303381456
       },
@@ -13289,6 +13597,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 178.5,
         "osm_way_id": 303382035
       },
@@ -13319,6 +13628,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 80.8,
         "osm_way_id": 303382035
       },
@@ -13349,6 +13659,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 123.6,
         "osm_way_id": 303382037
       },
@@ -13391,6 +13702,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 153.1,
         "osm_way_id": 303382870
       },
@@ -13433,6 +13745,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190,
         "osm_way_id": 303382870
       },
@@ -13487,6 +13800,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 74.2,
         "osm_way_id": 303382870
       },
@@ -13525,6 +13839,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 188.5,
         "osm_way_id": 303382907
       },
@@ -13583,6 +13898,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.1,
         "osm_way_id": 303382908
       },
@@ -13621,6 +13937,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 58.7,
         "osm_way_id": 303383395
       },
@@ -13647,6 +13964,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 170.6,
         "osm_way_id": 305352584
       },
@@ -13681,6 +13999,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161,
         "osm_way_id": 305352584
       },
@@ -13727,6 +14046,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160.5,
         "osm_way_id": 305352584
       },
@@ -13785,6 +14105,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 153.5,
         "osm_way_id": 305352584
       },
@@ -13843,6 +14164,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.5,
         "osm_way_id": 305352584
       },
@@ -13885,6 +14207,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 154.3,
         "osm_way_id": 305352584
       },
@@ -13939,6 +14262,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.8,
         "osm_way_id": 305352584
       },
@@ -14001,6 +14325,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.8,
         "osm_way_id": 305352584
       },
@@ -14051,6 +14376,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160,
         "osm_way_id": 305352584
       },
@@ -14113,6 +14439,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 150.4,
         "osm_way_id": 305352584
       },
@@ -14155,6 +14482,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 197.9,
         "osm_way_id": 305352584
       },
@@ -14237,6 +14565,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 60.8,
         "osm_way_id": 305352588
       },
@@ -14275,6 +14604,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 94.4,
         "osm_way_id": 305352601
       },
@@ -14313,6 +14643,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 164.6,
         "osm_way_id": 325094531
       },
@@ -14359,6 +14690,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 52.7,
         "osm_way_id": 325094531
       },
@@ -14385,6 +14717,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 42.1,
         "osm_way_id": 325094532
       },
@@ -14415,6 +14748,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.5,
         "osm_way_id": 363412292
       },
@@ -14485,6 +14819,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 49.9,
         "osm_way_id": 363412292
       },
@@ -14519,6 +14854,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.3,
         "osm_way_id": 363412293
       },
@@ -14569,6 +14905,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 46.1,
         "osm_way_id": 363412294
       },
@@ -14595,6 +14932,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.8,
         "osm_way_id": 384727148
       },
@@ -14625,6 +14963,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 99.2,
         "osm_way_id": 384728244
       },
@@ -14651,6 +14990,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 182.2,
         "osm_way_id": 389976560
       },
@@ -14681,6 +15021,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.3,
         "osm_way_id": 389976560
       },
@@ -14731,6 +15072,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 53.8,
         "osm_way_id": 389976560
       },
@@ -14765,6 +15107,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 128.6,
         "osm_way_id": 390893346
       },
@@ -14803,6 +15146,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 178.7,
         "osm_way_id": 396421765
       },
@@ -14833,6 +15177,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.4,
         "osm_way_id": 396421765
       },
@@ -14887,6 +15232,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155.6,
         "osm_way_id": 396421765
       },
@@ -14933,6 +15279,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 177.1,
         "osm_way_id": 396421765
       },
@@ -14967,6 +15314,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 241.1,
         "osm_way_id": 396421765
       },
@@ -15029,6 +15377,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 295.8,
         "osm_way_id": 396421765
       },
@@ -15067,6 +15416,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.9,
         "osm_way_id": 396421765
       },
@@ -15141,6 +15491,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151,
         "osm_way_id": 396421765
       },
@@ -15215,6 +15566,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.4,
         "osm_way_id": 396421765
       },
@@ -15297,6 +15649,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 148.2,
         "osm_way_id": 396426441
       },
@@ -15339,6 +15692,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 236.6,
         "osm_way_id": 396437771
       },
@@ -15377,6 +15731,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 173.5,
         "osm_way_id": 396437771
       },
@@ -15403,6 +15758,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 167.9,
         "osm_way_id": 396437771
       },
@@ -15437,6 +15793,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 178.4,
         "osm_way_id": 396439600
       },
@@ -15515,6 +15872,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 76.4,
         "osm_way_id": 396439600
       },
@@ -15561,6 +15919,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190.7,
         "osm_way_id": 401982641
       },
@@ -15591,6 +15950,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 194,
         "osm_way_id": 401982645
       },
@@ -15621,6 +15981,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 151.4,
         "osm_way_id": 426853181
       },
@@ -15675,6 +16036,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 71.3,
         "osm_way_id": 426853181
       },
@@ -15713,6 +16075,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 160.1,
         "osm_way_id": 426853345
       },
@@ -15771,6 +16134,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 161.6,
         "osm_way_id": 426853345
       },
@@ -15837,6 +16201,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 48.7,
         "osm_way_id": 426853345
       },
@@ -15871,6 +16236,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 55.5,
         "osm_way_id": 469357535
       },
@@ -15913,6 +16279,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 43.3,
         "osm_way_id": 469357536
       },
@@ -15951,6 +16318,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 83.2,
         "osm_way_id": 469357537
       },
@@ -15985,6 +16353,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 80.9,
         "osm_way_id": 469357538
       },
@@ -16043,6 +16412,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 60,
         "osm_way_id": 469357541
       },
@@ -16085,6 +16455,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 122,
         "osm_way_id": 475302994
       },
@@ -16111,6 +16482,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 92.3,
         "osm_way_id": 552499462
       },
@@ -16137,6 +16509,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 201.8,
         "osm_way_id": 557499802
       },
@@ -16179,6 +16552,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 189.2,
         "osm_way_id": 557499882
       },
@@ -16213,6 +16587,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 126.4,
         "osm_way_id": 611267487
       },
@@ -16319,6 +16694,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 129.5,
         "osm_way_id": 611267488
       },
@@ -16357,6 +16733,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 124.8,
         "osm_way_id": 611267489
       },
@@ -16387,6 +16764,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 118.3,
         "osm_way_id": 611267490
       },
@@ -16445,6 +16823,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190.8,
         "osm_way_id": 630711116
       },
@@ -16475,6 +16854,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 194.4,
         "osm_way_id": 630711117
       },
@@ -16509,6 +16889,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "tertiary",
+        "bike_infra": "none",
         "length_m": 191.1,
         "osm_way_id": 630717527
       },
@@ -16539,6 +16920,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 199.7,
         "osm_way_id": 652798666
       },
@@ -16573,6 +16955,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 181.2,
         "osm_way_id": 652798666
       },
@@ -16623,6 +17006,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 163.7,
         "osm_way_id": 652798666
       },
@@ -16669,6 +17053,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 56.5,
         "osm_way_id": 652798666
       },
@@ -16699,6 +17084,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190.7,
         "osm_way_id": 653168584
       },
@@ -16733,6 +17119,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 189,
         "osm_way_id": 653168585
       },
@@ -16763,6 +17150,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 94.9,
         "osm_way_id": 653168585
       },
@@ -16789,6 +17177,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 96.3,
         "osm_way_id": 653168587
       },
@@ -16815,6 +17204,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 199.9,
         "osm_way_id": 653168589
       },
@@ -16849,6 +17239,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 192.4,
         "osm_way_id": 653168589
       },
@@ -16879,6 +17270,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190.4,
         "osm_way_id": 653168589
       },
@@ -16921,6 +17313,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 88.1,
         "osm_way_id": 653168592
       },
@@ -16955,6 +17348,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.1,
         "osm_way_id": 653168599
       },
@@ -17033,6 +17427,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 172.4,
         "osm_way_id": 653168599
       },
@@ -17083,6 +17478,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 81.1,
         "osm_way_id": 653168599
       },
@@ -17113,6 +17509,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 155.8,
         "osm_way_id": 653405745
       },
@@ -17175,6 +17572,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 165.5,
         "osm_way_id": 653405745
       },
@@ -17229,6 +17627,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 163.8,
         "osm_way_id": 653405745
       },
@@ -17275,6 +17674,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 155.7,
         "osm_way_id": 653405745
       },
@@ -17329,6 +17729,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 151.5,
         "osm_way_id": 653405745
       },
@@ -17379,6 +17780,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 155.7,
         "osm_way_id": 653405745
       },
@@ -17433,6 +17835,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 156,
         "osm_way_id": 653405745
       },
@@ -17507,6 +17910,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 164.2,
         "osm_way_id": 653405745
       },
@@ -17577,6 +17981,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 154.5,
         "osm_way_id": 653405745
       },
@@ -17643,6 +18048,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 154,
         "osm_way_id": 653405745
       },
@@ -17697,6 +18103,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 150.8,
         "osm_way_id": 653405745
       },
@@ -17759,6 +18166,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 156.3,
         "osm_way_id": 653405745
       },
@@ -17801,6 +18209,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 54.7,
         "osm_way_id": 653405745
       },
@@ -17831,6 +18240,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 182.6,
         "osm_way_id": 655503265
       },
@@ -17885,6 +18295,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 239.5,
         "osm_way_id": 655503268
       },
@@ -17915,6 +18326,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 135.6,
         "osm_way_id": 655503268
       },
@@ -17941,6 +18353,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 157.8,
         "osm_way_id": 655503276
       },
@@ -17991,6 +18404,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.4,
         "osm_way_id": 655503276
       },
@@ -18033,6 +18447,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 165.9,
         "osm_way_id": 655503276
       },
@@ -18075,6 +18490,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151,
         "osm_way_id": 655503276
       },
@@ -18125,6 +18541,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.3,
         "osm_way_id": 655503276
       },
@@ -18171,6 +18588,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161.9,
         "osm_way_id": 655503276
       },
@@ -18237,6 +18655,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 150.8,
         "osm_way_id": 655503276
       },
@@ -18275,6 +18694,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 190.8,
         "osm_way_id": 655503276
       },
@@ -18313,6 +18733,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.5,
         "osm_way_id": 655503276
       },
@@ -18351,6 +18772,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 183.2,
         "osm_way_id": 655503276
       },
@@ -18393,6 +18815,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 181.6,
         "osm_way_id": 655503276
       },
@@ -18435,6 +18858,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 172.4,
         "osm_way_id": 655503276
       },
@@ -18477,6 +18901,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.5,
         "osm_way_id": 655503276
       },
@@ -18531,6 +18956,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 221.5,
         "osm_way_id": 655503276
       },
@@ -18573,6 +18999,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161.6,
         "osm_way_id": 667794384
       },
@@ -18619,6 +19046,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 148.2,
         "osm_way_id": 667794384
       },
@@ -18657,6 +19085,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 195.5,
         "osm_way_id": 678445558
       },
@@ -18687,6 +19116,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 179.9,
         "osm_way_id": 707057357
       },
@@ -18729,6 +19159,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 45.2,
         "osm_way_id": 707057358
       },
@@ -18755,6 +19186,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 58.2,
         "osm_way_id": 707057359
       },
@@ -18781,6 +19213,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 153,
         "osm_way_id": 707062848
       },
@@ -18831,6 +19264,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 124,
         "osm_way_id": 707062848
       },
@@ -18881,6 +19315,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 71,
         "osm_way_id": 707062849
       },
@@ -18919,6 +19354,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 217.9,
         "osm_way_id": 707363037
       },
@@ -18957,6 +19393,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 87.9,
         "osm_way_id": 707363044
       },
@@ -18999,6 +19436,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 106.1,
         "osm_way_id": 707363047
       },
@@ -19033,6 +19471,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.2,
         "osm_way_id": 707365154
       },
@@ -19079,6 +19518,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 158.4,
         "osm_way_id": 707365154
       },
@@ -19149,6 +19589,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 59.5,
         "osm_way_id": 707365154
       },
@@ -19195,6 +19636,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160.6,
         "osm_way_id": 707387971
       },
@@ -19237,6 +19679,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 90.5,
         "osm_way_id": 707387971
       },
@@ -19267,6 +19710,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 40.9,
         "osm_way_id": 707429834
       },
@@ -19293,6 +19737,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 54.5,
         "osm_way_id": 707429835
       },
@@ -19319,6 +19764,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 174.8,
         "osm_way_id": 707450797
       },
@@ -19385,6 +19831,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 159.8,
         "osm_way_id": 707450798
       },
@@ -19427,6 +19874,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161.6,
         "osm_way_id": 707450798
       },
@@ -19469,6 +19917,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 56.8,
         "osm_way_id": 707450799
       },
@@ -19503,6 +19952,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 168.5,
         "osm_way_id": 707454457
       },
@@ -19545,6 +19995,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 161.7,
         "osm_way_id": 707454457
       },
@@ -19583,6 +20034,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 155.4,
         "osm_way_id": 707455218
       },
@@ -19641,6 +20093,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 128.6,
         "osm_way_id": 707455218
       },
@@ -19699,6 +20152,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 241.8,
         "osm_way_id": 707455220
       },
@@ -19737,6 +20191,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 164.1,
         "osm_way_id": 707457207
       },
@@ -19795,6 +20250,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.1,
         "osm_way_id": 707457207
       },
@@ -19853,6 +20309,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 196,
         "osm_way_id": 707457207
       },
@@ -19927,6 +20384,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 64.3,
         "osm_way_id": 707460702
       },
@@ -19965,6 +20423,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 167.1,
         "osm_way_id": 707460703
       },
@@ -19995,6 +20454,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 170.4,
         "osm_way_id": 707460703
       },
@@ -20045,6 +20505,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 165.1,
         "osm_way_id": 707460703
       },
@@ -20083,6 +20544,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 70.5,
         "osm_way_id": 707460703
       },
@@ -20109,6 +20571,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 201,
         "osm_way_id": 707876600
       },
@@ -20159,6 +20622,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 153.4,
         "osm_way_id": 707876600
       },
@@ -20197,6 +20661,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 153.6,
         "osm_way_id": 707876600
       },
@@ -20255,6 +20720,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 155.4,
         "osm_way_id": 707876600
       },
@@ -20313,6 +20779,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 173.6,
         "osm_way_id": 707876600
       },
@@ -20363,6 +20830,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "unclassified",
+        "bike_infra": "none",
         "length_m": 137.3,
         "osm_way_id": 707876600
       },
@@ -20413,6 +20881,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 48.5,
         "osm_way_id": 713318294
       },
@@ -20439,6 +20908,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 122.5,
         "osm_way_id": 718063317
       },
@@ -20469,6 +20939,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 67,
         "osm_way_id": 769329925
       },
@@ -20495,6 +20966,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 191.8,
         "osm_way_id": 769352877
       },
@@ -20529,6 +21001,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 96.9,
         "osm_way_id": 769352878
       },
@@ -20555,6 +21028,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 48.7,
         "osm_way_id": 769356649
       },
@@ -20581,6 +21055,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 92.9,
         "osm_way_id": 769415494
       },
@@ -20611,6 +21086,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 45.5,
         "osm_way_id": 803100219
       },
@@ -20637,6 +21113,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 129.4,
         "osm_way_id": 865352624
       },
@@ -20679,6 +21156,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 106.9,
         "osm_way_id": 891322103
       },
@@ -20725,6 +21203,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 177.9,
         "osm_way_id": 891322104
       },
@@ -20775,6 +21254,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 110.8,
         "osm_way_id": 1033943575
       },
@@ -20857,6 +21337,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 119.9,
         "osm_way_id": 1124160521
       },
@@ -20883,6 +21364,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 170,
         "osm_way_id": 1124160522
       },
@@ -20925,6 +21407,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 160.2,
         "osm_way_id": 1124160522
       },
@@ -20959,6 +21442,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.3,
         "osm_way_id": 1124160522
       },
@@ -20993,6 +21477,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 151.1,
         "osm_way_id": 1124160522
       },
@@ -21043,6 +21528,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 174.6,
         "osm_way_id": 1124160522
       },
@@ -21113,6 +21599,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 105.9,
         "osm_way_id": 1124160522
       },
@@ -21151,6 +21638,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 114.8,
         "osm_way_id": 1177994412
       },
@@ -21213,6 +21701,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 181.7,
         "osm_way_id": 1182508264
       },
@@ -21251,6 +21740,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 110.6,
         "osm_way_id": 1182508265
       },
@@ -21277,6 +21767,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 91.9,
         "osm_way_id": 1182508266
       },
@@ -21303,6 +21794,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 199.7,
         "osm_way_id": 1185631844
       },
@@ -21365,6 +21857,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 46,
         "osm_way_id": 1185915483
       },
@@ -21391,6 +21884,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 236.1,
         "osm_way_id": 1185915484
       },
@@ -21433,6 +21927,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 105.1,
         "osm_way_id": 1188566342
       },
@@ -21479,6 +21974,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 100.3,
         "osm_way_id": 1189300877
       },
@@ -21549,6 +22045,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "secondary",
+        "bike_infra": "none",
         "length_m": 67,
         "osm_way_id": 1197157369
       },
@@ -21575,6 +22072,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 97,
         "osm_way_id": 1197550077
       },
@@ -21601,6 +22099,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 150.5,
         "osm_way_id": 1200907596
       },
@@ -21647,6 +22146,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 68.3,
         "osm_way_id": 1200907596
       },
@@ -21681,6 +22181,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 86.9,
         "osm_way_id": 1202847407
       },
@@ -21719,6 +22220,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.3,
         "osm_way_id": 1202847414
       },
@@ -21761,6 +22263,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 68.2,
         "osm_way_id": 1202847414
       },
@@ -21791,6 +22294,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 122.6,
         "osm_way_id": 1214883692
       },
@@ -21825,6 +22329,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 82,
         "osm_way_id": 1214883693
       },
@@ -21879,6 +22384,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 113.7,
         "osm_way_id": 1214883694
       },
@@ -21933,6 +22439,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 56.2,
         "osm_way_id": 1214883695
       },
@@ -21999,6 +22506,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 69.3,
         "osm_way_id": 1214883696
       },
@@ -22029,6 +22537,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 61.2,
         "osm_way_id": 1230463959
       },
@@ -22063,6 +22572,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 61.5,
         "osm_way_id": 1230463960
       },
@@ -22101,6 +22611,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 152.3,
         "osm_way_id": 1230463961
       },
@@ -22151,6 +22662,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 84.4,
         "osm_way_id": 1230463961
       },
@@ -22201,6 +22713,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 55.3,
         "osm_way_id": 1268788115
       },
@@ -22231,6 +22744,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 92.1,
         "osm_way_id": 1303955473
       },
@@ -22273,6 +22787,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 111.2,
         "osm_way_id": 1303959181
       },
@@ -22319,6 +22834,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 78.9,
         "osm_way_id": 1303959184
       },
@@ -22349,6 +22865,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 106,
         "osm_way_id": 1303959185
       },
@@ -22399,6 +22916,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 55.7,
         "osm_way_id": 1304114224
       },
@@ -22433,6 +22951,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.1,
         "osm_way_id": 1304117308
       },
@@ -22459,6 +22978,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 133.6,
         "osm_way_id": 1304117308
       },
@@ -22497,6 +23017,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 86,
         "osm_way_id": 1304117309
       },
@@ -22523,6 +23044,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 110.1,
         "osm_way_id": 1304122656
       },
@@ -22569,6 +23091,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 162.8,
         "osm_way_id": 1304122657
       },
@@ -22607,6 +23130,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 130.4,
         "osm_way_id": 1304122657
       },
@@ -22657,6 +23181,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 45.9,
         "osm_way_id": 1304499107
       },
@@ -22683,6 +23208,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "footway",
+        "bike_infra": "none",
         "length_m": 115.1,
         "osm_way_id": 1316167704
       },
@@ -22721,6 +23247,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 48.6,
         "osm_way_id": 1365949750
       },
@@ -22747,6 +23274,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 76.7,
         "osm_way_id": 1437068295
       },
@@ -22773,6 +23301,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 91.6,
         "osm_way_id": 1441807624
       },
@@ -22799,6 +23328,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 168.2,
         "osm_way_id": 1441807626
       },
@@ -22897,6 +23427,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 41,
         "osm_way_id": 1442048864
       },
@@ -22931,6 +23462,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 156.2,
         "osm_way_id": 1471541376
       },
@@ -22965,6 +23497,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 132.3,
         "osm_way_id": 1471541376
       },
@@ -22999,6 +23532,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 146.1,
         "osm_way_id": 1493105348
       },
@@ -23033,6 +23567,7 @@
         "district_id": "esc-san-antonio",
         "corridor_id": "esc-sa-corridor",
         "highway": "residential",
+        "bike_infra": "none",
         "length_m": 98.2,
         "osm_way_id": 1533405763
       },
