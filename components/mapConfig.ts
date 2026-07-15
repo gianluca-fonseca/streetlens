@@ -18,6 +18,7 @@ export const LAYER_ORDER: ScoreLayer[] = [
   "accessibility",
   "drainage",
   "shade",
+  "bike",
 ];
 
 type RampStop = { at: number; hex: string };
@@ -46,6 +47,15 @@ export const RAMP: Record<ScoreLayer, RampStop[]> = {
     { at: 0, hex: "#DDE3CE" },
     { at: 50, hex: "#6E9463" },
     { at: 100, hex: "#14532D" },
+  ],
+  // { value0: #E8D9C4 pale sand (no/poor bike infra), value100: #8A4B2D deep copper (protected) }
+  // Monotonic warm ramp (sand → tan → copper). Distinct from drainage's yellow
+  // end (#C7C13B): the copper hue is orange-brown and only one layer is active
+  // at a time, with the redundant width channel as backup for CVD.
+  bike: [
+    { at: 0, hex: "#E8D9C4" },
+    { at: 50, hex: "#C88C5E" },
+    { at: 100, hex: "#8A4B2D" },
   ],
 };
 
@@ -154,6 +164,7 @@ export const RUBRIC_ITEMS: Record<ScoreLayer, string[]> = {
   accessibility: ["ramp", "tactile", "crossing"],
   drainage: ["grate", "slope", "ponding"],
   shade: ["canopy", "awning", "exposure"],
+  bike: ["lane", "separation", "connectivity"],
 };
 
 export function seedFromId(id: string): number {
