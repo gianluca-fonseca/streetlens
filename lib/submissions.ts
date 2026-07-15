@@ -92,41 +92,39 @@ function extractRecords(parsed: unknown): RawRecord[] {
   return [];
 }
 
-/** Validate + normalize a raw record; returns null if it is malformed. */
-function normalizeRecord(raw: RawRecord): QueueSubmission | null {
-  if (typeof raw.id !== "string") return null;
-  if (raw.type !== "add_segment" && raw.type !== "update_segment") return null;
-
-  const schema =
-    raw.type === "add_segment"
-      ? addSegmentPayloadSchema
-      : updateSegmentPayloadSchema;
-  const parsed = schema.safeParse(raw.payload);
-  if (!parsed.success) return null;
-
-  const status: SubmissionStatus =
-    raw.status === "approved" || raw.status === "rejected"
-      ? raw.status
-      : "pending";
-
-  return {
-    id: raw.id,
-    type: raw.type,
-    payload: parsed.data,
-    status,
-    created_at:
-      typeof raw.created_at === "string"
-        ? raw.created_at
-        : new Date(0).toISOString(),
-    contact: typeof raw.contact === "string" ? raw.contact : null,
-  };
-}
+/**
+ * A submission reconciled to ONE effective status — the single source of truth
+ * (advisor ruling 5). Every record with a usable id+type is kept, INCLUDING
+ * records whose payload fails validation: a rejected submission is often
+ * rejected *because* its payload was malformed, and the Overview counters must
+ * not silently drop it. `payloadValid` gates rendering, never counting.
+ */
+type ReconciledSubmission = {
+  id: string;
+  type: SubmissionType;
+  /** Effective status: the review overlay wins, else the record's base status. */
+  status: SubmissionStatus;
+  created_at: string;
+  contact: string | null;
+  /** Parsed payload when valid; the raw payload otherwise. */
+  payload: unknown;
+  payloadValid: boolean;
+};
 
 /* ------------------------------------------------------------------ *
- * Base list (source resolution)
+ * Source resolution (raw) + reconciliation
  * ------------------------------------------------------------------ */
 
-async function liveList(): Promise<QueueSubmission[] | null> {
+async function readOverlay(): Promise<ReviewOverlay> {
+  const parsed = await readJsonFile(REVIEWS_PATH);
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    return parsed as ReviewOverlay;
+  }
+  return {};
+}
+
+/** Raw records from the live RPC, or null when the DB is unavailable. */
+async function liveRawList(): Promise<RawRecord[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
   const secret = process.env.ADMIN_RPC_SECRET;
@@ -137,62 +135,102 @@ async function liveList(): Promise<QueueSubmission[] | null> {
       p_status_filter: null,
     });
     if (error || !Array.isArray(data)) return null;
-    return (data as RawRecord[])
-      .map(normalizeRecord)
-      .filter((x): x is QueueSubmission => x !== null);
+    return data as RawRecord[];
   } catch {
     return null;
   }
 }
 
-async function baseList(): Promise<{
-  items: QueueSubmission[];
+/** Resolve the active source and return its raw (unfiltered) records. */
+async function baseRawList(): Promise<{
+  raw: RawRecord[];
   source: SubmissionSource;
 }> {
-  const live = await liveList();
-  if (live) return { items: live, source: "supabase" };
+  const live = await liveRawList();
+  if (live) return { raw: live, source: "supabase" };
 
   const local = await readJsonFile(LOCAL_PATH);
-  if (local !== null) {
-    const items = extractRecords(local)
-      .map(normalizeRecord)
-      .filter((x): x is QueueSubmission => x !== null);
-    return { items, source: "local" };
-  }
+  if (local !== null) return { raw: extractRecords(local), source: "local" };
 
   const sample = await readJsonFile(SAMPLE_PATH);
-  const items = extractRecords(sample)
-    .map(normalizeRecord)
-    .filter((x): x is QueueSubmission => x !== null);
-  return { items, source: "sample" };
+  return { raw: extractRecords(sample), source: "sample" };
 }
 
-async function readOverlay(): Promise<ReviewOverlay> {
-  const parsed = await readJsonFile(REVIEWS_PATH);
-  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-    return parsed as ReviewOverlay;
-  }
-  return {};
+/** Reconcile one raw record to a single effective status. */
+function reconcileRecord(
+  raw: RawRecord,
+  overlay: ReviewOverlay,
+): ReconciledSubmission | null {
+  if (typeof raw.id !== "string") return null;
+  if (raw.type !== "add_segment" && raw.type !== "update_segment") return null;
+
+  const baseStatus: SubmissionStatus =
+    raw.status === "approved" || raw.status === "rejected"
+      ? raw.status
+      : "pending";
+  const review = overlay[raw.id];
+  const status = review ? review.status : baseStatus;
+
+  const schema =
+    raw.type === "add_segment"
+      ? addSegmentPayloadSchema
+      : updateSegmentPayloadSchema;
+  const parsed = schema.safeParse(raw.payload);
+
+  return {
+    id: raw.id,
+    type: raw.type,
+    status,
+    created_at:
+      typeof raw.created_at === "string"
+        ? raw.created_at
+        : new Date(0).toISOString(),
+    contact: typeof raw.contact === "string" ? raw.contact : null,
+    payload: parsed.success ? parsed.data : raw.payload,
+    payloadValid: parsed.success,
+  };
+}
+
+/**
+ * THE single reconciled source. Overlay is applied for local/sample (the DB is
+ * authoritative on the supabase path). Records are kept regardless of payload
+ * validity so counts stay honest.
+ */
+async function getReconciledSubmissions(): Promise<{
+  items: ReconciledSubmission[];
+  source: SubmissionSource;
+}> {
+  const { raw, source } = await baseRawList();
+  const overlay = source === "supabase" ? {} : await readOverlay();
+  const items = raw
+    .map((r) => reconcileRecord(r, overlay))
+    .filter((x): x is ReconciledSubmission => x !== null);
+  return { items, source };
 }
 
 /* ------------------------------------------------------------------ *
  * Public read API
  * ------------------------------------------------------------------ */
 
-/** All submissions with effective status (overlay applied for local/sample). */
+/** Renderable submissions (valid payload) with effective status, for the queue. */
 export async function getSubmissions(): Promise<{
   items: QueueSubmission[];
   source: SubmissionSource;
 }> {
-  const { items, source } = await baseList();
-  if (source === "supabase") return { items, source };
-
-  const overlay = await readOverlay();
-  const merged = items.map((item) => {
-    const review = overlay[item.id];
-    return review ? { ...item, status: review.status } : item;
-  });
-  return { items: merged, source };
+  const { items, source } = await getReconciledSubmissions();
+  return {
+    items: items
+      .filter((i) => i.payloadValid)
+      .map((i) => ({
+        id: i.id,
+        type: i.type,
+        payload: i.payload,
+        status: i.status,
+        created_at: i.created_at,
+        contact: i.contact,
+      })),
+    source,
+  };
 }
 
 /** Pending submissions only (plus the active source, for the demo treatment). */
@@ -204,16 +242,24 @@ export async function getPendingSubmissions(): Promise<{
   return { items: items.filter((i) => i.status === "pending"), source };
 }
 
-/** Aggregate submission counts by status. */
+/**
+ * Aggregate submission counts by status, from the single reconciled source
+ * (ruling 5). Counts EVERY record — including payload-invalid ones — so a
+ * file-status-rejected record that lacks a review entry is never missed. `total`
+ * is derived from the tally, so the buckets can never drift from it.
+ */
 export async function getSubmissionCounts(): Promise<SubmissionCounts> {
-  const { items } = await getSubmissions();
+  const { items } = await getReconciledSubmissions();
   const counts: SubmissionCounts = {
     pending: 0,
     approved: 0,
     rejected: 0,
-    total: items.length,
+    total: 0,
   };
-  for (const item of items) counts[item.status] += 1;
+  for (const item of items) {
+    counts[item.status] += 1;
+    counts.total += 1;
+  }
   return counts;
 }
 
