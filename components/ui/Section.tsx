@@ -64,11 +64,15 @@ export default function Section({
     children
   );
 
+  // Flat marketing grounds (bone/sunken) carry the topographic contour motif;
+  // the dark "field" tone runs its own imagery, so it opts out.
+  const textured = tone === "bone" || tone === "sunken";
+
   return (
     <section
       id={id}
       style={tone === "field" ? FIELD_TOKENS : undefined}
-      className={cn(pad, TONES[tone], className)}
+      className={cn(pad, TONES[tone], textured && "contour-field", className)}
     >
       {inner}
     </section>

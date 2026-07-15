@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="560" viewBox="0 0 560 560" fill="none">
+  <!--
+    StreetLens topographic contour motif (design-direction rev 4).
+    A survey-plate texture for marketing surfaces: a few nested contour lines
+    with the feel of Escazú's hillside terrain. Static, very low contrast.
+    Strokes are dark ink; callers set final visibility via opacity so the same
+    single asset reads on light grounds and (inverted) on asphalt-dark.
+  -->
+  <g stroke="#171d1a" stroke-width="1" fill="none" stroke-linecap="round">
+    <path d="M-20 96 C 90 60, 190 150, 300 118 S 500 40, 600 92" />
+    <path d="M-20 150 C 96 112, 196 206, 300 172 S 498 96, 600 148" />
+    <path d="M-20 210 C 104 168, 206 262, 300 232 S 496 156, 600 206" />
+    <path d="M-20 276 C 120 232, 214 320, 302 300 S 494 224, 600 268" />
+    <path d="M-20 344 C 130 300, 220 380, 300 372 S 496 300, 600 336" />
+    <path d="M-20 412 C 128 372, 214 442, 300 440 S 500 372, 600 404" />
+    <path d="M-20 478 C 118 442, 208 500, 300 504 S 502 446, 600 470" />
+    <!-- one closed local high point, like a hill summit ring -->
+    <path d="M362 250 C 410 236, 452 268, 446 306 C 440 342, 392 356, 356 338 C 324 322, 322 274, 362 250 Z" />
+    <path d="M372 268 C 406 260, 432 284, 426 310 C 420 334, 388 342, 366 328 C 346 316, 346 282, 372 268 Z" />
+  </g>
+</svg>
