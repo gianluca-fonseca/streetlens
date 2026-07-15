@@ -46,5 +46,9 @@ next-env.d.ts
 /data/pending-submissions.local.json
 /data/submission-reviews.local.json
 /data/approved-submissions.local.json
+
+# community-apply local store (u7 apply pipeline, DB fallback; never committed)
+/data/community-segments.local.json
+/data/community-reports.local.json
   # Local anonymous-submission queue (DB fallback; never committed)
 data/pending-submissions.local.json
