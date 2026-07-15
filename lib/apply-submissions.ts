@@ -19,9 +19,11 @@
  * and writers upsert by id, so re-approving or re-importing never duplicates.
  */
 
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { getSupabaseClient } from "./supabase";
+import {
+  appendCommunityReports,
+  appendCommunitySegments,
+} from "./community-store";
 import type {
   AddSegmentPayload,
   ImportFeature,
@@ -29,66 +31,14 @@ import type {
 } from "./schemas";
 import type { CommunityReport, CommunitySegment } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const COMMUNITY_SEGMENTS_PATH = path.join(
-  DATA_DIR,
-  "community-segments.local.json",
-);
-const COMMUNITY_REPORTS_PATH = path.join(
-  DATA_DIR,
-  "community-reports.local.json",
-);
-
 /** Community contributions have no field-surveyed district; the pilot is Escazú. */
 const COMMUNITY_DISTRICT = "Escazú";
 
-/* ------------------------------------------------------------------ *
- * Local file store (upsert-by-id)
- * ------------------------------------------------------------------ */
-
-async function readJsonArray<T>(file: string): Promise<T[]> {
-  try {
-    const parsed = JSON.parse(await fs.readFile(file, "utf8"));
-    return Array.isArray(parsed) ? (parsed as T[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-/** All applied community segments (local store). Missing file → empty. */
-export async function readCommunitySegments(): Promise<CommunitySegment[]> {
-  return readJsonArray<CommunitySegment>(COMMUNITY_SEGMENTS_PATH);
-}
-
-/** All applied community reports (local store). Missing file → empty. */
-export async function readCommunityReports(): Promise<CommunityReport[]> {
-  return readJsonArray<CommunityReport>(COMMUNITY_REPORTS_PATH);
-}
-
-async function writeJson(file: string, value: unknown): Promise<void> {
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, JSON.stringify(value, null, 2), "utf8");
-}
-
-/** Upsert rows into a local store by `id`, preserving order (new ids appended). */
-function upsertById<T extends { id: string }>(existing: T[], incoming: T[]): T[] {
-  const byId = new Map(existing.map((r) => [r.id, r]));
-  for (const row of incoming) byId.set(row.id, row);
-  return [...byId.values()];
-}
-
-async function appendCommunitySegments(
-  rows: CommunitySegment[],
-): Promise<void> {
-  if (rows.length === 0) return;
-  const merged = upsertById(await readCommunitySegments(), rows);
-  await writeJson(COMMUNITY_SEGMENTS_PATH, merged);
-}
-
-async function appendCommunityReports(rows: CommunityReport[]): Promise<void> {
-  if (rows.length === 0) return;
-  const merged = upsertById(await readCommunityReports(), rows);
-  await writeJson(COMMUNITY_REPORTS_PATH, merged);
+/** Normalize validated [lng, lat] positions to a concrete tuple array. */
+function toCoords(
+  positions: readonly (readonly number[])[],
+): [number, number][] {
+  return positions.map((p) => [p[0], p[1]]);
 }
 
 /* ------------------------------------------------------------------ *
@@ -130,7 +80,7 @@ export function buildCommunitySegment(
     verified: false,
     auditor: null,
     submission_id: input.id,
-    coordinates: input.payload.coordinates,
+    coordinates: toCoords(input.payload.coordinates),
     community_report: note
       ? {
           id: `rep-${input.id}`,
@@ -174,7 +124,7 @@ export function buildImportSegment(
     verified: opts.verified,
     auditor: opts.verified ? opts.auditor : null,
     submission_id: null,
-    coordinates: feature.coordinates,
+    coordinates: toCoords(feature.coordinates),
     community_report: null,
     created_at: createdAt,
   };

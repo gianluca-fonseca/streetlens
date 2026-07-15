@@ -132,7 +132,7 @@ export type SegmentDetail = {
 
 /** Aggregate stats for the floating hero panel. */
 export type StreetStats = {
-  /** Number of audited segments. */
+  /** Number of audited (rubric-scored) segments. Community adds are excluded. */
   segments: number;
   /** Total audited length in kilometers. */
   km: number;
@@ -140,6 +140,12 @@ export type StreetStats = {
   coveragePct: number;
   /** Headline figure: percent of audited segments failing Ley 7600 minimums. */
   heroPct: number;
+  /**
+   * Contract v3 (u7): count of community/import segments in the read path,
+   * tallied SEPARATELY from `segments` so unverified contributions never inflate
+   * the official audited figure.
+   */
+  communitySegments: number;
 };
 
 /**

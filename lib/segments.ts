@@ -18,8 +18,14 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getSupabaseClient } from "./supabase";
 import {
+  readCommunityReports,
+  readCommunitySegments,
+} from "./community-store";
+import {
   LEY_7600_MIN_SCORE,
   SCORE_LAYERS,
+  type CommunityReport,
+  type CommunitySegment,
   type ScoreLayer,
   type SegmentCollection,
   type SegmentDetail,
@@ -199,18 +205,101 @@ async function liveScoreRows(id?: string): Promise<ScoreRow[] | null> {
 }
 
 /* ------------------------------------------------------------------ *
+ * Community layer (contract v3, u7) — applied contributions merged into the
+ * read path. Community/import segments carry NO rubric scores; they render with
+ * the neutral community casing and are excluded from the official stats.
+ * ------------------------------------------------------------------ */
+
+/** Group community reports by their target segment id. */
+function groupReports(
+  reports: CommunityReport[],
+): Map<string, CommunityReport[]> {
+  const byId = new Map<string, CommunityReport[]>();
+  for (const r of reports) {
+    const list = byId.get(r.segment_id);
+    if (list) list.push(r);
+    else byId.set(r.segment_id, [r]);
+  }
+  return byId;
+}
+
+/** A community segment as a scoreless GeoJSON feature flagged for the map. */
+function communitySegmentToFeature(
+  cs: CommunitySegment,
+  reportsBySegment: Map<string, CommunityReport[]>,
+): SegmentFeature {
+  return {
+    type: "Feature",
+    properties: {
+      id: cs.id,
+      name: cs.name,
+      district: cs.district,
+      score_overall: 0,
+      score_accessibility: 0,
+      score_drainage: 0,
+      score_shade: 0,
+      score_bike: 0,
+      audited_at: "",
+      demo: false,
+      source: cs.source,
+      verified: cs.verified,
+      community_report: cs.community_report,
+      community_reports: reportsBySegment.get(cs.id) ?? [],
+    },
+    geometry: { type: "LineString", coordinates: cs.coordinates },
+  };
+}
+
+/**
+ * Attach any community reports targeting an official (audited) feature, without
+ * mutating the shared cached feature objects.
+ */
+function attachReports(
+  features: SegmentFeature[],
+  reportsBySegment: Map<string, CommunityReport[]>,
+): SegmentFeature[] {
+  return features.map((f) => {
+    const attached = reportsBySegment.get(f.properties.id);
+    if (!attached || attached.length === 0) return f;
+    return {
+      ...f,
+      properties: { ...f.properties, community_reports: attached },
+    };
+  });
+}
+
+/* ------------------------------------------------------------------ *
  * Public API (frozen contract)
  * ------------------------------------------------------------------ */
 
-/** All audited segments as a GeoJSON collection for the map. */
+/**
+ * All segments as a GeoJSON collection for the map: the audited reference set
+ * plus any applied community/import segments (flagged `source`/`verified`, no
+ * scores). Community reports are attached to their target features.
+ */
 export async function getSegments(): Promise<SegmentCollection> {
+  const [community, reports] = await Promise.all([
+    readCommunitySegments(),
+    readCommunityReports(),
+  ]);
+  const reportsBySegment = groupReports(reports);
+  const communityFeatures = community.map((cs) =>
+    communitySegmentToFeature(cs, reportsBySegment),
+  );
+
   const live = await liveScoreRows();
-  if (live && live.length > 0) {
-    return { type: "FeatureCollection", features: live.map(rowToFeature) };
-  }
-  const demo = await readDemoCollection();
-  // Return a clean collection (drop foreign metadata member for the UI).
-  return { type: "FeatureCollection", features: demo.features };
+  const officialFeatures =
+    live && live.length > 0
+      ? live.map(rowToFeature)
+      : (await readDemoCollection()).features;
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      ...attachReports(officialFeatures, reportsBySegment),
+      ...communityFeatures,
+    ],
+  };
 }
 
 /** Full detail for one segment, or null if unknown. */
@@ -248,7 +337,24 @@ export async function getSegmentDetail(
     readDemoAudits(),
   ]);
   const feature = collection.features.find((f) => f.properties.id === id);
-  if (!feature) return null;
+  if (!feature) {
+    // A community/import segment carries geometry but no rubric audit.
+    const community = await readCommunitySegments();
+    const cs = community.find((c) => c.id === id);
+    if (!cs) return null;
+    return {
+      id: cs.id,
+      name: cs.name,
+      district: cs.district,
+      audited_at: "",
+      highway: cs.highway,
+      length_m: 0,
+      demo: false,
+      geometry: { type: "LineString", coordinates: cs.coordinates },
+      scores: { overall: 0, accessibility: 0, drainage: 0, shade: 0, bike: 0 },
+      audit: null,
+    };
+  }
   const audit = audits.audits[id];
 
   return {
@@ -282,6 +388,9 @@ export async function getSegmentDetail(
 export async function getStats(): Promise<StreetStats> {
   const demo = await readDemoCollection();
   const networkKm = demo.metadata?.network_km;
+  // Community/import segments are counted separately; never folded into the
+  // official audited figure (contract v3, ruling 1).
+  const communitySegments = (await readCommunitySegments()).length;
 
   const live = await liveScoreRows();
   if (live && live.length > 0) {
@@ -297,6 +406,7 @@ export async function getStats(): Promise<StreetStats> {
           ? Number(((km / networkKm) * 100).toFixed(1))
           : 100,
       heroPct: Math.round((failing / live.length) * 100),
+      communitySegments,
     };
   }
 
@@ -312,5 +422,6 @@ export async function getStats(): Promise<StreetStats> {
     heroPct: features.length
       ? Math.round((failing / features.length) * 100)
       : 0,
+    communitySegments,
   };
 }
