@@ -29,8 +29,10 @@ export default function Reveal({
     if (!el) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce || typeof IntersectionObserver === "undefined") {
-      setShown(true);
-      return;
+      // Show immediately (next frame, so the set is not synchronous in-effect);
+      // the transition is disabled under reduced motion, so it simply appears.
+      const raf = requestAnimationFrame(() => setShown(true));
+      return () => cancelAnimationFrame(raf);
     }
     const io = new IntersectionObserver(
       (entries) => {
