@@ -28,7 +28,10 @@ import { getSupabaseClient } from "./supabase";
 import {
   addSegmentPayloadSchema,
   updateSegmentPayloadSchema,
+  type AddSegmentPayload,
+  type UpdateSegmentPayload,
 } from "./schemas";
+import { applyApprovedSubmission, type ApplyInput } from "./apply-submissions";
 import type { SubmissionStatus, SubmissionType } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -271,11 +274,31 @@ export type ReviewResult =
   | { ok: true; status: SubmissionStatus; source: SubmissionSource }
   | { ok: false; error: "not_found" | "invalid_reason" | "invalid_action" };
 
+/** A renderable submission → the apply pipeline's typed input. */
+function toApplyInput(target: QueueSubmission): ApplyInput {
+  return target.type === "add_segment"
+    ? {
+        id: target.id,
+        created_at: target.created_at,
+        type: "add_segment",
+        payload: target.payload as AddSegmentPayload,
+      }
+    : {
+        id: target.id,
+        created_at: target.created_at,
+        type: "update_segment",
+        payload: target.payload as UpdateSegmentPayload,
+      };
+}
+
 /**
- * Approve or reject a pending submission.
- * - Supabase present: delegate to the `admin_review_submission` RPC.
- * - Otherwise: record the decision in the local overlay and, for approvals,
- *   stage the item to `approved-submissions.local.json`.
+ * Approve or reject a pending submission. Approval routes the contribution
+ * through the SINGLE apply pipeline (lib/apply-submissions.ts, ruling 3), so an
+ * approved add_segment becomes a community segment and an approved update_segment
+ * becomes a community report — the same code path bulk import uses.
+ * - Supabase present: `admin_review_submission` RPC, then apply.
+ * - Otherwise: record the decision in the local overlay, apply to the community
+ *   store, and stage the item to `approved-submissions.local.json`.
  */
 export async function reviewSubmission(
   id: string,
@@ -292,7 +315,11 @@ export async function reviewSubmission(
     action === "approve" ? "approved" : "rejected";
   const trimmedReason = reason.trim();
 
-  // Live path: RPC handles everything (auth via secret, DB write).
+  // The target (with parsed payload) drives the apply step for both paths.
+  const { items, source } = await getSubmissions();
+  const target = items.find((i) => i.id === id);
+
+  // Live path: RPC handles auth + DB write; then apply lands the community data.
   const client = getSupabaseClient();
   if (client && process.env.ADMIN_RPC_SECRET) {
     try {
@@ -303,6 +330,9 @@ export async function reviewSubmission(
         p_secret: process.env.ADMIN_RPC_SECRET,
       });
       if (!error) {
+        if (action === "approve" && target) {
+          await applyApprovedSubmission(toApplyInput(target));
+        }
         return { ok: true, status: newStatus, source: "supabase" };
       }
       // fall through to local staging on RPC failure
@@ -312,10 +342,14 @@ export async function reviewSubmission(
   }
 
   // Local path: must be a currently-pending item.
-  const { items, source } = await getSubmissions();
-  const target = items.find((i) => i.id === id);
   if (!target || target.status !== "pending") {
     return { ok: false, error: "not_found" };
+  }
+
+  // Land the data FIRST so a write failure never leaves an "approved" marker
+  // without the segment/report actually applied.
+  if (action === "approve") {
+    await applyApprovedSubmission(toApplyInput(target));
   }
 
   const reviewedAt = new Date().toISOString();
