@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/components/ui/cn";
 
 /**
@@ -12,8 +12,26 @@ export type SectionTone = "bone" | "sunken" | "field";
 const TONES: Record<SectionTone, string> = {
   bone: "bg-surface text-ink",
   sunken: "bg-surface-sunken text-ink",
-  // Dark warm field. Values mirror the sealed dark-mode tokens.
-  field: "bg-[#14140f] text-[#ecebe0]",
+  // Dark warm field: the token overrides below turn every child primitive dark
+  // (ink, neutrals, borders, pine, terracotta) without any per-child theming.
+  field: "bg-surface text-ink",
+};
+
+/** The sealed dark-mode token values, applied inline so `tone="field"` is
+ * theme-independent and the shared primitives read correctly on it. */
+const FIELD_TOKENS: CSSProperties = {
+  ["--surface-base" as string]: "#14140f",
+  ["--surface-elevated" as string]: "#1e1e17",
+  ["--surface-sunken" as string]: "#0f0f0b",
+  ["--ink" as string]: "#ecebe0",
+  ["--neutral-strong" as string]: "#a9ac9f",
+  ["--neutral" as string]: "#7d8175",
+  ["--neutral-soft" as string]: "#35352b",
+  ["--pine" as string]: "#3f9c7f",
+  ["--pine-strong" as string]: "#2c7a62",
+  ["--terracotta" as string]: "#ef8f56",
+  ["--border" as string]: "#35352b",
+  ["--border-strong" as string]: "#4c4c3e",
 };
 
 export default function Section({
@@ -44,7 +62,11 @@ export default function Section({
   );
 
   return (
-    <section id={id} className={cn(pad, TONES[tone], className)}>
+    <section
+      id={id}
+      style={tone === "field" ? FIELD_TOKENS : undefined}
+      className={cn(pad, TONES[tone], className)}
+    >
       {inner}
     </section>
   );

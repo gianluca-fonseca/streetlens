@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
 import Hero from "@/components/landing/Hero";
+import GapSection from "@/components/landing/GapSection";
 
 export async function generateMetadata({
   params,
@@ -36,6 +37,7 @@ export default async function HomePage({
   return (
     <main className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
       <Hero segments={segments} stats={stats} />
+      <GapSection heroPct={stats.heroPct} />
     </main>
   );
 }
