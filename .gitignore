@@ -56,3 +56,10 @@ next-env.d.ts
 /.test-build-*/
   # Local anonymous-submission queue (DB fallback; never committed)
 data/pending-submissions.local.json
+
+# Local QA scratch (screenshots + playwright output)
+.playwright-mcp/
+/qa-*.png
+/hero-*-check.png
+/gap-check.png
+/render-qa-*.png
