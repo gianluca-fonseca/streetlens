@@ -18,13 +18,18 @@
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { promises as fs } from "node:fs";
-import { rmSync } from "node:fs";
+import { rmSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".smoke-build");
+const COMMUNITY_SEGMENTS_PATH = path.join(
+  ROOT,
+  "data",
+  "community-segments.local.json",
+);
 const require = createRequire(import.meta.url);
 
 const FROZEN_EXPORTS = [
@@ -48,6 +53,14 @@ function check(label, ok, detail = "") {
 }
 
 async function main() {
+  // The community-exclusion scenario writes a temp community store; refuse to
+  // run over a real one so we never clobber runtime data.
+  if (existsSync(COMMUNITY_SEGMENTS_PATH)) {
+    throw new Error(
+      "refusing to run: data/community-segments.local.json exists (would be clobbered)",
+    );
+  }
+
   // 1. Export-surface check on the TypeScript source (covers type-only exports).
   const source = await fs.readFile(path.join(ROOT, "lib", "segments.ts"), "utf8");
   console.log("Export surface (lib/segments.ts source):");
@@ -120,6 +133,15 @@ async function main() {
     ["segments", "km", "coveragePct", "heroPct"].every((k) => typeof stats[k] === "number"),
   );
   check("stats.segments matches collection", stats.segments === col.features.length);
+  check(
+    "stats.communitySegments is numeric (contract v3)",
+    typeof stats.communitySegments === "number",
+  );
+  check(
+    "stats.communitySegments is 0 with no community store",
+    stats.communitySegments === 0,
+    `(${stats.communitySegments})`,
+  );
 
   console.log("getSegmentDetail():");
   const first = col.features[0].properties.id;
@@ -137,6 +159,60 @@ async function main() {
     `(${detail?.audit?.observations?.length ?? 0})`,
   );
   check("unknown id returns null", (await seg.getSegmentDetail("nope-does-not-exist")) === null);
+
+  // 3. Community-exclusion scenario (contract v3): with a community store present,
+  // community/import segments merge into getSegments but are EXCLUDED from the
+  // official 535 stat and counted under communitySegments instead.
+  console.log("community store merged in:");
+  const fixture = [
+    {
+      id: "com-smoke-1",
+      name: "SMOKE — community add",
+      highway: "residential",
+      district: "Escazú",
+      source: "community",
+      verified: false,
+      auditor: null,
+      submission_id: "smoke-1",
+      coordinates: [[-84.14, 9.912], [-84.139, 9.913]],
+      community_report: null,
+      created_at: "2026-07-14T00:00:00.000Z",
+    },
+    {
+      id: "imp-smoke-2",
+      name: "SMOKE — verified import",
+      highway: "tertiary",
+      district: "Escazú",
+      source: "import",
+      verified: true,
+      auditor: "Smoke Auditor",
+      submission_id: null,
+      coordinates: [[-84.14, 9.912], [-84.138, 9.914]],
+      community_report: null,
+      created_at: "2026-07-14T00:00:00.000Z",
+    },
+  ];
+  try {
+    await fs.writeFile(COMMUNITY_SEGMENTS_PATH, JSON.stringify(fixture, null, 2), "utf8");
+    const merged = await seg.getSegments();
+    const mergedStats = await seg.getStats();
+    check("merged collection = 535 + 2 community", merged.features.length === 537, `(${merged.features.length})`);
+    check("official stats.segments STILL 535 (community excluded)", mergedStats.segments === 535, `(${mergedStats.segments})`);
+    check("stats.communitySegments = 2", mergedStats.communitySegments === 2, `(${mergedStats.communitySegments})`);
+    const c1 = merged.features.find((f) => f.properties.id === "com-smoke-1");
+    check("community feature flagged source/verified", Boolean(c1) && c1.properties.source === "community" && c1.properties.verified === false);
+    check(
+      "community feature has NO scores",
+      Boolean(c1) &&
+        [c1.properties.score_overall, c1.properties.score_accessibility, c1.properties.score_drainage, c1.properties.score_shade, c1.properties.score_bike].every((s) => s === 0),
+    );
+    check(
+      "official features carry no community source flag",
+      merged.features.filter((f) => !f.properties.source).length === 535,
+    );
+  } finally {
+    await fs.rm(COMMUNITY_SEGMENTS_PATH, { force: true });
+  }
 
   rmSync(BUILD_DIR, { recursive: true, force: true });
 
