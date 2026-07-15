@@ -59,8 +59,10 @@
   --color-background: var(--surface-base);
   --color-foreground: var(--ink);
 
-  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  /* Space Grotesk is the single app-wide typeface (display + body/UI). */
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
   --radius-chip: var(--radius-chip);
