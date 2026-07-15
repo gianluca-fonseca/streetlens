@@ -84,7 +84,7 @@ export default async function AdminHeader({
             {other}
           </Link>
           <Link
-            href={`/${locale}`}
+            href={`/${locale}/map`}
             className="hidden items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12.5px] font-medium text-neutral-strong transition-colors hover:border-border-strong hover:text-ink sm:inline-flex"
           >
             <Map size={14} strokeWidth={1.75} aria-hidden="true" />
