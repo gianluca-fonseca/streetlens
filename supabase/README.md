@@ -23,6 +23,8 @@ supabase/
     0008_views.sql        v_segment_scores read model for the map
     0009_views_district_audited_at.sql  view fixup: district + audited_at
     0010_admin_list_rpc.sql  admin_list_submissions (queue read path)
+    0011_bike_layer.sql   bike becomes the fifth score layer
+    0012_community.sql    community_segments + community_reports + apply/import RPCs
   seed.sql                rubric v0.1 + demo geography/segments/audits (generated)
 ```
 
@@ -58,6 +60,16 @@ policies, so it is unreadable except from inside the definer functions):
   reviewed_at, reviewer_note), filtered by status, newest first, max 200 rows.
   `source_ip_hash` and `honeypot_tripped` are deliberately not returned
   (data minimization; they are abuse-forensics fields, not review-UI fields).
+- `admin_apply_submission(p_submission_id uuid, p_secret text)` (0012) — the
+  single apply path. Turns an approved `add_segment` into a `community_segments`
+  row (source `community`, `verified=false`, **no scores**) and an approved
+  `update_segment` into a `community_reports` row on the target segment. Called
+  after `admin_review_submission`. Idempotent (ids derive from the submission id;
+  upsert on conflict).
+- `admin_import_segments(p_secret text, p_features jsonb, p_verified boolean, p_auditor text)`
+  (0012) — applies an admin bulk-import batch into `community_segments`
+  (source `import`, `verified` per the admin's choice + auditor name). Idempotent
+  upsert by id.
 
 All raise `unauthorized` unless the secret matches `app_secrets.admin_rpc_secret`.
 The admin client holds only the anon key plus the secret; the **secret, not the
@@ -68,6 +80,7 @@ role, is the gate**.
 | Tables | anon/authenticated access |
 | --- | --- |
 | cantons, districts, corridors, segments, rubric_versions, rubric_items, audits, observations, photos | `SELECT` only (published open data) |
+| community_segments, community_reports | `SELECT` only (published open data); writes only via the 0012 definer RPCs |
 | submissions | `INSERT` only, forced to `status = 'pending'`; not readable |
 | app_secrets | no access (definer functions only) |
 
