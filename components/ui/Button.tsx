@@ -8,7 +8,7 @@ import { cn } from "@/components/ui/cn";
  * <Link> for internal routes, a plain <a> for same-page hash anchors, or a
  * <button> otherwise. Radius stays inside the 4/8/12 system (8px control).
  */
-export type ButtonVariant = "pine" | "terracotta" | "ghost";
+export type ButtonVariant = "pine" | "accent" | "ghost";
 export type ButtonSize = "md" | "lg";
 
 const BASE =
@@ -20,8 +20,11 @@ const BASE =
 const VARIANTS: Record<ButtonVariant, string> = {
   // Deep pine reads AA against white in both light and dark token sets.
   pine: "border-pine-strong bg-pine-strong text-white hover:opacity-90",
-  // Terracotta needs dark ink for AA; the accent stays legible either mode.
-  terracotta: "border-terracotta bg-terracotta text-ink hover:opacity-90",
+  // Road-marking yellow accent. Foreground is pinned to the asphalt ink (not the
+  // theme ink token) so the dark text holds AA on the saturated fill in BOTH
+  // themes (10.1:1 light, higher on the darker press form).
+  accent:
+    "border-accent-strong bg-accent text-[#171d1a] hover:bg-accent-strong",
   ghost: "border-border-strong bg-transparent text-ink hover:bg-surface-sunken",
 };
 

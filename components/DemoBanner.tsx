@@ -3,8 +3,8 @@ import { FlaskConical } from "lucide-react";
 
 /**
  * Persistent, non-dismissable honesty strip: every number on the map is demo
- * data until field collection begins. Slim, warm, terracotta-keyed — never a
- * marketing banner.
+ * data until field collection begins. Slim, keyed to the road-marking-yellow
+ * accent (a caution signal), never a marketing banner.
  */
 export default function DemoBanner() {
   const t = useTranslations("demoBanner");
@@ -17,7 +17,7 @@ export default function DemoBanner() {
       <FlaskConical
         size={14}
         strokeWidth={1.75}
-        className="shrink-0 text-terracotta"
+        className="shrink-0 text-accent-text"
         aria-hidden="true"
       />
       <span>{t("message")}</span>

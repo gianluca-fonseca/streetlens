@@ -48,7 +48,7 @@ export default function MapPanel({
         <p className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-pine">
           {t("eyebrow")}
         </p>
-        <p className="font-mono text-[2.15rem] font-medium leading-none tracking-tight text-terracotta">
+        <p className="font-mono text-[2.15rem] font-medium leading-none tracking-tight text-accent-text">
           {stats.heroPct}
           <span className="text-[1.4rem] text-neutral-strong">%</span>
         </p>

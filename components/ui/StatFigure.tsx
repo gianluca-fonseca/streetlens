@@ -20,7 +20,7 @@ export default function StatFigure({
   unit?: ReactNode;
   label: ReactNode;
   sublabel?: ReactNode;
-  tone?: "ink" | "terracotta";
+  tone?: "ink" | "accent";
   size?: "sm" | "md" | "lg";
   className?: string;
 }>) {
@@ -37,7 +37,7 @@ export default function StatFigure({
         className={cn(
           "font-mono font-medium leading-none tracking-tight",
           valueSize,
-          tone === "terracotta" ? "text-terracotta" : "text-ink",
+          tone === "accent" ? "text-accent-text" : "text-ink",
         )}
       >
         {value}

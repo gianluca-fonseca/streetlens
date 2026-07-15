@@ -65,7 +65,7 @@ export default function GapSection({
                   value={c.value}
                   label={c.label}
                   sublabel={c.note}
-                  tone="terracotta"
+                  tone="accent"
                   size="lg"
                 />
               </GlassPanel>

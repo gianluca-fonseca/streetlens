@@ -54,7 +54,7 @@ export default function Hero({
 
   const demoStat = (
     <>
-      <p className="font-mono text-[2.5rem] font-semibold leading-none tracking-tight text-terracotta">
+      <p className="font-mono text-[2.5rem] font-semibold leading-none tracking-tight text-accent-text">
         {stats.heroPct}%
       </p>
       <p className="mt-2 text-[0.9rem] leading-snug text-ink">

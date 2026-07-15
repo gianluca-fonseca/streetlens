@@ -186,7 +186,7 @@ function ErrorLine({ messageKey }: Readonly<{ messageKey: string | null }>) {
   return (
     <p
       role="alert"
-      className="rounded-[4px] border border-terracotta/40 bg-terracotta/10 px-2.5 py-1.5 text-[12px] text-ink"
+      className="rounded-[4px] border border-accent-text/40 bg-accent/10 px-2.5 py-1.5 text-[12px] text-ink"
     >
       {t(`errors.${messageKey}` as Parameters<typeof t>[0])}
     </p>
@@ -421,7 +421,7 @@ function TraceControls({
             <TriangleAlert
               size={13}
               strokeWidth={1.75}
-              className="mt-px shrink-0 text-terracotta"
+              className="mt-px shrink-0 text-accent-text"
               aria-hidden="true"
             />
             {t("followStreets.warning")}
@@ -505,11 +505,11 @@ function AddForm({
           />
 
           {contribute.hasFallback ? (
-            <p className="flex items-start gap-1.5 rounded-[4px] border border-terracotta/40 bg-terracotta/10 px-2.5 py-1.5 text-[11px] leading-snug text-ink">
+            <p className="flex items-start gap-1.5 rounded-[4px] border border-accent-text/40 bg-accent/10 px-2.5 py-1.5 text-[11px] leading-snug text-ink">
               <TriangleAlert
                 size={13}
                 strokeWidth={1.75}
-                className="mt-px shrink-0 text-terracotta"
+                className="mt-px shrink-0 text-accent-text"
                 aria-hidden="true"
               />
               {t("followStreets.warning")}

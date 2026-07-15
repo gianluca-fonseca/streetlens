@@ -96,7 +96,7 @@ export default function QueueList({
           <FlaskConical
             size={14}
             strokeWidth={1.75}
-            className="shrink-0 text-terracotta"
+            className="shrink-0 text-accent-text"
             aria-hidden="true"
           />
           <span>{t("localNote")}</span>

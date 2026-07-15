@@ -191,7 +191,7 @@ export default function ImportPanel({
       </section>
 
       {error ? (
-        <p className="inline-flex items-center gap-2 rounded-[8px] border border-border bg-surface-sunken px-3 py-2 text-[12.5px] text-terracotta">
+        <p className="inline-flex items-center gap-2 rounded-[8px] border border-border bg-surface-sunken px-3 py-2 text-[12.5px] text-accent-text">
           <CircleAlert size={15} strokeWidth={1.75} aria-hidden="true" />
           {error}
         </p>
@@ -325,7 +325,7 @@ function StatusPill({
       ? "border-pine/40 text-pine"
       : status === "duplicate"
         ? "border-border-strong text-neutral-strong"
-        : "border-terracotta/40 text-terracotta";
+        : "border-accent-text/40 text-accent-text";
   return (
     <span
       className={`inline-flex rounded-[4px] border px-1.5 py-0.5 font-mono text-[11px] ${tone}`}
@@ -344,7 +344,7 @@ function SummaryChip({
       ? "border-pine/40 text-pine"
       : tone === "warn"
         ? "border-border-strong text-neutral-strong"
-        : "border-terracotta/40 text-terracotta";
+        : "border-accent-text/40 text-accent-text";
   return (
     <span className={`inline-flex rounded-[4px] border px-1.5 py-0.5 ${cls}`}>
       {label}

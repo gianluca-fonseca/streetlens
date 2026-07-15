@@ -44,7 +44,7 @@ export default function RoadmapSection() {
                 className={
                   "absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border " +
                   (isNow
-                    ? "border-terracotta bg-terracotta"
+                    ? "border-accent-strong bg-accent"
                     : "border-border-strong bg-surface")
                 }
               />
@@ -56,7 +56,7 @@ export default function RoadmapSection() {
                   className={
                     "rounded-[4px] border px-2 py-0.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] " +
                     (isNow
-                      ? "border-terracotta text-terracotta"
+                      ? "border-accent-text text-accent-text"
                       : "border-border text-pine")
                   }
                 >
