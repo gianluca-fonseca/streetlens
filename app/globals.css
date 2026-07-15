@@ -14,7 +14,9 @@
 
   /* Ink + neutral ramp */
   --ink: #1c2321;
-  --neutral-strong: #6b7069;
+  /* Secondary body text. Darkened from #6b7069 so it clears AA (4.5:1) as body
+     copy on all three light surfaces, including the sunken tone (4.65:1). */
+  --neutral-strong: #646963;
   --neutral: #9aa097;
   --neutral-soft: #d8d6cc;
 
