@@ -87,15 +87,16 @@ async function main() {
   check(
     "SCORE_LAYERS value",
     JSON.stringify(seg.SCORE_LAYERS) ===
-      JSON.stringify(["overall", "accessibility", "drainage", "shade"]),
+      JSON.stringify(["overall", "accessibility", "drainage", "shade", "bike"]),
   );
 
   console.log("getSegments():");
   const col = await seg.getSegments();
   check("FeatureCollection", col.type === "FeatureCollection");
   check(">= 40 features", col.features.length >= 40, `(${col.features.length})`);
+  check("exactly 535 features", col.features.length === 535, `(${col.features.length})`);
 
-  const SCORE_KEYS = ["score_overall", "score_accessibility", "score_drainage", "score_shade"];
+  const SCORE_KEYS = ["score_overall", "score_accessibility", "score_drainage", "score_shade", "score_bike"];
   let badDistrict = 0, badAuditedAt = 0, badScores = 0, badDemo = 0, badGeom = 0;
   for (const f of col.features) {
     const p = f.properties;
@@ -107,7 +108,7 @@ async function main() {
   }
   check("every feature has district", badDistrict === 0, badDistrict ? `(${badDistrict} missing)` : "");
   check("every feature has audited_at", badAuditedAt === 0, badAuditedAt ? `(${badAuditedAt} missing)` : "");
-  check("every feature has all four score_* in 0..100", badScores === 0, badScores ? `(${badScores} bad)` : "");
+  check("every feature has all five score_* in 0..100 (incl. score_bike)", badScores === 0, badScores ? `(${badScores} bad)` : "");
   check("every feature demo=true", badDemo === 0);
   check("every geometry is a real LineString", badGeom === 0);
 
