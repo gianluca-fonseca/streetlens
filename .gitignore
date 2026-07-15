@@ -50,5 +50,9 @@ next-env.d.ts
 # community-apply local store (u7 apply pipeline, DB fallback; never committed)
 /data/community-segments.local.json
 /data/community-reports.local.json
+
+# transient tsc→cjs build dirs used by the node test/smoke scripts
+/.smoke-build/
+/.test-build-*/
   # Local anonymous-submission queue (DB fallback; never committed)
 data/pending-submissions.local.json
