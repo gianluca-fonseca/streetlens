@@ -14,7 +14,9 @@
 
   /* Ink + neutral ramp */
   --ink: #1c2321;
-  --neutral-strong: #6b7069;
+  /* Secondary body text. Darkened from #6b7069 so it clears AA (4.5:1) as body
+     copy on all three light surfaces, including the sunken tone (4.65:1). */
+  --neutral-strong: #646963;
   --neutral: #9aa097;
   --neutral-soft: #d8d6cc;
 
@@ -40,6 +42,12 @@
   --radius-chip: 4px;
   --radius-panel: 8px;
   --radius-primary: 12px;
+
+  /* Earned glass (rev 3): imagery-backed surfaces only. Warm bone tint + warm
+   * hairline. Theme-adaptive so a single primitive reads over light renders,
+   * the live map, and warm-dark renders alike. */
+  --glass-bg: rgba(244, 241, 234, 0.72);
+  --glass-border: rgba(58, 52, 40, 0.16);
 }
 
 @theme inline {
@@ -99,6 +107,9 @@
     --shadow-popover:
       0 2px 6px rgba(0, 0, 0, 0.5),
       0 18px 42px -10px rgba(0, 0, 0, 0.66);
+
+    --glass-bg: rgba(20, 20, 15, 0.62);
+    --glass-border: rgba(236, 235, 224, 0.14);
   }
 }
 

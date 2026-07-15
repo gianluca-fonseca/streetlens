@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "render:maps": "node scripts/render-map-images.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.109.0",
