@@ -1,9 +1,27 @@
-import { setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
+import { getSegments, getStats } from "@/lib/segments";
+import Hero from "@/components/landing/Hero";
 
-// Placeholder landing — the full "Civic Atlas" marketing page is assembled in
-// this unit (hero, gap, four lenses, method, grounding, FAQ, CTA, footer).
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing.meta" });
+  return {
+    title: t("title"),
+    description: t("description"),
+    openGraph: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      type: "website",
+    },
+  };
+}
+
 export default async function HomePage({
   params,
 }: Readonly<{
@@ -12,17 +30,12 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  // The Civic Atlas landing: the live map is the hero; honest numbers carry it.
+  const [segments, stats] = await Promise.all([getSegments(), getStats()]);
+
   return (
-    <main className="min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto flex min-h-full max-w-2xl flex-col items-start justify-center gap-4 px-6 py-24">
-        <p className="font-display text-2xl font-semibold text-ink">StreetLens</p>
-        <Link
-          href="/map"
-          className="rounded-[8px] bg-pine px-4 py-2 text-[0.95rem] font-medium text-surface-elevated"
-        >
-          Explore the map
-        </Link>
-      </div>
+    <main className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
+      <Hero segments={segments} stats={stats} />
     </main>
   );
 }

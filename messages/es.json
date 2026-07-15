@@ -351,7 +351,8 @@
       "heroStatDemo": "Cifra de demostración sobre geometría real. No es una medición real.",
       "statSegments": "Segmentos auditados",
       "statKm": "Km del corredor",
-      "statCoverage": "Cobertura del piloto"
+      "statCoverage": "Cobertura del piloto",
+      "statsNote": "Geometría real de las calles de OpenStreetMap. Las calificaciones son datos de demostración hasta que inicie el trabajo de campo en agosto de 2026."
     },
     "gap": {
       "eyebrow": "Por qué importa",

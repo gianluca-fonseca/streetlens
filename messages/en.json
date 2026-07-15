@@ -351,7 +351,8 @@
       "heroStatDemo": "Demo figure over real geometry. Not a real measurement.",
       "statSegments": "Segments audited",
       "statKm": "Corridor km",
-      "statCoverage": "Pilot coverage"
+      "statCoverage": "Pilot coverage",
+      "statsNote": "Real street geometry from OpenStreetMap. Scores are demo data until fieldwork begins in August 2026."
     },
     "gap": {
       "eyebrow": "Why this matters",
