@@ -9,7 +9,12 @@
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
     "demoTag": "DEMO",
-    "loading": "Loading map…"
+    "loading": "Loading map…",
+    "threeD": {
+      "label": "3D view",
+      "enable": "Enable 3D view",
+      "disable": "Disable 3D view"
+    }
   },
   "layers": {
     "switcherLabel": "Score layer",

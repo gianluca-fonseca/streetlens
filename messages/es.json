@@ -9,7 +9,12 @@
   "map": {
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
     "demoTag": "DEMO",
-    "loading": "Cargando el mapa…"
+    "loading": "Cargando el mapa…",
+    "threeD": {
+      "label": "Vista 3D",
+      "enable": "Activar la vista 3D",
+      "disable": "Desactivar la vista 3D"
+    }
   },
   "layers": {
     "switcherLabel": "Capa de puntaje",
