@@ -32,6 +32,9 @@ const FIELD_TOKENS: CSSProperties = {
   ["--terracotta" as string]: "#ef8f56",
   ["--border" as string]: "#35352b",
   ["--border-strong" as string]: "#4c4c3e",
+  // Glass over dark renders inside a field section: warm-dark tint + light hairline.
+  ["--glass-bg" as string]: "rgba(20, 20, 15, 0.62)",
+  ["--glass-border" as string]: "rgba(236, 235, 224, 0.14)",
 };
 
 export default function Section({
