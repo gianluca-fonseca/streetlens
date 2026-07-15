@@ -273,6 +273,47 @@ function setupTerrain(map: maplibregl.Map, dark: boolean) {
   }
 }
 
+/** Threshold (m) past which the map center is considered detached from the DEM
+ * surface and in need of a re-clamp. Healthy deviation is a few metres of numeric
+ * noise; a sunk camera sits hundreds of metres below the terrain. */
+const CENTER_ELEVATION_TOLERANCE_M = 30;
+
+/**
+ * Re-clamp the map center onto the terrain surface.
+ *
+ * Root cause of the "zoom-in blanks the map in 3D" defect: when 3D is enabled
+ * (or 3D is toggled on already zoomed in) before the center's Terrarium DEM tile
+ * has loaded, MapLibre cannot resolve the center elevation and leaves the
+ * transform's center altitude pinned at 0 (sea level). Escazú's terrain is
+ * ~1500 m; with the center stuck at sea level, the fixed-altitude camera under
+ * 60° pitch descends *below* the real terrain surface on any animated `easeTo`
+ * zoom (the `+`/`-` controls, double-click) once it crosses the DEM source
+ * maxzoom, so the frame renders nothing — a persistent white canvas that never
+ * recovers. Smooth wheel zoom escapes this because its gesture handler freezes
+ * elevation during the move and re-clamps when the DEM has settled.
+ *
+ * The fix mirrors that gesture-end behaviour for the animated path: once the DEM
+ * has real data, nudge the center (a no-op position set) so MapLibre re-clamps
+ * the center altitude to the loaded surface. Guarded by a tolerance so it is a
+ * no-op in the healthy case and never loops on its own `setCenter`.
+ */
+function clampCenterToTerrain(map: maplibregl.Map) {
+  if (!map.getTerrain()) return; // 2D — nothing to clamp
+  const center = map.getCenter();
+  const ground = map.queryTerrainElevation(center);
+  // `queryTerrainElevation` reads 0 (not null) while the DEM tile is still
+  // loading; comparing against the equally-0 center altitude keeps us from
+  // clamping to a phantom sea-level surface. We simply retry on the next idle.
+  if (ground == null) return;
+  const centerElevation =
+    (map.transform as unknown as { elevation?: number }).elevation ?? 0;
+  if (Math.abs(centerElevation - ground) > CENTER_ELEVATION_TOLERANCE_M) {
+    // Re-setting the current center forces MapLibre to re-derive the center
+    // altitude from the now-loaded DEM, lifting the camera back above ground.
+    map.setCenter(center);
+  }
+}
+
 /** Toggle presentational 3D: terrain + eased pitch + building extrusions. */
 function applyThreeD(map: maplibregl.Map, on: boolean) {
   const bid = buildingLayerId(map);
@@ -283,6 +324,10 @@ function applyThreeD(map: maplibregl.Map, on: boolean) {
     });
     if (bid) map.setLayoutProperty(bid, "visibility", "visible");
     map.easeTo({ pitch: 60, duration: 900, essential: true });
+    // The DEM tile for the center may still be loading; clamp the center onto
+    // the terrain as soon as it settles so subsequent animated zooms keep the
+    // camera above ground instead of blanking the canvas.
+    clampCenterToTerrain(map);
   } else {
     map.setTerrain(null);
     if (bid) map.setLayoutProperty(bid, "visibility", "none");
@@ -397,6 +442,12 @@ export default function AuditMap({
       applyLayer(map, activeLayerRef.current, dark);
       readyRef.current = true;
       setMapReady(true);
+
+      // Whenever the map settles in 3D, ensure the center is clamped onto the
+      // DEM surface. This catches the initial "enabled before DEM loaded" race
+      // and recovers from any transient underground camera an animated zoom may
+      // produce while its DEM tiles are still in flight. No-op in 2D.
+      map.on("idle", () => clampCenterToTerrain(map));
 
       map.on("mousemove", INTERACTIVE_LAYER_IDS, (e) => {
         const f = e.features?.[0];
