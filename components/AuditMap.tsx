@@ -12,14 +12,19 @@ import type {
 } from "@/lib/segments";
 import {
   BASEMAP,
+  BUILDINGS,
   COMMUNITY_CASING,
   COMMUNITY_LAYER_FILTER,
+  HILLSHADE_LAYER_ID,
+  HILLSHADE_PAINT,
   RAMP_LAYER_FILTER,
+  TERRAIN,
   communityWidthExpression,
   lineColorExpression,
   lineWidthExpression,
 } from "@/components/mapConfig";
 import MapPanel from "@/components/MapPanel";
+import ThreeDToggle from "@/components/ThreeDToggle";
 import SegmentDetail from "@/components/SegmentDetail";
 import ContributeUI from "@/components/contribute/ContributeUI";
 import { useContribute } from "@/components/contribute/useContribute";
@@ -196,6 +201,120 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
   }
 }
 
+/* ------------------------------------------------------------------ *
+ * 3D mode (u8) — presentational only. These helpers add DEM terrain,
+ * always-on hillshade, and OSM building extrusions. They never touch the
+ * score data layers, the RAMP, or the line color/width expressions.
+ * ------------------------------------------------------------------ */
+
+/** First road-ish line layer id, so hillshade can be inserted beneath roads. */
+function firstRoadLayerId(map: maplibregl.Map): string | undefined {
+  const layers = map.getStyle()?.layers ?? [];
+  for (const layer of layers) {
+    if (
+      layer.type === "line" &&
+      /road|highway|street|bridge|tunnel|transportation|motorway|trunk|primary|secondary/i.test(
+        layer.id,
+      )
+    ) {
+      return layer.id;
+    }
+  }
+  return undefined;
+}
+
+/** The building extrusion layer present in the active style, if any. */
+function buildingLayerId(map: maplibregl.Map): string | undefined {
+  return BUILDINGS.layerIdCandidates.find((id) => map.getLayer(id));
+}
+
+/** Add the DEM source + always-on hillshade, and prime the (hidden) building
+ * extrusions. Hillshade sits beneath roads so it never fights the score ramps. */
+function setupTerrain(map: maplibregl.Map, dark: boolean) {
+  if (!map.getSource(TERRAIN.sourceId)) {
+    map.addSource(TERRAIN.sourceId, {
+      type: "raster-dem",
+      tiles: [...TERRAIN.tiles],
+      encoding: TERRAIN.encoding,
+      tileSize: TERRAIN.tileSize,
+      maxzoom: TERRAIN.maxzoom,
+      attribution: TERRAIN.attribution,
+    });
+  }
+  if (!map.getLayer(HILLSHADE_LAYER_ID)) {
+    map.addLayer(
+      {
+        id: HILLSHADE_LAYER_ID,
+        type: "hillshade",
+        source: TERRAIN.sourceId,
+        paint: { ...(dark ? HILLSHADE_PAINT.dark : HILLSHADE_PAINT.light) },
+      },
+      firstRoadLayerId(map),
+    );
+  }
+  // Reuse the style's building extrusion layer: mute it, coalesce heights, and
+  // keep it hidden until 3D is enabled.
+  const bid = buildingLayerId(map);
+  if (bid) {
+    try {
+      map.setPaintProperty(
+        bid,
+        "fill-extrusion-color",
+        dark ? BUILDINGS.color.dark : BUILDINGS.color.light,
+      );
+      map.setPaintProperty(bid, "fill-extrusion-height", BUILDINGS.heightExpression);
+      map.setPaintProperty(bid, "fill-extrusion-base", BUILDINGS.baseExpression);
+      map.setPaintProperty(bid, "fill-extrusion-opacity", BUILDINGS.opacity);
+      map.setLayoutProperty(bid, "visibility", "none");
+    } catch {
+      /* style lacks the extrusion paint props; skip buildings */
+    }
+  }
+}
+
+/** Toggle presentational 3D: terrain + eased pitch + building extrusions. */
+function applyThreeD(map: maplibregl.Map, on: boolean) {
+  const bid = buildingLayerId(map);
+  if (on) {
+    map.setTerrain({
+      source: TERRAIN.sourceId,
+      exaggeration: TERRAIN.exaggeration,
+    });
+    if (bid) map.setLayoutProperty(bid, "visibility", "visible");
+    map.easeTo({ pitch: 60, duration: 900, essential: true });
+  } else {
+    map.setTerrain(null);
+    if (bid) map.setLayoutProperty(bid, "visibility", "none");
+    map.easeTo({ pitch: 0, bearing: 0, duration: 700, essential: true });
+  }
+}
+
+/** Re-tint the always-on hillshade + building extrusions on theme change. */
+function applyThreeDTheme(map: maplibregl.Map, dark: boolean) {
+  if (map.getLayer(HILLSHADE_LAYER_ID)) {
+    const paint = dark ? HILLSHADE_PAINT.dark : HILLSHADE_PAINT.light;
+    for (const [prop, value] of Object.entries(paint)) {
+      try {
+        map.setPaintProperty(HILLSHADE_LAYER_ID, prop, value);
+      } catch {
+        /* not ready */
+      }
+    }
+  }
+  const bid = buildingLayerId(map);
+  if (bid) {
+    try {
+      map.setPaintProperty(
+        bid,
+        "fill-extrusion-color",
+        dark ? BUILDINGS.color.dark : BUILDINGS.color.light,
+      );
+    } catch {
+      /* not ready */
+    }
+  }
+}
+
 export default function AuditMap({
   segments,
   stats,
@@ -211,6 +330,7 @@ export default function AuditMap({
   const [activeLayer, setActiveLayer] = useState<ScoreLayer>("overall");
   const [selected, setSelected] = useState<SegmentProperties | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [threeD, setThreeD] = useState(false);
 
   // Map-integrated contribution flow (owns its own draw layers + handlers).
   const contribute = useContribute(mapRef, mapReady);
@@ -233,15 +353,26 @@ export default function AuditMap({
     const container = containerRef.current;
     if (!container) return;
 
+    // Cap pitch on touch / narrow viewports to bound horizon DEM-tile fetches
+    // in 3D (research: mobile ≈60°, desktop 70°).
+    const coarsePointer =
+      window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 640;
+    const maxPitch = coarsePointer ? 60 : 70;
+
     const map = new maplibregl.Map({
       container,
       style: LIBERTY_STYLE_URL,
       center: ESCAZU_CENTER,
       zoom: INITIAL_ZOOM,
+      maxPitch,
       attributionControl: { compact: true },
     });
     mapRef.current = map;
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    // visualizePitch renders the rotate/pitch dial used by 3D mode.
+    map.addControl(
+      new maplibregl.NavigationControl({ visualizePitch: true }),
+      "top-right",
+    );
 
     let styleLoaded = false;
     let fallbackApplied = false;
@@ -258,6 +389,8 @@ export default function AuditMap({
       const dark = prefersDark();
       muteBasemap(map, dark);
       addDataLayers(map, segmentsRef.current);
+      // DEM source + always-on hillshade + primed (hidden) building extrusions.
+      setupTerrain(map, dark);
 
       // Apply the current active layer + dark-mode glow.
       applyLayer(map, activeLayerRef.current, dark);
@@ -336,6 +469,7 @@ export default function AuditMap({
       const dark = mq.matches;
       muteBasemap(map, dark);
       applyLayer(map, activeLayerRef.current, dark);
+      applyThreeDTheme(map, dark);
     };
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
@@ -347,6 +481,12 @@ export default function AuditMap({
     if (!map || !readyRef.current) return;
     applyLayer(map, activeLayer, prefersDark());
   }, [activeLayer]);
+
+  const handleToggleThreeD = (next: boolean) => {
+    setThreeD(next);
+    const map = mapRef.current;
+    if (map && readyRef.current) applyThreeD(map, next);
+  };
 
   const handleClose = () => {
     const map = mapRef.current;
@@ -370,12 +510,13 @@ export default function AuditMap({
       />
 
       <div className="pointer-events-none absolute inset-0 flex items-start justify-between gap-3 p-3 sm:p-4">
-        <div className="pointer-events-none">
+        <div className="pointer-events-none flex flex-col items-start gap-3">
           <MapPanel
             stats={stats}
             activeLayer={activeLayer}
             onSelectLayer={setActiveLayer}
           />
+          <ThreeDToggle active={threeD} onToggle={handleToggleThreeD} />
         </div>
         {selected ? (
           <div className="pointer-events-none">
