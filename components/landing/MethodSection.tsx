@@ -50,10 +50,10 @@ export default function MethodSection() {
             delay={i * 70}
             className="bg-surface-elevated p-6 sm:p-7"
           >
-            <span className="font-mono text-[12px] font-medium text-pine">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h3 className="mt-2 font-display text-[1.15rem] font-semibold leading-tight text-ink">
+            {/* No numbered marker here: these four inputs are an unordered
+                rubric, not a sequence, so a 01-04 index would imply an order
+                that does not exist. The hairline grid carries the structure. */}
+            <h3 className="font-display text-[1.15rem] font-semibold leading-tight text-ink">
               {t(`items.${key}.title`)}
             </h3>
             <p className="mt-2 text-[0.95rem] leading-relaxed text-neutral-strong">
