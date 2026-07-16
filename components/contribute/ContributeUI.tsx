@@ -24,6 +24,7 @@ import {
   type ConditionState,
 } from "@/components/contribute/conditions";
 import type { ContributeApi } from "@/components/contribute/useContribute";
+import styles from "@/components/ui/zen.module.css";
 
 const HIGHWAY_KEYS = [
   "residential",
@@ -36,8 +37,10 @@ const HIGHWAY_KEYS = [
 ] as const;
 type HighwayKey = (typeof HIGHWAY_KEYS)[number];
 
-const PANEL =
-  "pointer-events-auto w-[min(22rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[12px] border border-border bg-surface-elevated shadow-[var(--shadow-popover)]";
+// Contribute form panels float over live map tiles → Recipe A glass (dossier §4
+// maps panel-sized surfaces to A, small pills to C). Fields inside stay SOLID
+// (INPUT below) so there is no stacked glass.
+const PANEL = `${styles.glassPanel} pointer-events-auto w-[min(22rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[12px]`;
 // 16px on phones keeps iOS from auto-zooming the viewport on field focus; the
 // sealed 13px control returns at sm+.
 const INPUT =
@@ -46,10 +49,8 @@ const LABEL = "mb-1 block text-[12px] font-medium text-ink";
 // rev-5 primary = ink fill / paper label. Flips by theme: near-black fill + paper
 // label in light (17.49:1), creme fill + dark-paper label in dark (17.75:1). Both
 // clear AA. (Retires the rev-4 fixed-dark-pine + white-text pair.)
-const PRIMARY_BTN =
-  "inline-flex items-center justify-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-semibold text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated disabled:pointer-events-none disabled:opacity-50";
-const GHOST_BTN =
-  "inline-flex items-center justify-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink";
+const PRIMARY_BTN = `${styles.controlSoft} inline-flex items-center justify-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-semibold text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated disabled:pointer-events-none disabled:opacity-50`;
+const GHOST_BTN = `${styles.control} inline-flex items-center justify-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink`;
 
 /** Gentle one-time slide-up on mount (entrance on user action, not idle motion). */
 function SlideUp({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -61,7 +62,8 @@ function SlideUp({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div
       className={[
-        "transition-all duration-300 ease-out",
+        // Entrance on user action; motion-reduce collapses to an instant appear.
+        "transition-all duration-300 ease-out motion-reduce:transition-none",
         shown ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
       ].join(" ")}
     >
@@ -250,7 +252,7 @@ function ChoosePanel({
           <button
             type="button"
             onClick={onTrace}
-            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className={`${styles.control} flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink`}
           >
             <Route
               size={18}
@@ -270,7 +272,7 @@ function ChoosePanel({
           <button
             type="button"
             onClick={onSelect}
-            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className={`${styles.control} flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink`}
           >
             <PencilLine
               size={18}
@@ -306,7 +308,7 @@ function InstructionPill({
 }>) {
   return (
     <div className="pointer-events-none absolute left-1/2 top-3 z-20 flex -translate-x-1/2 justify-center px-3">
-      <div className="pointer-events-auto flex items-center gap-3 rounded-[8px] border border-border bg-surface-elevated px-3 py-2 shadow-[var(--shadow-panel)]">
+      <div className={`${styles.glassChip} pointer-events-auto flex items-center gap-3 rounded-[8px] px-3 py-2`}>
         <div className="min-w-0">
           <p className="text-[12px] font-semibold text-ink">{title}</p>
           <p className="text-[11px] leading-snug text-neutral-strong">{hint}</p>
@@ -382,7 +384,7 @@ function TraceControls({
   const t = useTranslations("contribute");
   return (
     <SlideUp>
-      <div className="pointer-events-auto flex flex-col gap-2 rounded-[8px] border border-border bg-surface-elevated px-3 py-2 shadow-[var(--shadow-panel)]">
+      <div className={`${styles.glassPanel} pointer-events-auto flex flex-col gap-2 rounded-[8px] px-3 py-2`}>
         <div className="flex items-center gap-2">
           <FollowStreetsToggle on={followStreets} onToggle={onToggleFollow} />
         </div>
