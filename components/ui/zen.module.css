@@ -16,12 +16,13 @@
 
 /* ─── Glass Recipe A — panels over tiles (MapPanel, SegmentDetail desktop) ─── */
 .glassPanel {
-  background: rgba(255, 255, 255, 0.72);
-  /* --glass-blur (18px, globals) honors u16 adjudication A1; sits in the dossier's
-     16–24px panel sweet spot. saturate() is the piece the bare token lacked. */
-  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(150%);
-  backdrop-filter: blur(var(--glass-blur, 18px)) saturate(150%);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  /* Recipe A over-tile panel, consolidated onto u17's globals tokens (u18-A1):
+     bg/blur/saturate/border are the shared --glass-* vars (both flip in dark). The
+     Recipe-A inner-highlight + lift shadow has no globals token, so it stays literal. */
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.65),
     inset 0 -1px 0 rgba(0, 0, 0, 0.04),
@@ -33,13 +34,11 @@
    A pill can sit wholly over a bright OR dark spot, so alpha is pushed up and blur
    pulled DOWN to 14px (18–24px on a 28px pill reads muddy). */
 .glassChip {
-  background: rgba(255, 255, 255, 0.78);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 2px 8px rgba(0, 0, 0, 0.16);
+  background: var(--glass-chip-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur-chip)) saturate(160%);
+  border: 1px solid var(--glass-chip-border);
+  box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift);
 }
 
 /* Recipe A gated to desktop (≥768px) ONLY. Used by SegmentDetail, whose phone
@@ -53,10 +52,10 @@
 }
 @media (min-width: 768px) {
   .glassPanelDesktop.glassPanelDesktop {
-    background: rgba(255, 255, 255, 0.72);
-    -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(150%);
-    backdrop-filter: blur(var(--glass-blur, 18px)) saturate(150%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    border: 1px solid var(--glass-border);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.65),
       inset 0 -1px 0 rgba(0, 0, 0, 0.04),
@@ -66,10 +65,10 @@
 }
 @media (min-width: 768px) and (prefers-color-scheme: dark) {
   .glassPanelDesktop.glassPanelDesktop {
-    background: rgba(12, 12, 12, 0.64);
-    -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(140%) brightness(1.08);
-    backdrop-filter: blur(var(--glass-blur, 18px)) saturate(140%) brightness(1.08);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
+    border: 1px solid var(--glass-border);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.09),
       inset 0 -1px 0 rgba(0, 0, 0, 0.35),
@@ -111,10 +110,10 @@
 
 @media (prefers-color-scheme: dark) {
   .glassPanel {
-    background: rgba(12, 12, 12, 0.64);
-    -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(140%) brightness(1.08);
-    backdrop-filter: blur(var(--glass-blur, 18px)) saturate(140%) brightness(1.08);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
+    border: 1px solid var(--glass-border);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.09),
       inset 0 -1px 0 rgba(0, 0, 0, 0.35),
@@ -122,13 +121,11 @@
       0 2px 8px rgba(0, 0, 0, 0.40);
   }
   .glassChip {
-    background: rgba(14, 14, 14, 0.70);
-    -webkit-backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
-    backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.10),
-      0 2px 10px rgba(0, 0, 0, 0.5);
+    background: var(--glass-chip-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+    backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+    border: 1px solid var(--glass-chip-border);
+    box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift);
   }
   .glassScrim {
     background: rgba(10, 10, 10, 0.55);
@@ -179,55 +176,35 @@
    bigger black shadow. `.plate` sets box-shadow only, so it composes with the
    existing Tailwind bg/border/radius utilities on the same element. */
 .plate {
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 2px 6px -1px rgba(0, 0, 0, 0.05);
+  /* Consolidated onto u17's zen-soft shadow spine (u18-A1). Both tiers flip in dark
+     via the token, so the dark overrides that were duplicated below are now dropped. */
+  box-shadow: var(--shadow-panel);
 }
 .popover {
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 6px 12px -3px rgba(0, 0, 0, 0.05),
-    0 16px 32px -6px rgba(0, 0, 0, 0.07),
-    0 28px 48px -10px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-popover);
 }
 
 /* Interactive card: hover = exactly one tier (T1 → T2) + a small lift. In dark the
    surface tints up alongside the shadow (Notion dual-channel tint+lift) — that
    surface step is what sells hover on black. Dense grids use -2px. */
 .plateInteractive {
+  /* 180ms has no globals --dur-* token, so it stays literal; the easing is --ease-standard. */
   transition:
-    box-shadow 180ms cubic-bezier(0.2, 0, 0, 1),
-    transform 180ms cubic-bezier(0.2, 0, 0, 1),
-    background-color 180ms cubic-bezier(0.2, 0, 0, 1);
+    box-shadow 180ms var(--ease-standard),
+    transform 180ms var(--ease-standard),
+    background-color 180ms var(--ease-standard);
 }
 .plateInteractive:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 4px 8px -2px rgba(0, 0, 0, 0.05),
-    0 12px 24px -4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-raised);
 }
 
 @media (prefers-color-scheme: dark) {
-  .plate {
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.30),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  }
-  .popover {
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.50),
-      0 12px 32px -8px rgba(0, 0, 0, 0.60),
-      0 24px 48px -12px rgba(0, 0, 0, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  }
   .plateInteractive:hover {
-    /* +8/255 surface step from the #141414 rest plate → tiers separate on black. */
-    background-color: #1c1c1c;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.40),
-      0 8px 24px -6px rgba(0, 0, 0, 0.50),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    /* +8/255 surface step from the #141414 rest plate → tiers separate on black. The
+       box-shadow flips through --shadow-raised on the base rule; only the dark surface
+       tint needs a dark override (light hover does not tint). */
+    background-color: var(--surface-raised);
   }
 }
 
@@ -263,10 +240,11 @@
 
 /* Panel settle (≤ 8px travel, decelerated, one-shot). */
 .enter {
-  animation: zenEnter 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: zenEnter var(--dur-slow) var(--ease-out-soft) both;
 }
 .enterChip {
-  animation: zenEnterChip 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* 260ms has no --dur-* token; the easing is --ease-out-soft. */
+  animation: zenEnterChip 260ms var(--ease-out-soft) both;
 }
 
 /* Interactive control — one transition declaration covering color/bg/border/shadow
@@ -274,11 +252,11 @@
    (a separate transform transition would clobber the shorthand). Buttons. */
 .control {
   transition:
-    color 150ms cubic-bezier(0.2, 0, 0, 1),
-    background-color 150ms cubic-bezier(0.2, 0, 0, 1),
-    border-color 150ms cubic-bezier(0.2, 0, 0, 1),
-    box-shadow 150ms cubic-bezier(0.2, 0, 0, 1),
-    transform 100ms cubic-bezier(0.2, 0, 0, 1);
+    color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard),
+    transform var(--dur-instant) var(--ease-standard);
 }
 .control:active {
   transform: scale(0.97);
@@ -288,8 +266,8 @@
    the opacity transition and adds the press transform in one declaration. */
 .controlSoft {
   transition:
-    opacity 150ms cubic-bezier(0.2, 0, 0, 1),
-    transform 100ms cubic-bezier(0.2, 0, 0, 1);
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-instant) var(--ease-standard);
 }
 .controlSoft:active {
   transform: scale(0.98);
@@ -297,7 +275,7 @@
 
 /* Pressed feedback for non-color elements (cards/tiles). */
 .pressable {
-  transition: transform 100ms cubic-bezier(0.2, 0, 0, 1);
+  transition: transform var(--dur-instant) var(--ease-standard);
 }
 .pressable:active {
   transform: scale(0.985);
