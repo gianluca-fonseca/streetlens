@@ -9,6 +9,7 @@ import {
   FileUp,
   Upload,
 } from "lucide-react";
+import styles from "@/components/ui/zen.module.css";
 
 /* Shapes shared with app/api/admin/import/route.ts (kept in lockstep). */
 type IssueCode = "bbox" | "duplicate" | "schema";
@@ -133,7 +134,7 @@ export default function ImportPanel({
       ) : null}
 
       {/* Upload + options */}
-      <section className="rounded-[8px] border border-border bg-surface-elevated p-4 shadow-[var(--shadow-panel)]">
+      <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-4`}>
         <label className="block text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
           {t("fileLabel")}
         </label>
@@ -156,7 +157,7 @@ export default function ImportPanel({
             type="button"
             onClick={validate}
             disabled={!content || busy}
-            className="inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-2 text-[13px] font-medium text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className={`${styles.controlSoft} inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-2 text-[13px] font-medium text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:cursor-not-allowed disabled:opacity-50`}
           >
             {phase === "validating" ? t("validating") : t("dryRun")}
           </button>
@@ -183,7 +184,8 @@ export default function ImportPanel({
                 value={auditor}
                 onChange={(e) => setAuditor(e.target.value)}
                 placeholder={t("auditorPlaceholder")}
-                className="mt-1 w-full max-w-xs rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[13px] text-ink focus:border-border-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                // 16px on phones prevents iOS focus auto-zoom; 13px returns at sm+.
+                className="mt-1 w-full max-w-xs rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[16px] text-ink focus:border-border-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-ink sm:text-[13px]"
               />
             </div>
           ) : null}
@@ -217,7 +219,7 @@ export default function ImportPanel({
           </p>
         ) : null
       ) : (
-        <section className="rounded-[8px] border border-border bg-surface-elevated p-4 shadow-[var(--shadow-panel)]">
+        <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-4`}>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
               {t("previewHeading")}
@@ -249,7 +251,10 @@ export default function ImportPanel({
               </thead>
               <tbody>
                 {preview.rows.map((row) => (
-                  <tr key={row.index} className="border-b border-border/70 align-top">
+                  <tr
+                    key={row.index}
+                    className="border-b border-border/70 align-top transition-colors hover:bg-surface-sunken"
+                  >
                     <td className="py-1.5 pr-3 font-mono text-neutral-strong">
                       {row.index + 1}
                     </td>
@@ -292,7 +297,7 @@ export default function ImportPanel({
               type="button"
               onClick={commit}
               disabled={!canCommit}
-              className="inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-medium text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:cursor-not-allowed disabled:opacity-50"
+              className={`${styles.controlSoft} inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-medium text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:cursor-not-allowed disabled:opacity-50`}
             >
               <Upload size={15} strokeWidth={1.75} aria-hidden="true" />
               {phase === "committing"

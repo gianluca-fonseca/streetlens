@@ -284,6 +284,17 @@
   transform: scale(0.97);
 }
 
+/* Interactive control whose hover feedback is OPACITY (ink-fill buttons) — keeps
+   the opacity transition and adds the press transform in one declaration. */
+.controlSoft {
+  transition:
+    opacity 150ms cubic-bezier(0.2, 0, 0, 1),
+    transform 100ms cubic-bezier(0.2, 0, 0, 1);
+}
+.controlSoft:active {
+  transform: scale(0.98);
+}
+
 /* Pressed feedback for non-color elements (cards/tiles). */
 .pressable {
   transition: transform 100ms cubic-bezier(0.2, 0, 0, 1);
@@ -302,6 +313,7 @@
     transform: none;
   }
   .control:active,
+  .controlSoft:active,
   .pressable:active {
     transform: none;
   }

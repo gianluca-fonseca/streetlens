@@ -4,6 +4,7 @@ import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Lock, LoaderCircle } from "lucide-react";
+import styles from "@/components/ui/zen.module.css";
 
 /**
  * Admin login. Posts the shared password to `/api/admin/login`; on success the
@@ -70,7 +71,7 @@ function LoginForm() {
     <div className="flex min-h-full items-center justify-center px-4 py-16">
       <div className="w-[min(24rem,100%)]">
         <div className="mb-5 flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-[8px] border border-border bg-surface-elevated text-ink shadow-[var(--shadow-panel)]">
+          <span className={`${styles.plate} flex size-9 items-center justify-center rounded-[8px] border border-border bg-surface-elevated text-ink`}>
             <Lock size={17} strokeWidth={1.75} aria-hidden="true" />
           </span>
           <div>
@@ -85,7 +86,7 @@ function LoginForm() {
 
         <form
           onSubmit={onSubmit}
-          className="flex flex-col gap-4 rounded-[8px] border border-border bg-surface-elevated p-5 shadow-[var(--shadow-panel)]"
+          className={`${styles.plate} flex flex-col gap-4 rounded-[8px] border border-border bg-surface-elevated p-5`}
         >
           <p className="text-[13px] leading-snug text-neutral-strong">
             {t("subtitle")}
@@ -104,7 +105,9 @@ function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder={t("passwordPlaceholder")}
               aria-invalid={error ? true : undefined}
-              className="rounded-[4px] border border-border bg-surface-base px-3 py-2 font-mono text-[14px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-ink"
+              // 16px on phones stops iOS from auto-zooming the viewport on focus
+              // (matches the contribute INPUT pattern); the mono 13px returns at sm+.
+              className="rounded-[4px] border border-border bg-surface-base px-3 py-2 font-mono text-[16px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-ink sm:text-[13px]"
             />
           </label>
 
@@ -120,7 +123,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={busy || password.length === 0}
-            className="inline-flex items-center justify-center gap-2 rounded-[4px] bg-ink-display px-4 py-2 text-[13.5px] font-semibold text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55"
+            className={`${styles.controlSoft} inline-flex items-center justify-center gap-2 rounded-[4px] bg-ink-display px-4 py-2 text-[13.5px] font-semibold text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55`}
           >
             {busy ? (
               <LoaderCircle

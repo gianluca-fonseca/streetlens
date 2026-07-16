@@ -43,7 +43,9 @@ export default async function AdminHeader({
   ];
 
   return (
-    <header className="sticky top-0 z-10 border-b border-border bg-surface-elevated/95 backdrop-blur-[2px]">
+    // Flat admin ground: solid surface, NO backdrop-blur (glass is sanctioned only
+    // over live map tiles, per the zen dossier §2/§6).
+    <header className="sticky top-0 z-10 border-b border-border bg-surface-elevated">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5 sm:px-6">
         <span className="font-display text-[0.98rem] font-semibold tracking-tight text-ink">
           {t("brand")}

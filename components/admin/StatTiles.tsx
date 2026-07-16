@@ -4,6 +4,7 @@
  * submission-status figures (amber pending / clay rejected; approved is neutral
  * ink), never a decorative left-border.
  */
+import styles from "@/components/ui/zen.module.css";
 
 export type StatTile = {
   key: string;
@@ -25,7 +26,7 @@ export default function StatTiles({
       {tiles.map((t) => (
         <div
           key={t.key}
-          className="flex flex-col gap-1 rounded-[8px] border border-border bg-surface-elevated p-3.5 shadow-[var(--shadow-panel)]"
+          className={`${styles.plate} flex flex-col gap-1 rounded-[8px] border border-border bg-surface-elevated p-3.5`}
         >
           <dd
             className="font-mono text-[1.55rem] font-medium leading-none tracking-tight text-ink"

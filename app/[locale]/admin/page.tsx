@@ -6,6 +6,7 @@ import { getSegments, getStats } from "@/lib/segments";
 import { getSubmissionCounts } from "@/lib/submissions";
 import AdminHeader from "@/components/admin/AdminHeader";
 import StatTiles, { type StatTile } from "@/components/admin/StatTiles";
+import styles from "@/components/ui/zen.module.css";
 
 // Admin figures must always reflect the live dataset, never a build snapshot.
 export const dynamic = "force-dynamic";
@@ -114,7 +115,7 @@ export default async function AdminDashboardPage({
           <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
             {t("districtHeading")}
           </h2>
-          <div className="overflow-x-auto rounded-[8px] border border-border bg-surface-elevated shadow-[var(--shadow-panel)]">
+          <div className={`${styles.plate} overflow-x-auto rounded-[8px] border border-border bg-surface-elevated`}>
             <table className="w-full border-collapse text-[13px]">
               <thead>
                 <tr className="border-b border-border text-left text-[10.5px] font-mono uppercase tracking-[0.14em] text-neutral-strong">
@@ -133,7 +134,7 @@ export default async function AdminDashboardPage({
                 {districts.map((d) => (
                   <tr
                     key={d.name}
-                    className="border-b border-border last:border-b-0"
+                    className="border-b border-border transition-colors last:border-b-0 hover:bg-surface-sunken"
                   >
                     <td className="px-4 py-2.5 text-ink">{d.name}</td>
                     <td className="px-4 py-2.5 text-right font-mono text-ink">

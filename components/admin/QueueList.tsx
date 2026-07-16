@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Check, FlaskConical, Plus, PencilLine, X } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import GeometryPreview from "./GeometryPreview";
+import styles from "@/components/ui/zen.module.css";
 
 /** A queue item prepared by the (server) queue page for display. */
 export type QueueItemView = {
@@ -111,7 +112,7 @@ export default function QueueList({
         return (
           <article
             key={item.id}
-            className="rounded-[8px] border border-border bg-surface-elevated p-4 shadow-[var(--shadow-panel)]"
+            className={`${styles.plate} ${styles.plateInteractive} rounded-[8px] border border-border bg-surface-elevated p-4`}
           >
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status="pending" label={ts("pending")} />
@@ -233,7 +234,8 @@ export default function QueueList({
                     setReasons((r) => ({ ...r, [item.id]: e.target.value }))
                   }
                   placeholder={t("reasonPlaceholder")}
-                  className="resize-y rounded-[4px] border border-border bg-surface-base px-3 py-2 text-[13px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-ink"
+                  // 16px on phones prevents iOS focus auto-zoom; 13px returns at sm+.
+                  className="resize-y rounded-[4px] border border-border bg-surface-base px-3 py-2 text-[16px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-ink sm:text-[13px]"
                 />
               </label>
 
@@ -251,7 +253,7 @@ export default function QueueList({
                   type="button"
                   onClick={() => review(item.id, "approve")}
                   disabled={busy[item.id]}
-                  className="inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-1.5 text-[12.5px] font-semibold text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55"
+                  className={`${styles.controlSoft} inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-1.5 text-[12.5px] font-semibold text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55`}
                 >
                   <Check size={14} strokeWidth={2.25} aria-hidden="true" />
                   {busy[item.id] ? t("working") : t("approve")}
@@ -260,7 +262,7 @@ export default function QueueList({
                   type="button"
                   onClick={() => review(item.id, "reject")}
                   disabled={busy[item.id]}
-                  className="inline-flex items-center gap-1.5 rounded-[4px] border border-clay/45 bg-clay/10 px-3 py-1.5 text-[12.5px] font-semibold text-clay transition-colors hover:bg-clay/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-55"
+                  className={`${styles.control} inline-flex items-center gap-1.5 rounded-[4px] border border-clay/45 bg-clay/10 px-3 py-1.5 text-[12.5px] font-semibold text-clay hover:bg-clay/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-55`}
                 >
                   <X size={14} strokeWidth={2.25} aria-hidden="true" />
                   {busy[item.id] ? t("working") : t("reject")}
