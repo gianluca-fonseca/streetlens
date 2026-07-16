@@ -4,7 +4,7 @@
     "description": "A field instrument for the street. Open, portable audits of sidewalk accessibility, drainage, shade, and bike infrastructure. Now measuring Escazú, Costa Rica."
   },
   "demoBanner": {
-    "message": "Demo data over real street geometry. Field pilot begins August 2026 — no number shown is a real measurement."
+    "message": "Demo data over real street geometry. Field pilot begins August 2026: no number shown is a real measurement."
   },
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
