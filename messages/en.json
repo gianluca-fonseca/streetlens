@@ -354,13 +354,21 @@
       "abstract": "StreetLens turns a walk down any street into a public, checkable score. Accessibility, drainage, shade, and bike infrastructure, measured segment by segment. No proprietary index. No black box. The method is on this page.",
       "ctaExplore": "Explore the live map",
       "ctaMethod": "Read the method",
+      "nav": {
+        "label": "Jump to section",
+        "figure": "Figure 1",
+        "method": "Method",
+        "references": "References",
+        "map": "Open the map"
+      },
       "figure": {
         "label": "Figure 1",
         "claim": "A map you can check.",
         "support": "Segment scores across the Escazú pilot, live and interactive. Pan the corridor, then open a segment to see how it scored.",
         "source": "Source: StreetLens over OpenStreetMap geometry. n={n} segments, Escazú. Demo scores until fieldwork begins August 2026.",
         "affordance": "Drag to pan. Scroll to zoom. Tap a segment.",
-        "live": "Live map"
+        "live": "Live map",
+        "plate": "Escazú · Costa Rica"
       }
     },
     "measure": {
@@ -427,6 +435,7 @@
       "statSegments": "Segments mapped",
       "statKm": "Corridor km",
       "statCoverage": "Pilot coverage",
+      "beginning": "This is a pilot, and a beginning.",
       "demoNote": "Demo audit over real geometry. No score shown is a measurement until fieldwork begins in August 2026."
     },
     "method": {

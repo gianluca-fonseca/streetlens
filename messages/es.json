@@ -354,13 +354,21 @@
       "abstract": "StreetLens convierte un recorrido por cualquier calle en una puntuación pública y verificable. Accesibilidad, drenaje, sombra e infraestructura ciclista, medidas segmento a segmento. Sin índice propietario. Sin caja negra. El método está en esta página.",
       "ctaExplore": "Explorar el mapa en vivo",
       "ctaMethod": "Leer el método",
+      "nav": {
+        "label": "Ir a la sección",
+        "figure": "Figura 1",
+        "method": "Método",
+        "references": "Referencias",
+        "map": "Abrir el mapa"
+      },
       "figure": {
         "label": "Figura 1",
         "claim": "Un mapa que puedes comprobar.",
         "support": "Puntuaciones por segmento en el piloto de Escazú, en vivo e interactivas. Recorre el corredor y abre un segmento para ver cómo se puntuó.",
         "source": "Fuente: StreetLens sobre geometría de OpenStreetMap. n={n} segmentos, Escazú. Datos de demostración hasta el trabajo de campo en agosto de 2026.",
         "affordance": "Arrastra para desplazar. Desplaza para acercar. Toca un segmento.",
-        "live": "Mapa en vivo"
+        "live": "Mapa en vivo",
+        "plate": "Escazú · Costa Rica"
       }
     },
     "measure": {
@@ -427,6 +435,7 @@
       "statSegments": "Segmentos mapeados",
       "statKm": "Km de corredor",
       "statCoverage": "Cobertura del piloto",
+      "beginning": "Esto es un piloto, y un comienzo.",
       "demoNote": "Auditoría de demostración sobre geometría real. Ninguna puntuación es una medición hasta que el trabajo de campo comience en agosto de 2026."
     },
     "method": {
