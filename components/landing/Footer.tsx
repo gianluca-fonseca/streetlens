@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/components/ui/cn";
 import Logo from "@/components/ui/Logo";
-import { GITHUB_URL } from "@/lib/links";
+import { AUTHOR_LINKEDIN, GITHUB_URL } from "@/lib/links";
 
 /**
  * A centered colophon on the sunken surface: the wordmark, the tagline, a
@@ -33,6 +34,22 @@ export default function Footer() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[12px] uppercase tracking-[0.08em]">
+          <a
+            href={AUTHOR_LINKEDIN}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sl-card inline-flex min-h-[36px] items-center gap-2 rounded-full border border-hairline bg-paper-white py-1 pl-1 pr-3 font-sans text-[11.5px] font-medium normal-case tracking-normal text-ink-muted hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          >
+            <Image
+              src="/gianluca.jpg"
+              alt=""
+              width={44}
+              height={44}
+              className="h-6 w-6 shrink-0 rounded-full object-cover"
+            />
+            <span>{t("madeBy")}</span>
+          </a>
+          <span aria-hidden="true" className="h-3 w-px bg-hairline-strong" />
           <a
             href={GITHUB_URL}
             target="_blank"
