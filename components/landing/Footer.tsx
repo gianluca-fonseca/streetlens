@@ -18,6 +18,27 @@ const LOCALES = [
   { code: "es", label: "Español" },
 ] as const;
 
+/** The official LinkedIn "in" mark in `currentColor`, taking the bold `--ink`
+ * tone of the author name beside it. Founder-sanctioned icon-ban exception, scoped
+ * to the author pill (parity with the hero pill). */
+function LinkedInMark({
+  size = 13,
+  className,
+}: Readonly<{ size?: number; className?: string }>) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 448 512"
+      fill="currentColor"
+      aria-hidden="true"
+      className={cn("shrink-0", className)}
+    >
+      <path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.3 0 79.7 44.3 79.7 101.9V416z" />
+    </svg>
+  );
+}
+
 export default function Footer() {
   const t = useTranslations("landing.footer");
   const locale = useLocale();
@@ -38,16 +59,25 @@ export default function Footer() {
             href={AUTHOR_LINKEDIN}
             target="_blank"
             rel="noopener noreferrer"
-            className="sl-card inline-flex min-h-[36px] pointer-coarse:min-h-[44px] items-center gap-2 rounded-full border border-hairline bg-paper-white py-1 pl-1 pr-3 font-sans text-[11.5px] font-medium normal-case tracking-normal text-ink-muted hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="sl-card group inline-flex min-h-[36px] pointer-coarse:min-h-[44px] items-center gap-2 rounded-full border border-hairline bg-paper-white py-1 pl-1 pr-3 font-sans text-[11.5px] font-medium normal-case tracking-normal text-ink-muted hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             <Image
               src="/gianluca.jpg"
               alt=""
               width={44}
               height={44}
-              className="h-6 w-6 shrink-0 rounded-full object-cover"
+              className="h-6 w-6 shrink-0 rounded-full object-cover transition-transform duration-200 motion-safe:group-hover:scale-105"
             />
-            <span>{t("madeBy")}</span>
+            <span className="inline-flex items-center gap-1.5">
+              {t.rich("madeBy", {
+                name: (chunks) => (
+                  <span className="font-semibold text-ink-display underline-offset-[3px] group-hover:underline group-hover:decoration-accent group-hover:decoration-2">
+                    {chunks}
+                  </span>
+                ),
+              })}
+              <LinkedInMark className="text-ink-display" />
+            </span>
           </a>
           <span aria-hidden="true" className="h-3 w-px bg-hairline-strong" />
           <a

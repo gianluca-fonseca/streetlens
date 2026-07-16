@@ -356,7 +356,7 @@
       "question": "How good are our streets?",
       "pilot": "Pilot program · Escazú, Costa Rica",
       "requestCity": "Want this for your city? Request it",
-      "madeBy": "Made with ❤️ by Gianluca Fonseca",
+      "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
       "banner": {
         "methodQuestion": "How does StreetLens work?",
         "methodLink": "Method",
@@ -379,7 +379,7 @@
         "live": "Live map",
         "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform."
       },
-      "openSource": "Open source"
+      "openSource": "The code is public: view / contribute"
     },
     "measure": {
       "eyebrow": "What we measure",
@@ -599,7 +599,7 @@
       "tagline": "An open field instrument for the street. Now measuring Escazú, Costa Rica.",
       "openSource": "Open source",
       "github": "GitHub",
-      "madeBy": "Made with ❤️ by Gianluca Fonseca",
+      "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
       "localeLabel": "Language",
       "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins in August 2026.",
       "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress."

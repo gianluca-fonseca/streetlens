@@ -212,6 +212,27 @@ function GitHubMark({ size = 14 }: Readonly<{ size?: number }>) {
   );
 }
 
+/** The official LinkedIn "in" mark, drawn in `currentColor` so it takes the bold
+ * `--ink` tone of the author name it sits beside. Founder-sanctioned exception to
+ * the icon ban, scoped to the author pill only. */
+function LinkedInMark({
+  size = 13,
+  className,
+}: Readonly<{ size?: number; className?: string }>) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 448 512"
+      fill="currentColor"
+      aria-hidden="true"
+      className={cn("shrink-0", className)}
+    >
+      <path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.3 0 79.7 44.3 79.7 101.9V416z" />
+    </svg>
+  );
+}
+
 /** Shared pill chrome (zen instrument register): hairline pill on paper-white, T1
  * rest shadow + reduced-motion-safe hover lift via `sl-card`, ink-muted → ink text.
  * Never pink-filled — warmth comes only from the founder-mandated ❤️. */
@@ -219,36 +240,50 @@ const PILL_CLASS =
   "sl-card inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center gap-2 rounded-full border border-hairline bg-paper-white text-[11.5px] font-medium text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 /** The author + open-source pill pair. Replaces u22's plain mono "Open source →
- * GitHub" hero line. The avatar is served locally (never the expiring licdn URL). */
-function AttributionPills({
-  madeByLabel,
-  openSourceLabel,
-}: Readonly<{ madeByLabel: string; openSourceLabel: string }>) {
+ * GitHub" hero line. The avatar is served locally (never the expiring licdn URL).
+ * The author name is bold `--ink` with the LinkedIn mark beside it; on hover the
+ * pink underline signal appears under the name, the muted text warms to `--ink`,
+ * and the avatar lifts a hair (motion-safe only). The open-source pill carries the
+ * same hover family. The shared `sl-card` chrome supplies the zen T1→T2 lift and
+ * collapses it to colour-only under `prefers-reduced-motion`. */
+function AttributionPills() {
+  const t = useTranslations("landing.hero");
   return (
     <div className="flex flex-wrap items-center gap-2">
       <a
         href={AUTHOR_LINKEDIN}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn(PILL_CLASS, "py-1 pl-1 pr-3")}
+        className={cn(PILL_CLASS, "group py-1 pl-1 pr-3")}
       >
         <Image
           src="/gianluca.jpg"
           alt=""
           width={44}
           height={44}
-          className="h-6 w-6 shrink-0 rounded-full object-cover"
+          className="h-6 w-6 shrink-0 rounded-full object-cover transition-transform duration-200 motion-safe:group-hover:scale-105"
         />
-        <span>{madeByLabel}</span>
+        <span className="inline-flex items-center gap-1.5">
+          {t.rich("madeBy", {
+            name: (chunks) => (
+              <span className="font-semibold text-ink underline-offset-[3px] group-hover:underline group-hover:decoration-accent group-hover:decoration-2">
+                {chunks}
+              </span>
+            ),
+          })}
+          <LinkedInMark className="text-ink" />
+        </span>
       </a>
       <a
         href={GITHUB_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn(PILL_CLASS, "px-3 py-1")}
+        className={cn(PILL_CLASS, "group px-3 py-1")}
       >
         <GitHubMark />
-        <span>{openSourceLabel}</span>
+        <span className="underline-offset-[3px] group-hover:underline group-hover:decoration-accent group-hover:decoration-2">
+          {t("openSource")}
+        </span>
       </a>
     </div>
   );
@@ -313,7 +348,7 @@ export default function Hero({
     <section className="pb-10 sm:pb-14 lg:pb-16">
       <Banner />
       <div className="mx-auto w-full pl-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-left))] pr-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-right))] pt-6 sm:pt-8">
-        <div className="grid grid-cols-1 gap-x-[clamp(1.5rem,2.2vw,2.5rem)] gap-y-8 lg:h-[78vh] lg:max-h-[52rem] lg:grid-cols-[clamp(280px,20vw,360px)_minmax(0,1fr)_clamp(240px,17vw,320px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-y-6">
+        <div className="grid grid-cols-1 gap-x-[clamp(1.25rem,2.2vw,2.5rem)] gap-y-8 lg:h-[78vh] lg:max-h-[52rem] lg:grid-cols-[clamp(280px,20vw,360px)_minmax(0,1fr)_clamp(220px,17vw,320px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-y-6">
           {/* ── LEFT zone head: lockup, pilot status, question, request +
                attribution pills ──────────────────────────────────────── */}
           <div className="lg:col-start-1 lg:row-start-1">
@@ -346,15 +381,12 @@ export default function Hero({
               <span aria-hidden="true">→</span>
             </a>
             <div className="sl-hero-el mt-4" style={{ animationDelay: "300ms" }}>
-              <AttributionPills
-                madeByLabel={t("madeBy")}
-                openSourceLabel={t("openSource")}
-              />
+              <AttributionPills />
             </div>
           </div>
 
           {/* ── CENTER zone: the live map plate (z0 frame) + chips (z10) ── */}
-          <div className="sl-hero-map flex flex-col lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-full">
+          <div className="sl-hero-map flex min-w-0 flex-col lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-full">
             <div className="min-h-0 flex-1 rounded-[4px] border border-hairline bg-paper p-2 sm:p-3">
               <div
                 data-map-moving={mapMoving ? "true" : "false"}
@@ -378,7 +410,7 @@ export default function Hero({
 
           {/* ── RIGHT zone: zen-solid stat stack (horizontal snap on phone,
                vertical on desktop) + one shared demo footnote ────────── */}
-          <div className="flex flex-col gap-3 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:min-h-0">
+          <div className="flex flex-col gap-3 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:min-h-0 lg:min-w-0">
             <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:min-h-0 lg:flex-col lg:overflow-y-auto lg:px-0 lg:pb-0 lg:[scrollbar-width:thin]">
               <StatCard
                 value={String(stats.heroPct)}
