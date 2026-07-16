@@ -12,12 +12,12 @@ export default function DemoBanner() {
   return (
     <div
       role="status"
-      className="flex shrink-0 items-center justify-center gap-2 border-b border-border bg-surface-sunken px-4 py-1.5 text-center text-[12.5px] font-medium text-ink"
+      className="flex shrink-0 items-center justify-center gap-2 border-b border-border bg-surface-sunken px-3 py-1.5 pt-[max(0.375rem,env(safe-area-inset-top))] text-center text-[11.5px] font-medium leading-snug text-balance text-ink sm:px-4 sm:text-[12.5px]"
     >
       <FlaskConical
         size={14}
         strokeWidth={1.75}
-        className="shrink-0 text-accent-text"
+        className="mt-px shrink-0 self-start text-accent-text sm:mt-0 sm:self-center"
         aria-hidden="true"
       />
       <span>{t("message")}</span>
