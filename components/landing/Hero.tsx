@@ -9,6 +9,7 @@ import { BINS, sampleRamp } from "@/components/mapConfig";
 import AuditMap from "@/components/AuditMap";
 import Button from "@/components/ui/Button";
 import Eyebrow from "@/components/ui/Eyebrow";
+import Logo from "@/components/ui/Logo";
 import StatFigure from "@/components/ui/StatFigure";
 import { cn } from "@/components/ui/cn";
 
@@ -144,12 +145,12 @@ export default function Hero({
         <div className="grid gap-x-8 gap-y-6 lg:grid-cols-[360px_1fr] lg:grid-rows-[auto_1fr]">
           {/* ── Title block (rail head) ─────────────────────────────── */}
           <div className="lg:col-start-1 lg:row-start-1 lg:self-start">
-            <p
-              className="sl-hero-el font-display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-ink-display"
+            <div
+              className="sl-hero-el text-ink-display"
               style={{ animationDelay: "120ms" }}
             >
-              {t("wordmark")}
-            </p>
+              <Logo withWordmark size={22} title={t("wordmark")} />
+            </div>
             <div
               className="sl-hero-el mt-4"
               style={{ animationDelay: "120ms" }}

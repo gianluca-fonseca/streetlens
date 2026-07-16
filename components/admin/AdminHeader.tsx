@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { LayoutGrid, ListChecks, Map, Upload } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
+import { LogoMark } from "@/components/ui/Logo";
 import LogoutButton from "./LogoutButton";
 
 /**
@@ -47,7 +48,8 @@ export default async function AdminHeader({
     // over live map tiles, per the zen dossier §2/§6).
     <header className="sticky top-0 z-10 border-b border-border bg-surface-elevated">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5 sm:px-6">
-        <span className="font-display text-[0.98rem] font-semibold tracking-tight text-ink">
+        <span className="flex items-center gap-2 font-display text-[0.98rem] font-semibold tracking-tight text-ink">
+          <LogoMark size={19} />
           {t("brand")}
         </span>
 

@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/components/ui/cn";
+import Logo from "@/components/ui/Logo";
 
 /**
  * A centered colophon on the sunken surface: the wordmark, the tagline, a
@@ -23,9 +24,9 @@ export default function Footer() {
   return (
     <footer className="border-t border-hairline bg-surface-sunken">
       <div className="mx-auto max-w-[42.5rem] px-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))] py-14 text-center">
-        <p className="font-display text-[1.25rem] font-bold leading-none tracking-[-0.02em] text-ink-display">
-          StreetLens
-        </p>
+        <div className="flex justify-center text-ink-display">
+          <Logo withWordmark size={23} title="StreetLens" />
+        </div>
         <p className="mx-auto mt-3 max-w-[34rem] font-serif text-[1rem] leading-[1.5] text-ink-muted">
           {t("tagline")}
         </p>
