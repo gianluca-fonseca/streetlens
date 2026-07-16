@@ -45,7 +45,7 @@
   "legend": {
     "title": "Legend",
     "scaleHint": "Higher is better (0–100)",
-    "community": "Community — unverified",
+    "community": "Community (unverified)",
     "widthNote": "Thicker lines mark lower-scoring segments.",
     "bins": {
       "poor": "Poor",
@@ -74,7 +74,7 @@
     "photoPlaceholder": "Photo pending fieldwork",
     "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
     "close": "Close detail panel",
-    "communityPending": "Community — pending field verification",
+    "communityPending": "Community: pending field verification",
     "communityNote": "Community-contributed. Not yet field-verified, so it carries no audit scores.",
     "communityReportsHeading": "Community reports",
     "communityReportLabel": "Community report"
@@ -173,7 +173,7 @@
     },
     "import": {
       "title": "Bulk import",
-      "subtitle": "Validate field geometry, then import. Dry-run first — nothing is written until you confirm.",
+      "subtitle": "Validate field geometry, then import. Dry-run first: nothing is written until you confirm.",
       "fileLabel": "GeoJSON or CSV file",
       "fileHint": "A GeoJSON FeatureCollection of LineStrings, or a CSV with name, highway, and coordinates columns.",
       "verifiedLabel": "Mark as field-verified",

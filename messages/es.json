@@ -45,7 +45,7 @@
   "legend": {
     "title": "Leyenda",
     "scaleHint": "Más alto es mejor (0–100)",
-    "community": "Comunitario — sin verificar",
+    "community": "Comunitario (sin verificar)",
     "widthNote": "Las líneas más gruesas marcan los segmentos con menor puntaje.",
     "bins": {
       "poor": "Deficiente",
@@ -74,7 +74,7 @@
     "photoPlaceholder": "Foto pendiente del trabajo de campo",
     "demoNote": "Auditoría de demostración. Los datos de campo reales reemplazan este corredor, tramo por tramo, desde agosto de 2026.",
     "close": "Cerrar el panel de detalle",
-    "communityPending": "Comunidad — pendiente de verificación de campo",
+    "communityPending": "Comunidad: pendiente de verificación de campo",
     "communityNote": "Aporte de la comunidad. Aún sin verificación de campo, por lo que no tiene puntajes de auditoría.",
     "communityReportsHeading": "Reportes de la comunidad",
     "communityReportLabel": "Reporte de la comunidad"
@@ -173,7 +173,7 @@
     },
     "import": {
       "title": "Importación masiva",
-      "subtitle": "Validá la geometría de campo y luego importala. Primero una simulación — no se escribe nada hasta que confirmés.",
+      "subtitle": "Validá la geometría de campo y luego importala. Primero una simulación: no se escribe nada hasta que confirmés.",
       "fileLabel": "Archivo GeoJSON o CSV",
       "fileHint": "Un FeatureCollection de GeoJSON con LineStrings, o un CSV con columnas name, highway y coordinates.",
       "verifiedLabel": "Marcar como verificado en campo",
