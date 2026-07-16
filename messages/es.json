@@ -55,6 +55,8 @@
     "eyebrow": "Piloto de Escazú",
     "heroStat": "{pct}% de los segmentos auditados incumplen los mínimos de accesibilidad de la Ley 7600",
     "heroDemoNote": "Cifra de demostración. No es una medición real.",
+    "expand": "Mostrar estadísticas del piloto y la leyenda",
+    "collapse": "Ocultar estadísticas del piloto y la leyenda",
     "segmentsLabel": "Segmentos auditados",
     "kmLabel": "Km del corredor",
     "coverageLabel": "Cobertura del piloto",

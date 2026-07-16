@@ -55,6 +55,8 @@
     "eyebrow": "Escazú pilot",
     "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",
     "heroDemoNote": "Demo figure. Not a real measurement.",
+    "expand": "Show full pilot stats and legend",
+    "collapse": "Hide pilot stats and legend",
     "segmentsLabel": "Segments audited",
     "kmLabel": "Corridor km",
     "coverageLabel": "Pilot coverage",
