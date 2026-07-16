@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { ChevronDown } from "lucide-react";
 import type { ScoreLayer } from "@/lib/segments";
 import {
   BINS,
@@ -10,9 +12,14 @@ import {
 } from "@/components/mapConfig";
 
 /**
- * Always-visible legend with explicit value bins (never color-only encoding).
- * Each row pairs the color swatch with a width cue, and the width channel is
- * explained in one line so it does not read as noise.
+ * Legend with explicit value bins (never color-only encoding). Each row pairs
+ * the color swatch with a width cue, and the width channel is explained in one
+ * line so it does not read as noise.
+ *
+ * On phones the legend is collapsible via a chip toggle (map real estate is
+ * scarce); it starts collapsed and the body reveals on tap. On desktop it is
+ * always open exactly as before — the toggle chrome is `md:hidden` and the body
+ * carries `md:block`, so the sealed desktop layout is untouched.
  */
 export default function Legend({
   layer,
@@ -24,18 +31,38 @@ export default function Legend({
 }>) {
   const t = useTranslations("legend");
   const tl = useTranslations("layers");
+  const [open, setOpen] = useState(false);
+  // Body is shown when the user opens it (mobile) OR always on desktop.
+  const bodyClass = open ? "block" : "hidden md:block";
 
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h3 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
-          {t("title")}
-        </h3>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="flex items-center gap-1.5 md:pointer-events-none"
+        >
+          <h3 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+            {t("title")}
+          </h3>
+          <ChevronDown
+            size={13}
+            strokeWidth={2}
+            aria-hidden="true"
+            className={[
+              "text-neutral-strong transition-transform md:hidden",
+              open ? "rotate-180" : "",
+            ].join(" ")}
+          />
+        </button>
         <span className="font-mono text-[10px] text-neutral-strong">
           {t("scaleHint")}
         </span>
       </div>
 
+      <div className={bodyClass}>
       <p className="mb-2 text-[12px] text-neutral-strong">
         {tl(`${layer}.short`)}
       </p>
@@ -89,6 +116,7 @@ export default function Legend({
       <p className="mt-2.5 border-t border-border pt-2 text-[11px] leading-snug text-neutral-strong">
         {t("widthNote")}
       </p>
+      </div>
     </div>
   );
 }
