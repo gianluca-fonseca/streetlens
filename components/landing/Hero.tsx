@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
@@ -10,7 +11,7 @@ import AuditMap from "@/components/AuditMap";
 import Logo from "@/components/ui/Logo";
 import StatFigure from "@/components/ui/StatFigure";
 import { cn } from "@/components/ui/cn";
-import { GITHUB_URL } from "@/lib/links";
+import { AUTHOR_LINKEDIN, CITY_REQUEST_URL, GITHUB_URL } from "@/lib/links";
 
 /**
  * The platform hero (rev 6, u21 — the mcbroken restructure). A slim top banner
@@ -193,6 +194,66 @@ function StatCard({
   );
 }
 
+/** The official GitHub mark (octocat silhouette), drawn in `currentColor` so it
+ * inherits the pill's ink-muted → ink hover. Founder-sanctioned exception to the
+ * icon ban, scoped to the open-source pill. */
+function GitHubMark({ size = 14 }: Readonly<{ size?: number }>) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden="true"
+      className="shrink-0"
+    >
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+    </svg>
+  );
+}
+
+/** Shared pill chrome (zen instrument register): hairline pill on paper-white, T1
+ * rest shadow + reduced-motion-safe hover lift via `sl-card`, ink-muted → ink text.
+ * Never pink-filled — warmth comes only from the founder-mandated ❤️. */
+const PILL_CLASS =
+  "sl-card inline-flex min-h-[32px] items-center gap-2 rounded-full border border-hairline bg-paper-white text-[11.5px] font-medium text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+
+/** The author + open-source pill pair. Replaces u22's plain mono "Open source →
+ * GitHub" hero line. The avatar is served locally (never the expiring licdn URL). */
+function AttributionPills({
+  madeByLabel,
+  openSourceLabel,
+}: Readonly<{ madeByLabel: string; openSourceLabel: string }>) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <a
+        href={AUTHOR_LINKEDIN}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(PILL_CLASS, "py-1 pl-1 pr-3")}
+      >
+        <Image
+          src="/gianluca.jpg"
+          alt=""
+          width={44}
+          height={44}
+          className="h-6 w-6 shrink-0 rounded-full object-cover"
+        />
+        <span>{madeByLabel}</span>
+      </a>
+      <a
+        href={GITHUB_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(PILL_CLASS, "px-3 py-1")}
+      >
+        <GitHubMark />
+        <span>{openSourceLabel}</span>
+      </a>
+    </div>
+  );
+}
+
 /** Whether a feature is an official audited segment (community/import adds carry a
  * `source` and no rubric score — they must never enter the score list). */
 function isAudited(source: string | undefined, score: number): boolean {
@@ -251,9 +312,10 @@ export default function Hero({
   return (
     <section className="pb-10 sm:pb-14 lg:pb-16">
       <Banner />
-      <div className="mx-auto w-full max-w-[1400px] px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-8 lg:h-[78vh] lg:max-h-[52rem] lg:grid-cols-[300px_minmax(0,1fr)_260px] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-y-6">
-          {/* ── LEFT zone head: compact lockup + question title ──────── */}
+      <div className="mx-auto w-full pl-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-left))] pr-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-right))] pt-6 sm:pt-8">
+        <div className="grid grid-cols-1 gap-x-[clamp(1.5rem,2.2vw,2.5rem)] gap-y-8 lg:h-[78vh] lg:max-h-[52rem] lg:grid-cols-[clamp(280px,20vw,360px)_minmax(0,1fr)_clamp(240px,17vw,320px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-y-6">
+          {/* ── LEFT zone head: lockup, pilot status, question, request +
+               attribution pills ──────────────────────────────────────── */}
           <div className="lg:col-start-1 lg:row-start-1">
             <div
               className="sl-hero-el text-ink-display"
@@ -261,12 +323,34 @@ export default function Hero({
             >
               <Logo withWordmark size={20} title={t("wordmark")} />
             </div>
+            <p
+              className="sl-hero-el mt-4 inline-flex items-center rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted"
+              style={{ animationDelay: "160ms" }}
+            >
+              {t("pilot")}
+            </p>
             <h1
-              className="sl-hero-el mt-4 max-w-[20ch] font-display text-[clamp(1.35rem,1.9vw,1.6rem)] font-bold leading-[1.12] tracking-[-0.02em] text-ink-display text-balance dark:tracking-[-0.015em]"
-              style={{ animationDelay: "180ms" }}
+              className="sl-hero-el mt-3 max-w-[20ch] font-display text-[clamp(1.35rem,1.9vw,1.6rem)] font-bold leading-[1.12] tracking-[-0.02em] text-ink-display text-balance dark:tracking-[-0.015em]"
+              style={{ animationDelay: "200ms" }}
             >
               {t("question")}
             </h1>
+            <a
+              href={CITY_REQUEST_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sl-hero-el mt-3 inline-flex items-center gap-1 text-[12.5px] text-ink-muted underline decoration-accent decoration-2 underline-offset-[4px] transition-colors hover:text-ink-display hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              style={{ animationDelay: "240ms" }}
+            >
+              {t("requestCity")}
+              <span aria-hidden="true">→</span>
+            </a>
+            <div className="sl-hero-el mt-4" style={{ animationDelay: "300ms" }}>
+              <AttributionPills
+                madeByLabel={t("madeBy")}
+                openSourceLabel={t("openSource")}
+              />
+            </div>
           </div>
 
           {/* ── CENTER zone: the live map plate (z0 frame) + chips (z10) ── */}
@@ -330,16 +414,6 @@ export default function Hero({
             <p className="px-1 font-mono text-[11px] leading-snug text-ink-muted lg:px-0">
               {t("stats.demoFootnote")}
             </p>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 self-start px-1 font-mono text-[11px] uppercase tracking-[0.08em] text-ink-muted underline-offset-4 transition-colors hover:text-ink-display hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface lg:px-0"
-            >
-              {t("openSource")}
-              <span aria-hidden="true">→</span>
-              GitHub
-            </a>
           </div>
 
           {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}
