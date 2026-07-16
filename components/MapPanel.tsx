@@ -6,6 +6,7 @@ import { ChevronDown } from "lucide-react";
 import type { ScoreLayer, StreetStats } from "@/lib/segments";
 import LayerSwitcher from "@/components/LayerSwitcher";
 import Legend from "@/components/Legend";
+import styles from "@/components/ui/zen.module.css";
 
 /**
  * Floating primary map panel (the only 12px-radius surface, top elevation).
@@ -52,7 +53,7 @@ export default function MapPanel({
   return (
     <section
       aria-label={t("eyebrow")}
-      className="pointer-events-auto flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 rounded-[12px] border border-border bg-surface-elevated p-4 shadow-[var(--shadow-panel)]"
+      className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 rounded-[12px] p-4`}
     >
       <header>
         <div className="flex items-start justify-between gap-2">

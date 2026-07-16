@@ -15,6 +15,7 @@ import {
   sampleRamp,
   seedFromId,
 } from "@/components/mapConfig";
+import styles from "@/components/ui/zen.module.css";
 
 /**
  * Elevated detail panel shown when a segment is selected (popover elevation).
@@ -93,7 +94,12 @@ export default function SegmentDetail({
       aria-label={segment.name}
       style={dragY ? { transform: `translateY(${dragY}px)` } : undefined}
       className={[
+        // Phone: SOLID bottom sheet (edge-anchored, reads better solid — dossier
+        // §4 z-layering). Desktop: Recipe A glass popover floating over tiles,
+        // applied ≥768px only via the module's media-gated class.
         "pointer-events-auto flex flex-col overflow-hidden border border-border bg-surface-elevated shadow-[var(--shadow-popover)]",
+        styles.glassPanelDesktop,
+        styles.enter,
         // Mobile: full-width bottom sheet flush to the bottom edge.
         "w-full max-h-[72dvh] rounded-t-[16px] border-b-0",
         // Desktop (sealed): the top-right popover, exactly as before.

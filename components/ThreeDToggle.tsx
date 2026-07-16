@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Box } from "lucide-react";
+import styles from "@/components/ui/zen.module.css";
 
 /**
  * Small 3D view toggle — design-direction compliant micro-control that sits
@@ -26,11 +27,13 @@ export default function ThreeDToggle({
       aria-label={active ? t("disable") : t("enable")}
       onClick={() => onToggle(!active)}
       className={[
-        "pointer-events-auto flex items-center gap-2 rounded-[8px] border px-3 py-2 text-[13px] font-medium shadow-[var(--shadow-panel)] transition-colors",
+        "pointer-events-auto flex items-center gap-2 rounded-[8px] px-3 py-2 text-[13px] font-medium",
+        styles.control,
+        styles.enterChip,
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1",
         active
-          ? "border-ink-display bg-ink-display text-surface"
-          : "border-border bg-surface-elevated text-ink hover:border-border-strong",
+          ? "border border-ink-display bg-ink-display text-surface shadow-[0_2px_8px_rgba(0,0,0,0.16)]"
+          : `${styles.glassChip} text-ink hover:border-border-strong`,
       ].join(" ")}
     >
       <Box
