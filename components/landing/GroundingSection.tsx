@@ -20,7 +20,7 @@ export default function GroundingSection() {
     <Section id="grounding" tone="paper" rule>
       <Measure width="outset">
         <SectionHeader
-          index="05"
+          index="06"
           eyebrow={t("eyebrow")}
           title={t("heading")}
           lead={t("lead")}

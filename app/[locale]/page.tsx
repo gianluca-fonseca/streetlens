@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
 import Hero from "@/components/landing/Hero";
+import MissionSection from "@/components/landing/MissionSection";
 import MeasureSection from "@/components/landing/MeasureSection";
 import GapSection from "@/components/landing/GapSection";
 import PilotSection from "@/components/landing/PilotSection";
@@ -46,6 +47,7 @@ export default async function HomePage({
   return (
     <main className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
       <Hero segments={segments} stats={stats} />
+      <MissionSection />
       <MeasureSection />
       <GapSection heroPct={stats.heroPct} />
       <PilotSection stats={stats} />

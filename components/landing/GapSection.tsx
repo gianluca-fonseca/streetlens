@@ -30,7 +30,7 @@ export default function GapSection({
     <Section id="gap" tone="sunken" rule>
       <Measure width="outset">
         <SectionHeader
-          index="02"
+          index="03"
           eyebrow={t("eyebrow")}
           title={t("heading")}
           lead={t("lead")}

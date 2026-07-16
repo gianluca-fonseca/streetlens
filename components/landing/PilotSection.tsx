@@ -32,7 +32,7 @@ export default function PilotSection({
     <Section id="pilot" tone="paper" rule>
       <Measure width="outset">
         <SectionHeader
-          index="03"
+          index="04"
           eyebrow={t("eyebrow")}
           title={t("heading")}
           lead={t("lead")}

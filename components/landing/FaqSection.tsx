@@ -26,7 +26,7 @@ export default function FaqSection() {
   return (
     <Section id="faq" tone="paper" rule>
       <Measure width="outset">
-        <SectionHeader index="07" eyebrow={t("eyebrow")} title={t("heading")} />
+        <SectionHeader index="08" eyebrow={t("eyebrow")} title={t("heading")} />
       </Measure>
 
       <Measure width="text" className="mt-12">

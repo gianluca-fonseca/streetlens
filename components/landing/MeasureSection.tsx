@@ -35,7 +35,7 @@ export default function MeasureSection() {
     <Section id="measure" tone="paper" rule>
       <Measure width="outset">
         <SectionHeader
-          index="01"
+          index="02"
           eyebrow={t("eyebrow")}
           title={t("heading")}
           lead={t("lead")}

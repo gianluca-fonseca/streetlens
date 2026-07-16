@@ -20,7 +20,7 @@ export default function RoadmapSection() {
     <Section id="roadmap" tone="sunken" rule>
       <Measure width="outset">
         <SectionHeader
-          index="06"
+          index="07"
           eyebrow={t("eyebrow")}
           title={t("heading")}
           lead={t("lead")}

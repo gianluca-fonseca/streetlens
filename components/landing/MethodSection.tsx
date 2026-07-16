@@ -32,7 +32,7 @@ export default function MethodSection() {
     <Section id="method" tone="sunken" rule>
       <Measure width="outset">
         <SectionHeader
-          index="04"
+          index="05"
           eyebrow={t("eyebrow")}
           title={t("heading")}
           lead={t("lead")}
