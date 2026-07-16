@@ -22,8 +22,8 @@ const VARIANTS: Record<ButtonVariant, string> = {
   // paper label in light (18.9:1), creme fill + dark-paper label in dark (17.8:1).
   // (Variant key stays "pine" for API stability; brand pine is retired in rev-5.)
   pine: "border-ink-display bg-ink-display text-surface hover:opacity-90",
-  // Flash-pink signal CTA. Foreground is the fixed dark --accent-fg (#0c0a06),
-  // which holds AA on the pink fill in BOTH themes (5.05 light, 6.50 dark). Hover
+  // Flash-pink signal CTA. Foreground is the fixed pure-black --accent-fg (#000000),
+  // which holds AA on the pink fill in BOTH themes (5.36 light, 6.90 dark). Hover
   // lightens via opacity so the dark label stays readable (darkening to
   // accent-strong would drop dark text below AA).
   accent:

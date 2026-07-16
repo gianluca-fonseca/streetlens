@@ -371,7 +371,7 @@
         "failLabel": "Fail Ley 7600 minimums",
         "coverageLabel": "Corridor coverage",
         "segmentsLabel": "Segments audited",
-        "kmLabel": "Street audited",
+        "kmLabel": "Street network audited",
         "bikeLabel": "Avg. bike infrastructure",
         "demoFootnote": "Fail rate and averages are demo figures over real OSM geometry."
       },

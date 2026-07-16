@@ -38,7 +38,7 @@ export default function Footer() {
             href={AUTHOR_LINKEDIN}
             target="_blank"
             rel="noopener noreferrer"
-            className="sl-card inline-flex min-h-[36px] items-center gap-2 rounded-full border border-hairline bg-paper-white py-1 pl-1 pr-3 font-sans text-[11.5px] font-medium normal-case tracking-normal text-ink-muted hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="sl-card inline-flex min-h-[36px] pointer-coarse:min-h-[44px] items-center gap-2 rounded-full border border-hairline bg-paper-white py-1 pl-1 pr-3 font-sans text-[11.5px] font-medium normal-case tracking-normal text-ink-muted hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             <Image
               src="/gianluca.jpg"

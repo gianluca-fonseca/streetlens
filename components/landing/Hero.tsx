@@ -38,7 +38,7 @@ function Banner() {
           {t("methodQuestion")}
           <a
             href="#method"
-            className="font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
+            className="inline-flex items-center pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
           >
             {t("methodLink")}
           </a>
@@ -48,7 +48,7 @@ function Banner() {
         </span>
         <Link
           href="/map"
-          className="inline-flex items-center gap-1 font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
+          className="inline-flex items-center gap-1 pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
         >
           {t("platform")}
           <span aria-hidden="true">→</span>
@@ -91,7 +91,7 @@ function LegendChip() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="sl-glass-chip inline-flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        className="sl-glass-chip inline-flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5 pointer-coarse:min-h-[44px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
       >
         {t("title")}
         <ChevronDown
@@ -216,7 +216,7 @@ function GitHubMark({ size = 14 }: Readonly<{ size?: number }>) {
  * rest shadow + reduced-motion-safe hover lift via `sl-card`, ink-muted → ink text.
  * Never pink-filled — warmth comes only from the founder-mandated ❤️. */
 const PILL_CLASS =
-  "sl-card inline-flex min-h-[32px] items-center gap-2 rounded-full border border-hairline bg-paper-white text-[11.5px] font-medium text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+  "sl-card inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center gap-2 rounded-full border border-hairline bg-paper-white text-[11.5px] font-medium text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 /** The author + open-source pill pair. Replaces u22's plain mono "Open source →
  * GitHub" hero line. The avatar is served locally (never the expiring licdn URL). */
@@ -339,7 +339,7 @@ export default function Hero({
               href={CITY_REQUEST_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="sl-hero-el mt-3 inline-flex items-center gap-1 text-[12.5px] text-ink-muted underline decoration-accent decoration-2 underline-offset-[4px] transition-colors hover:text-ink-display hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              className="sl-hero-el mt-3 inline-flex min-h-[24px] pointer-coarse:min-h-[44px] items-center gap-1 text-[12.5px] text-ink-muted underline decoration-accent decoration-2 underline-offset-[4px] transition-colors hover:text-ink-display hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               style={{ animationDelay: "240ms" }}
             >
               {t("requestCity")}
