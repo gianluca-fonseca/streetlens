@@ -104,6 +104,8 @@
      no-blur swap used during map pan/zoom + as the @supports/no-backdrop fallback. */
   --glass-chip-bg: rgba(255, 255, 255, 0.78);
   --glass-chip-border: rgba(0, 0, 0, 0.10);
+  --glass-blur-chip: 14px; /* chip/control blur (Recipe C): lower than panels so a
+                              small pill over a bright OR dark spot stays crisp. */
   --glass-chip-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   --glass-chip-lift: 0 2px 8px rgba(0, 0, 0, 0.16);
   --glass-chip-solid: rgba(255, 255, 255, 0.92);
@@ -286,16 +288,47 @@ body {
   isolation: isolate;
 }
 
-/* MapLibre popup/control overrides so nothing ships looking default. Group chrome
-   reads the panel tokens (re-valued above); attribution uses paper tints. */
+/* MapLibre popup/control overrides so nothing ships looking default. The zoom/nav
+   control group floats over live map tiles, so it is a Recipe-C glass chip (u18-A2):
+   the same recipe as .sl-glass-chip — chip-blur + saturate, chip alpha, inner-top
+   hairline + small lift. Solid fallbacks below. Attribution uses paper tints. */
 .maplibregl-ctrl-group {
-  background: var(--surface-elevated) !important;
-  border: 1px solid var(--border) !important;
+  background: var(--glass-chip-bg) !important;
+  border: 1px solid var(--glass-chip-border) !important;
   border-radius: var(--radius-panel) !important;
-  box-shadow: var(--shadow-panel) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur-chip)) saturate(160%);
+  box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift) !important;
+}
+@media (prefers-color-scheme: dark) {
+  .maplibregl-ctrl-group {
+    -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+    backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+  }
+}
+/* During pan/zoom the backdrop re-blurs every frame; the app map container carries
+   data-map-moving, so swap the controls to the near-opaque solid (no blur) while it
+   moves and restore on idle — mirrors the .sl-glass-chip move-swap. */
+[data-map-moving="true"] .maplibregl-ctrl-group {
+  background: var(--glass-chip-solid) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* No backdrop-filter support (or Increase Contrast): fall back to a solid so the
+   glyphs never sit on raw tiles. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .maplibregl-ctrl-group {
+    background: var(--glass-chip-solid) !important;
+  }
+}
+@media (prefers-contrast: more) {
+  .maplibregl-ctrl-group {
+    background: var(--glass-chip-solid) !important;
+    border-color: var(--ink-muted) !important;
+  }
 }
 .maplibregl-ctrl-group button + button {
-  border-top: 1px solid var(--border) !important;
+  border-top: 1px solid var(--glass-chip-border) !important;
 }
 .maplibregl-ctrl button .maplibregl-ctrl-icon {
   filter: none;
