@@ -4,27 +4,30 @@ import { cn } from "@/components/ui/cn";
 
 /**
  * The one CTA primitive for the public surface. Three variants keyed to the
- * sealed palette; all clear AA with their foreground. Renders as a locale-aware
+ * rev-5 palette; all clear AA with their foreground. Renders as a locale-aware
  * <Link> for internal routes, a plain <a> for same-page hash anchors, or a
- * <button> otherwise. Radius stays inside the 4/8/12 system (8px control).
+ * <button> otherwise. Radius is the 6px primary-control size (rev-5 2/4/6 system).
  */
 export type ButtonVariant = "pine" | "accent" | "ghost";
 export type ButtonSize = "md" | "lg";
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-[8px] border font-medium " +
+  "inline-flex items-center justify-center gap-2 rounded-[6px] border font-medium " +
   "transition-[opacity,transform,background-color,border-color] " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 focus-visible:ring-offset-surface " +
   "active:translate-y-px disabled:pointer-events-none disabled:opacity-50";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  // Deep pine reads AA against white in both light and dark token sets.
-  pine: "border-pine-strong bg-pine-strong text-white hover:opacity-90",
-  // Road-marking yellow accent. Foreground is pinned to the asphalt ink (not the
-  // theme ink token) so the dark text holds AA on the saturated fill in BOTH
-  // themes (10.1:1 light, higher on the darker press form).
+  // Primary = ink fill / paper text. Flips correctly by theme: near-black fill +
+  // paper label in light (18.9:1), creme fill + dark-paper label in dark (17.8:1).
+  // (Variant key stays "pine" for API stability; brand pine is retired in rev-5.)
+  pine: "border-ink-display bg-ink-display text-surface hover:opacity-90",
+  // Flash-pink signal CTA. Foreground is the fixed dark --accent-fg (#0c0a06),
+  // which holds AA on the pink fill in BOTH themes (5.05 light, 6.50 dark). Hover
+  // lightens via opacity so the dark label stays readable (darkening to
+  // accent-strong would drop dark text below AA).
   accent:
-    "border-accent-strong bg-accent text-[#171d1a] hover:bg-accent-strong",
+    "border-accent-strong bg-accent text-accent-fg hover:opacity-90",
   ghost: "border-border-strong bg-transparent text-ink hover:bg-surface-sunken",
 };
 
