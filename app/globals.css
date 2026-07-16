@@ -483,11 +483,14 @@ section[id] {
     transform: none;
   }
 }
+/* fill-mode `backwards` holds the from-state during the delay (no flash, JS-off
+   still animates) but reverts to base styles after finishing — so a settled card
+   is free to take the hover-lift transform (a `both` fill would pin transform). */
 .sl-hero-map {
-  animation: sl-settle-map var(--dur-settle) var(--ease-out-soft) both;
+  animation: sl-settle-map var(--dur-settle) var(--ease-out-soft) backwards;
 }
 .sl-hero-el {
-  animation: sl-settle-up var(--dur-slow) var(--ease-out-soft) both;
+  animation: sl-settle-up var(--dur-slow) var(--ease-out-soft) backwards;
 }
 
 /* Card hover-lift: up one shadow tier + rise, leaves faster than it enters (enter

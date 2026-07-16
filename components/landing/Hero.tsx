@@ -157,7 +157,7 @@ export default function Hero({
               <Eyebrow>{t("eyebrow")}</Eyebrow>
             </div>
             <h1
-              className="sl-hero-el mt-3 max-w-[16ch] font-display text-[clamp(1.85rem,3vw,2.6rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink-display text-balance"
+              className="sl-hero-el mt-3 max-w-[16ch] font-display text-[clamp(1.85rem,3vw,2.6rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink-display text-balance dark:tracking-[-0.02em]"
               style={{ animationDelay: "180ms" }}
             >
               {t("thesis")}

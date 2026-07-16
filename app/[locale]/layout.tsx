@@ -81,6 +81,13 @@ export default async function LocaleLayout({
       className={`${spaceGrotesk.variable} ${plexMono.variable} ${newsreader.variable} h-full antialiased`}
     >
       <body className="flex h-dvh-safe flex-col overflow-hidden font-sans">
+        {/* Mark the document JS-enabled before paint so the section-reveal hidden
+            pre-state applies only when JS can reveal it (research §3 JS-off rule). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js-enabled')",
+          }}
+        />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

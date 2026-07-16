@@ -1,49 +1,50 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { cn } from "@/components/ui/cn";
 
 /**
- * Subtle reveal-on-scroll: fade + short rise, fired once when the element
- * enters the viewport. Honors prefers-reduced-motion (renders visible, no
- * transition) and degrades to visible if IntersectionObserver is unavailable.
- * This is the whole motion budget for content — the map camera is the other.
+ * The single sanctioned section reveal (research §3): a subtle opacity + 8px rise,
+ * fired once when the block scrolls into view. Constrained on all four failure
+ * modes — small translate, no child stagger, once-only, and JS-off safe.
+ *
+ * The hidden pre-reveal state lives entirely in CSS under `.js-enabled` (set by an
+ * inline script before paint), so the REVEALED state is the default and content is
+ * always visible if JS fails or is disabled. This component only adds `is-visible`
+ * when the block enters the viewport (or immediately under reduced motion / no IO).
  */
 export default function Reveal({
   children,
   className,
   as: Tag = "div",
-  delay = 0,
 }: Readonly<{
   children: ReactNode;
   className?: string;
-  as?: "div" | "li" | "section";
-  delay?: number;
+  as?: "div" | "section" | "li";
 }>) {
   const ref = useRef<HTMLElement | null>(null);
-  const [shown, setShown] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const reveal = () => el.classList.add("is-visible");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce || typeof IntersectionObserver === "undefined") {
-      // Show immediately (next frame, so the set is not synchronous in-effect);
-      // the transition is disabled under reduced motion, so it simply appears.
-      const raf = requestAnimationFrame(() => setShown(true));
-      return () => cancelAnimationFrame(raf);
+      reveal();
+      return;
     }
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setShown(true);
+            reveal();
             io.disconnect();
+            break;
           }
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+      { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -53,12 +54,7 @@ export default function Reveal({
     <Tag
       // @ts-expect-error polymorphic ref across the small Tag union
       ref={ref}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
-      className={cn(
-        "transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none",
-        shown ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
-        className,
-      )}
+      className={cn("sl-reveal", className)}
     >
       {children}
     </Tag>
