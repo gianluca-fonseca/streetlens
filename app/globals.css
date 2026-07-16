@@ -1,83 +1,87 @@
 @import "tailwindcss";
 
 /*
- * StreetLens design tokens — sealed from docs/design-direction.md (rev 5, 2026-07-16).
- * "Field Manifesto": academic-paper bones in cool restrained creme (NOT honey),
- * warm near-black ink, one loud FLASH-PINK signal. Dark mode is the same document
- * as an inverted-paper (letterpress negative): warm near-black ground, creme ink.
- * Flat paper + hairlines carry structure (no texture); pink is signal-only.
+ * StreetLens design tokens — sealed from docs/design-direction.md (rev 6, 2026-07-16).
+ * "Zen Instrument": pure black-and-white zen (Japanese-zen meets Notion), one loud
+ * FLASH-PINK signal. Light = soft-white page, pure-black ink. Dark = near-black page,
+ * pure-white ink. Flat grounds carry structure through hairlines + zen-soft diffuse
+ * shadows (large radius, very low alpha); glass (backdrop-blur) survives ONLY over
+ * live map tiles. Pink is signal-only. All warm/creme tints are retired.
  *
- * Token strategy (churn-minimizing): the rev-4 names components already consume
+ * Token strategy (unchanged from u13): the rev-4 names components already consume
  * (--surface-*, --ink, --neutral-*, --border*, --pine*, --accent*, --ring) are KEPT
- * and re-valued. The rev-5 vocabulary (--paper*, --ink-display/muted/faint,
- * --hairline*, --amber, --clay, --accent-fg) is added as the primary source of
- * truth, and the legacy names alias onto it via var() so both spellings resolve to
- * one value. --pine is an INTERIM ink hold (brand pine retired in rev-5) kept alive
- * only so unreskinned components build; u14/u15 remove the pine references.
- * Every ratio in the comments is computed AA (see contrast table in the u13 report).
+ * and re-valued; the rev-5/6 vocabulary (--paper*, --ink-display/muted/faint,
+ * --hairline*, --amber, --clay, --accent-fg) is the primary source of truth, and the
+ * legacy names alias onto it via var() so both spellings resolve to one value. --pine
+ * is an INTERIM ink hold kept alive only so un-reskinned components build.
+ * Every ratio in the comments is computed AA (see the u16 report contrast tables).
  */
 
 :root {
-  /* Paper grounds (light) — cool restrained creme, not honey. */
-  --paper: #f3f1e9; /* page ground */
-  --paper-white: #fbfaf6; /* plates, cards, long-reading blocks */
-  --paper-sunken: #e9e6db; /* interstitial bands, sidenote lane, zebra */
+  /* Grounds (light) — white zen: soft white page, pure-white plates. No tint. */
+  --paper: #fafafa; /* page ground (soft white, not glaring) */
+  --paper-white: #ffffff; /* plates, cards, long-reading blocks */
+  --paper-sunken: #f1f1f1; /* recessed zones, zebra, sunken wells */
   --surface-base: var(--paper);
   --surface-elevated: var(--paper-white);
   --surface-sunken: var(--paper-sunken);
 
-  /* Ink ramp (warm near-black; never pure #000 for body). */
-  --ink: #191510; /* body (16.1:1 on paper) */
-  --ink-display: #0c0a06; /* bold-black headlines, truest black */
-  --ink-muted: #6a6355; /* captions/meta (AA: 5.26 paper / 5.70 pw / 4.76 sunken) */
-  --ink-faint: #938b7b; /* ticks/disabled — graphic/large only, sub-AA by design */
+  /* Ink ramp (pure neutral gray; display is truest black). */
+  --ink: #111111; /* body (min 16.72:1 across grounds) */
+  --ink-display: #000000; /* bold-black headlines, pure black (min 18.59:1) */
+  --ink-muted: #5c5c5c; /* captions/meta (AA: 6.41 paper / 6.69 pw / 5.92 sunken) */
+  --ink-faint: #9a9a9a; /* ticks/disabled — graphic/large only, sub-AA by design */
   --neutral-strong: var(--ink-muted);
   --neutral: var(--ink-faint);
 
-  /* Hairlines (flat paper carries structure through rules, not shadow). */
-  --hairline: #dad5c7; /* 1px rules, plate borders */
-  --hairline-strong: #b7b0a0; /* stronger dividers, active borders */
+  /* Hairlines (flat grounds carry structure through rules, not shadow). */
+  --hairline: #e4e4e4; /* 1px rules, plate borders */
+  --hairline-strong: #c6c6c6; /* stronger dividers, active borders */
   --neutral-soft: var(--hairline);
   --border: var(--hairline);
   --border-strong: var(--hairline-strong);
 
-  /* INTERIM: brand pine is retired in rev-5 (primary chrome goes ink). Held to
-     ink values so any un-reskinned pine reference reads ink-ish; removed in u14/u15. */
-  --pine: #191510;
-  --pine-strong: #0c0a06;
+  /* INTERIM: brand pine is retired (primary chrome goes ink). Held to ink values
+     so any un-reskinned pine reference reads ink; removed once refs clear. */
+  --pine: #111111;
+  --pine-strong: #000000;
 
   /* FLASH PINK — signal only (CTA fill, active state, underline, tick, LIVE dot). */
   --accent: #f0268c; /* graphic signal */
   --accent-strong: #cf1273; /* press/hover form */
-  --accent-text: #a80d5f; /* deep magenta for accent TEXT on paper (AA: 5.82–6.96) */
-  --accent-fg: #0c0a06; /* fixed dark label on pink fills — AA in BOTH themes
-                           (5.05 on light pink, 6.50 on dark pink); never re-valued. */
+  --accent-text: #c0106b; /* deep magenta for accent TEXT on white (AA: 5.27–5.95) */
+  --accent-fg: #000000; /* fixed pure-black label on pink fills — AA in BOTH themes
+                           (5.36 on light pink, 6.90 on dark pink); never re-valued. */
 
   /* Terracotta: DATA ONLY (score ramps / geometry viz). Banned from chrome. */
   --terracotta: #e07a3f;
 
-  /* Status semantics (promoted for admin/u14): pending amber + destructive clay.
-     AA text on all three light grounds (amber 5.10–5.87, clay 4.77–5.71). */
+  /* Status semantics (admin): pending amber + destructive clay. Hue semantics kept;
+     re-verified AA on the neutral grounds (amber 5.64–6.37, clay 5.28–5.96). */
   --amber: #7a5a0e;
   --clay: #b23a22;
 
   /* Focus ring = ink. */
-  --ring: #191510;
+  --ring: #111111;
 
-  /* Near-flat elevation: panel almost imperceptible; popover kept functional
-     (map app layering). Ink-tinted, never pure black. */
-  --shadow-panel: 0 1px 2px rgba(25, 21, 16, 0.06);
+  /* Zen-soft elevation: large-radius, very-low-alpha diffuse lift on flat grounds
+     (no inset emboss/deboss). Popover is a slightly stronger member of one family. */
+  --shadow-panel:
+    0 10px 40px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-popover:
-    0 2px 6px rgba(25, 21, 16, 0.10), 0 16px 36px -12px rgba(25, 21, 16, 0.20);
+    0 16px 50px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
 
   /* Radius: plates are square-ish (big radius reads SaaS). */
   --radius-chip: 2px;
   --radius-panel: 4px;
   --radius-primary: 6px;
 
-  /* Glass retires on flat paper — survives ONLY over live map tiles. Paper tints. */
-  --glass-bg: rgba(251, 250, 246, 0.80);
-  --glass-border: rgba(25, 21, 16, 0.14);
+  /* Glass — permitted ONLY over live map tiles (never on flat grounds). Neutral
+     white tint. --glass-blur is the sanctioned blur radius; wire it into the glass
+     primitive in u18 (blur is currently hardcoded in GlassPanel — see u16 report). */
+  --glass-bg: rgba(255, 255, 255, 0.66);
+  --glass-border: rgba(0, 0, 0, 0.10);
+  --glass-blur: 18px;
 }
 
 @theme inline {
@@ -131,45 +135,46 @@
   --shadow-popover: var(--shadow-popover);
 }
 
-/* Dark mode: inverted paper (letterpress negative). Warm near-black ground, creme
-   ink. Overrides base-token VALUES only; the legacy aliases above re-resolve
-   through var(), so components style through the same names as light. Auto via
-   prefers-color-scheme, as today. */
+/* Dark mode: black zen (the negative). Near-black ground, pure-white ink. Overrides
+   base-token VALUES only; the legacy aliases above re-resolve through var(), so
+   components style through the same names as light. Auto via prefers-color-scheme. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #14120c;
-    --paper-white: #1e1b14;
-    --paper-sunken: #0d0b07;
+    --paper: #0a0a0a;
+    --paper-white: #141414;
+    --paper-sunken: #050505;
 
-    --ink: #f1eee3;
-    --ink-display: #fbf9f0;
-    --ink-muted: #a69e8c; /* AA 6.46–7.39 on dark grounds */
-    --ink-faint: #6e6656; /* graphic/large only */
+    --ink: #f2f2f2; /* min 16.46:1 on dark grounds */
+    --ink-display: #ffffff; /* pure-white headlines (min 18.42:1) */
+    --ink-muted: #a3a3a3; /* AA 7.30–8.08 on dark grounds */
+    --ink-faint: #666666; /* graphic/large only */
 
-    --hairline: #33302a;
-    --hairline-strong: #4c483f;
+    --hairline: #262626;
+    --hairline-strong: #3d3d3d;
 
-    --pine: #f1eee3; /* interim creme-ink hold */
-    --pine-strong: #fbf9f0;
+    --pine: #f2f2f2; /* interim ink hold */
+    --pine-strong: #ffffff;
 
     --accent: #ff4fa3; /* flash pink pops on near-black */
     --accent-strong: #ff77b8;
-    --accent-text: #ff6fb0; /* AA 6.67–7.63 on dark grounds */
-    /* --accent-fg intentionally NOT re-valued: stays #0c0a06 (dark label on pink). */
+    --accent-text: #ff6fb0; /* AA 7.15–7.91 on dark grounds */
+    /* --accent-fg intentionally NOT re-valued: stays #000000 (black label on pink). */
 
     --terracotta: #ef8f56;
 
-    --amber: #e0a93a; /* AA 8.11–9.27 */
-    --clay: #f0876b; /* AA 6.86–7.85 */
+    --amber: #e0a93a; /* AA 8.69–9.61 */
+    --clay: #f0876b; /* AA 7.35–8.14 */
 
-    --ring: #f1eee3;
+    --ring: #f2f2f2;
 
-    --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.30);
+    /* Zen-soft geometry, black alphas deepened for the near-black ground. */
+    --shadow-panel:
+      0 10px 40px rgba(0, 0, 0, 0.40), 0 1px 2px rgba(0, 0, 0, 0.30);
     --shadow-popover:
-      0 2px 6px rgba(0, 0, 0, 0.42), 0 16px 36px -12px rgba(0, 0, 0, 0.58);
+      0 16px 50px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.40);
 
-    --glass-bg: rgba(20, 18, 12, 0.72);
-    --glass-border: rgba(241, 238, 227, 0.14);
+    --glass-bg: rgba(10, 10, 10, 0.58);
+    --glass-border: rgba(255, 255, 255, 0.12);
   }
 }
 
@@ -236,10 +241,10 @@ body {
 .maplibregl-ctrl button .maplibregl-ctrl-icon {
   filter: none;
 }
-/* Attribution as a tiny mono data-source line (rev-5: the map is FIGURE 1, its
-   source credit reads like a figure caption). */
+/* Attribution as a tiny mono data-source line (the map is FIGURE 1, its source
+   credit reads like a figure caption). Neutral zen white/near-black tints. */
 .maplibregl-ctrl-attrib {
-  background: rgba(251, 250, 246, 0.80) !important;
+  background: rgba(255, 255, 255, 0.80) !important;
   color: var(--ink-muted) !important;
   border-radius: var(--radius-chip) 0 0 0 !important;
   font-family: var(--font-mono) !important;
@@ -250,7 +255,7 @@ body {
 }
 @media (prefers-color-scheme: dark) {
   .maplibregl-ctrl-attrib {
-    background: rgba(20, 18, 12, 0.80) !important;
+    background: rgba(10, 10, 10, 0.80) !important;
   }
 }
 
