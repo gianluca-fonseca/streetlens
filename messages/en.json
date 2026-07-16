@@ -352,26 +352,23 @@
       "ogDescription": "An open field instrument for the street: accessibility, drainage, shade, and bike infrastructure, scored segment by segment. Now measuring Escazú, Costa Rica."
     },
     "hero": {
+      "wordmark": "StreetLens",
       "eyebrow": "A field instrument for the street",
       "thesis": "Every street can be measured. Most never are.",
-      "abstract": "StreetLens turns a walk down any street into a public, checkable score. Accessibility, drainage, shade, and bike infrastructure, measured segment by segment. No proprietary index. No black box. The method is on this page.",
-      "ctaExplore": "Explore the live map",
+      "abstract": "A public, checkable score for every street. Accessibility, drainage, shade, and bike infrastructure, measured segment by segment.",
+      "ctaPlatform": "Open the platform",
       "ctaMethod": "Read the method",
-      "nav": {
-        "label": "Jump to section",
-        "figure": "Figure 1",
-        "method": "Method",
-        "references": "References",
-        "map": "Open the map"
+      "stats": {
+        "segmentsLabel": "Segments audited",
+        "segmentsNote": "Escazú pilot corridor",
+        "coverageLabel": "Pilot coverage",
+        "coverageNote": "of the district street network",
+        "failLabel": "Fail Ley 7600 minimums",
+        "failNote": "Demo figure, not a real measurement."
       },
-      "figure": {
-        "label": "Figure 1",
-        "claim": "A map you can check.",
-        "support": "Segment scores across the Escazú pilot, live and interactive. Pan the corridor, then open a segment to see how it scored.",
-        "source": "Source: StreetLens over OpenStreetMap geometry. n={n} segments, Escazú. Demo scores until fieldwork begins August 2026.",
-        "affordance": "Drag to pan. Scroll to zoom. Tap a segment.",
+      "map": {
         "live": "Live map",
-        "plate": "Escazú · Costa Rica"
+        "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform."
       }
     },
     "measure": {
