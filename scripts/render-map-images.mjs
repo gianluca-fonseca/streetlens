@@ -61,24 +61,24 @@ const WIDTH_AT_100 = 2.5;
 // --- BASEMAP palette: mirrors mapConfig.ts BASEMAP ---------------------------
 const BASEMAP = {
   light: {
-    land: "#efece3",
-    landuse: "#e7e4d8",
-    park: "#dbe3cf",
-    water: "#c8d4d2",
-    road: "#f7f5ef",
-    roadMinor: "#f1eee6",
-    building: "#e6e2d6",
-    boundary: "#cfccc0",
+    land: "#f3f1e9",
+    landuse: "#eeebe1",
+    park: "#e7e7d8",
+    water: "#dbe0dd",
+    road: "#fbfaf6",
+    roadMinor: "#f6f4ec",
+    building: "#e5e1d5",
+    boundary: "#dad5c7",
   },
   dark: {
-    land: "#16160f",
-    landuse: "#1a1a12",
-    park: "#1c2417",
-    water: "#10201f",
-    road: "#22221a",
-    roadMinor: "#1c1c14",
-    building: "#1e1e15",
-    boundary: "#2c2c22",
+    land: "#14120c",
+    landuse: "#181610",
+    park: "#161810",
+    water: "#101613",
+    road: "#1e1b14",
+    roadMinor: "#181510",
+    building: "#201d15",
+    boundary: "#33302a",
   },
 };
 
@@ -275,8 +275,10 @@ function main() {
 
   console.log(`Rendering ${features.length} segments →  ${OUT_DIR}`);
 
-  // Per-lens, LIGHT field, full extent, ~4:3.
-  for (const lens of LENSES) {
+  // Per-lens, LIGHT field, full extent, ~4:3. "overall" is retired here (rev-5):
+  // the overall lens ships as atlas-wide/atlas-dark, so lens-overall.svg is
+  // orphaned art and no longer emitted.
+  for (const lens of LENSES.filter((l) => l !== "overall")) {
     emit(
       `lens-${lens}.svg`,
       renderSvg({
@@ -343,58 +345,10 @@ function main() {
     );
   }
 
-  // QA contact sheet.
-  writeContactSheet(written);
-
-  console.log(`\nDone. ${written.length} SVGs + 1 contact sheet written.`);
+  console.log(`\nDone. ${written.length} SVGs written.`);
   console.log(
     `Districts: ${districtSlugs.map((d) => `${d.district} → ${d.slug}`).join(", ")}`,
   );
-}
-
-function writeContactSheet(written) {
-  const cards = written
-    .map(
-      ({ name, bytes }) =>
-        `<figure><div class="frame"><img src="./${name}" alt="${name}" loading="lazy"/></div>` +
-        `<figcaption>${name} <span>${(bytes / 1024).toFixed(1)} KB</span></figcaption></figure>`,
-    )
-    .join("\n");
-  const html = `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>StreetLens map renders — QA contact sheet</title>
-<style>
-  :root { color-scheme: light; }
-  body { margin: 0; padding: 32px; background: #f4f1ea; color: #2a2a24;
-    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif; }
-  h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
-  p.sub { margin: 0 0 24px; color: #6b675c; }
-  .grid { display: grid; gap: 20px;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-  figure { margin: 0; }
-  .frame { border: 1px solid #d8d3c6; border-radius: 8px; overflow: hidden;
-    background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  .frame img { display: block; width: 100%; height: auto; }
-  figcaption { margin-top: 8px; font-family: ui-monospace, monospace;
-    font-size: 12px; color: #4a473f; display: flex; justify-content: space-between; }
-  figcaption span { color: #918c7e; }
-</style>
-</head>
-<body>
-  <h1>StreetLens map renders — QA contact sheet</h1>
-  <p class="sub">${written.length} generated SVGs from public/render/. Real Escazú geometry, real mapConfig ramps.</p>
-  <div class="grid">
-${cards}
-  </div>
-</body>
-</html>
-`;
-  const p = join(OUT_DIR, "_contact-sheet.html");
-  writeFileSync(p, html);
-  console.log(`  wrote _contact-sheet.html  (${statSync(p).size} bytes)`);
 }
 
 main();
