@@ -26,10 +26,10 @@ export default function StatFigure({
 }>) {
   const valueSize =
     size === "lg"
-      ? "text-[clamp(2.6rem,6vw,3.6rem)]"
+      ? "text-[clamp(2.2rem,5vw,3.05rem)]"
       : size === "sm"
-        ? "text-[1.5rem]"
-        : "text-[2.4rem]";
+        ? "text-[1.4rem]"
+        : "text-[2.15rem]";
 
   return (
     <div className={cn("flex flex-col gap-1", className)}>

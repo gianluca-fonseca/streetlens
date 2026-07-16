@@ -74,7 +74,7 @@ export default function Section({
    * stays put; only the padded content fades + rises. JS-off safe. */
   reveal?: boolean;
 }>) {
-  const pad = spacing === "lg" ? "py-[3.5rem] sm:py-16" : "py-10 sm:py-12";
+  const pad = spacing === "lg" ? "py-12 sm:py-14" : "py-9 sm:py-11";
 
   return (
     <section

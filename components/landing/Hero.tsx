@@ -111,7 +111,7 @@ function StatCard({
 }>) {
   return (
     <div
-      className="sl-card sl-hero-el min-w-[13.5rem] shrink-0 snap-start rounded-[4px] border border-hairline bg-paper-white p-4 lg:min-w-0 lg:shrink"
+      className="sl-card sl-hero-el min-w-[12.5rem] shrink-0 snap-start rounded-[4px] border border-hairline bg-paper-white p-3.5 lg:min-w-0 lg:shrink"
       style={{ animationDelay: `${delay}ms` }}
     >
       <StatFigure
@@ -153,25 +153,25 @@ export default function Hero({
               <Logo withWordmark size={22} title={t("wordmark")} />
             </div>
             <div
-              className="sl-hero-el mt-4"
+              className="sl-hero-el mt-3.5"
               style={{ animationDelay: "120ms" }}
             >
               <Eyebrow>{t("eyebrow")}</Eyebrow>
             </div>
             <h1
-              className="sl-hero-el mt-3 max-w-[16ch] font-display text-[clamp(1.85rem,3vw,2.6rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink-display text-balance dark:tracking-[-0.02em]"
+              className="sl-hero-el mt-2.5 max-w-[16ch] font-display text-[clamp(1.65rem,2.5vw,2.25rem)] font-bold leading-[1.06] tracking-[-0.025em] text-ink-display text-balance dark:tracking-[-0.02em]"
               style={{ animationDelay: "180ms" }}
             >
               {t("thesis")}
             </h1>
             <p
-              className="sl-hero-el mt-4 max-w-[34rem] font-serif text-[1.05rem] leading-[1.5] text-ink text-pretty"
+              className="sl-hero-el mt-3.5 max-w-[32rem] font-serif text-[1rem] leading-[1.5] text-ink text-pretty"
               style={{ animationDelay: "260ms" }}
             >
               {t("abstract")}
             </p>
             <div
-              className="sl-hero-el mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center"
+              className="sl-hero-el mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center"
               style={{ animationDelay: "340ms" }}
             >
               <Button
