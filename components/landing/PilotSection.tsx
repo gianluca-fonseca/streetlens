@@ -70,6 +70,9 @@ export default function PilotSection({
             />
           ))}
         </dl>
+        <p className="mt-8 font-serif text-[1.18rem] leading-[1.55] text-accent-text">
+          {t("beginning")}
+        </p>
         <p className="mt-5 text-[12.5px] leading-snug text-ink-muted">
           {t("demoNote")}
         </p>
