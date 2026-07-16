@@ -354,6 +354,7 @@
     "hero": {
       "wordmark": "StreetLens",
       "question": "¿Qué tan buenas son nuestras calles?",
+      "subtitle": "Ciudades más limpias y vivibles para todas las personas empiezan con calles que se pueden medir.",
       "pilot": "Programa piloto · Escazú, Costa Rica",
       "requestCity": "¿Quieres esto para tu ciudad? Solicítalo",
       "madeBy": "Hecho con ❤️ por <name>Gianluca Fonseca</name>",
@@ -380,6 +381,29 @@
         "affordance": "Arrastra para desplazar. Mantén ⌘ o Ctrl para hacer zoom. Toca un segmento para abrirlo en la plataforma."
       },
       "openSource": "El código es público: ver / contribuir"
+    },
+    "mission": {
+      "eyebrow": "La misión",
+      "heading": "Ciudades más limpias y vivibles, para todas las personas.",
+      "lead": "Queremos ciudades más limpias, más tranquilas y más vivibles para todas las personas que las recorren. Eso no empieza con un plan más grande. Empieza con una mirada honesta a la calle.",
+      "body": {
+        "p1": "La calidad de una calle no es solo el pavimento. Es donde se cruzan la infraestructura, la vida diaria y la comunidad, y su estado decide en silencio a quién sirve una ciudad y a quién deja atrás.",
+        "p2": "StreetLens es el instrumento para eso. El método es abierto y el mismo criterio se aplica en cualquier ciudad, así cualquier persona puede leer una calle de la misma forma y comprobar el resultado. Hoy el piloto funciona con datos de demostración sobre geometría real, y el trabajo de campo en Escazú comienza en agosto de 2026."
+      },
+      "principles": {
+        "measure": {
+          "label": "Medir lo que importa",
+          "desc": "Accesibilidad, drenaje, sombra e infraestructura ciclista, evaluadas segmento por segmento. Una ciudad que no se mide no se puede hacer justa."
+        },
+        "implement": {
+          "label": "Implementar, no solo proponer",
+          "desc": "Preferimos medir una calle real antes que publicar otro plan. Cada lectura se construye para ser concreta y accionable, y los datos crecerán hasta formar un registro público del que otras ciudades puedan aprender."
+        },
+        "together": {
+          "label": "De base y sistémico",
+          "desc": "Las personas pueden evaluar las calles que caminan cada día, mientras que los datos abiertos dan a quienes deciden una imagen compartida y verificable. Así se construyen ciudades mejores, más limpias y más vivibles para todas las personas."
+        }
+      }
     },
     "measure": {
       "eyebrow": "Qué medimos",
@@ -599,6 +623,7 @@
       "tagline": "Un instrumento de campo abierto para la calle. Ahora midiendo Escazú, Costa Rica.",
       "openSource": "Código abierto",
       "github": "GitHub",
+      "cusp": "CUSP · urbanismo sostenible",
       "madeBy": "Hecho con ❤️ por <name>Gianluca Fonseca</name>",
       "localeLabel": "Idioma",
       "openData": "Geometría de calles de OpenStreetMap, bajo ODbL 1.0. Las puntuaciones son datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",

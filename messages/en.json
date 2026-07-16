@@ -354,6 +354,7 @@
     "hero": {
       "wordmark": "StreetLens",
       "question": "How good are our streets?",
+      "subtitle": "Cleaner, more livable cities for everyone start with streets you can measure.",
       "pilot": "Pilot program · Escazú, Costa Rica",
       "requestCity": "Want this for your city? Request it",
       "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
@@ -380,6 +381,29 @@
         "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform."
       },
       "openSource": "The code is public: view / contribute"
+    },
+    "mission": {
+      "eyebrow": "The mission",
+      "heading": "Cleaner, more livable cities for all.",
+      "lead": "We want cities that are cleaner, calmer, and more livable for everyone who moves through them. That does not begin with a bigger plan. It begins with an honest look at the street.",
+      "body": {
+        "p1": "Street quality is not just pavement. It is where infrastructure, daily life, and community intersect, and its condition quietly decides who a city serves and who it leaves behind.",
+        "p2": "StreetLens is the instrument for that. The method is open and the same rubric applies in any city, so anyone can read a street the same way and check the result. Today the pilot runs on demo data over real geometry, and fieldwork in Escazú begins in August 2026."
+      },
+      "principles": {
+        "measure": {
+          "label": "Measure what matters",
+          "desc": "Accessibility, drainage, shade, and bike infrastructure, scored segment by segment. A city that goes unmeasured cannot be made fair."
+        },
+        "implement": {
+          "label": "Implement, don't just propose",
+          "desc": "We would rather measure one real street than publish another plan. Every reading is built to be concrete and actionable, and the data will grow into a public record other cities can learn from."
+        },
+        "together": {
+          "label": "Grassroots and systemic",
+          "desc": "Residents can score the streets they walk every day, while open data gives policymakers a shared, checkable picture. That is how better, cleaner, more livable cities get built for everyone."
+        }
+      }
     },
     "measure": {
       "eyebrow": "What we measure",
@@ -599,6 +623,7 @@
       "tagline": "An open field instrument for the street. Now measuring Escazú, Costa Rica.",
       "openSource": "Open source",
       "github": "GitHub",
+      "cusp": "CUSP · sustainable urbanism",
       "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
       "localeLabel": "Language",
       "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins in August 2026.",
