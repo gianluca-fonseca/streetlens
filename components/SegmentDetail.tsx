@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ImageOff, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
@@ -32,6 +33,29 @@ export default function SegmentDetail({
   const t = useTranslations("detail");
   const tl = useTranslations("layers");
   const tr = useTranslations("rubric");
+
+  // Mobile bottom-sheet drag-to-dismiss. Attached only to the drag handle (which
+  // is `md:hidden`), so the desktop popover is never draggable. A downward drag
+  // past the threshold dismisses; anything short snaps back.
+  const [dragY, setDragY] = useState(0);
+  const dragRef = useRef<{ startY: number; active: boolean }>({
+    startY: 0,
+    active: false,
+  });
+  const onDragStart = (e: React.PointerEvent) => {
+    dragRef.current = { startY: e.clientY, active: true };
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+  const onDragMove = (e: React.PointerEvent) => {
+    if (!dragRef.current.active) return;
+    setDragY(Math.max(0, e.clientY - dragRef.current.startY));
+  };
+  const onDragEnd = () => {
+    if (!dragRef.current.active) return;
+    dragRef.current.active = false;
+    if (dragY > 88) onClose();
+    setDragY(0);
+  };
 
   const scores: Record<ScoreLayer, number> = {
     overall: segment.score_overall,
@@ -67,9 +91,29 @@ export default function SegmentDetail({
     <section
       role="dialog"
       aria-label={segment.name}
-      className="pointer-events-auto flex w-[min(21rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-8rem)] flex-col overflow-hidden rounded-[12px] border border-border bg-surface-elevated shadow-[var(--shadow-popover)]"
+      style={dragY ? { transform: `translateY(${dragY}px)` } : undefined}
+      className={[
+        "pointer-events-auto flex flex-col overflow-hidden border border-border bg-surface-elevated shadow-[var(--shadow-popover)]",
+        // Mobile: full-width bottom sheet flush to the bottom edge.
+        "w-full max-h-[72dvh] rounded-t-[16px] border-b-0",
+        // Desktop (sealed): the top-right popover, exactly as before.
+        "md:w-[min(21rem,calc(100vw-1.5rem))] md:max-h-[calc(100dvh-8rem)] md:rounded-[12px] md:border-b",
+        dragY ? "" : "transition-transform",
+      ].join(" ")}
     >
-      <header className="flex items-start justify-between gap-3 border-b border-border p-4">
+      {/* Drag handle — bottom-sheet affordance, mobile only. */}
+      <div
+        onPointerDown={onDragStart}
+        onPointerMove={onDragMove}
+        onPointerUp={onDragEnd}
+        onPointerCancel={onDragEnd}
+        className="flex shrink-0 cursor-grab touch-none justify-center py-2.5 active:cursor-grabbing md:hidden"
+        aria-hidden="true"
+      >
+        <span className="h-1 w-10 rounded-full bg-border-strong" />
+      </div>
+
+      <header className="flex items-start justify-between gap-3 border-b border-border px-4 pb-4 pt-0 md:pt-4">
         <div className="min-w-0">
           <h2 className="font-display text-[1.05rem] font-semibold leading-tight text-ink">
             {segment.name}
@@ -102,7 +146,7 @@ export default function SegmentDetail({
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-4">
         {isCommunity ? (
           <div className="mb-4 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken p-3">
             <p className="text-[12px] leading-snug text-neutral-strong">
@@ -222,7 +266,7 @@ export default function SegmentDetail({
       </div>
 
       {!isCommunity ? (
-        <footer className="border-t border-border bg-surface-sunken px-4 py-2.5">
+        <footer className="border-t border-border bg-surface-sunken px-4 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] md:pb-2.5">
           <p className="text-[11px] leading-snug text-neutral-strong">
             {t("demoNote")}
           </p>

@@ -653,7 +653,8 @@ export default function AuditMap({
         className="h-full w-full"
       />
 
-      <div className="pointer-events-none absolute inset-0 flex items-start justify-between gap-3 p-3 sm:p-4">
+      {/* Top-left control cluster (thumb-reachable, stacked). */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start gap-3 p-3 sm:p-4">
         <div className="pointer-events-none flex flex-col items-start gap-3">
           {stats ? (
             <MapPanel
@@ -664,16 +665,29 @@ export default function AuditMap({
           ) : null}
           <ThreeDToggle active={threeD} onToggle={handleToggleThreeD} />
         </div>
-        {selected ? (
-          <div className="pointer-events-none">
+      </div>
+
+      {/* Segment detail: a bottom sheet on phones (map stays visible above,
+          tap the scrim or drag the handle to dismiss), the sealed top-right
+          popover on desktop. */}
+      {selected ? (
+        <>
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-hidden="true"
+            tabIndex={-1}
+            className="absolute inset-0 z-20 bg-[rgba(23,29,26,0.18)] md:hidden"
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center md:inset-x-auto md:bottom-auto md:right-4 md:top-4 md:block">
             <SegmentDetail
               segment={selected}
               activeLayer={activeLayer}
               onClose={handleClose}
             />
           </div>
-        ) : null}
-      </div>
+        </>
+      ) : null}
 
       <ContributeUI contribute={contribute} />
     </div>
@@ -695,15 +709,27 @@ export default function AuditMap({
     selectedIdRef.current = props.id;
     map.setFeatureState({ source: SOURCE_ID, id: props.id }, { selected: true });
 
-    // Smooth fly-to: fit the segment with padding for the floating panels.
+    // Smooth fly-to: fit the segment clear of the chrome. On phones the detail is
+    // a bottom sheet, so we frame the segment into the upper map band (big bottom
+    // pad, slim sides); on desktop we clear the left panel and right popover.
     if (geometry.type === "LineString") {
       const coords = geometry.coordinates as [number, number][];
       const bounds = coords.reduce(
         (b, c) => b.extend(c),
         new maplibregl.LngLatBounds(coords[0], coords[0]),
       );
+      const isPhone =
+        typeof window !== "undefined" && window.innerWidth < 768;
+      const padding = isPhone
+        ? {
+            top: 96,
+            bottom: Math.round(window.innerHeight * 0.5),
+            left: 36,
+            right: 36,
+          }
+        : { top: 90, bottom: 60, left: 360, right: 380 };
       map.fitBounds(bounds, {
-        padding: { top: 90, bottom: 60, left: 360, right: 380 },
+        padding,
         maxZoom: 16.5,
         duration: 1100,
         essential: true,
