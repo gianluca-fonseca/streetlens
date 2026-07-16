@@ -353,6 +353,7 @@
     },
     "hero": {
       "wordmark": "StreetLens",
+      "byCusp": "por CUSP",
       "question": "¿Qué tan buenas son nuestras calles?",
       "subtitle": "Ciudades más limpias y vivibles para todas las personas empiezan con calles que se pueden medir.",
       "pilot": "Programa piloto · Escazú, Costa Rica",
@@ -623,7 +624,7 @@
       "tagline": "Un instrumento de campo abierto para la calle. Ahora midiendo Escazú, Costa Rica.",
       "openSource": "Código abierto",
       "github": "GitHub",
-      "cusp": "CUSP · urbanismo sostenible",
+      "byCusp": "por CUSP",
       "madeBy": "Hecho con ❤️ por <name>Gianluca Fonseca</name>",
       "localeLabel": "Idioma",
       "openData": "Geometría de calles de OpenStreetMap, bajo ODbL 1.0. Las puntuaciones son datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",

@@ -9,3 +9,7 @@ export const CITY_REQUEST_URL =
 
 // Author profile for the "Made with ❤️ by" attribution pill.
 export const AUTHOR_LINKEDIN = "https://www.linkedin.com/in/gianluca-fonseca/";
+
+// CUSP: the founder's sustainable-urbanism initiative. Wired to the hero and
+// footer "by CUSP" bylines. External; the site attributes the mission, no more.
+export const CUSP_URL = "https://www.joincusp.in/";

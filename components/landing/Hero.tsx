@@ -11,7 +11,7 @@ import AuditMap from "@/components/AuditMap";
 import Logo from "@/components/ui/Logo";
 import StatFigure from "@/components/ui/StatFigure";
 import { cn } from "@/components/ui/cn";
-import { AUTHOR_LINKEDIN, CITY_REQUEST_URL, GITHUB_URL } from "@/lib/links";
+import { AUTHOR_LINKEDIN, CITY_REQUEST_URL, CUSP_URL, GITHUB_URL } from "@/lib/links";
 
 /**
  * The platform hero (rev 6, u21 — the mcbroken restructure). A slim top banner
@@ -353,10 +353,24 @@ export default function Hero({
                attribution pills ──────────────────────────────────────── */}
           <div className="lg:col-start-1 lg:row-start-1">
             <div
-              className="sl-hero-el text-ink-display"
+              className="sl-hero-el flex flex-col items-start text-ink-display"
               style={{ animationDelay: "120ms" }}
             >
               <Logo withWordmark size={20} title={t("wordmark")} />
+              {/* Founder byline: the wordmark sits over a quiet "by CUSP" credit,
+                  indented to the wordmark's left edge (mark 20 + gap 6.4). Pink
+                  underline is the sanctioned link signal, on hover only. */}
+              <a
+                href={CUSP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-0.5 inline-flex items-center font-mono text-[11px] font-medium text-ink-muted underline-offset-[3px] transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                style={{ marginLeft: "26.4px" }}
+              >
+                <span className="group-hover:underline group-hover:decoration-accent group-hover:decoration-2">
+                  {t("byCusp")}
+                </span>
+              </a>
             </div>
             <p
               className="sl-hero-el mt-4 inline-flex items-center rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted"
@@ -370,6 +384,12 @@ export default function Hero({
             >
               {t("question")}
             </h1>
+            <p
+              className="sl-hero-el mt-2 max-w-[38ch] text-[12.5px] leading-[1.45] text-ink-muted text-pretty"
+              style={{ animationDelay: "220ms" }}
+            >
+              {t("subtitle")}
+            </p>
             <a
               href={CITY_REQUEST_URL}
               target="_blank"

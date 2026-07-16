@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/components/ui/cn";
 import Logo from "@/components/ui/Logo";
-import { AUTHOR_LINKEDIN, GITHUB_URL } from "@/lib/links";
+import { AUTHOR_LINKEDIN, CUSP_URL, GITHUB_URL } from "@/lib/links";
 
 /**
  * A centered colophon on the sunken surface: the wordmark, the tagline, a
@@ -47,8 +47,21 @@ export default function Footer() {
   return (
     <footer className="border-t border-hairline bg-surface-sunken">
       <div className="mx-auto max-w-[42.5rem] px-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))] py-14 text-center">
-        <div className="flex justify-center text-ink-display">
+        <div className="flex flex-col items-center text-ink-display">
           <Logo withWordmark size={23} title="StreetLens" />
+          {/* The wordmark sits over a quiet "by CUSP" credit (parity with the
+              hero lockup). This folds the CUSP attribution in, so the colophon
+              never names CUSP twice. Pink underline is the on-hover link signal. */}
+          <a
+            href={CUSP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group mt-1 inline-flex min-h-[24px] pointer-coarse:min-h-[44px] items-center font-mono text-[11px] font-medium normal-case tracking-normal text-ink-muted underline-offset-[3px] transition-colors hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          >
+            <span className="group-hover:underline group-hover:decoration-accent group-hover:decoration-2">
+              {t("byCusp")}
+            </span>
+          </a>
         </div>
         <p className="mx-auto mt-3 max-w-[34rem] font-serif text-[1rem] leading-[1.5] text-ink-muted">
           {t("tagline")}
