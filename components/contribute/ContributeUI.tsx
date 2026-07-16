@@ -38,8 +38,10 @@ type HighwayKey = (typeof HIGHWAY_KEYS)[number];
 
 const PANEL =
   "pointer-events-auto w-[min(22rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[12px] border border-border bg-surface-elevated shadow-[var(--shadow-popover)]";
+// 16px on phones keeps iOS from auto-zooming the viewport on field focus; the
+// sealed 13px control returns at sm+.
 const INPUT =
-  "w-full rounded-[4px] border border-border bg-surface-elevated px-2.5 py-2 text-[13px] text-ink placeholder:text-neutral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine";
+  "w-full rounded-[4px] border border-border bg-surface-elevated px-2.5 py-2 text-[16px] text-ink placeholder:text-neutral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine sm:text-[13px]";
 const LABEL = "mb-1 block text-[12px] font-medium text-ink";
 // Fixed dark pine so white text clears AA in BOTH themes (the token flips lighter in dark mode).
 const PRIMARY_BTN =
@@ -870,9 +872,11 @@ export default function ContributeUI({
   // FAB / menu / toolbar / confirmation stay bottom-left (a free, quiet corner
   // that never covers MapLibre's bottom-right attribution).
   const rightDock = mode === "add" || mode === "update";
+  // On phones the dock is bottom-anchored; pad it off the home bar. At sm+ it
+  // returns to the sealed corner docking (no safe-area padding needed).
   const dockClass = rightDock
-    ? "inset-x-0 bottom-0 justify-center p-3 sm:inset-x-auto sm:right-4 sm:top-[4.75rem] sm:bottom-4 sm:items-start sm:justify-end sm:p-0"
-    : "inset-x-0 bottom-0 justify-center p-3 sm:inset-x-auto sm:left-4 sm:bottom-4 sm:justify-start sm:p-0";
+    ? "inset-x-0 bottom-0 justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-4 sm:top-[4.75rem] sm:bottom-4 sm:items-start sm:justify-end sm:p-0"
+    : "inset-x-0 bottom-0 justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:inset-x-auto sm:left-4 sm:bottom-4 sm:justify-start sm:p-0";
 
   return (
     <>
