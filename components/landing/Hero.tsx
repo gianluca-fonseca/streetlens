@@ -2,11 +2,32 @@
 
 import { useTranslations } from "next-intl";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
+import { Link } from "@/i18n/navigation";
 import AuditMap from "@/components/AuditMap";
 import Button from "@/components/ui/Button";
 import Eyebrow from "@/components/ui/Eyebrow";
 import Measure from "@/components/ui/Measure";
 import Figure from "@/components/ui/Figure";
+
+/**
+ * Masthead jump-nav. A quiet strip of hairline chips under the abstract: three
+ * in-page anchors (Figure 1, Method, References) and one route into the app.
+ * Mono caps labels with a small leading glyph; paper-white ground; 44px targets
+ * that wrap on phone. No external links, no pink — pink stays signal-only.
+ */
+const NAV_CHIPS = [
+  { key: "figure", glyph: "↓", href: "#figure-1" },
+  { key: "method", glyph: "§", href: "#method" },
+  { key: "references", glyph: "§", href: "#grounding" },
+  { key: "map", glyph: "→", href: "/map" },
+] as const;
+
+const CHIP_CLASS =
+  "inline-flex min-h-[44px] items-center gap-2 rounded-[2px] border border-hairline " +
+  "bg-paper-white px-3.5 font-mono text-[12px] font-medium uppercase tracking-[0.06em] " +
+  "text-ink-muted transition-colors hover:border-hairline-strong hover:text-ink " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring " +
+  "focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 /**
  * The masthead: a centered academic-paper opening. A mono eyebrow, the bold-black
@@ -52,6 +73,34 @@ export default function Hero({
             {t("ctaMethod")}
           </a>
         </div>
+
+        <nav
+          aria-label={t("nav.label")}
+          className="mt-8 flex flex-wrap items-center justify-center gap-2.5"
+        >
+          {NAV_CHIPS.map((chip) => {
+            const inner = (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="text-[13px] leading-none text-ink-faint"
+                >
+                  {chip.glyph}
+                </span>
+                {t(`nav.${chip.key}`)}
+              </>
+            );
+            return chip.href.startsWith("#") ? (
+              <a key={chip.key} href={chip.href} className={CHIP_CLASS}>
+                {inner}
+              </a>
+            ) : (
+              <Link key={chip.key} href={chip.href} className={CHIP_CLASS}>
+                {inner}
+              </Link>
+            );
+          })}
+        </nav>
       </Measure>
 
       <Measure width="screen" className="mt-14 sm:mt-20">
@@ -64,6 +113,7 @@ export default function Hero({
             source={t("figure.source", { n: stats.segments })}
             affordance={t("figure.affordance")}
             live={{ label: t("figure.live") }}
+            cornerTab={t("figure.plate")}
             aspectClassName="aspect-[3/4] sm:aspect-[3/2] lg:aspect-[16/10]"
           >
             <AuditMap variant="hero" segments={segments} flyOnLoad />
