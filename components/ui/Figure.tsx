@@ -20,6 +20,7 @@ export default function Figure({
   source,
   affordance,
   live,
+  cornerTab,
   aspectClassName = "aspect-[4/5] sm:aspect-[3/2] lg:aspect-[16/10]",
   plateClassName,
   className,
@@ -33,6 +34,8 @@ export default function Figure({
   source?: ReactNode;
   affordance?: ReactNode;
   live?: { label: ReactNode };
+  /** Optional journal plate-stamp, pinned to the plate's top-left corner. */
+  cornerTab?: ReactNode;
   aspectClassName?: string;
   plateClassName?: string;
   className?: string;
@@ -50,6 +53,11 @@ export default function Figure({
           )}
         >
           {children}
+          {cornerTab ? (
+            <span className="pointer-events-none absolute left-0 top-0 z-10 inline-flex items-center rounded-br-[2px] border-b border-r border-hairline bg-paper px-2.5 py-1.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.1em] text-ink-muted">
+              {cornerTab}
+            </span>
+          ) : null}
         </div>
       </div>
 
