@@ -1,0 +1,235 @@
+/*
+ * zen.module.css — rev-6 "Zen Instrument" glass + elevation + motion recipes (u18).
+ *
+ * These are LITERAL values transcribed from the research-zen craft dossier
+ * (Recipe A/C glass §1, zen-soft T1/T2/T3 shadows §2, motion §3). They live here,
+ * not in app/globals.css, because globals.css is owned by u17 this sesh; when u17's
+ * token vars land these classes should collapse onto tokens (see u18 report,
+ * token-swap follow-up). Theming mirrors globals.css: values flip in
+ * `@media (prefers-color-scheme: dark)`, so consumers style through one class name.
+ *
+ * Discipline (dossier §6): glass ONLY over live map tiles, never stacked, never
+ * pink-tinted; flat grounds get hairline + zen-soft shadow, never glass. Every
+ * glass surface carries saturate() (never bare blur). Motion is restrained and
+ * fully guarded by prefers-reduced-motion.
+ */
+
+/* ─── Glass Recipe A — panels over tiles (MapPanel, SegmentDetail desktop) ─── */
+.glassPanel {
+  background: rgba(255, 255, 255, 0.72);
+  /* --glass-blur (18px, globals) honors u16 adjudication A1; sits in the dossier's
+     16–24px panel sweet spot. saturate() is the piece the bare token lacked. */
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(150%);
+  backdrop-filter: blur(var(--glass-blur, 18px)) saturate(150%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Glass Recipe C — small floating chips/pills (3D toggle, collapsed legend) ─
+   A pill can sit wholly over a bright OR dark spot, so alpha is pushed up and blur
+   pulled DOWN to 14px (18–24px on a 28px pill reads muddy). */
+.glassChip {
+  background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+/* Text scrim — a second, higher-alpha, NON-blurred layer directly behind a dense
+   text block inside a glass panel. Belt-and-suspenders for body/list/table text
+   over the (grayscale-zen) tiles; effective local white ≈ 0.87 → holds ~4.5:1. */
+.glassScrim {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glassPanel {
+    background: rgba(12, 12, 12, 0.64);
+    -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(140%) brightness(1.08);
+    backdrop-filter: blur(var(--glass-blur, 18px)) saturate(140%) brightness(1.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+      0 10px 30px rgba(0, 0, 0, 0.55),
+      0 2px 8px rgba(0, 0, 0, 0.40);
+  }
+  .glassChip {
+    background: rgba(14, 14, 14, 0.70);
+    -webkit-backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
+    backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      0 2px 10px rgba(0, 0, 0, 0.5);
+  }
+  .glassScrim {
+    background: rgba(10, 10, 10, 0.55);
+  }
+}
+
+/* Blur unsupported → fall back to a near-solid surface (never leave the translucent
+   alpha, text on raw tiles would fail). Applies to both themes. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .glassPanel,
+  .glassChip {
+    background: rgba(255, 255, 255, 0.92);
+  }
+  @media (prefers-color-scheme: dark) {
+    .glassPanel,
+    .glassChip {
+      background: rgba(10, 10, 10, 0.90);
+    }
+  }
+}
+
+/* Increase-Contrast → near-opaque surface + full-strength outline (Apple/Linear
+   both fall back to solid outlines under Increase Contrast). */
+@media (prefers-contrast: more) {
+  .glassPanel,
+  .glassChip {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(0, 0, 0, 0.55);
+  }
+  .glassScrim {
+    background: rgba(255, 255, 255, 0.85);
+  }
+  @media (prefers-color-scheme: dark) {
+    .glassPanel,
+    .glassChip {
+      background: rgba(10, 10, 10, 0.94);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    .glassScrim {
+      background: rgba(10, 10, 10, 0.82);
+    }
+  }
+}
+
+/* ─── Zen-soft elevation — cards on FLAT grounds (admin, contribute) ───────────
+   One top-down light, zero horizontal offset, hairline carries the sides, per-layer
+   alpha ≤ 0.08. Dark elevation = surface + border + inset top highlight, NOT a
+   bigger black shadow. `.plate` sets box-shadow only, so it composes with the
+   existing Tailwind bg/border/radius utilities on the same element. */
+.plate {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 2px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.popover {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 6px 12px -3px rgba(0, 0, 0, 0.05),
+    0 16px 32px -6px rgba(0, 0, 0, 0.07),
+    0 28px 48px -10px rgba(0, 0, 0, 0.08);
+}
+
+/* Interactive card: hover = exactly one tier (T1 → T2) + a small lift. In dark the
+   surface tints up alongside the shadow (Notion dual-channel tint+lift) — that
+   surface step is what sells hover on black. Dense grids use -2px. */
+.plateInteractive {
+  transition:
+    box-shadow 180ms cubic-bezier(0.2, 0, 0, 1),
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.plateInteractive:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 8px -2px rgba(0, 0, 0, 0.05),
+    0 12px 24px -4px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .plate {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  .popover {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.50),
+      0 12px 32px -8px rgba(0, 0, 0, 0.60),
+      0 24px 48px -12px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  .plateInteractive:hover {
+    /* +8/255 surface step from the #141414 rest plate → tiers separate on black. */
+    background-color: #1c1c1c;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.40),
+      0 8px 24px -6px rgba(0, 0, 0, 0.50),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* ─── Motion (dossier §3) — one settle, one hover, one press. No loops. ──────── */
+@keyframes zenEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes zenEnterChip {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes zenFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Panel settle (≤ 8px travel, decelerated, one-shot). */
+.enter {
+  animation: zenEnter 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.enterChip {
+  animation: zenEnterChip 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Pressed feedback — restrained scale, GPU-only. */
+.pressable {
+  transition: transform 100ms cubic-bezier(0.2, 0, 0, 1);
+}
+.pressable:active {
+  transform: scale(0.985);
+}
+
+/* Reduced motion: keep opacity arrival (vestibular-safe), drop translate/scale. */
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .enterChip {
+    animation: zenFade 160ms both;
+  }
+  .plateInteractive:hover {
+    transform: none;
+  }
+  .pressable {
+    transition: none;
+  }
+  .pressable:active {
+    transform: none;
+  }
+}

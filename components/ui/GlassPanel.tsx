@@ -1,37 +1,45 @@
 import type { ReactNode } from "react";
 import { cn } from "@/components/ui/cn";
+import styles from "@/components/ui/zen.module.css";
 
 /**
- * Earned glass (design-direction rev 3): a floating surface for IMAGERY-BACKED
- * contexts only — over the live map, over a rendered map render, or over the
- * dark field renders. Backdrop-blur with a warm bone tint (`--glass-bg`) and a
- * warm hairline (`--glass-border`), both theme-adaptive so one primitive reads
- * over light and warm-dark imagery alike. Never place this on a flat surface,
- * and never stack it glass-on-glass — that is the banned glassmorphism. Text
- * inside stays AA: the tint sits at ~0.62–0.72 opacity so ink holds contrast.
+ * Earned glass (design-direction rev 6, "Zen Instrument"): a floating surface for
+ * IMAGERY-BACKED contexts ONLY — over the live map tiles. Recipe A (`variant="panel"`)
+ * for panels/popovers, Recipe C (`variant="chip"`) for small floating pills. Both
+ * carry `saturate()` (never bare blur), an inner-top edge highlight + outer lift
+ * shadow, and are theme-adaptive so one primitive reads over light and dark tiles.
+ * The blur radius is wired to the `--glass-blur` token (u16 adjudication A1).
+ *
+ * NEVER place this on a flat ground (use a zen-soft `.plate` there), and NEVER stack
+ * it glass-on-glass — a chip inside a glass panel goes solid. The full recipe lives
+ * in `zen.module.css`; components may apply those classes directly where wrapping
+ * would restructure layout.
  */
 export default function GlassPanel({
   children,
   className,
+  variant = "panel",
   radius = "panel",
-  elevation = "popover",
+  animateIn = false,
   as: Tag = "div",
 }: Readonly<{
   children: ReactNode;
   className?: string;
-  radius?: "panel" | "primary";
-  elevation?: "panel" | "popover";
+  variant?: "panel" | "chip";
+  radius?: "panel" | "primary" | "pill";
+  animateIn?: boolean;
   as?: "div" | "section" | "article" | "aside" | "figcaption";
 }>) {
   return (
     <Tag
       className={cn(
-        "border bg-[var(--glass-bg)] backdrop-blur-md",
-        "border-[color:var(--glass-border)]",
-        radius === "primary" ? "rounded-[12px]" : "rounded-[8px]",
-        elevation === "popover"
-          ? "shadow-[var(--shadow-popover)]"
-          : "shadow-[var(--shadow-panel)]",
+        variant === "chip" ? styles.glassChip : styles.glassPanel,
+        animateIn && (variant === "chip" ? styles.enterChip : styles.enter),
+        radius === "pill"
+          ? "rounded-full"
+          : radius === "primary"
+            ? "rounded-[12px]"
+            : "rounded-[8px]",
         className,
       )}
     >
