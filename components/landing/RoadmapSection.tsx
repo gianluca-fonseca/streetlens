@@ -2,14 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import Section from "@/components/ui/Section";
-import Eyebrow from "@/components/ui/Eyebrow";
-import Reveal from "@/components/ui/Reveal";
+import Measure from "@/components/ui/Measure";
+import SectionHeader from "@/components/ui/SectionHeader";
 
 /**
- * "Where this goes": an honest scale path from one corridor to an open standard.
- * A vertical ordered list on a hairline rail, each row carrying a mono step
- * index, a real status chip (Now vs Planned), the stage title, and what it
- * means. This reads as a roadmap, not a numbered marketing sequence.
+ * Section 06 — the scale path. Stacked numbered entries on a hairline stack (no
+ * left rail, which is intrinsically left-anchored): each row carries a mono step
+ * index, a real status chip (Now in pink, Planned muted), the stage title, and
+ * what it means. A roadmap, not a marketing 1-2-3.
  */
 const ROADMAP_STEPS = ["pilot", "canton", "compare", "api"] as const;
 
@@ -17,62 +17,48 @@ export default function RoadmapSection() {
   const t = useTranslations("landing.roadmap");
 
   return (
-    <Section id="roadmap" tone="bone">
-      <Reveal className="max-w-3xl">
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <h2 className="mt-3 font-display text-[clamp(1.85rem,3.9vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink">
-          {t("heading")}
-        </h2>
-        <p className="mt-4 max-w-2xl text-[1.05rem] leading-relaxed text-neutral-strong">
-          {t("lead")}
-        </p>
-      </Reveal>
+    <Section id="roadmap" tone="sunken" rule>
+      <Measure width="outset">
+        <SectionHeader
+          index="06"
+          eyebrow={t("eyebrow")}
+          title={t("heading")}
+          lead={t("lead")}
+        />
+      </Measure>
 
-      <ol className="mt-12 border-l border-border">
-        {ROADMAP_STEPS.map((key, i) => {
-          const isNow = i === 0;
-          return (
-            <Reveal
-              key={key}
-              as="li"
-              delay={i * 80}
-              className="relative pb-9 pl-8 last:pb-0"
-            >
-              {/* Rail node aligned to the ordered-list left border. */}
-              <span
-                aria-hidden="true"
-                className={
-                  "absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border " +
-                  (isNow
-                    ? "border-accent-strong bg-accent"
-                    : "border-border-strong bg-surface")
-                }
-              />
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="font-mono text-[12px] font-medium text-neutral-strong">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span
-                  className={
-                    "rounded-[4px] border px-2 py-0.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] " +
-                    (isNow
-                      ? "border-accent-text text-accent-text"
-                      : "border-border text-pine")
-                  }
-                >
-                  {t(`steps.${key}.status`)}
-                </span>
-              </div>
-              <h3 className="mt-2 font-display text-[1.25rem] font-semibold leading-tight text-ink">
-                {t(`steps.${key}.title`)}
-              </h3>
-              <p className="mt-1.5 max-w-xl text-[0.98rem] leading-relaxed text-neutral-strong">
-                {t(`steps.${key}.desc`)}
-              </p>
-            </Reveal>
-          );
-        })}
-      </ol>
+      <Measure width="text" className="mt-12">
+        <ol className="border-t border-hairline">
+          {ROADMAP_STEPS.map((key, i) => {
+            const isNow = i === 0;
+            return (
+              <li key={key} className="border-b border-hairline py-6">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-[12px] font-medium tabular-nums text-ink-muted">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    className={
+                      "rounded-[2px] border px-2 py-0.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] " +
+                      (isNow
+                        ? "border-accent-text text-accent-text"
+                        : "border-hairline-strong text-ink-muted")
+                    }
+                  >
+                    {t(`steps.${key}.status`)}
+                  </span>
+                </div>
+                <h3 className="mt-2.5 font-display text-[1.25rem] font-semibold leading-tight tracking-[-0.01em] text-ink-display">
+                  {t(`steps.${key}.title`)}
+                </h3>
+                <p className="mt-1.5 font-serif text-[1.02rem] leading-[1.55] text-ink-muted">
+                  {t(`steps.${key}.desc`)}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+      </Measure>
     </Section>
   );
 }

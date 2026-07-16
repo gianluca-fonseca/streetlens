@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "StreetLens",
-    "description": "Auditorías abiertas de calles para Costa Rica. Mapeamos la calidad, accesibilidad, drenaje y sombra de las aceras de Escazú, segmento por segmento."
+    "description": "Un instrumento de campo para la calle. Auditorías abiertas y portátiles de accesibilidad, drenaje, sombra e infraestructura ciclista en las aceras. Ahora midiendo Escazú, Costa Rica."
   },
   "demoBanner": {
     "message": "Datos de demostración sobre geometría vial real. El piloto de campo inicia en agosto de 2026: ninguna cifra mostrada es una medición real."
@@ -343,142 +343,155 @@
   },
   "landing": {
     "meta": {
-      "title": "StreetLens: cada calle, medida de forma abierta",
-      "description": "Una plataforma abierta para medir la calidad de las calles: auditorías portables de accesibilidad, drenaje, sombra e infraestructura ciclista que cualquier ciudad puede realizar. Ahora auditando Escazú, Costa Rica, con datos de demostración hasta que inicie la recolección en campo en agosto de 2026.",
-      "ogTitle": "Cada calle, medida de forma abierta",
-      "ogDescription": "Un instrumento abierto y portable para datos sobre la calidad de las calles: accesibilidad, drenaje, sombra e infraestructura ciclista. Ahora en piloto en Escazú, Costa Rica."
+      "title": "StreetLens: toda calle puede medirse",
+      "description": "Toda calle puede medirse. Casi ninguna se mide. StreetLens es un instrumento de campo abierto que puntúa la accesibilidad, el drenaje, la sombra y la infraestructura ciclista de las aceras, segmento a segmento. Ahora mide Escazú, Costa Rica, con datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
+      "ogTitle": "Toda calle puede medirse. Casi ninguna se mide.",
+      "ogDescription": "Un instrumento de campo abierto para la calle: accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento. Ahora en Escazú, Costa Rica."
     },
     "hero": {
-      "eyebrow": "Plataforma abierta de calidad vial",
-      "headline": "Cada calle, medida de forma abierta.",
-      "support": "StreetLens es un instrumento portable para la calidad de las calles: auditorías abiertas de accesibilidad, drenaje, sombra e infraestructura ciclista que cualquier ciudad puede realizar. Empezamos por Escazú, Costa Rica.",
+      "eyebrow": "Un instrumento de campo para la calle",
+      "thesis": "Toda calle puede medirse. Casi ninguna se mide.",
+      "abstract": "StreetLens convierte un recorrido por cualquier calle en una puntuación pública y verificable. Accesibilidad, drenaje, sombra e infraestructura ciclista, medidas segmento a segmento. Sin índice propietario. Sin caja negra. El método está en esta página.",
       "ctaExplore": "Explorar el mapa en vivo",
-      "ctaMethod": "Cómo funciona",
-      "snapshotLabel": "Piloto en vivo: Escazú, Costa Rica",
-      "statSegments": "Segmentos auditados",
-      "statKm": "Km del corredor",
-      "statCoverage": "Cobertura",
-      "heroStat": "{pct}% de los segmentos auditados no cumple los mínimos de accesibilidad de la Ley 7600",
-      "heroStatDemo": "Cifra de demostración sobre geometría real. No es una medición real.",
-      "statsNote": "Geometría real de las calles de OpenStreetMap. Las calificaciones son datos de demostración hasta que inicie el trabajo de campo en agosto de 2026.",
-      "heroStatShort": "de los segmentos auditados no cumple los mínimos de accesibilidad de la Ley 7600"
+      "ctaMethod": "Leer el método",
+      "figure": {
+        "label": "Figura 1",
+        "claim": "Un mapa que puedes comprobar.",
+        "support": "Puntuaciones por segmento en el piloto de Escazú, en vivo e interactivas. Recorre el corredor y abre un segmento para ver cómo se puntuó.",
+        "source": "Fuente: StreetLens sobre geometría de OpenStreetMap. n={n} segmentos, Escazú. Datos de demostración hasta el trabajo de campo en agosto de 2026.",
+        "affordance": "Arrastra para desplazar. Desplaza para acercar. Toca un segmento.",
+        "live": "Mapa en vivo"
+      }
     },
     "measure": {
       "eyebrow": "Qué medimos",
-      "heading": "Cuatro miradas sobre cualquier calle.",
-      "lead": "Cada segmento se califica con cuatro rubros independientes, de la misma forma en cualquier ciudad. Cada rampa de color es segura para el daltonismo y se acompaña de un canal de grosor de línea, y cada leyenda muestra sus rangos de valores.",
+      "heading": "Cuatro lentes sobre cada calle.",
+      "lead": "Cada segmento se puntúa con cuatro rúbricas independientes, igual en cualquier ciudad. Cada rampa de color es segura para el daltonismo y va con un canal de grosor de línea, y cada leyenda muestra sus rangos.",
+      "plateAlt": "Puntuaciones de {name} en la red de calles del piloto",
       "items": {
         "accessibility": {
+          "fig": "Figura 2a",
           "name": "Accesibilidad",
-          "desc": "Rampas de acera, pavimento táctil y cruces seguros. Si de verdad todas las personas pueden usar la acera.",
-          "low": "Incumple los mínimos",
-          "high": "Totalmente accesible"
+          "desc": "Rampas, pavimento táctil y cruces seguros. Si todas las personas pueden usar la acera.",
+          "low": "No cumple",
+          "high": "Accesible"
         },
         "drainage": {
+          "fig": "Figura 2b",
           "name": "Drenaje",
-          "desc": "Rejillas, pendiente transversal e historial de encharcamiento, de propenso a inundarse a bien drenado.",
+          "desc": "Rejillas, pendiente transversal e historial de encharcamiento. De inundable a bien drenada.",
           "low": "Se inunda",
           "high": "Drena bien"
         },
         "shade": {
+          "fig": "Figura 2c",
           "name": "Sombra",
-          "desc": "Copa arbórea y cobertura, de pavimento expuesto a sombra plena.",
-          "low": "Expuesto",
-          "high": "Sombra plena"
+          "desc": "Copa arbórea y cobertura. De pavimento expuesto a copa completa.",
+          "low": "Expuesta",
+          "high": "Copa completa"
         },
         "bike": {
+          "fig": "Figura 2d",
           "name": "Bici",
-          "desc": "Ciclovías y separación del tráfico, de ninguna a protegida.",
+          "desc": "Ciclovías y separación del tráfico. De ninguna a protegida.",
           "low": "Ninguna",
           "high": "Protegida"
         }
       }
     },
     "gap": {
-      "eyebrow": "Por qué no existen estos datos",
-      "heading": "La mayoría de las ciudades no puede decir cuáles aceras incumplen, ni dónde.",
-      "lead": "La accesibilidad, el drenaje y la sombra casi nunca se miden al nivel de un solo segmento, por lo que no se pueden presupuestar, reparar ni exigir cuentas. Costa Rica muestra lo que está en juego.",
+      "eyebrow": "Por qué importa",
+      "heading": "La rendición de cuentas empieza con un número.",
+      "lead": "No se puede presupuestar, arreglar ni responder por lo que nunca se midió. Casi ninguna ciudad puede decir qué aceras fallan, ni dónde.",
+      "body": "La accesibilidad, el drenaje y la sombra casi nunca se miden segmento a segmento, así que nunca entran en un presupuesto ni en una orden de trabajo.<ley>La Ley 7600, la ley de igualdad de oportunidades de Costa Rica, exige aceras accesibles desde 1996. Tres décadas después, ninguna municipalidad publica un mapa de cumplimiento.</ley> El costo de no saber no es abstracto. Se cuenta en personas.<cosevi>El COSEVI, el consejo nacional de seguridad vial, publica cada año las cifras de siniestralidad de Costa Rica.</cosevi>",
       "stat1Value": "1.601",
-      "stat1Label": "personas atropelladas en Costa Rica en 2024",
+      "stat1Label": "peatones atropellados en Costa Rica en 2024",
       "stat1Note": "Datos de seguridad vial del COSEVI.",
       "stat2Value": "30",
-      "stat2Label": "años de la Ley 7600, aún sin un mapa municipal de cumplimiento",
-      "stat2Note": "La Ley 7600 entró en vigencia en 1996.",
-      "stat3Label": "de los segmentos auditados no cumple el mínimo de accesibilidad",
-      "stat3Note": "Cifra de demostración sobre geometría real. No es una medición real."
+      "stat2Label": "años de Ley 7600, aún sin un mapa municipal de cumplimiento",
+      "stat2Note": "La Ley 7600 entró en vigor en 1996.",
+      "stat3Label": "de los segmentos auditados no cumplen el mínimo de accesibilidad",
+      "stat3Note": "Cifra de demostración sobre geometría real. No es una medición."
     },
     "pilot": {
-      "eyebrow": "Por dónde empezamos",
-      "heading": "El piloto: Escazú, Costa Rica.",
-      "lead": "Toda plataforma necesita una primera calle. La nuestra es San Antonio de Escazú, mapeada segmento por segmento sobre geometría real de OpenStreetMap. Por ahora las calificaciones son datos de demostración; la recolección en campo inicia en agosto de 2026, corredor por corredor.",
+      "eyebrow": "El piloto",
+      "heading": "Escazú primero. Luego cada corredor que nos acepte.",
+      "lead": "Todo instrumento necesita una primera calle. La nuestra es San Antonio de Escazú, mapeada segmento a segmento sobre geometría real. El trabajo de campo comienza en agosto de 2026, corredor por corredor.",
+      "figure": {
+        "label": "Figura 3",
+        "claim": "El corredor piloto, mapeado por completo.",
+        "support": "San Antonio de Escazú sobre geometría real de OpenStreetMap. El resto del cantón sigue, con la misma rúbrica.",
+        "source": "Fuente: StreetLens sobre geometría de OpenStreetMap. Datos de demostración hasta el trabajo de campo en agosto de 2026.",
+        "alt": "Mapa renderizado del corredor piloto de San Antonio de Escazú"
+      },
       "statSegments": "Segmentos mapeados",
-      "statKm": "Km del corredor",
+      "statKm": "Km de corredor",
       "statCoverage": "Cobertura del piloto",
-      "corridorEyebrow": "Corredor en vivo",
-      "corridorName": "San Antonio de Escazú",
-      "corridorNote": "El corredor piloto, mapeado por completo. El resto del cantón sigue, con el mismo rubro.",
-      "demoNote": "Auditoría de demostración sobre geometría real. Ninguna calificación mostrada es una medición real hasta que inicie el trabajo de campo en agosto de 2026."
+      "demoNote": "Auditoría de demostración sobre geometría real. Ninguna puntuación es una medición hasta que el trabajo de campo comience en agosto de 2026."
     },
     "method": {
-      "eyebrow": "Cómo funciona",
-      "heading": "Un método de campo, no una suposición.",
-      "lead": "Cada segmento se audita con un rubro establecido. Una persona auditora recorre el segmento, registra cada ítem y la calificación se calcula a partir de esas observaciones. El mismo instrumento funciona en cualquier lugar, y nada se infiere desde un escritorio.",
+      "eyebrow": "Método",
+      "heading": "Caminamos la calle, luego la puntuamos.",
+      "lead": "Cada segmento se audita contra una rúbrica establecida. Nada se infiere desde un escritorio.",
+      "body": "Un auditor camina el segmento, registra cada ítem en el sitio, y la puntuación se calcula a partir de esas observaciones.<maps>MAPS-Mini es una auditoría microescalar validada de entornos peatonales: aceras, cruces y franjas.</maps> El mismo instrumento funciona en cualquier red de calles, y cada número se remonta a algo que una persona vio y anotó.<lanamme>LANAMME-UCR es el laboratorio nacional de materiales de vía de Costa Rica, en la Universidad de Costa Rica, la fuente de los estándares de pavimento y condición.</lanamme>",
       "items": {
         "maps": {
           "title": "MAPS-Mini",
-          "desc": "Una auditoría microescala validada del entorno peatonal: aceras, cruces y franjas de amortiguamiento."
+          "desc": "Una auditoría microescalar validada de entornos peatonales: aceras, cruces y franjas."
         },
         "lanamme": {
           "title": "LANAMME-UCR",
-          "desc": "El laboratorio nacional de materiales y vías de Costa Rica, en la Universidad de Costa Rica, para estándares de pavimento y condición."
+          "desc": "Laboratorio nacional de materiales de vía de Costa Rica, en la Universidad de Costa Rica, para estándares de pavimento y condición."
         },
         "ley": {
           "title": "Ley 7600",
-          "desc": "La ley de igualdad de oportunidades de Costa Rica, que fija los mínimos de accesibilidad que debe cumplir una acera."
+          "desc": "La ley de igualdad de oportunidades de Costa Rica, que fija los mínimos de accesibilidad que una acera debe cumplir."
         },
         "field": {
           "title": "Auditoría de campo",
-          "desc": "Cada calificación se remite a una observación en sitio y, con el tiempo, a una foto. El ejemplo muestra la anatomía del detalle de un segmento."
+          "desc": "Cada puntuación se remonta a una observación en el sitio y, con el tiempo, a una foto."
         }
       },
-      "anatomyLabel": "Segmento de ejemplo. Auditoría de demostración sobre geometría real de OSM, no es una medición real.",
+      "anatomyLabel": "Tabla 1",
+      "anatomySegment": "Calle Central, San Antonio",
+      "anatomyCaption": "Segmento de ejemplo. Auditoría de demostración sobre geometría real de OSM, no una medición.",
       "collect": {
-        "eyebrow": "Cómo se recolectan los datos",
-        "heading": "Dos vías de entrada, un solo conjunto de datos revisado.",
+        "eyebrow": "Cómo se recogen los datos",
+        "heading": "Dos vías de entrada, un solo conjunto revisado.",
         "field": {
           "title": "Auditorías de campo",
-          "desc": "Una persona auditora capacitada recorre un corredor y registra el rubro en sitio. Esta es la fuente de verdad."
+          "desc": "Un auditor capacitado camina un corredor y registra la rúbrica en el sitio. Esta es la fuente de verdad."
         },
         "community": {
           "title": "Reportes de la comunidad",
-          "desc": "Cualquier persona puede agregar una calle que faltó o señalar una corrección desde el mapa. Cada envío se revisa antes de que cambie algo público."
+          "desc": "Cualquiera puede añadir una calle que nos faltó o señalar una corrección desde el mapa. Cada envío se revisa antes de cambiar algo público."
         }
       }
     },
     "grounding": {
-      "eyebrow": "Hecho para ser verificado",
-      "heading": "Basado en estándares públicos y datos abiertos.",
-      "lead": "StreetLens no es una caja negra. Se apoya en rubros establecidos y conjuntos de datos abiertos, cada calificación se publica con su fórmula y el código es público.",
+      "eyebrow": "Referencias",
+      "heading": "Datos abiertos, o no pasó.",
+      "lead": "StreetLens no es una caja negra. Se apoya en rúbricas establecidas y datos abiertos, cada puntuación viene con su fórmula, y el código es público.",
       "items": {
         "maps": {
           "name": "MAPS-Mini",
-          "note": "Auditoría microescala del entorno peatonal"
+          "note": "Auditoría microescalar de entornos peatonales."
         },
         "lanamme": {
           "name": "LANAMME-UCR",
-          "note": "Laboratorio nacional de materiales y vías, Universidad de Costa Rica"
+          "note": "Laboratorio nacional de materiales de vía, Universidad de Costa Rica."
         },
         "ley": {
           "name": "Ley 7600",
-          "note": "Ley de Igualdad de Oportunidades para las Personas con Discapacidad"
+          "note": "Ley de igualdad de oportunidades para las personas con discapacidad."
         },
         "osm": {
           "name": "OpenStreetMap",
-          "note": "Geometría de las calles, bajo ODbL 1.0"
+          "note": "Geometría de calles, bajo ODbL 1.0."
         },
         "cosevi": {
           "name": "COSEVI",
-          "note": "Consejo de Seguridad Vial, datos de seguridad vial"
+          "note": "Datos de seguridad vial del Consejo de Seguridad Vial."
         }
       },
       "openSource": {
@@ -487,32 +500,32 @@
       },
       "openData": {
         "label": "Datos abiertos",
-        "note": "Cada segmento se exporta con su geometría y la fórmula de su calificación."
+        "note": "Cada segmento se exporta con su geometría y su fórmula de puntuación."
       }
     },
     "roadmap": {
       "eyebrow": "Hacia dónde va",
       "heading": "De un corredor a un estándar abierto.",
-      "lead": "El piloto es el primer paso. El instrumento está hecho para escalar de un solo corredor a un cantón entero, entre cantones y hasta cualquier persona que necesite los datos.",
+      "lead": "El piloto es el primer paso. El instrumento está hecho para escalar, de un corredor a un cantón entero, entre cantones, y hasta quien necesite los datos.",
       "steps": {
         "pilot": {
           "title": "Corredor piloto",
-          "desc": "San Antonio de Escazú, mapeado sobre geometría real. La recolección en campo inicia en agosto de 2026.",
+          "desc": "San Antonio de Escazú, mapeado sobre geometría real. El trabajo de campo comienza en agosto de 2026.",
           "status": "Ahora"
         },
         "canton": {
           "title": "Cantón completo",
-          "desc": "Cada corredor de Escazú, auditado con el mismo rubro.",
+          "desc": "Cada corredor de Escazú, auditado con la misma rúbrica.",
           "status": "Planeado"
         },
         "compare": {
-          "title": "Comparación entre cantones",
-          "desc": "Cantones vecinos medidos de la misma forma, de modo que los resultados se comparan directamente.",
+          "title": "Comparación de cantones",
+          "desc": "Cantones vecinos medidos de la misma forma, para que los resultados se comparen directamente.",
           "status": "Planeado"
         },
         "api": {
           "title": "API y datos abiertos",
-          "desc": "Gobiernos e investigadores consultan la red calificada directamente.",
+          "desc": "Gobiernos e investigadores consultan la red puntuada directamente.",
           "status": "Planeado"
         }
       }
@@ -522,44 +535,44 @@
       "heading": "Respuestas honestas.",
       "items": {
         "real": {
-          "q": "¿Son datos reales?",
-          "a": "Todavía no. Cada calificación que ve hoy es un dato de demostración generado sobre geometría real de OpenStreetMap, de modo que el mapa se comporta igual que lo hará con datos de campo. Las mediciones reales lo reemplazan corredor por corredor una vez que inicie el trabajo de campo en agosto de 2026."
+          "q": "¿Estos son datos reales?",
+          "a": "Todavía no. Cada puntuación que ves hoy es un dato de demostración generado sobre geometría real de OpenStreetMap, así que el mapa se comporta igual que lo hará con datos de campo. Las mediciones reales lo reemplazan corredor por corredor cuando el trabajo de campo comience en agosto de 2026."
         },
         "scores": {
-          "q": "¿Cómo se calculan las calificaciones?",
-          "a": "Cada capa se califica de 0 a 100 a partir de un rubro de ítems observados, donde más alto es mejor. El mapa combina una rampa de color segura para el daltonismo con un canal de grosor de línea, y la leyenda siempre muestra los rangos de valores. Cada calificación se publica con su fórmula."
+          "q": "¿Cómo se calculan las puntuaciones?",
+          "a": "Cada capa se puntúa de 0 a 100 a partir de una rúbrica de ítems observados, donde más alto es mejor. El mapa combina una rampa de color segura para el daltonismo con un canal de grosor de línea, y la leyenda siempre muestra los rangos. Cada puntuación viene con su fórmula."
         },
         "city": {
-          "q": "¿Puede usar esto mi ciudad?",
-          "a": "Ese es el objetivo. El rubro, la aplicación y el formato de datos son abiertos y portables, hechos para funcionar en cualquier red de calles. Hoy solo el piloto de Escazú está en vivo. Si quiere llevar StreetLens a su ciudad, escríbanos a través del proyecto en GitHub."
+          "q": "¿Puede usarlo mi ciudad?",
+          "a": "Ese es el objetivo. La rúbrica, la aplicación y el formato de datos son abiertos y portátiles, hechos para funcionar en cualquier red de calles. Hoy solo el piloto de Escazú está en vivo. Si quieres llevar StreetLens a tu ciudad, escríbenos a través del proyecto en GitHub."
         },
         "fieldwork": {
-          "q": "¿Cuándo inicia el trabajo de campo?",
-          "a": "La recolección en campo en San Antonio de Escazú está prevista para agosto de 2026. Hasta entonces, el piloto funciona con datos de demostración sobre el corredor real."
+          "q": "¿Cuándo empieza el trabajo de campo?",
+          "a": "La recolección de campo en San Antonio de Escazú está prevista para agosto de 2026. Hasta entonces, el piloto funciona con datos de demostración sobre el corredor real."
         },
         "contribute": {
           "q": "¿Puedo contribuir?",
-          "a": "Sí. Puede agregar una calle que faltó o señalar una corrección desde el mapa. Una persona revisora verifica cada envío antes de que algo cambie en el mapa público."
+          "a": "Sí. Puedes añadir una calle que nos faltó o señalar una corrección desde el mapa. Una persona revisa cada envío antes de que cambie algo en el mapa público."
         },
         "who": {
           "q": "¿Quién está detrás de esto?",
-          "a": "StreetLens es un proyecto de CUSP, el Collective for Urbanism and Sustainable Progress, liderado por Gianluca Fonseca. Es de código abierto y se construye de forma pública."
+          "a": "StreetLens es un proyecto de CUSP, el Colectivo para el Urbanismo y el Progreso Sostenible, liderado por Gianluca Fonseca. Es de código abierto y se construye en abierto."
         }
       }
     },
     "cta": {
-      "eyebrow": "Abra el mapa",
-      "heading": "Lea la calle usted mismo.",
-      "support": "Explore el mapa del piloto en vivo o agregue una calle que conozca. Cada calificación se publica con su fórmula.",
+      "eyebrow": "El llamado",
+      "heading": "Mide lo que la ciudad olvidó medir.",
+      "support": "Abre el mapa en vivo, o añade una calle que conozcas. Cada puntuación viene con su fórmula.",
       "explore": "Explorar el mapa en vivo",
       "contribute": "Contribuir una calle"
     },
     "footer": {
-      "tagline": "Medición abierta de la calidad de las calles. Ahora auditando Escazú, Costa Rica.",
-      "openData": "Geometría de las calles de OpenStreetMap, bajo ODbL 1.0. Las calificaciones son datos de demostración hasta que inicie la recolección en campo en agosto de 2026.",
+      "tagline": "Un instrumento de campo abierto para la calle. Ahora midiendo Escazú, Costa Rica.",
       "github": "GitHub",
       "localeLabel": "Idioma",
-      "built": "Un proyecto de CUSP, el Collective for Urbanism and Sustainable Progress."
+      "openData": "Geometría de calles de OpenStreetMap, bajo ODbL 1.0. Las puntuaciones son datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
+      "built": "Un proyecto de CUSP, el Colectivo para el Urbanismo y el Progreso Sostenible."
     }
   }
 }

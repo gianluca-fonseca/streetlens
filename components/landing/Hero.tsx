@@ -5,15 +5,16 @@ import type { SegmentCollection, StreetStats } from "@/lib/segments";
 import AuditMap from "@/components/AuditMap";
 import Button from "@/components/ui/Button";
 import Eyebrow from "@/components/ui/Eyebrow";
-import GlassPanel from "@/components/ui/GlassPanel";
+import Measure from "@/components/ui/Measure";
+import Figure from "@/components/ui/Figure";
 
 /**
- * The hero: a full-bleed live map of the Escazú corridor (the one live MapLibre
- * instance on the page) with earned glass layered over it, Genesis-style. A
- * primary glass panel carries the platform headline and CTAs; two floating
- * glass data cards read as a dashboard over the map: the live-pilot snapshot and
- * the demo Ley-7600 fail-rate with its caveat. On small screens the two cards
- * collapse into the main panel so nothing clips.
+ * The masthead: a centered academic-paper opening. A mono eyebrow, the bold-black
+ * thesis H1, a centered italic abstract, one pink primary call and a pink-underline
+ * secondary link. Below it, the live Escazú map is presented as FIGURE 1: a matted
+ * plate (composed here, outside AuditMap) with a full journal caption. The map
+ * itself stays the untouched `variant="hero"` canvas with its reduced-motion-safe
+ * corridor glide; the frame is ours.
  */
 export default function Hero({
   segments,
@@ -24,114 +25,51 @@ export default function Hero({
 }>) {
   const t = useTranslations("landing.hero");
 
-  const facts = [
-    { key: "segments", value: String(stats.segments), label: t("statSegments") },
-    { key: "km", value: stats.km.toFixed(1), label: t("statKm") },
-    { key: "coverage", value: `${stats.coveragePct}%`, label: t("statCoverage") },
-  ];
-
-  const snapshot = (
-    <>
-      <Eyebrow>{t("snapshotLabel")}</Eyebrow>
-      <dl className="mt-3 grid grid-cols-3 gap-3">
-        {facts.map((f) => (
-          <div key={f.key} className="flex flex-col gap-1">
-            <dt className="sr-only">{f.label}</dt>
-            <dd className="font-mono text-[1.3rem] font-medium leading-none text-ink">
-              {f.value}
-            </dd>
-            <span
-              aria-hidden="true"
-              className="text-[10.5px] leading-tight text-neutral-strong"
-            >
-              {f.label}
-            </span>
-          </div>
-        ))}
-      </dl>
-    </>
-  );
-
-  const demoStat = (
-    <>
-      <p className="font-mono text-[2.5rem] font-semibold leading-none tracking-tight text-accent-text">
-        {stats.heroPct}%
-      </p>
-      <p className="mt-2 text-[0.9rem] leading-snug text-ink">
-        {t("heroStatShort")}
-      </p>
-      <p className="mt-2 text-[11px] leading-snug text-neutral-strong">
-        {t("heroStatDemo")}
-      </p>
-    </>
-  );
-
   return (
-    <section className="relative h-full min-h-[640px] w-full overflow-hidden">
-      <div className="absolute inset-0">
-        <AuditMap variant="hero" segments={segments} flyOnLoad />
-      </div>
+    <section className="pb-[3.5rem] pt-[max(4rem,calc(env(safe-area-inset-top)+2.5rem))] sm:pb-16 sm:pt-28">
+      <Measure width="outset" className="text-center">
+        <Eyebrow>{t("eyebrow")}</Eyebrow>
+        <h1 className="mx-auto mt-5 max-w-[18ch] font-display text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[1.03] tracking-[-0.03em] text-ink-display text-balance">
+          {t("thesis")}
+        </h1>
+        <p className="mx-auto mt-7 max-w-[40rem] font-serif text-[clamp(1.15rem,2.2vw,1.4rem)] italic leading-[1.5] text-ink text-pretty">
+          {t("abstract")}
+        </p>
 
-      <div className="relative z-10 mx-auto h-full max-w-6xl px-4 sm:px-6">
-        {/* Main glass panel: brand + headline + CTAs */}
-        <div className="flex h-full flex-col justify-end pb-[max(1.5rem,env(safe-area-inset-bottom))] md:justify-center md:pb-0">
-          <GlassPanel
-            as="section"
-            radius="primary"
-            elevation="popover"
-            className="w-full max-w-md p-6 sm:p-7"
+        <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Button
+            href="/map"
+            variant="accent"
+            size="lg"
+            className="min-h-[48px] w-full sm:w-auto"
           >
-            <Eyebrow>{t("eyebrow")}</Eyebrow>
-            <h1 className="mt-2.5 font-display text-[clamp(2.05rem,4.7vw,3.15rem)] font-bold leading-[1.02] tracking-[-0.03em] text-ink">
-              {t("headline")}
-            </h1>
-            <p className="mt-3 text-[1.02rem] leading-relaxed text-neutral-strong">
-              {t("support")}
-            </p>
-
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Button
-                href="/map"
-                variant="pine"
-                size="lg"
-                className="min-h-[48px] w-full sm:w-auto"
-              >
-                {t("ctaExplore")}
-              </Button>
-              <Button
-                href="#method"
-                variant="ghost"
-                size="lg"
-                className="min-h-[48px] w-full sm:w-auto"
-              >
-                {t("ctaMethod")}
-              </Button>
-            </div>
-
-            {/* Small screens: fold the two data cards into the panel */}
-            <div className="mt-6 border-t border-border pt-5 md:hidden">
-              {snapshot}
-              <div className="mt-4 border-t border-border pt-4">{demoStat}</div>
-            </div>
-          </GlassPanel>
+            {t("ctaExplore")}
+          </Button>
+          <a
+            href="#method"
+            className="inline-flex min-h-[48px] items-center font-medium text-ink underline decoration-accent decoration-2 underline-offset-[6px] transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          >
+            {t("ctaMethod")}
+          </a>
         </div>
+      </Measure>
 
-        {/* Desktop: two floating glass data cards over the map */}
-        <GlassPanel
-          radius="panel"
-          elevation="popover"
-          className="pointer-events-none absolute right-4 top-16 hidden w-60 p-5 md:block lg:right-6"
-        >
-          {snapshot}
-        </GlassPanel>
-        <GlassPanel
-          radius="panel"
-          elevation="popover"
-          className="pointer-events-none absolute bottom-14 right-10 hidden w-60 p-5 md:block lg:right-16"
-        >
-          {demoStat}
-        </GlassPanel>
-      </div>
+      <Measure width="screen" className="mt-14 sm:mt-20">
+        <div className="mx-auto max-w-[1240px] px-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:px-6 lg:px-8">
+          <Figure
+            id="figure-1"
+            label={t("figure.label")}
+            claim={t("figure.claim")}
+            support={t("figure.support")}
+            source={t("figure.source", { n: stats.segments })}
+            affordance={t("figure.affordance")}
+            live={{ label: t("figure.live") }}
+            aspectClassName="aspect-[3/4] sm:aspect-[3/2] lg:aspect-[16/10]"
+          >
+            <AuditMap variant="hero" segments={segments} flyOnLoad />
+          </Figure>
+        </div>
+      </Measure>
     </section>
   );
 }

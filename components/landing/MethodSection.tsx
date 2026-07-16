@@ -2,17 +2,16 @@
 
 import { useTranslations } from "next-intl";
 import Section from "@/components/ui/Section";
-import Eyebrow from "@/components/ui/Eyebrow";
-import Reveal from "@/components/ui/Reveal";
-import Panel from "@/components/ui/Panel";
+import Measure from "@/components/ui/Measure";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Sidenote from "@/components/ui/Sidenote";
 import StatFigure from "@/components/ui/StatFigure";
 
 /**
- * "How it works": the field method laid out honestly. Four grounding entries
- * read as a typographic rubric (title + descriptor, no icon cards), then an
- * example-segment card shows the segment-detail anatomy as an illustrative
- * scores-by-layer readout, and finally the two-way collection engine. The
- * anatomy figures are static demo values, captioned as such, never a claim.
+ * Section 04 — the method. A serif argument with two margin citations (MAPS-Mini,
+ * LANAMME-UCR), the four grounding inputs as a hairline rubric grid (not cards),
+ * an example segment shown as TABLE 1 (an honest illustrative readout, framed in
+ * hairlines, captioned as demo), then the two-way collection engine.
  */
 const METHOD_ITEMS = ["maps", "lanamme", "ley", "field"] as const;
 
@@ -30,47 +29,52 @@ export default function MethodSection() {
   const tl = useTranslations("layers");
 
   return (
-    <Section id="method" tone="bone">
-      <Reveal className="max-w-3xl">
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <h2 className="mt-3 font-display text-[clamp(1.85rem,3.9vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink">
-          {t("heading")}
-        </h2>
-        <p className="mt-4 max-w-2xl text-[1.05rem] leading-relaxed text-neutral-strong">
-          {t("lead")}
+    <Section id="method" tone="sunken" rule>
+      <Measure width="outset">
+        <SectionHeader
+          index="04"
+          eyebrow={t("eyebrow")}
+          title={t("heading")}
+          lead={t("lead")}
+        />
+      </Measure>
+
+      <Measure width="text" className="mt-12">
+        <p className="font-serif text-[1.18rem] leading-[1.7] text-ink">
+          {t.rich("body", {
+            maps: (chunks) => <Sidenote number={3}>{chunks}</Sidenote>,
+            lanamme: (chunks) => <Sidenote number={4}>{chunks}</Sidenote>,
+          })}
         </p>
-      </Reveal>
+      </Measure>
 
-      {/* Four grounding-of-method entries: a hairline-divided rubric, not cards. */}
-      <div className="mt-12 grid gap-px overflow-hidden rounded-[8px] border border-border bg-border sm:grid-cols-2">
-        {METHOD_ITEMS.map((key, i) => (
-          <Reveal
-            key={key}
-            as="div"
-            delay={i * 70}
-            className="bg-surface-elevated p-6 sm:p-7"
-          >
-            {/* No numbered marker here: these four inputs are an unordered
-                rubric, not a sequence, so a 01-04 index would imply an order
-                that does not exist. The hairline grid carries the structure. */}
-            <h3 className="font-display text-[1.15rem] font-semibold leading-tight text-ink">
-              {t(`items.${key}.title`)}
-            </h3>
-            <p className="mt-2 text-[0.95rem] leading-relaxed text-neutral-strong">
-              {t(`items.${key}.desc`)}
-            </p>
-          </Reveal>
-        ))}
-      </div>
+      {/* Four grounding inputs: a hairline rubric, not cards. Unordered by design
+          (no 01–04 index), so the grid carries the structure. */}
+      <Measure width="page" className="clear-both mt-14">
+        <div className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-2">
+          {METHOD_ITEMS.map((key) => (
+            <div key={key} className="bg-surface p-6 sm:p-7">
+              <h3 className="font-display text-[1.15rem] font-semibold leading-tight tracking-[-0.01em] text-ink-display">
+                {t(`items.${key}.title`)}
+              </h3>
+              <p className="mt-2 font-serif text-[1rem] leading-[1.55] text-ink-muted">
+                {t(`items.${key}.desc`)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </Measure>
 
-      {/* Example-segment anatomy: an honest illustrative readout in mono. */}
-      <Reveal delay={80} className="mt-8">
-        <Panel radius="primary" elevation="panel" className="p-6 sm:p-7">
+      {/* Example-segment anatomy as TABLE 1: hairline-framed, mono readout. */}
+      <Measure width="page" className="mt-10">
+        <figure className="rounded-[4px] border border-hairline bg-surface p-6 sm:p-8">
           <div className="grid gap-8 sm:grid-cols-[minmax(0,15rem)_1fr] sm:items-center">
             <div>
-              <Eyebrow>{t("items.field.title")}</Eyebrow>
-              <p className="mt-1.5 font-display text-[1.15rem] font-semibold leading-tight text-ink">
-                Calle Central, San Antonio
+              <span className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-ink-muted">
+                {t("anatomyLabel")}.
+              </span>
+              <p className="mt-1.5 font-display text-[1.15rem] font-semibold leading-tight tracking-[-0.01em] text-ink-display">
+                {t("anatomySegment")}
               </p>
               <div className="mt-4">
                 <StatFigure
@@ -89,11 +93,11 @@ export default function MethodSection() {
                     {tl(`${layer.key}.name`)}
                   </dt>
                   <div
-                    className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-sunken"
+                    className="h-1.5 flex-1 overflow-hidden rounded-full bg-hairline"
                     aria-hidden="true"
                   >
                     <div
-                      className="h-full rounded-full bg-pine"
+                      className="h-full rounded-full bg-ink-display"
                       style={{ width: `${layer.value}%` }}
                     />
                   </div>
@@ -104,34 +108,38 @@ export default function MethodSection() {
               ))}
             </dl>
           </div>
-          <p className="mt-6 border-t border-border pt-4 text-[12.5px] leading-snug text-neutral-strong">
-            {t("anatomyLabel")}
-          </p>
-        </Panel>
-      </Reveal>
+          <figcaption className="mt-6 border-t border-hairline pt-4 font-serif text-[0.95rem] leading-snug text-ink-muted">
+            {t("anatomyCaption")}
+          </figcaption>
+        </figure>
+      </Measure>
 
       {/* The collection engine: two ways in, one reviewed dataset. */}
-      <Reveal delay={40} className="mt-16 max-w-3xl">
-        <Eyebrow>{t("collect.eyebrow")}</Eyebrow>
-        <h3 className="mt-3 font-display text-[clamp(1.4rem,2.8vw,1.9rem)] font-semibold leading-[1.14] tracking-tight text-ink">
-          {t("collect.heading")}
-        </h3>
-      </Reveal>
+      <Measure width="outset" className="mt-16">
+        <div className="text-center">
+          <p className="font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-ink-muted">
+            {t("collect.eyebrow")}
+          </p>
+          <h3 className="mx-auto mt-4 max-w-[24ch] font-display text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.12] tracking-[-0.015em] text-ink-display text-balance">
+            {t("collect.heading")}
+          </h3>
+        </div>
+      </Measure>
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2">
-        {(["field", "community"] as const).map((key, i) => (
-          <Reveal key={key} as="div" delay={i * 90}>
-            <Panel elevation="panel" className="h-full p-6 sm:p-7">
-              <h4 className="font-display text-[1.1rem] font-semibold leading-tight text-ink">
+      <Measure width="page" className="mt-10">
+        <div className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-2">
+          {(["field", "community"] as const).map((key) => (
+            <div key={key} className="bg-surface p-6 sm:p-7">
+              <h4 className="font-display text-[1.1rem] font-semibold leading-tight tracking-[-0.01em] text-ink-display">
                 {t(`collect.${key}.title`)}
               </h4>
-              <p className="mt-2 text-[0.95rem] leading-relaxed text-neutral-strong">
+              <p className="mt-2 font-serif text-[1rem] leading-[1.55] text-ink-muted">
                 {t(`collect.${key}.desc`)}
               </p>
-            </Panel>
-          </Reveal>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      </Measure>
     </Section>
   );
 }
