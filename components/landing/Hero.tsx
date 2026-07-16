@@ -142,9 +142,10 @@ export default function Hero({
   return (
     <section className="pb-10 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.5rem))] sm:pb-14 lg:pb-16">
       <div className="mx-auto w-full max-w-[1400px] px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-6 lg:px-8">
-        <div className="grid gap-x-8 gap-y-6 lg:grid-cols-[360px_1fr] lg:grid-rows-[auto_1fr]">
-          {/* ── Title block (rail head) ─────────────────────────────── */}
-          <div className="lg:col-start-1 lg:row-start-1 lg:self-start">
+        <div className="grid gap-x-8 gap-y-6 lg:min-h-[87vh] lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_auto_auto_1fr]">
+          {/* ── Title block (rail head). Centered as a group with the stat
+               cards inside the hero zone via the two 1fr spacer rows. ─── */}
+          <div className="lg:col-start-1 lg:row-start-2">
             <div
               className="sl-hero-el text-ink-display"
               style={{ animationDelay: "120ms" }}
@@ -191,7 +192,7 @@ export default function Hero({
           </div>
 
           {/* ── Map plate (z0 flat frame) + glass chips (z10) ───────── */}
-          <div className="sl-hero-map flex flex-col lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:h-[63dvh] lg:max-h-[44rem]">
+          <div className="sl-hero-map flex flex-col lg:col-start-2 lg:row-start-1 lg:row-span-4 lg:h-[63dvh] lg:max-h-[44rem] lg:self-center">
             <div className="min-h-0 flex-1 rounded-[4px] border border-hairline bg-paper p-2 sm:p-3">
               <div
                 data-map-moving={mapMoving ? "true" : "false"}
@@ -215,7 +216,7 @@ export default function Hero({
 
           {/* ── Stat cards (zen-solid): horizontal scroll on phone, stacked
                in the rail on desktop ─────────────────────────────────── */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:col-start-1 lg:row-start-2 lg:flex-col lg:self-start lg:overflow-visible lg:px-0 lg:pb-0">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:col-start-1 lg:row-start-3 lg:mt-2 lg:flex-col lg:self-start lg:overflow-visible lg:px-0 lg:pb-0">
             <StatCard
               value={String(stats.segments)}
               label={t("stats.segmentsLabel")}
