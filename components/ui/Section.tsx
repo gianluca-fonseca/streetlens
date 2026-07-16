@@ -20,37 +20,37 @@ const TONES: Record<SectionTone, string> = {
   inverted: "bg-surface text-ink",
 };
 
-/** The rev-5 inverted-paper token values, applied inline so `tone="inverted"` is
- * theme-independent and every shared primitive reads correctly on it. Mirrors the
- * dark @media block in globals.css. --accent-fg is left at its light value
- * (#0c0a06) so the pink fills keep their AA label on the negative. */
+/** The rev-6 black-zen (negative) token values, applied inline so `tone="inverted"`
+ * is theme-independent and every shared primitive reads correctly on it. Mirrors the
+ * dark @media block in globals.css. --accent-fg is left at its light value (#000000,
+ * pure black) so the pink fills keep their AA label on the negative. */
 const INVERTED_TOKENS: CSSProperties = {
-  ["--paper" as string]: "#14120c",
-  ["--paper-white" as string]: "#1e1b14",
-  ["--paper-sunken" as string]: "#0d0b07",
-  ["--surface-base" as string]: "#14120c",
-  ["--surface-elevated" as string]: "#1e1b14",
-  ["--surface-sunken" as string]: "#0d0b07",
-  ["--ink" as string]: "#f1eee3",
-  ["--ink-display" as string]: "#fbf9f0",
-  ["--ink-muted" as string]: "#a69e8c",
-  ["--ink-faint" as string]: "#6e6656",
-  ["--neutral-strong" as string]: "#a69e8c",
-  ["--neutral" as string]: "#6e6656",
-  ["--neutral-soft" as string]: "#33302a",
-  ["--hairline" as string]: "#33302a",
-  ["--hairline-strong" as string]: "#4c483f",
-  ["--border" as string]: "#33302a",
-  ["--border-strong" as string]: "#4c483f",
-  ["--pine" as string]: "#f1eee3",
-  ["--pine-strong" as string]: "#fbf9f0",
+  ["--paper" as string]: "#0a0a0a",
+  ["--paper-white" as string]: "#141414",
+  ["--paper-sunken" as string]: "#050505",
+  ["--surface-base" as string]: "#0a0a0a",
+  ["--surface-elevated" as string]: "#141414",
+  ["--surface-sunken" as string]: "#050505",
+  ["--ink" as string]: "#f2f2f2",
+  ["--ink-display" as string]: "#ffffff",
+  ["--ink-muted" as string]: "#a3a3a3",
+  ["--ink-faint" as string]: "#666666",
+  ["--neutral-strong" as string]: "#a3a3a3",
+  ["--neutral" as string]: "#666666",
+  ["--neutral-soft" as string]: "#262626",
+  ["--hairline" as string]: "#262626",
+  ["--hairline-strong" as string]: "#3d3d3d",
+  ["--border" as string]: "#262626",
+  ["--border-strong" as string]: "#3d3d3d",
+  ["--pine" as string]: "#f2f2f2",
+  ["--pine-strong" as string]: "#ffffff",
   ["--accent" as string]: "#ff4fa3",
   ["--accent-strong" as string]: "#ff77b8",
   ["--accent-text" as string]: "#ff6fb0",
   ["--terracotta" as string]: "#ef8f56",
-  ["--ring" as string]: "#f1eee3",
-  ["--glass-bg" as string]: "rgba(20, 18, 12, 0.72)",
-  ["--glass-border" as string]: "rgba(241, 238, 227, 0.14)",
+  ["--ring" as string]: "#f2f2f2",
+  ["--glass-bg" as string]: "rgba(10, 10, 10, 0.58)",
+  ["--glass-border" as string]: "rgba(255, 255, 255, 0.12)",
 };
 
 export default function Section({
