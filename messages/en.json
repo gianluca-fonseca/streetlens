@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "StreetLens",
-    "description": "A field instrument for the street. Open, portable audits of sidewalk accessibility, drainage, shade, and bike infrastructure. Now measuring Escazú, Costa Rica."
+    "description": "A field instrument for the street. Open-source, portable audits of sidewalk accessibility, drainage, shade, and bike infrastructure. Now measuring Escazú, Costa Rica."
   },
   "demoBanner": {
     "message": "Demo data over real street geometry. Field pilot begins August 2026: no number shown is a real measurement."
@@ -347,9 +347,9 @@
   "landing": {
     "meta": {
       "title": "StreetLens: every street can be measured",
-      "description": "Every street can be measured. Most never are. StreetLens is an open field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure, segment by segment. Now measuring Escazú, Costa Rica, on demo data until fieldwork begins in August 2026.",
+      "description": "Every street can be measured. Most never are. StreetLens is an open-source field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure, segment by segment. Now measuring Escazú, Costa Rica, on demo data until fieldwork begins in August 2026.",
       "ogTitle": "Every street can be measured. Most never are.",
-      "ogDescription": "An open field instrument for the street: accessibility, drainage, shade, and bike infrastructure, scored segment by segment. Now measuring Escazú, Costa Rica."
+      "ogDescription": "An open-source field instrument for the street: accessibility, drainage, shade, and bike infrastructure, scored segment by segment. Now measuring Escazú, Costa Rica."
     },
     "hero": {
       "wordmark": "StreetLens",
@@ -375,12 +375,13 @@
       "map": {
         "live": "Live map",
         "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform."
-      }
+      },
+      "openSource": "Open source"
     },
     "measure": {
       "eyebrow": "What we measure",
       "heading": "Four lenses on every street.",
-      "lead": "Every segment is scored on four independent rubrics, the same way in any city. Each ramp is colorblind-safe and paired with a line-width channel, and every legend shows its bins.",
+      "lead": "Walkability breaks down into parts you can measure. Every segment is scored on four independent rubrics, the same way in any city. Two of them are climate resilience: shade tracks heat exposure, and drainage tracks flood risk. Each ramp is colorblind-safe and paired with a line-width channel, and every legend shows its bins.",
       "plateAlt": "{name} scores across the pilot street network",
       "items": {
         "accessibility": {
@@ -400,7 +401,7 @@
         "shade": {
           "fig": "Figure 2c",
           "name": "Shade",
-          "desc": "Tree canopy and cover. From exposed pavement to full canopy.",
+          "desc": "Tree canopy and cover, and the heat they hold off. From exposed pavement to full canopy.",
           "low": "Exposed",
           "high": "Full canopy"
         },
@@ -416,7 +417,7 @@
     "gap": {
       "eyebrow": "Why it matters",
       "heading": "Accountability begins with a number.",
-      "lead": "You cannot budget, fix, or answer for what you never measured. Most cities cannot say which sidewalks fail, or where.",
+      "lead": "You cannot budget, fix, or answer for what you never measured. A complete street starts as a measured one, and most cities cannot say which sidewalks fail, or where.",
       "body": "Accessibility, drainage, and shade are almost never measured segment by segment, so they never enter a budget or a work order.<ley>Ley 7600, Costa Rica's equal-opportunity law, has required accessible sidewalks since 1996. No municipality yet publishes a compliance map.</ley> The cost of not knowing is not abstract. It is counted in people.<cosevi>COSEVI, the national road-safety council, publishes Costa Rica's annual road-safety counts.</cosevi>",
       "stat1Value": "1,601",
       "stat1Label": "pedestrians run over in Costa Rica in 2024",
@@ -481,6 +482,11 @@
           "title": "Community reports",
           "desc": "Anyone can add a street we missed or flag a correction from the map. Every submission is reviewed before it changes anything public."
         }
+      },
+      "pipeline": {
+        "eyebrow": "The engine ahead",
+        "heading": "Every audit trains the next one.",
+        "body": "Field audits are the source of truth, and they stay that way. From the August 2026 pilot on, every corridor an auditor walks is also photographed, and those images become labeled training data. Over time they will train a computer-vision and machine-learning pipeline that reads sidewalk condition and obstructions straight from a photo, so every future audit scores faster than the last. No model scores a street today. When one does, a person still verifies what it reports."
       }
     },
     "grounding": {
@@ -511,7 +517,7 @@
       },
       "openSource": {
         "label": "Open source",
-        "note": "The whole platform is public on GitHub."
+        "note": "The whole platform is public on GitHub: the code, the rubric, and the scoring method, open for anyone to read, run, or fork."
       },
       "openData": {
         "label": "Open data",
@@ -557,6 +563,10 @@
           "q": "How are scores computed?",
           "a": "Each layer is scored 0 to 100 from a rubric of observed items, where higher is better. The map pairs a colorblind-safe color ramp with a line-width channel, and the legend always shows the value bins. Every score ships with its formula."
         },
+        "ai": {
+          "q": "Does StreetLens use machine learning or computer vision?",
+          "a": "Not to score streets today. Every score you see is demo data, and real scores will come from auditors in the field. Their photos become the training data for a computer-vision and machine-learning pipeline that will speed up future audits, and a person will always verify what it produces. Machine learning and computer vision are on the roadmap, not in today's numbers."
+        },
         "city": {
           "q": "Can my city use this?",
           "a": "That is the goal. The rubric, the app, and the data format are open and portable, built to run on any street network. Today only the Escazú pilot is live. If you want to bring StreetLens to your city, reach out through the project on GitHub."
@@ -584,6 +594,7 @@
     },
     "footer": {
       "tagline": "An open field instrument for the street. Now measuring Escazú, Costa Rica.",
+      "openSource": "Open source",
       "github": "GitHub",
       "localeLabel": "Language",
       "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins in August 2026.",

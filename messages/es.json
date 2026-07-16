@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "StreetLens",
-    "description": "Un instrumento de campo para la calle. Auditorías abiertas y portátiles de accesibilidad, drenaje, sombra e infraestructura ciclista en las aceras. Ahora midiendo Escazú, Costa Rica."
+    "description": "Un instrumento de campo para la calle. Auditorías de código abierto y portátiles de accesibilidad, drenaje, sombra e infraestructura ciclista en las aceras. Ahora midiendo Escazú, Costa Rica."
   },
   "demoBanner": {
     "message": "Datos de demostración sobre geometría vial real. El piloto de campo inicia en agosto de 2026: ninguna cifra mostrada es una medición real."
@@ -347,9 +347,9 @@
   "landing": {
     "meta": {
       "title": "StreetLens: toda calle puede medirse",
-      "description": "Toda calle puede medirse. Casi ninguna se mide. StreetLens es un instrumento de campo abierto que puntúa la accesibilidad, el drenaje, la sombra y la infraestructura ciclista de las aceras, segmento a segmento. Ahora mide Escazú, Costa Rica, con datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
+      "description": "Toda calle puede medirse. Casi ninguna se mide. StreetLens es un instrumento de campo de código abierto que puntúa la accesibilidad, el drenaje, la sombra y la infraestructura ciclista de las aceras, segmento a segmento. Ahora mide Escazú, Costa Rica, con datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
       "ogTitle": "Toda calle puede medirse. Casi ninguna se mide.",
-      "ogDescription": "Un instrumento de campo abierto para la calle: accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento. Ahora en Escazú, Costa Rica."
+      "ogDescription": "Un instrumento de campo de código abierto para la calle: accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento. Ahora en Escazú, Costa Rica."
     },
     "hero": {
       "wordmark": "StreetLens",
@@ -375,12 +375,13 @@
       "map": {
         "live": "Mapa en vivo",
         "affordance": "Arrastra para desplazar. Mantén ⌘ o Ctrl para hacer zoom. Toca un segmento para abrirlo en la plataforma."
-      }
+      },
+      "openSource": "Código abierto"
     },
     "measure": {
       "eyebrow": "Qué medimos",
       "heading": "Cuatro lentes sobre cada calle.",
-      "lead": "Cada segmento se puntúa con cuatro rúbricas independientes, igual en cualquier ciudad. Cada rampa de color es segura para el daltonismo y va con un canal de grosor de línea, y cada leyenda muestra sus rangos.",
+      "lead": "La caminabilidad se descompone en partes que se pueden medir. Cada segmento se puntúa con cuatro rúbricas independientes, igual en cualquier ciudad. Dos de ellas son resiliencia climática: la sombra mide la exposición al calor, y el drenaje mide el riesgo de inundación. Cada rampa de color es segura para el daltonismo y va con un canal de grosor de línea, y cada leyenda muestra sus rangos.",
       "plateAlt": "Puntuaciones de {name} en la red de calles del piloto",
       "items": {
         "accessibility": {
@@ -400,7 +401,7 @@
         "shade": {
           "fig": "Figura 2c",
           "name": "Sombra",
-          "desc": "Copa arbórea y cobertura. De pavimento expuesto a copa completa.",
+          "desc": "Copa arbórea y cobertura, y el calor que frenan. De pavimento expuesto a copa completa.",
           "low": "Expuesta",
           "high": "Copa completa"
         },
@@ -416,7 +417,7 @@
     "gap": {
       "eyebrow": "Por qué importa",
       "heading": "La rendición de cuentas empieza con un número.",
-      "lead": "No se puede presupuestar, arreglar ni responder por lo que nunca se midió. Casi ninguna ciudad puede decir qué aceras fallan, ni dónde.",
+      "lead": "No se puede presupuestar, arreglar ni responder por lo que nunca se midió. El derecho a la ciudad empieza por una acera que alguien contó, y casi ninguna ciudad puede decir qué aceras fallan, ni dónde.",
       "body": "La accesibilidad, el drenaje y la sombra casi nunca se miden segmento a segmento, así que nunca entran en un presupuesto ni en una orden de trabajo.<ley>La Ley 7600, la ley de igualdad de oportunidades de Costa Rica, exige aceras accesibles desde 1996. Tres décadas después, ninguna municipalidad publica un mapa de cumplimiento.</ley> El costo de no saber no es abstracto. Se cuenta en personas.<cosevi>El COSEVI, el consejo nacional de seguridad vial, publica cada año las cifras de siniestralidad de Costa Rica.</cosevi>",
       "stat1Value": "1.601",
       "stat1Label": "peatones atropellados en Costa Rica en 2024",
@@ -481,6 +482,11 @@
           "title": "Reportes de la comunidad",
           "desc": "Cualquiera puede añadir una calle que nos faltó o señalar una corrección desde el mapa. Cada envío se revisa antes de cambiar algo público."
         }
+      },
+      "pipeline": {
+        "eyebrow": "El motor que viene",
+        "heading": "Cada auditoría entrena a la siguiente.",
+        "body": "Las auditorías de campo son la fuente de verdad, y así se quedan. Desde el piloto de agosto de 2026, cada corredor que un auditor camina también se fotografía, y esas imágenes se vuelven datos de entrenamiento etiquetados. Con el tiempo entrenarán un sistema de visión por computadora y aprendizaje automático que lee la condición de la acera y las obstrucciones directamente desde una foto, para que cada auditoría futura puntúe más rápido que la anterior. Hoy ningún modelo puntúa una calle. Cuando lo haga, una persona seguirá verificando lo que reporte."
       }
     },
     "grounding": {
@@ -511,7 +517,7 @@
       },
       "openSource": {
         "label": "Código abierto",
-        "note": "Toda la plataforma es pública en GitHub."
+        "note": "Toda la plataforma es pública en GitHub: el código, la rúbrica y el método de puntuación, abiertos para que cualquiera los lea, ejecute o bifurque."
       },
       "openData": {
         "label": "Datos abiertos",
@@ -557,6 +563,10 @@
           "q": "¿Cómo se calculan las puntuaciones?",
           "a": "Cada capa se puntúa de 0 a 100 a partir de una rúbrica de ítems observados, donde más alto es mejor. El mapa combina una rampa de color segura para el daltonismo con un canal de grosor de línea, y la leyenda siempre muestra los rangos. Cada puntuación viene con su fórmula."
         },
+        "ai": {
+          "q": "¿StreetLens usa aprendizaje automático o visión por computadora?",
+          "a": "Para puntuar calles, hoy no. Cada puntuación que ves es un dato de demostración, y las puntuaciones reales vendrán de auditores en el campo. Sus fotos se vuelven los datos de entrenamiento de un sistema de visión por computadora y aprendizaje automático que acelerará las auditorías futuras, y una persona siempre verificará lo que produzca. El aprendizaje automático y la visión por computadora están en la hoja de ruta, no en las cifras de hoy."
+        },
         "city": {
           "q": "¿Puede usarlo mi ciudad?",
           "a": "Ese es el objetivo. La rúbrica, la aplicación y el formato de datos son abiertos y portátiles, hechos para funcionar en cualquier red de calles. Hoy solo el piloto de Escazú está en vivo. Si quieres llevar StreetLens a tu ciudad, escríbenos a través del proyecto en GitHub."
@@ -584,6 +594,7 @@
     },
     "footer": {
       "tagline": "Un instrumento de campo abierto para la calle. Ahora midiendo Escazú, Costa Rica.",
+      "openSource": "Código abierto",
       "github": "GitHub",
       "localeLabel": "Idioma",
       "openData": "Geometría de calles de OpenStreetMap, bajo ODbL 1.0. Las puntuaciones son datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
