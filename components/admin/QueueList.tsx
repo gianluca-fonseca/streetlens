@@ -96,7 +96,7 @@ export default function QueueList({
           <FlaskConical
             size={14}
             strokeWidth={1.75}
-            className="shrink-0 text-accent-text"
+            className="shrink-0 text-amber"
             aria-hidden="true"
           />
           <span>{t("localNote")}</span>
@@ -158,9 +158,10 @@ export default function QueueList({
                     <h3 className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
                       {t("diffHeading")}
                     </h3>
+                    <div className="overflow-x-auto">
                     <table className="w-full border-collapse text-[12.5px]">
                       <thead>
-                        <tr className="text-left text-[10.5px] font-mono uppercase tracking-[0.14em] text-neutral">
+                        <tr className="text-left text-[10.5px] font-mono uppercase tracking-[0.14em] text-neutral-strong">
                           <th className="pb-1 pr-3 font-semibold" />
                           <th className="pb-1 pr-3 font-semibold">
                             {t("current")}
@@ -206,6 +207,7 @@ export default function QueueList({
                         })}
                       </tbody>
                     </table>
+                    </div>
                     {item.contributorReason ? (
                       <p className="mt-2 text-[12px] text-neutral-strong">
                         <span className="font-medium text-ink">
@@ -231,14 +233,14 @@ export default function QueueList({
                     setReasons((r) => ({ ...r, [item.id]: e.target.value }))
                   }
                   placeholder={t("reasonPlaceholder")}
-                  className="resize-y rounded-[4px] border border-border bg-surface-base px-3 py-2 text-[13px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-pine"
+                  className="resize-y rounded-[4px] border border-border bg-surface-base px-3 py-2 text-[13px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-ink"
                 />
               </label>
 
               {errors[item.id] ? (
                 <p
                   role="alert"
-                  className="mt-2 text-[12px] font-medium text-[#C0472B]"
+                  className="mt-2 text-[12px] font-medium text-clay"
                 >
                   {errors[item.id]}
                 </p>
@@ -249,7 +251,7 @@ export default function QueueList({
                   type="button"
                   onClick={() => review(item.id, "approve")}
                   disabled={busy[item.id]}
-                  className="inline-flex items-center gap-1.5 rounded-[4px] bg-pine px-3 py-1.5 text-[12.5px] font-semibold text-surface-elevated transition-colors hover:bg-pine-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55"
+                  className="inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-1.5 text-[12.5px] font-semibold text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55"
                 >
                   <Check size={14} strokeWidth={2.25} aria-hidden="true" />
                   {busy[item.id] ? t("working") : t("approve")}
@@ -258,7 +260,7 @@ export default function QueueList({
                   type="button"
                   onClick={() => review(item.id, "reject")}
                   disabled={busy[item.id]}
-                  className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#C0472B]/45 bg-[#C0472B]/8 px-3 py-1.5 text-[12.5px] font-semibold text-[#9A3A23] transition-colors hover:bg-[#C0472B]/16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C0472B] disabled:cursor-not-allowed disabled:opacity-55"
+                  className="inline-flex items-center gap-1.5 rounded-[4px] border border-clay/45 bg-clay/10 px-3 py-1.5 text-[12.5px] font-semibold text-clay transition-colors hover:bg-clay/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-55"
                 >
                   <X size={14} strokeWidth={2.25} aria-hidden="true" />
                   {busy[item.id] ? t("working") : t("reject")}

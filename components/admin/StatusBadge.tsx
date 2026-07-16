@@ -1,8 +1,11 @@
 import type { SubmissionStatus } from "@/lib/types";
 
 /**
- * Semantic status pill (pending amber / approved pine / rejected clay). The dot
- * is always paired with a text label — never an orphan status dot (ban list).
+ * Semantic status pill driven by rev-5 status tokens: pending --amber, rejected
+ * --clay, approved neutral ink (rev-5 retires green; the resolved/good state
+ * reads as plain ink, not a status color). Tints use color-mix so they flip with
+ * the token in dark mode. The dot is always paired with a text label — never an
+ * orphan status dot (ban list).
  */
 
 const STYLES: Record<
@@ -10,22 +13,22 @@ const STYLES: Record<
   { dot: string; text: string; bg: string; border: string }
 > = {
   pending: {
-    dot: "#B98A16",
-    text: "#7A5A0E",
-    bg: "rgba(232, 184, 75, 0.16)",
-    border: "rgba(185, 138, 22, 0.45)",
+    dot: "var(--amber)",
+    text: "var(--amber)",
+    bg: "color-mix(in srgb, var(--amber) 15%, transparent)",
+    border: "color-mix(in srgb, var(--amber) 45%, transparent)",
   },
   approved: {
-    dot: "var(--pine)",
-    text: "var(--pine-strong)",
-    bg: "rgba(31, 92, 74, 0.12)",
-    border: "rgba(31, 92, 74, 0.4)",
+    dot: "var(--ink-muted)",
+    text: "var(--ink)",
+    bg: "color-mix(in srgb, var(--ink) 7%, transparent)",
+    border: "var(--hairline-strong)",
   },
   rejected: {
-    dot: "#C0472B",
-    text: "#9A3A23",
-    bg: "rgba(192, 71, 43, 0.12)",
-    border: "rgba(192, 71, 43, 0.42)",
+    dot: "var(--clay)",
+    text: "var(--clay)",
+    bg: "color-mix(in srgb, var(--clay) 14%, transparent)",
+    border: "color-mix(in srgb, var(--clay) 45%, transparent)",
   },
 };
 

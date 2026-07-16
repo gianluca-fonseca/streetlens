@@ -10,9 +10,10 @@ import StatTiles, { type StatTile } from "@/components/admin/StatTiles";
 // Admin figures must always reflect the live dataset, never a build snapshot.
 export const dynamic = "force-dynamic";
 
-const AMBER = "#B98A16";
-const PINE = "var(--pine)";
-const CLAY = "#C0472B";
+// rev-5 status tokens (flip per theme). Approved is neutral ink (no green in
+// rev-5), so its tile carries no accent.
+const AMBER = "var(--amber)";
+const CLAY = "var(--clay)";
 
 export default async function AdminDashboardPage({
   params,
@@ -69,7 +70,6 @@ export default async function AdminDashboardPage({
       key: "approved",
       value: String(counts.approved),
       label: t("approved"),
-      accent: PINE,
     },
     {
       key: "rejected",
@@ -101,7 +101,7 @@ export default async function AdminDashboardPage({
             </h2>
             <Link
               href={`/${locale}/admin/queue`}
-              className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12px] font-medium text-pine transition-colors hover:border-border-strong"
+              className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12px] font-medium text-ink transition-colors hover:border-border-strong"
             >
               <ListChecks size={14} strokeWidth={1.75} aria-hidden="true" />
               {t("queueLink")}

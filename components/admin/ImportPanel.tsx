@@ -140,7 +140,7 @@ export default function ImportPanel({
         <p className="mt-1 mb-3 text-[12px] text-neutral-strong">{t("fileHint")}</p>
 
         <div className="flex flex-wrap items-center gap-3">
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink transition-colors hover:border-border-strong focus-within:ring-2 focus-within:ring-pine">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink transition-colors hover:border-border-strong focus-within:ring-2 focus-within:ring-ink">
             <FileUp size={15} strokeWidth={1.75} aria-hidden="true" />
             {filename ?? t("fileLabel")}
             <input
@@ -156,7 +156,7 @@ export default function ImportPanel({
             type="button"
             onClick={validate}
             disabled={!content || busy}
-            className="inline-flex items-center gap-1.5 rounded-[4px] bg-pine px-3 py-2 text-[13px] font-medium text-surface-elevated transition-colors hover:bg-pine-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-2 text-[13px] font-medium text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:cursor-not-allowed disabled:opacity-50"
           >
             {phase === "validating" ? t("validating") : t("dryRun")}
           </button>
@@ -168,7 +168,7 @@ export default function ImportPanel({
               type="checkbox"
               checked={verified}
               onChange={(e) => setVerified(e.target.checked)}
-              className="size-4 accent-pine"
+              className="size-4 accent-ink"
             />
             {t("verifiedLabel")}
           </label>
@@ -183,7 +183,7 @@ export default function ImportPanel({
                 value={auditor}
                 onChange={(e) => setAuditor(e.target.value)}
                 placeholder={t("auditorPlaceholder")}
-                className="mt-1 w-full max-w-xs rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[13px] text-ink focus:border-border-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+                className="mt-1 w-full max-w-xs rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[13px] text-ink focus:border-border-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               />
             </div>
           ) : null}
@@ -191,7 +191,7 @@ export default function ImportPanel({
       </section>
 
       {error ? (
-        <p className="inline-flex items-center gap-2 rounded-[8px] border border-border bg-surface-sunken px-3 py-2 text-[12.5px] text-accent-text">
+        <p className="inline-flex items-center gap-2 rounded-[8px] border border-clay/40 bg-clay/10 px-3 py-2 text-[12.5px] text-clay">
           <CircleAlert size={15} strokeWidth={1.75} aria-hidden="true" />
           {error}
         </p>
@@ -202,7 +202,7 @@ export default function ImportPanel({
           <CheckCircle2
             size={15}
             strokeWidth={1.75}
-            className="text-pine"
+            className="text-ink"
             aria-hidden="true"
           />
           {t("commitSuccess", { count: imported })}
@@ -292,7 +292,7 @@ export default function ImportPanel({
               type="button"
               onClick={commit}
               disabled={!canCommit}
-              className="inline-flex items-center gap-1.5 rounded-[4px] bg-pine px-3.5 py-2 text-[13px] font-medium text-surface-elevated transition-colors hover:bg-pine-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-medium text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Upload size={15} strokeWidth={1.75} aria-hidden="true" />
               {phase === "committing"
@@ -322,10 +322,10 @@ function StatusPill({
 }: Readonly<{ status: PreviewRow["status"]; label: string }>) {
   const tone =
     status === "valid"
-      ? "border-pine/40 text-pine"
+      ? "border-hairline-strong text-ink"
       : status === "duplicate"
         ? "border-border-strong text-neutral-strong"
-        : "border-accent-text/40 text-accent-text";
+        : "border-clay/40 text-clay";
   return (
     <span
       className={`inline-flex rounded-[4px] border px-1.5 py-0.5 font-mono text-[11px] ${tone}`}
@@ -341,10 +341,10 @@ function SummaryChip({
 }: Readonly<{ tone: "ok" | "warn" | "bad"; label: string }>) {
   const cls =
     tone === "ok"
-      ? "border-pine/40 text-pine"
+      ? "border-hairline-strong text-ink"
       : tone === "warn"
         ? "border-border-strong text-neutral-strong"
-        : "border-accent-text/40 text-accent-text";
+        : "border-clay/40 text-clay";
   return (
     <span className={`inline-flex rounded-[4px] border px-1.5 py-0.5 ${cls}`}>
       {label}

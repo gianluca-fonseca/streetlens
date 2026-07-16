@@ -1,8 +1,9 @@
 /**
  * Self-contained SVG preview of a segment's LineString geometry. No tiles, no
- * MapLibre instance — light, deterministic, and evidence-friendly. The line is
- * pine-keyed with terracotta endpoints; the aspect ratio of the geometry is
- * preserved (square projection window).
+ * MapLibre instance — light, deterministic, and evidence-friendly. The path is
+ * ink; the start/end markers are terracotta (the geometry-viz data hue, matching
+ * the contribute draw trace). The aspect ratio of the geometry is preserved
+ * (square projection window).
  */
 
 const W = 132;
@@ -65,7 +66,7 @@ export default function GeometryPreview({
       <path
         d={d}
         fill="none"
-        stroke="var(--pine)"
+        stroke="var(--ink)"
         strokeWidth={2.4}
         strokeLinecap="round"
         strokeLinejoin="round"

@@ -67,7 +67,7 @@ export default async function AdminHeader({
                 <Icon
                   size={14}
                   strokeWidth={1.75}
-                  className={isActive ? "text-pine" : "text-neutral-strong"}
+                  className={isActive ? "text-ink" : "text-neutral-strong"}
                   aria-hidden="true"
                 />
                 {label}

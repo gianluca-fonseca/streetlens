@@ -1,7 +1,8 @@
 /**
  * Data-dense stat tiles in the established mono-numeral style. One repeated
- * primitive (not five card styles); optional semantic accent bar for the
- * submission-status figures (amber/pine/clay), never a decorative left-border.
+ * primitive (not five card styles); optional semantic accent for the
+ * submission-status figures (amber pending / clay rejected; approved is neutral
+ * ink), never a decorative left-border.
  */
 
 export type StatTile = {

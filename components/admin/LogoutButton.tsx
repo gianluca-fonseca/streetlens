@@ -28,7 +28,7 @@ export default function LogoutButton() {
       type="button"
       onClick={onLogout}
       disabled={busy}
-      className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12.5px] font-medium text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine disabled:opacity-55"
+      className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12.5px] font-medium text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-55"
     >
       <LogOut size={14} strokeWidth={1.75} aria-hidden="true" />
       {t("logout")}
