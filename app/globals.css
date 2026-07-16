@@ -64,12 +64,23 @@
   /* Focus ring = ink. */
   --ring: #111111;
 
-  /* Zen-soft elevation: large-radius, very-low-alpha diffuse lift on flat grounds
-     (no inset emboss/deboss). Popover is a slightly stronger member of one family. */
+  /* Zen-soft elevation (rev-6 research §2): one top-down light, zero horizontal
+     offset, growing negative spread, per-layer alpha <= 0.08, hairline carries the
+     structure. Three tiers of one family: T1 rest = --shadow-panel, T2 raised =
+     --shadow-raised (hover, exactly one tier up), T3 overlay = --shadow-popover.
+     Penumbra filled (no hollow 4-16px band), contact tightened, no inset emboss. */
   --shadow-panel:
-    0 10px 40px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-raised:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 8px -2px rgba(0, 0, 0, 0.05),
+    0 12px 24px -4px rgba(0, 0, 0, 0.06);
   --shadow-popover:
-    0 16px 50px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 12px -3px rgba(0, 0, 0, 0.05),
+    0 16px 32px -6px rgba(0, 0, 0, 0.07), 0 28px 48px -10px rgba(0, 0, 0, 0.08);
+
+  /* Card hover surface lift. Light plate does not tint (shadow + rise sell it);
+     dark plate lifts +8/255 (#141414 -> #1c1c1c) — the dual-channel Notion cue. */
+  --surface-raised: #ffffff;
 
   /* Radius: plates are square-ish (big radius reads SaaS). */
   --radius-chip: 2px;
@@ -78,10 +89,40 @@
 
   /* Glass — permitted ONLY over live map tiles (never on flat grounds). Neutral
      white tint. --glass-blur is the sanctioned blur radius; wire it into the glass
-     primitive in u18 (blur is currently hardcoded in GlassPanel — see u16 report). */
-  --glass-bg: rgba(255, 255, 255, 0.66);
-  --glass-border: rgba(0, 0, 0, 0.10);
-  --glass-blur: 18px;
+     primitive in u18 (blur is currently hardcoded in GlassPanel — see u16 report).
+     Refined per research §1: alpha .66 -> .72 for standalone text, saturate() is the
+     missing tell, blur 20px panels. u18 consumes these for over-tile panels. */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-blur: 20px;
+  --glass-saturate: 150%;
+
+  /* Floating over-tile CHIPS (research §1 Recipe C): small elements can sit fully
+     over a bright OR dark tile, so push alpha up + blur down (14px). Near-opaque
+     enough that short labels clear AA over any tile without a scrim (worst case
+     ~10:1 light / ~6.9:1 dark; see u17 AA notes). --glass-chip-solid is the
+     no-blur swap used during map pan/zoom + as the @supports/no-backdrop fallback. */
+  --glass-chip-bg: rgba(255, 255, 255, 0.78);
+  --glass-chip-border: rgba(0, 0, 0, 0.10);
+  --glass-chip-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --glass-chip-lift: 0 2px 8px rgba(0, 0, 0, 0.16);
+  --glass-chip-solid: rgba(255, 255, 255, 0.92);
+
+  /* Motion (research §3): opacity + transform only, decelerated so the page
+     "arrives and settles". Theme-independent. */
+  --dur-instant: 100ms;
+  --dur-fast: 150ms;
+  --dur-base: 200ms; /* workhorse: hover-lift enter, popovers, most enters */
+  --dur-slow: 300ms; /* overlays, section reveal, hero chrome */
+  --dur-settle: 420ms; /* the single largest hero element (map plate) only */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* default: moves, hover, enters */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1); /* hero enters — luxurious settle */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1); /* exits / dismissals */
+
+  /* LIVE pulse ring colour (flash pink), fading to transparent — the halo's last
+     30% is fully invisible; that gap IS the ma. */
+  --sl-pulse-from: rgba(240, 38, 140, 0.45);
+  --sl-pulse-to: rgba(240, 38, 140, 0);
 }
 
 @theme inline {
@@ -167,14 +208,32 @@
 
     --ring: #f2f2f2;
 
-    /* Zen-soft geometry, black alphas deepened for the near-black ground. */
+    /* Dark elevation (research §2): lighter surface + border + inset top highlight
+       lead; black shadow supports. Each tier's own stack (a light stack is invisible
+       on black). Inset white highlight <= 0.06 or it reads as a glowing seam. */
     --shadow-panel:
-      0 10px 40px rgba(0, 0, 0, 0.40), 0 1px 2px rgba(0, 0, 0, 0.30);
+      0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    --shadow-raised:
+      0 1px 2px rgba(0, 0, 0, 0.40), 0 8px 24px -6px rgba(0, 0, 0, 0.50),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --shadow-popover:
-      0 16px 50px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.40);
+      0 1px 2px rgba(0, 0, 0, 0.50), 0 12px 32px -8px rgba(0, 0, 0, 0.60),
+      0 24px 48px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
-    --glass-bg: rgba(10, 10, 10, 0.58);
-    --glass-border: rgba(255, 255, 255, 0.12);
+    /* Card hover lifts the surface +8/255 (the dual-channel tint+lift cue on black). */
+    --surface-raised: #1c1c1c;
+
+    --glass-bg: rgba(12, 12, 12, 0.64);
+    --glass-border: rgba(255, 255, 255, 0.10);
+
+    --glass-chip-bg: rgba(14, 14, 14, 0.70);
+    --glass-chip-border: rgba(255, 255, 255, 0.14);
+    --glass-chip-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    --glass-chip-lift: 0 2px 10px rgba(0, 0, 0, 0.5);
+    --glass-chip-solid: rgba(10, 10, 10, 0.90);
+
+    --sl-pulse-from: rgba(255, 79, 163, 0.45);
+    --sl-pulse-to: rgba(255, 79, 163, 0);
   }
 }
 
@@ -319,5 +378,175 @@ body {
     font-size: 0.82rem;
     line-height: 1.45;
     text-align: left;
+  }
+}
+
+/* ─── u17 platform-hero: motion + over-tile glass + reveals ───────────────────
+   The rev-6 "Zen Instrument" motion system (research §3) and the over-tile glass
+   chip recipe (research §1 Recipe C). Everything opacity + transform only, all
+   motion-safe; the reduced-motion block at the end collapses it to plain fades. */
+
+/* Larger tap target for footnote superscripts on coarse pointers (wave-8 finding
+   b): pad the hit box to >=24x24px without touching font-size; negative margin
+   keeps the inline flow stable. */
+@media (pointer: coarse) {
+  .sl-sidenote-marker {
+    padding: 8px 7px;
+    margin: -8px -5px;
+  }
+}
+
+/* Smooth in-page scrolling honours reduced motion (the scroll container carries
+   `scroll-smooth`; anchor targets clear the top edge with scroll-margin). */
+section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* Over-tile glass chip (Recipe C): a designed material, not a translucent box —
+   backdrop blur + the missing saturate(), a bright inner-top hairline, a small
+   outer lift. Caller owns radius (pill / 10px). Neutral only; pink lives on a
+   SOLID sub-element (dot / border / text), never a tint on the glass. */
+.sl-glass-chip {
+  background: var(--glass-chip-bg);
+  border: 1px solid var(--glass-chip-border);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift);
+}
+@media (prefers-color-scheme: dark) {
+  .sl-glass-chip {
+    -webkit-backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
+    backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
+  }
+}
+/* During active pan/zoom the backdrop re-blurs every frame (the costly path on a
+   moving map). Swap to a near-opaque solid, no blur — visually close, zero cost —
+   while the plate carries data-map-moving; restore on idle. */
+[data-map-moving="true"] .sl-glass-chip {
+  background: var(--glass-chip-solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* No backdrop-filter support (or Increase Contrast): fall back to solid so text
+   never sits on raw tiles. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .sl-glass-chip {
+    background: var(--glass-chip-solid);
+  }
+}
+@media (prefers-contrast: more) {
+  .sl-glass-chip {
+    background: var(--glass-chip-solid);
+    border-color: var(--ink-muted);
+  }
+}
+
+/* LIVE dot: solid pink core, a calm breathing halo via box-shadow (2.6s; the last
+   30% is invisible — the ma). Static solid dot under reduced motion (presence
+   without a pulse; no fabricated timestamp — honesty rule). Pauses when hidden. */
+.sl-live-dot {
+  background: var(--accent);
+  animation: sl-live-pulse 2600ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes sl-live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--sl-pulse-from);
+  }
+  70% {
+    box-shadow: 0 0 0 8px var(--sl-pulse-to);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--sl-pulse-to);
+  }
+}
+
+/* Hero settle (research §3): map focuses into place first (420ms), then the rail
+   chrome cascades on top. One-shot on mount (fill-mode both holds the from-state
+   during the delay, so nothing flashes and JS-off still animates). Total < 850ms. */
+@keyframes sl-settle-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sl-settle-y, 10px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sl-settle-map {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.sl-hero-map {
+  animation: sl-settle-map var(--dur-settle) var(--ease-out-soft) both;
+}
+.sl-hero-el {
+  animation: sl-settle-up var(--dur-slow) var(--ease-out-soft) both;
+}
+
+/* Card hover-lift: up one shadow tier + rise, leaves faster than it enters (enter
+   200ms / leave 150ms). Dark also lifts the surface (dual-channel). No colored
+   glow — transform + box-shadow + background-color only. */
+.sl-card {
+  box-shadow: var(--shadow-panel);
+  transition:
+    transform var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+@media (hover: hover) {
+  .sl-card:hover {
+    transition-duration: var(--dur-base);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-raised);
+    background-color: var(--surface-raised);
+  }
+}
+
+/* Section reveal — the single sanctioned variant (research §3): opacity + 8px rise,
+   once-only, no child stagger. The REVEALED state is the CSS default so content is
+   visible with JS off; the hidden pre-state applies ONLY under `.js-enabled` (set
+   by an inline script before paint), and JS adds `.is-visible` when it scrolls in. */
+.js-enabled .sl-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out-soft),
+    transform var(--dur-slow) var(--ease-out-soft);
+}
+.js-enabled .sl-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Reduced motion (research §3): disable translate/scale/pulse/hover-lift and the
+   smooth scroll; KEEP short opacity fades, colour feedback, focus rings, the solid
+   live dot. Author the reduced variant, do not blanket-strip presence. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sl-hero-el,
+  .sl-hero-map,
+  .sl-reveal {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .sl-live-dot {
+    animation: none !important;
+  }
+  .sl-card:hover {
+    transform: none !important;
   }
 }
