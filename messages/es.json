@@ -353,18 +353,24 @@
     },
     "hero": {
       "wordmark": "StreetLens",
-      "eyebrow": "Un instrumento de campo para la calle",
-      "thesis": "Toda calle puede medirse. Casi ninguna se mide.",
-      "abstract": "Una puntuación pública y verificable para cada calle. Accesibilidad, drenaje, sombra e infraestructura ciclista, medidas segmento por segmento.",
-      "ctaPlatform": "Abrir la plataforma",
-      "ctaMethod": "Leer el método",
+      "question": "¿Qué tan buenas son las calles de Escazú?",
+      "banner": {
+        "methodQuestion": "¿Cómo funciona StreetLens?",
+        "methodLink": "Método",
+        "platform": "Abrir la plataforma"
+      },
+      "segments": {
+        "title": "Calles con menor puntuación",
+        "caveat": "Puntuaciones de demostración sobre geometría real. No son mediciones reales.",
+        "activate": "Abrir {name} en la plataforma"
+      },
       "stats": {
-        "segmentsLabel": "Segmentos auditados",
-        "segmentsNote": "Corredor piloto de Escazú",
-        "coverageLabel": "Cobertura del piloto",
-        "coverageNote": "de la red vial del distrito",
         "failLabel": "Incumplen la Ley 7600",
-        "failNote": "Cifra de demostración, no una medición real."
+        "coverageLabel": "Cobertura del corredor",
+        "segmentsLabel": "Segmentos auditados",
+        "kmLabel": "Vía auditada",
+        "bikeLabel": "Infraestructura ciclista media",
+        "demoFootnote": "La tasa de incumplimiento y los promedios son cifras de demostración sobre geometría real de OSM."
       },
       "map": {
         "live": "Mapa en vivo",

@@ -353,18 +353,24 @@
     },
     "hero": {
       "wordmark": "StreetLens",
-      "eyebrow": "A field instrument for the street",
-      "thesis": "Every street can be measured. Most never are.",
-      "abstract": "A public, checkable score for every street. Accessibility, drainage, shade, and bike infrastructure, measured segment by segment.",
-      "ctaPlatform": "Open the platform",
-      "ctaMethod": "Read the method",
+      "question": "How good are Escazú's streets?",
+      "banner": {
+        "methodQuestion": "How does StreetLens work?",
+        "methodLink": "Method",
+        "platform": "Open the platform"
+      },
+      "segments": {
+        "title": "Lowest-scoring streets",
+        "caveat": "Demo scores over real geometry. Not real measurements.",
+        "activate": "Open {name} in the platform"
+      },
       "stats": {
-        "segmentsLabel": "Segments audited",
-        "segmentsNote": "Escazú pilot corridor",
-        "coverageLabel": "Pilot coverage",
-        "coverageNote": "of the district street network",
         "failLabel": "Fail Ley 7600 minimums",
-        "failNote": "Demo figure, not a real measurement."
+        "coverageLabel": "Corridor coverage",
+        "segmentsLabel": "Segments audited",
+        "kmLabel": "Street audited",
+        "bikeLabel": "Avg. bike infrastructure",
+        "demoFootnote": "Fail rate and averages are demo figures over real OSM geometry."
       },
       "map": {
         "live": "Live map",

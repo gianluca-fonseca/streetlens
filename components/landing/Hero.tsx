@@ -1,30 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import AuditMap from "@/components/AuditMap";
-import Button from "@/components/ui/Button";
-import Eyebrow from "@/components/ui/Eyebrow";
 import Logo from "@/components/ui/Logo";
 import StatFigure from "@/components/ui/StatFigure";
 import { cn } from "@/components/ui/cn";
 
 /**
- * The platform hero (rev 6, u17). The mcbroken pattern in the Zen Instrument
- * key: a live, genuinely usable audit map embedded above the fold, a title rail
- * beside it, zen-solid stat cards below the rail, and glass chips floating on the
- * map. Every deeper action opens the full platform at `/[locale]/map`.
- *
- * Layout (research §4): a left rail (360px at 1440) and a large map plate on the
- * right at desktop; a stacked title-block / map / stat-row on phone. Motion
- * (research §3): the map focuses into place first, then the rail chrome cascades
- * on top, the stat cards stagger 70ms apart, and the LIVE / legend chips land
- * last. All one-shot, reduced-motion collapses it to a plain fade.
+ * The platform hero (rev 6, u21 — the mcbroken restructure). A slim top banner
+ * over a three-zone utility layout, map dominant: a LEFT rail (compact logo, a
+ * short question-title, and a scrolling list of the lowest-scoring streets), the
+ * CENTER live audit map (the same u17 cooperative-gesture embed, now nearly
+ * full-height), and a RIGHT stack of zen-solid stat cards. Every deeper action
+ * opens the full platform at `/[locale]/map`; the manifesto document survives
+ * below the fold. The rev-5 masthead voice (thesis H1 + serif abstract) has
+ * moved entirely into that document.
  */
+
+/** Slim full-width top banner (mcbroken register): one centered utility line
+ * carrying the method anchor and the primary platform link. Black ground / paper
+ * text in light; a near-black plate with a hairline separator in dark. Links are
+ * paper text with the single sanctioned pink signal on the underline. In flow,
+ * not fixed. */
+function Banner() {
+  const t = useTranslations("landing.hero.banner");
+  return (
+    <div className="w-full border-b border-transparent bg-ink-display text-paper dark:border-hairline dark:bg-paper-white dark:text-ink">
+      <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-center gap-x-5 gap-y-1 px-[max(1rem,env(safe-area-inset-left))] py-2.5 text-center text-[13px] leading-snug sm:px-6">
+        <span className="inline-flex items-center gap-1.5">
+          {t("methodQuestion")}
+          <a
+            href="#method"
+            className="font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
+          >
+            {t("methodLink")}
+          </a>
+        </span>
+        <span aria-hidden="true" className="hidden text-ink-faint sm:inline">
+          ·
+        </span>
+        <Link
+          href="/map"
+          className="inline-flex items-center gap-1 font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
+        >
+          {t("platform")}
+          <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 /** LIVE presence chip (glass Recipe C). Solid pink dot + calm breathing halo; a
  * static solid dot under reduced motion. No timestamp — the map is live, the demo
@@ -92,38 +122,80 @@ function LegendChip() {
   );
 }
 
-/** A zen-solid stat card in the rail (flat ground → hairline + zen-soft shadow,
- * never glass). Mono tabular numerals; a demo caveat where the number is synthetic. */
+/** One street in the LEFT-zone list: a hairline card in the segment's SEALED ramp
+ * color (a score dot, data context like the legend), the street name, its
+ * district, and the mono score. Tapping opens the full platform (u17 rule: no
+ * deep-link infra, the map opens at the district view). */
+function SegmentRow({
+  name,
+  district,
+  score,
+  activateLabel,
+  onActivate,
+}: Readonly<{
+  name: string;
+  district: string;
+  score: number;
+  activateLabel: string;
+  onActivate: () => void;
+}>) {
+  return (
+    <button
+      type="button"
+      onClick={onActivate}
+      aria-label={activateLabel}
+      className="sl-card flex min-h-[44px] w-full items-center gap-3 rounded-[8px] border border-hairline bg-paper-white px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+    >
+      <span
+        aria-hidden="true"
+        className="h-2.5 w-2.5 shrink-0 rounded-full"
+        style={{ backgroundColor: sampleRamp("overall", score) }}
+      />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13.5px] font-medium leading-tight text-ink">
+          {name}
+        </span>
+        <span className="block truncate text-[11.5px] leading-tight text-ink-muted">
+          {district}
+        </span>
+      </span>
+      <span className="shrink-0 font-mono text-[13px] tabular-nums text-ink-muted">
+        {score}
+      </span>
+    </button>
+  );
+}
+
+/** A zen-solid stat card in the RIGHT stack (flat ground → hairline + zen-soft
+ * shadow, never glass). Mono tabular numerals over one muted explainer line;
+ * demo caveating is carried once by the shared footnote at the stack's foot. */
 function StatCard({
   value,
   unit,
   label,
-  note,
   tone = "ink",
   delay,
 }: Readonly<{
   value: string;
   unit?: string;
   label: string;
-  note: string;
   tone?: "ink" | "accent";
   delay: number;
 }>) {
   return (
     <div
-      className="sl-card sl-hero-el min-w-[12.5rem] shrink-0 snap-start rounded-[4px] border border-hairline bg-paper-white p-3.5 lg:min-w-0 lg:shrink"
+      className="sl-card sl-hero-el min-w-[11.5rem] shrink-0 snap-start rounded-[4px] border border-hairline bg-paper-white p-3.5 lg:min-w-0 lg:shrink"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <StatFigure
-        value={value}
-        unit={unit}
-        label={label}
-        sublabel={note}
-        tone={tone}
-        size="md"
-      />
+      <StatFigure value={value} unit={unit} label={label} tone={tone} size="md" />
     </div>
   );
+}
+
+/** Whether a feature is an official audited segment (community/import adds carry a
+ * `source` and no rubric score — they must never enter the score list). */
+function isAudited(source: string | undefined, score: number): boolean {
+  return score > 0 && (source === undefined || source === "audit");
 }
 
 export default function Hero({
@@ -139,70 +211,75 @@ export default function Hero({
   // perf note): backdrop-blur re-blurs every frame a map pans/zooms.
   const [mapMoving, setMapMoving] = useState(false);
 
+  // The lowest-scoring streets, deduped by name (the worst segment per street, so
+  // the list reads as distinct streets rather than seven "Diagonal 68" rows), and
+  // the real average bike-infrastructure score — both from the sealed demo data.
+  const { worst, avgBike } = useMemo(() => {
+    const audited = segments.features.filter((f) =>
+      isAudited(f.properties.source, f.properties.score_overall),
+    );
+    const byStreet = new Map<
+      string,
+      { name: string; district: string; score: number }
+    >();
+    for (const f of audited) {
+      const p = f.properties;
+      const prev = byStreet.get(p.name);
+      if (!prev || p.score_overall < prev.score) {
+        byStreet.set(p.name, {
+          name: p.name,
+          district: p.district,
+          score: p.score_overall,
+        });
+      }
+    }
+    const worstStreets = [...byStreet.values()]
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 10);
+    const bikeMean = audited.length
+      ? Math.round(
+          audited.reduce((s, f) => s + f.properties.score_bike, 0) /
+            audited.length,
+        )
+      : 0;
+    return { worst: worstStreets, avgBike: bikeMean };
+  }, [segments]);
+
+  const openPlatform = () => router.push("/map");
+
   return (
-    <section className="pb-10 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.5rem))] sm:pb-14 lg:pb-16">
-      <div className="mx-auto w-full max-w-[1400px] px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-6 lg:px-8">
-        <div className="grid gap-x-8 gap-y-6 lg:min-h-[87vh] lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_auto_auto_1fr]">
-          {/* ── Title block (rail head). Centered as a group with the stat
-               cards inside the hero zone via the two 1fr spacer rows. ─── */}
-          <div className="lg:col-start-1 lg:row-start-2">
+    <section className="pb-10 sm:pb-14 lg:pb-16">
+      <Banner />
+      <div className="mx-auto w-full max-w-[1400px] px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-6 sm:px-6 sm:pt-8 lg:px-8">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-8 lg:h-[78vh] lg:max-h-[52rem] lg:grid-cols-[300px_minmax(0,1fr)_260px] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-y-6">
+          {/* ── LEFT zone head: compact lockup + question title ──────── */}
+          <div className="lg:col-start-1 lg:row-start-1">
             <div
               className="sl-hero-el text-ink-display"
               style={{ animationDelay: "120ms" }}
             >
-              <Logo withWordmark size={22} title={t("wordmark")} />
-            </div>
-            <div
-              className="sl-hero-el mt-3.5"
-              style={{ animationDelay: "120ms" }}
-            >
-              <Eyebrow>{t("eyebrow")}</Eyebrow>
+              <Logo withWordmark size={20} title={t("wordmark")} />
             </div>
             <h1
-              className="sl-hero-el mt-2.5 max-w-[16ch] font-display text-[clamp(1.65rem,2.5vw,2.25rem)] font-bold leading-[1.06] tracking-[-0.025em] text-ink-display text-balance dark:tracking-[-0.02em]"
+              className="sl-hero-el mt-4 max-w-[20ch] font-display text-[clamp(1.35rem,1.9vw,1.6rem)] font-bold leading-[1.12] tracking-[-0.02em] text-ink-display text-balance dark:tracking-[-0.015em]"
               style={{ animationDelay: "180ms" }}
             >
-              {t("thesis")}
+              {t("question")}
             </h1>
-            <p
-              className="sl-hero-el mt-3.5 max-w-[32rem] font-serif text-[1rem] leading-[1.5] text-ink text-pretty"
-              style={{ animationDelay: "260ms" }}
-            >
-              {t("abstract")}
-            </p>
-            <div
-              className="sl-hero-el mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center"
-              style={{ animationDelay: "340ms" }}
-            >
-              <Button
-                href="/map"
-                variant="accent"
-                size="lg"
-                className="min-h-[48px] w-full justify-center sm:w-auto"
-              >
-                {t("ctaPlatform")}
-              </Button>
-              <a
-                href="#method"
-                className="inline-flex min-h-[48px] items-center font-medium text-ink underline decoration-accent decoration-2 underline-offset-[6px] transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-              >
-                {t("ctaMethod")}
-              </a>
-            </div>
           </div>
 
-          {/* ── Map plate (z0 flat frame) + glass chips (z10) ───────── */}
-          <div className="sl-hero-map flex flex-col lg:col-start-2 lg:row-start-1 lg:row-span-4 lg:h-[63dvh] lg:max-h-[44rem] lg:self-center">
+          {/* ── CENTER zone: the live map plate (z0 frame) + chips (z10) ── */}
+          <div className="sl-hero-map flex flex-col lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-full">
             <div className="min-h-0 flex-1 rounded-[4px] border border-hairline bg-paper p-2 sm:p-3">
               <div
                 data-map-moving={mapMoving ? "true" : "false"}
-                className="relative h-[60dvh] overflow-hidden rounded-[2px] bg-paper-sunken lg:h-full"
+                className="relative h-[55dvh] overflow-hidden rounded-[2px] bg-paper-sunken lg:h-full"
               >
                 <AuditMap
                   variant="hero"
                   interactive
                   segments={segments}
-                  onSegmentActivate={() => router.push("/map")}
+                  onSegmentActivate={openPlatform}
                   onMoveStateChange={setMapMoving}
                 />
                 <LiveChip label={t("map.live")} />
@@ -214,30 +291,69 @@ export default function Hero({
             </p>
           </div>
 
-          {/* ── Stat cards (zen-solid): horizontal scroll on phone, stacked
-               in the rail on desktop ─────────────────────────────────── */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:col-start-1 lg:row-start-3 lg:mt-2 lg:flex-col lg:self-start lg:overflow-visible lg:px-0 lg:pb-0">
-            <StatCard
-              value={String(stats.segments)}
-              label={t("stats.segmentsLabel")}
-              note={t("stats.segmentsNote")}
-              delay={420}
-            />
-            <StatCard
-              value={String(stats.coveragePct)}
-              unit="%"
-              label={t("stats.coverageLabel")}
-              note={t("stats.coverageNote")}
-              delay={490}
-            />
-            <StatCard
-              value={String(stats.heroPct)}
-              unit="%"
-              label={t("stats.failLabel")}
-              note={t("stats.failNote")}
-              tone="accent"
-              delay={560}
-            />
+          {/* ── RIGHT zone: zen-solid stat stack (horizontal snap on phone,
+               vertical on desktop) + one shared demo footnote ────────── */}
+          <div className="flex flex-col gap-3 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:min-h-0">
+            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:min-h-0 lg:flex-col lg:overflow-y-auto lg:px-0 lg:pb-0 lg:[scrollbar-width:thin]">
+              <StatCard
+                value={String(stats.heroPct)}
+                unit="%"
+                label={t("stats.failLabel")}
+                tone="accent"
+                delay={420}
+              />
+              <StatCard
+                value={String(stats.coveragePct)}
+                unit="%"
+                label={t("stats.coverageLabel")}
+                delay={490}
+              />
+              <StatCard
+                value={String(stats.segments)}
+                label={t("stats.segmentsLabel")}
+                delay={560}
+              />
+              <StatCard
+                value={stats.km.toFixed(1)}
+                unit="km"
+                label={t("stats.kmLabel")}
+                delay={630}
+              />
+              <StatCard
+                value={String(avgBike)}
+                unit="/100"
+                label={t("stats.bikeLabel")}
+                delay={700}
+              />
+            </div>
+            <p className="px-1 font-mono text-[11px] leading-snug text-ink-muted lg:px-0">
+              {t("stats.demoFootnote")}
+            </p>
+          </div>
+
+          {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}
+          <div className="flex flex-col lg:col-start-1 lg:row-start-2 lg:min-h-0">
+            <div className="shrink-0">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
+                {t("segments.title")}
+              </p>
+              <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
+                {t("segments.caveat")}
+              </p>
+            </div>
+            <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
+              {worst.map((s) => (
+                <li key={s.name}>
+                  <SegmentRow
+                    name={s.name}
+                    district={s.district}
+                    score={s.score}
+                    activateLabel={t("segments.activate", { name: s.name })}
+                    onActivate={openPlatform}
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
