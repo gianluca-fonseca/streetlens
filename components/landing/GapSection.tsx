@@ -38,7 +38,7 @@ export default function GapSection({
       </Measure>
 
       <Measure width="text" className="mt-12">
-        <p className="font-serif text-[1.18rem] leading-[1.7] text-ink">
+        <p className="font-serif text-[1.08rem] leading-[1.7] text-ink">
           {t.rich("body", {
             ley: (chunks) => <Sidenote number={1}>{chunks}</Sidenote>,
             cosevi: (chunks) => <Sidenote number={2}>{chunks}</Sidenote>,
@@ -50,7 +50,7 @@ export default function GapSection({
         <dl className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-3">
           {stats.map((s) => (
             <div key={s.key} className="flex flex-col bg-surface p-6 sm:p-7">
-              <dd className="font-mono text-[clamp(2rem,4vw,2.5rem)] font-medium leading-none tracking-tight text-ink-display">
+              <dd className="font-mono text-[clamp(1.7rem,3.4vw,2.15rem)] font-medium leading-none tracking-tight text-ink-display">
                 {s.value}
               </dd>
               <dt className="mt-3 text-[0.95rem] font-medium leading-snug text-ink">

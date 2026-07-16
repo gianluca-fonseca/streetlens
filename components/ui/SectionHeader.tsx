@@ -28,11 +28,11 @@ export default function SectionHeader({
         <span className="h-3 w-px bg-hairline-strong" aria-hidden="true" />
         <span>{eyebrow}</span>
       </div>
-      <h2 className="mx-auto mt-5 max-w-[20ch] font-display text-[clamp(2rem,4vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink-display text-balance dark:tracking-[-0.015em]">
+      <h2 className="mx-auto mt-4 max-w-[20ch] font-display text-[clamp(1.7rem,3.1vw,2.15rem)] font-bold leading-[1.1] tracking-[-0.02em] text-ink-display text-balance dark:tracking-[-0.015em]">
         {title}
       </h2>
       {lead ? (
-        <p className="mx-auto mt-5 max-w-[46rem] font-serif text-[1.18rem] leading-[1.55] text-ink text-pretty">
+        <p className="mx-auto mt-4 max-w-[40rem] font-serif text-[1.08rem] leading-[1.55] text-ink text-pretty">
           {lead}
         </p>
       ) : null}

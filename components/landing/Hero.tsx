@@ -9,6 +9,7 @@ import { BINS, sampleRamp } from "@/components/mapConfig";
 import AuditMap from "@/components/AuditMap";
 import Button from "@/components/ui/Button";
 import Eyebrow from "@/components/ui/Eyebrow";
+import Logo from "@/components/ui/Logo";
 import StatFigure from "@/components/ui/StatFigure";
 import { cn } from "@/components/ui/cn";
 
@@ -110,7 +111,7 @@ function StatCard({
 }>) {
   return (
     <div
-      className="sl-card sl-hero-el min-w-[13.5rem] shrink-0 snap-start rounded-[4px] border border-hairline bg-paper-white p-4 lg:min-w-0 lg:shrink"
+      className="sl-card sl-hero-el min-w-[12.5rem] shrink-0 snap-start rounded-[4px] border border-hairline bg-paper-white p-3.5 lg:min-w-0 lg:shrink"
       style={{ animationDelay: `${delay}ms` }}
     >
       <StatFigure
@@ -141,35 +142,36 @@ export default function Hero({
   return (
     <section className="pb-10 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.5rem))] sm:pb-14 lg:pb-16">
       <div className="mx-auto w-full max-w-[1400px] px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-6 lg:px-8">
-        <div className="grid gap-x-8 gap-y-6 lg:grid-cols-[360px_1fr] lg:grid-rows-[auto_1fr]">
-          {/* ── Title block (rail head) ─────────────────────────────── */}
-          <div className="lg:col-start-1 lg:row-start-1 lg:self-start">
-            <p
-              className="sl-hero-el font-display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-ink-display"
+        <div className="grid gap-x-8 gap-y-6 lg:min-h-[87vh] lg:grid-cols-[360px_1fr] lg:grid-rows-[1fr_auto_auto_1fr]">
+          {/* ── Title block (rail head). Centered as a group with the stat
+               cards inside the hero zone via the two 1fr spacer rows. ─── */}
+          <div className="lg:col-start-1 lg:row-start-2">
+            <div
+              className="sl-hero-el text-ink-display"
               style={{ animationDelay: "120ms" }}
             >
-              {t("wordmark")}
-            </p>
+              <Logo withWordmark size={22} title={t("wordmark")} />
+            </div>
             <div
-              className="sl-hero-el mt-4"
+              className="sl-hero-el mt-3.5"
               style={{ animationDelay: "120ms" }}
             >
               <Eyebrow>{t("eyebrow")}</Eyebrow>
             </div>
             <h1
-              className="sl-hero-el mt-3 max-w-[16ch] font-display text-[clamp(1.85rem,3vw,2.6rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink-display text-balance dark:tracking-[-0.02em]"
+              className="sl-hero-el mt-2.5 max-w-[16ch] font-display text-[clamp(1.65rem,2.5vw,2.25rem)] font-bold leading-[1.06] tracking-[-0.025em] text-ink-display text-balance dark:tracking-[-0.02em]"
               style={{ animationDelay: "180ms" }}
             >
               {t("thesis")}
             </h1>
             <p
-              className="sl-hero-el mt-4 max-w-[34rem] font-serif text-[1.05rem] leading-[1.5] text-ink text-pretty"
+              className="sl-hero-el mt-3.5 max-w-[32rem] font-serif text-[1rem] leading-[1.5] text-ink text-pretty"
               style={{ animationDelay: "260ms" }}
             >
               {t("abstract")}
             </p>
             <div
-              className="sl-hero-el mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center"
+              className="sl-hero-el mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center"
               style={{ animationDelay: "340ms" }}
             >
               <Button
@@ -190,7 +192,7 @@ export default function Hero({
           </div>
 
           {/* ── Map plate (z0 flat frame) + glass chips (z10) ───────── */}
-          <div className="sl-hero-map flex flex-col lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:h-[63dvh] lg:max-h-[44rem]">
+          <div className="sl-hero-map flex flex-col lg:col-start-2 lg:row-start-1 lg:row-span-4 lg:h-[63dvh] lg:max-h-[44rem] lg:self-center">
             <div className="min-h-0 flex-1 rounded-[4px] border border-hairline bg-paper p-2 sm:p-3">
               <div
                 data-map-moving={mapMoving ? "true" : "false"}
@@ -214,7 +216,7 @@ export default function Hero({
 
           {/* ── Stat cards (zen-solid): horizontal scroll on phone, stacked
                in the rail on desktop ─────────────────────────────────── */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:col-start-1 lg:row-start-2 lg:flex-col lg:self-start lg:overflow-visible lg:px-0 lg:pb-0">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:col-start-1 lg:row-start-3 lg:mt-2 lg:flex-col lg:self-start lg:overflow-visible lg:px-0 lg:pb-0">
             <StatCard
               value={String(stats.segments)}
               label={t("stats.segmentsLabel")}

@@ -48,7 +48,7 @@ export default function RoadmapSection() {
                     {t(`steps.${key}.status`)}
                   </span>
                 </div>
-                <h3 className="mt-2.5 font-display text-[1.25rem] font-semibold leading-tight tracking-[-0.01em] text-ink-display">
+                <h3 className="mt-2.5 font-display text-[1.15rem] font-semibold leading-tight tracking-[-0.01em] text-ink-display">
                   {t(`steps.${key}.title`)}
                 </h3>
                 <p className="mt-1.5 font-serif text-[1.02rem] leading-[1.55] text-ink-muted">

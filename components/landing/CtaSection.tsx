@@ -20,10 +20,10 @@ export default function CtaSection() {
     <Section id="cta" tone="inverted" spacing="lg">
       <Measure width="outset" className="text-center">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <h2 className="mx-auto mt-5 max-w-[16ch] font-display text-[clamp(2.25rem,5vw,3.5rem)] font-bold leading-[1.04] tracking-[-0.025em] text-ink-display text-balance">
+        <h2 className="mx-auto mt-4 max-w-[16ch] font-display text-[clamp(1.9rem,4vw,2.7rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink-display text-balance">
           {t("heading")}
         </h2>
-        <p className="mx-auto mt-6 max-w-[38rem] font-serif text-[1.18rem] leading-[1.55] text-ink text-pretty">
+        <p className="mx-auto mt-5 max-w-[36rem] font-serif text-[1.08rem] leading-[1.55] text-ink text-pretty">
           {t("support")}
         </p>
 

@@ -40,7 +40,7 @@ export default function MethodSection() {
       </Measure>
 
       <Measure width="text" className="mt-12">
-        <p className="font-serif text-[1.18rem] leading-[1.7] text-ink">
+        <p className="font-serif text-[1.08rem] leading-[1.7] text-ink">
           {t.rich("body", {
             maps: (chunks) => <Sidenote number={3}>{chunks}</Sidenote>,
             lanamme: (chunks) => <Sidenote number={4}>{chunks}</Sidenote>,
@@ -120,7 +120,7 @@ export default function MethodSection() {
           <p className="font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-ink-muted">
             {t("collect.eyebrow")}
           </p>
-          <h3 className="mx-auto mt-4 max-w-[24ch] font-display text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.12] tracking-[-0.015em] text-ink-display text-balance">
+          <h3 className="mx-auto mt-4 max-w-[24ch] font-display text-[clamp(1.35rem,2.6vw,1.8rem)] font-bold leading-[1.14] tracking-[-0.015em] text-ink-display text-balance">
             {t("collect.heading")}
           </h3>
         </div>
