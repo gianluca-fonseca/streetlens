@@ -50,7 +50,7 @@ export default function MethodSection() {
 
       {/* Four grounding inputs: a hairline rubric, not cards. Unordered by design
           (no 01–04 index), so the grid carries the structure. */}
-      <Measure width="page" className="mt-14">
+      <Measure width="page" className="clear-both mt-14">
         <div className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-2">
           {METHOD_ITEMS.map((key) => (
             <div key={key} className="bg-surface p-6 sm:p-7">

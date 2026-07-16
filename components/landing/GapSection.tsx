@@ -46,7 +46,7 @@ export default function GapSection({
         </p>
       </Measure>
 
-      <Measure width="page" className="mt-14">
+      <Measure width="page" className="clear-both mt-14">
         <dl className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-3">
           {stats.map((s) => (
             <div key={s.key} className="flex flex-col bg-surface p-6 sm:p-7">
