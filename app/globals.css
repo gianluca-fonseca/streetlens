@@ -1,71 +1,87 @@
 @import "tailwindcss";
 
 /*
- * StreetLens design tokens — sealed from docs/design-direction.md (rev 4, 2026-07-15).
- * Survey-instrument field aesthetic: cool concrete-paper grounds with a green
- * hue bias (OFF-cream, deliberate), road-marking yellow as the single UI accent,
- * pine as brand primary. Soft-depth (dual green-black shadow), non-uniform radius
- * (4/8/12), colorblind-safe data. Terracotta is demoted to DATA colors only.
- * Every ratio in the comments below is computed AA (see contrast table in report).
+ * StreetLens design tokens — sealed from docs/design-direction.md (rev 5, 2026-07-16).
+ * "Field Manifesto": academic-paper bones in cool restrained creme (NOT honey),
+ * warm near-black ink, one loud FLASH-PINK signal. Dark mode is the same document
+ * as an inverted-paper (letterpress negative): warm near-black ground, creme ink.
+ * Flat paper + hairlines carry structure (no texture); pink is signal-only.
+ *
+ * Token strategy (churn-minimizing): the rev-4 names components already consume
+ * (--surface-*, --ink, --neutral-*, --border*, --pine*, --accent*, --ring) are KEPT
+ * and re-valued. The rev-5 vocabulary (--paper*, --ink-display/muted/faint,
+ * --hairline*, --amber, --clay, --accent-fg) is added as the primary source of
+ * truth, and the legacy names alias onto it via var() so both spellings resolve to
+ * one value. --pine is an INTERIM ink hold (brand pine retired in rev-5) kept alive
+ * only so unreskinned components build; u14/u15 remove the pine references.
+ * Every ratio in the comments is computed AA (see contrast table in the u13 report).
  */
 
 :root {
-  /* Grounds (light: cool concrete-paper, green-biased, OFF-cream) */
-  --surface-base: #f2f3f0;
-  --surface-elevated: #fafbf9;
-  --surface-sunken: #e9ebe6;
+  /* Paper grounds (light) — cool restrained creme, not honey. */
+  --paper: #f3f1e9; /* page ground */
+  --paper-white: #fbfaf6; /* plates, cards, long-reading blocks */
+  --paper-sunken: #e9e6db; /* interstitial bands, sidenote lane, zebra */
+  --surface-base: var(--paper);
+  --surface-elevated: var(--paper-white);
+  --surface-sunken: var(--paper-sunken);
 
-  /* Ink + neutral ramp (rebiased green to match the grounds) */
-  --ink: #171d1a;
-  /* Secondary body text: green-biased slate. Clears AA (>=4.5:1) as body copy on
-     all three light grounds — min 5.73:1 on the sunken tone. */
-  --neutral-strong: #565c54;
-  --neutral: #8b9188;
-  --neutral-soft: #d3d6cf;
+  /* Ink ramp (warm near-black; never pure #000 for body). */
+  --ink: #191510; /* body (16.1:1 on paper) */
+  --ink-display: #0c0a06; /* bold-black headlines, truest black */
+  --ink-muted: #6a6355; /* captions/meta (AA: 5.26 paper / 5.70 pw / 4.76 sunken) */
+  --ink-faint: #938b7b; /* ticks/disabled — graphic/large only, sub-AA by design */
+  --neutral-strong: var(--ink-muted);
+  --neutral: var(--ink-faint);
 
-  /* Brand primary: pine (unchanged) */
-  --pine: #1f5c4a;
-  --pine-strong: #164034;
+  /* Hairlines (flat paper carries structure through rules, not shadow). */
+  --hairline: #dad5c7; /* 1px rules, plate borders */
+  --hairline-strong: #b7b0a0; /* stronger dividers, active borders */
+  --neutral-soft: var(--hairline);
+  --border: var(--hairline);
+  --border-strong: var(--hairline-strong);
 
-  /* UI accent: road-marking yellow (lane paint). Two forms:
-     - surface/graphic: saturated lane yellow for fills, active markers, highlights
-     - accent-strong: darker press/hover form
-     - accent-text: dark ochre that clears AA (>=4.5:1) on every light ground
-       (min 4.98:1 on sunken); use this for accent TEXT on grounds, never the
-       saturated form (which is graphic-only at 1.4:1). */
-  --accent: #e8c51c;
-  --accent-strong: #d2b015;
-  --accent-text: #756211;
+  /* INTERIM: brand pine is retired in rev-5 (primary chrome goes ink). Held to
+     ink values so any un-reskinned pine reference reads ink-ish; removed in u14/u15. */
+  --pine: #191510;
+  --pine-strong: #0c0a06;
 
-  /* Terracotta: DATA ONLY (score ramps / geometry viz). Retired from all chrome. */
+  /* FLASH PINK — signal only (CTA fill, active state, underline, tick, LIVE dot). */
+  --accent: #f0268c; /* graphic signal */
+  --accent-strong: #cf1273; /* press/hover form */
+  --accent-text: #a80d5f; /* deep magenta for accent TEXT on paper (AA: 5.82–6.96) */
+  --accent-fg: #0c0a06; /* fixed dark label on pink fills — AA in BOTH themes
+                           (5.05 on light pink, 6.50 on dark pink); never re-valued. */
+
+  /* Terracotta: DATA ONLY (score ramps / geometry viz). Banned from chrome. */
   --terracotta: #e07a3f;
 
-  /* Borders / rings (non-shadow affordance; border-strong is the visible step) */
-  --border: #d3d6cf;
-  --border-strong: #adb1a6;
-  --ring: #1f5c4a;
+  /* Status semantics (promoted for admin/u14): pending amber + destructive clay.
+     AA text on all three light grounds (amber 5.10–5.87, clay 4.77–5.71). */
+  --amber: #7a5a0e;
+  --clay: #b23a22;
 
-  /* Soft-depth shadows: dual green-black tint (ambient + tight directional), never pure black. */
-  --shadow-panel:
-    0 1px 2px rgba(23, 29, 26, 0.10),
-    0 8px 24px -6px rgba(23, 29, 26, 0.16);
+  /* Focus ring = ink. */
+  --ring: #191510;
+
+  /* Near-flat elevation: panel almost imperceptible; popover kept functional
+     (map app layering). Ink-tinted, never pure black. */
+  --shadow-panel: 0 1px 2px rgba(25, 21, 16, 0.06);
   --shadow-popover:
-    0 2px 6px rgba(23, 29, 26, 0.14),
-    0 18px 42px -10px rgba(23, 29, 26, 0.26);
+    0 2px 6px rgba(25, 21, 16, 0.10), 0 16px 36px -12px rgba(25, 21, 16, 0.20);
 
-  /* Radius system (intentional, non-uniform) */
-  --radius-chip: 4px;
-  --radius-panel: 8px;
-  --radius-primary: 12px;
+  /* Radius: plates are square-ish (big radius reads SaaS). */
+  --radius-chip: 2px;
+  --radius-panel: 4px;
+  --radius-primary: 6px;
 
-  /* Earned glass (rev 3): imagery-backed surfaces only. Cool concrete tint +
-   * green-black hairline. Theme-adaptive so a single primitive reads over light
-   * renders, the live map, and asphalt-dark renders alike. */
-  --glass-bg: rgba(242, 243, 240, 0.72);
-  --glass-border: rgba(23, 29, 26, 0.16);
+  /* Glass retires on flat paper — survives ONLY over live map tiles. Paper tints. */
+  --glass-bg: rgba(251, 250, 246, 0.80);
+  --glass-border: rgba(25, 21, 16, 0.14);
 }
 
 @theme inline {
+  /* Legacy names (components consume these utilities today). */
   --color-surface: var(--surface-base);
   --color-surface-elevated: var(--surface-elevated);
   --color-surface-sunken: var(--surface-sunken);
@@ -82,13 +98,29 @@
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
 
+  /* rev-5 vocabulary (paper/ink/hairline/status/pink-fg) for u14 + u15. */
+  --color-paper: var(--paper);
+  --color-paper-white: var(--paper-white);
+  --color-paper-sunken: var(--paper-sunken);
+  --color-ink-display: var(--ink-display);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-accent-fg: var(--accent-fg);
+  --color-amber: var(--amber);
+  --color-clay: var(--clay);
+
   --color-background: var(--surface-base);
   --color-foreground: var(--ink);
 
-  /* Space Grotesk is the single app-wide typeface (display + body/UI). */
+  /* Space Grotesk 700 display + UI/sans, Newsreader serif (landing/prose voice —
+     NEVER a headline), IBM Plex Mono instrument. */
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui,
     sans-serif;
   --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, "Times New Roman",
+    serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
   --radius-chip: var(--radius-chip);
@@ -99,45 +131,45 @@
   --shadow-popover: var(--shadow-popover);
 }
 
-/* Dark mode: asphalt green-black grounds. Yellow accent reads beautifully on
-   asphalt. Data glow (dark only) lives on the map layer, not chrome. Redefines
-   token VALUES only — components style through the same tokens as light. */
+/* Dark mode: inverted paper (letterpress negative). Warm near-black ground, creme
+   ink. Overrides base-token VALUES only; the legacy aliases above re-resolve
+   through var(), so components style through the same names as light. Auto via
+   prefers-color-scheme, as today. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface-base: #10130f;
-    --surface-elevated: #191d17;
-    --surface-sunken: #0b0e0a;
+    --paper: #14120c;
+    --paper-white: #1e1b14;
+    --paper-sunken: #0d0b07;
 
-    --ink: #e8ebe0;
-    --neutral-strong: #a4a99c;
-    --neutral: #78806f;
-    --neutral-soft: #333a2e;
+    --ink: #f1eee3;
+    --ink-display: #fbf9f0;
+    --ink-muted: #a69e8c; /* AA 6.46–7.39 on dark grounds */
+    --ink-faint: #6e6656; /* graphic/large only */
 
-    --pine: #3f9c7f;
-    --pine-strong: #2c7a62;
+    --hairline: #33302a;
+    --hairline-strong: #4c483f;
 
-    /* Yellow accent on asphalt: the surface form reads directly, and it clears
-       AA as text on the dark grounds (min ~10:1), so accent-text folds back to
-       the saturated form here. */
-    --accent: #e8c51c;
-    --accent-strong: #f0d23a;
-    --accent-text: #e8c51c;
+    --pine: #f1eee3; /* interim creme-ink hold */
+    --pine-strong: #fbf9f0;
+
+    --accent: #ff4fa3; /* flash pink pops on near-black */
+    --accent-strong: #ff77b8;
+    --accent-text: #ff6fb0; /* AA 6.67–7.63 on dark grounds */
+    /* --accent-fg intentionally NOT re-valued: stays #0c0a06 (dark label on pink). */
 
     --terracotta: #ef8f56;
 
-    --border: #333a2e;
-    --border-strong: #4a5142;
-    --ring: #3f9c7f;
+    --amber: #e0a93a; /* AA 8.11–9.27 */
+    --clay: #f0876b; /* AA 6.86–7.85 */
 
-    --shadow-panel:
-      0 1px 2px rgba(0, 0, 0, 0.44),
-      0 8px 24px -6px rgba(0, 0, 0, 0.56);
+    --ring: #f1eee3;
+
+    --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.30);
     --shadow-popover:
-      0 2px 6px rgba(0, 0, 0, 0.5),
-      0 18px 42px -10px rgba(0, 0, 0, 0.66);
+      0 2px 6px rgba(0, 0, 0, 0.42), 0 16px 36px -12px rgba(0, 0, 0, 0.58);
 
-    --glass-bg: rgba(16, 19, 15, 0.62);
-    --glass-border: rgba(232, 235, 224, 0.14);
+    --glass-bg: rgba(20, 18, 12, 0.72);
+    --glass-border: rgba(241, 238, 227, 0.14);
   }
 }
 
@@ -177,47 +209,21 @@ body {
   background: var(--surface-base);
   color: var(--ink);
   font-family: var(--font-sans);
-  /* Subtle grain on the concrete base (no aurora/mesh). Marketing surfaces layer
-     the topographic contour motif over this; see .contour-field. */
-  background-image: radial-gradient(
-    rgba(23, 29, 26, 0.016) 0.5px,
-    transparent 0.5px
-  );
-  background-size: 3px 3px;
+  /* Flat paper: no micro-grain, no tiled texture. Hairlines carry all structure. */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Topographic contour motif for marketing surfaces (design-direction rev 4).
-   Replaces the generic paper-grain dot on landing sections with a survey-plate
-   terrain texture: a single static SVG of a few contour lines, very low
-   contrast, tiled. Drawn in a pseudo-element so content stacks above it; the
-   asset ships with dark ink strokes and is inverted on asphalt-dark so one file
-   serves both themes. Honors reduced-transparency preferences implicitly by
-   sitting far below AA thresholds. */
+/* rev-4 topographic contour texture is RETIRED. The class is kept as a no-op
+   (positioning context only) so any lingering reference is harmless until u15
+   removes the last call sites. No tiled background renders. */
 .contour-field {
   position: relative;
   isolation: isolate;
 }
-.contour-field::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: url("/contour.svg");
-  background-size: 560px 560px;
-  background-repeat: repeat;
-  opacity: 0.05;
-  pointer-events: none;
-}
-@media (prefers-color-scheme: dark) {
-  .contour-field::before {
-    opacity: 0.07;
-    filter: invert(1);
-  }
-}
 
-/* MapLibre popup/control overrides so nothing ships looking default. */
+/* MapLibre popup/control overrides so nothing ships looking default. Group chrome
+   reads the panel tokens (re-valued above); attribution uses paper tints. */
 .maplibregl-ctrl-group {
   background: var(--surface-elevated) !important;
   border: 1px solid var(--border) !important;
@@ -231,12 +237,12 @@ body {
   filter: none;
 }
 .maplibregl-ctrl-attrib {
-  background: rgba(250, 251, 249, 0.78) !important;
+  background: rgba(251, 250, 246, 0.80) !important;
   color: var(--neutral-strong) !important;
   border-radius: var(--radius-chip) 0 0 0 !important;
 }
 @media (prefers-color-scheme: dark) {
   .maplibregl-ctrl-attrib {
-    background: rgba(25, 29, 23, 0.78) !important;
+    background: rgba(20, 18, 12, 0.80) !important;
   }
 }
