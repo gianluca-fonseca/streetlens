@@ -29,6 +29,7 @@ import ThreeDToggle from "@/components/ThreeDToggle";
 import SegmentDetail from "@/components/SegmentDetail";
 import ContributeUI from "@/components/contribute/ContributeUI";
 import { useContribute } from "@/components/contribute/useContribute";
+import { cn } from "@/components/ui/cn";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 export type { SegmentCollection } from "@/lib/segments";
@@ -388,6 +389,9 @@ export default function AuditMap({
   variant = "app",
   activeLayer: controlledLayer,
   flyOnLoad = false,
+  interactive = false,
+  onSegmentActivate,
+  onMoveStateChange,
 }: Readonly<{
   segments: SegmentCollection;
   stats?: StreetStats;
@@ -396,9 +400,17 @@ export default function AuditMap({
   activeLayer?: ScoreLayer;
   /** Run the gentle corridor fly-to on load (hero only, reduced-motion safe). */
   flyOnLoad?: boolean;
+  /** Hero platform embed: pan / cooperative wheel-zoom / +- / tap-to-open. */
+  interactive?: boolean;
+  /** Called when a segment is tapped in the interactive hero (opens /map). */
+  onSegmentActivate?: () => void;
+  /** Fires true on movestart / false on moveend so the composing chrome can swap
+   * its over-tile glass to a solid while the map moves (research §1 perf note). */
+  onMoveStateChange?: (moving: boolean) => void;
 }>) {
   const t = useTranslations("map");
   const isHero = variant === "hero";
+  const heroInteractive = isHero && interactive;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const readyRef = useRef(false);
@@ -410,6 +422,8 @@ export default function AuditMap({
   const [selected, setSelected] = useState<SegmentProperties | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [threeD, setThreeD] = useState(false);
+  // Transient cooperative-gesture hint (shown on a raw wheel over the hero map).
+  const [wheelHint, setWheelHint] = useState(false);
 
   // Map-integrated contribution flow (owns its own draw layers + handlers).
   const contribute = useContribute(mapRef, mapReady);
@@ -425,12 +439,18 @@ export default function AuditMap({
   // effect through refs, matching how the rest of that effect avoids props.
   const isHeroRef = useRef(isHero);
   const flyOnLoadRef = useRef(flyOnLoad);
+  const interactiveRef = useRef(heroInteractive);
+  const onActivateRef = useRef(onSegmentActivate);
+  const onMoveRef = useRef(onMoveStateChange);
   useEffect(() => {
     activeLayerRef.current = activeLayer;
     segmentsRef.current = segments;
     contributeRef.current = contribute;
     isHeroRef.current = isHero;
     flyOnLoadRef.current = flyOnLoad;
+    interactiveRef.current = heroInteractive;
+    onActivateRef.current = onSegmentActivate;
+    onMoveRef.current = onMoveStateChange;
   });
 
   // Create the map exactly once.
@@ -439,6 +459,7 @@ export default function AuditMap({
     if (!container) return;
 
     const hero = isHeroRef.current;
+    const heroLive = hero && interactiveRef.current;
     // Cap pitch on touch / narrow viewports to bound horizon DEM-tile fetches
     // in 3D (research: mobile ≈60°, desktop 70°). Harmless for the hero, which
     // never leaves pitch 0.
@@ -454,8 +475,10 @@ export default function AuditMap({
       bearing: hero ? HERO_START.bearing : 0,
       maxPitch,
       attributionControl: { compact: true },
-      // Hero is a calm backdrop: never hijack the page scroll.
-      scrollZoom: !hero,
+      // Static hero backdrop never hijacks scroll. The interactive platform hero
+      // keeps MapLibre's cursor-anchored scroll-zoom but gates it to Cmd/Ctrl+wheel
+      // in the capture phase below (cooperative-gesture policy, research §4).
+      scrollZoom: !hero || heroLive,
     });
     mapRef.current = map;
     // The read-only hero has no map chrome. The app surface keeps the nav
@@ -572,6 +595,16 @@ export default function AuditMap({
           setSelected(props);
         });
       }
+
+      // Interactive hero: a segment tap opens the full platform (the mcbroken
+      // pattern — every deeper action goes to /map; no new deep-link infra per
+      // spec §Hero). Movestart/moveend surface up so the Hero can drop the glass
+      // chips to solid while the map is in motion (research §1 perf note).
+      if (heroLive) {
+        map.on("click", INTERACTIVE_LAYER_IDS, () => onActivateRef.current?.());
+        map.on("movestart", () => onMoveRef.current?.(true));
+        map.on("moveend", () => onMoveRef.current?.(false));
+      }
     };
     map.on("load", onLoad);
 
@@ -611,6 +644,35 @@ export default function AuditMap({
     applyLayer(map, activeLayer, prefersDark());
   }, [activeLayer]);
 
+  // Cooperative wheel gating (research §4): a plain wheel over the embedded hero
+  // map scrolls the PAGE — we stop the event in the capture phase before it reaches
+  // MapLibre's canvas handler (so it neither zooms nor preventDefaults the scroll)
+  // and flash a transient hint. Cmd/Ctrl+wheel (and trackpad pinch, which the OS
+  // reports as a ctrlKey wheel) passes through to MapLibre's cursor-anchored zoom.
+  // Touch pan/pinch stay on the native handlers; the bounded map height leaves page
+  // above and below to scroll.
+  useEffect(() => {
+    if (!heroInteractive) return;
+    const container = containerRef.current;
+    if (!container) return;
+    let hideTimer: number | undefined;
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        setWheelHint(false);
+        return; // let MapLibre zoom around the cursor
+      }
+      e.stopPropagation();
+      setWheelHint(true);
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(() => setWheelHint(false), 1400);
+    };
+    container.addEventListener("wheel", onWheel, { capture: true, passive: true });
+    return () => {
+      window.clearTimeout(hideTimer);
+      container.removeEventListener("wheel", onWheel, { capture: true });
+    };
+  }, [heroInteractive, mapReady]);
+
   const handleToggleThreeD = (next: boolean) => {
     setThreeD(next);
     const map = mapRef.current;
@@ -630,8 +692,10 @@ export default function AuditMap({
   };
 
   if (isHero) {
-    // Calm read-only backdrop: no chrome, no popover, no contribute FAB. The
-    // overlay panel is composed by the landing Hero section, over this canvas.
+    // Read-only backdrop OR the interactive platform embed. The informational
+    // glass chips (LIVE / legend) are composed by the landing Hero over this
+    // canvas; the map-coupled controls (zoom, cooperative-gesture hint) live here
+    // because they need the map instance.
     return (
       <div className="absolute inset-0">
         <div
@@ -640,6 +704,40 @@ export default function AuditMap({
           aria-label={t("ariaLabel")}
           className="h-full w-full"
         />
+        {heroInteractive ? (
+          <>
+            {/* Explicit +/- zoom (mono, glass): the always-available non-scroll
+                path so gating wheel-zoom never blocks the user. */}
+            <div className="absolute bottom-3 right-3 z-10 flex flex-col">
+              <button
+                type="button"
+                onClick={() => mapRef.current?.zoomIn({ duration: 220 })}
+                aria-label={t("zoomIn")}
+                className="sl-glass-chip flex h-9 w-9 items-center justify-center rounded-t-[10px] font-mono text-[19px] leading-none text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                onClick={() => mapRef.current?.zoomOut({ duration: 220 })}
+                aria-label={t("zoomOut")}
+                className="sl-glass-chip -mt-px flex h-9 w-9 items-center justify-center rounded-b-[10px] font-mono text-[19px] leading-none text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              >
+                −
+              </button>
+            </div>
+            {/* Transient cooperative-gesture hint. */}
+            <div
+              aria-hidden={!wheelHint}
+              className={cn(
+                "sl-glass-chip pointer-events-none absolute inset-x-0 bottom-3 z-10 mx-auto flex w-max max-w-[calc(100%-5rem)] items-center rounded-full px-3.5 py-1.5 font-mono text-[11px] leading-none text-ink transition-opacity duration-200",
+                wheelHint ? "opacity-100" : "opacity-0",
+              )}
+            >
+              {t("zoomHint")}
+            </div>
+          </>
+        ) : null}
       </div>
     );
   }

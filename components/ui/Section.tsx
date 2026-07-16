@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/components/ui/cn";
+import Reveal from "@/components/ui/Reveal";
 
 /**
  * The manifesto band. Owns the document's vertical rhythm and, optionally, the
@@ -60,6 +61,7 @@ export default function Section({
   className,
   spacing = "lg",
   rule = false,
+  reveal = true,
 }: Readonly<{
   children: ReactNode;
   id?: string;
@@ -68,6 +70,9 @@ export default function Section({
   spacing?: "md" | "lg";
   /** Draw a column-width hairline at the top edge (the between-section rule). */
   rule?: boolean;
+  /** Reveal the band's content once on scroll-in (research §3). Solid band bg
+   * stays put; only the padded content fades + rises. JS-off safe. */
+  reveal?: boolean;
 }>) {
   const pad = spacing === "lg" ? "py-[3.5rem] sm:py-16" : "py-10 sm:py-12";
 
@@ -82,7 +87,11 @@ export default function Section({
           <div className="h-px w-full bg-hairline" aria-hidden="true" />
         </div>
       ) : null}
-      <div className={pad}>{children}</div>
+      {reveal ? (
+        <Reveal className={pad}>{children}</Reveal>
+      ) : (
+        <div className={pad}>{children}</div>
+      )}
     </section>
   );
 }

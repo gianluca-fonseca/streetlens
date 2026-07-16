@@ -10,6 +10,9 @@
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
     "demoTag": "DEMO",
     "loading": "Cargando el mapa…",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "zoomHint": "Mantén ⌘ o Ctrl y desplázate para hacer zoom",
     "threeD": {
       "label": "Vista 3D",
       "enable": "Activar la vista 3D",
@@ -349,26 +352,23 @@
       "ogDescription": "Un instrumento de campo abierto para la calle: accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento. Ahora en Escazú, Costa Rica."
     },
     "hero": {
+      "wordmark": "StreetLens",
       "eyebrow": "Un instrumento de campo para la calle",
       "thesis": "Toda calle puede medirse. Casi ninguna se mide.",
-      "abstract": "StreetLens convierte un recorrido por cualquier calle en una puntuación pública y verificable. Accesibilidad, drenaje, sombra e infraestructura ciclista, medidas segmento a segmento. Sin índice propietario. Sin caja negra. El método está en esta página.",
-      "ctaExplore": "Explorar el mapa en vivo",
+      "abstract": "Una puntuación pública y verificable para cada calle. Accesibilidad, drenaje, sombra e infraestructura ciclista, medidas segmento por segmento.",
+      "ctaPlatform": "Abrir la plataforma",
       "ctaMethod": "Leer el método",
-      "nav": {
-        "label": "Ir a la sección",
-        "figure": "Figura 1",
-        "method": "Método",
-        "references": "Referencias",
-        "map": "Abrir el mapa"
+      "stats": {
+        "segmentsLabel": "Segmentos auditados",
+        "segmentsNote": "Corredor piloto de Escazú",
+        "coverageLabel": "Cobertura del piloto",
+        "coverageNote": "de la red vial del distrito",
+        "failLabel": "Incumplen la Ley 7600",
+        "failNote": "Cifra de demostración, no una medición real."
       },
-      "figure": {
-        "label": "Figura 1",
-        "claim": "Un mapa que puedes comprobar.",
-        "support": "Puntuaciones por segmento en el piloto de Escazú, en vivo e interactivas. Recorre el corredor y abre un segmento para ver cómo se puntuó.",
-        "source": "Fuente: StreetLens sobre geometría de OpenStreetMap. n={n} segmentos, Escazú. Datos de demostración hasta el trabajo de campo en agosto de 2026.",
-        "affordance": "Arrastra para desplazar. Desplaza para acercar. Toca un segmento.",
+      "map": {
         "live": "Mapa en vivo",
-        "plate": "Escazú · Costa Rica"
+        "affordance": "Arrastra para desplazar. Mantén ⌘ o Ctrl para hacer zoom. Toca un segmento para abrirlo en la plataforma."
       }
     },
     "measure": {

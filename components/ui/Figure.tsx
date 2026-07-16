@@ -94,7 +94,7 @@ export default function Figure({
               </p>
             ) : null}
             {affordance ? (
-              <p className="font-mono text-[11px] leading-snug text-ink-faint">
+              <p className="font-mono text-[11px] leading-snug text-ink-muted">
                 {affordance}
               </p>
             ) : null}

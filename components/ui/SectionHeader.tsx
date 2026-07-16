@@ -28,7 +28,7 @@ export default function SectionHeader({
         <span className="h-3 w-px bg-hairline-strong" aria-hidden="true" />
         <span>{eyebrow}</span>
       </div>
-      <h2 className="mx-auto mt-5 max-w-[20ch] font-display text-[clamp(2rem,4vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink-display text-balance">
+      <h2 className="mx-auto mt-5 max-w-[20ch] font-display text-[clamp(2rem,4vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink-display text-balance dark:tracking-[-0.015em]">
         {title}
       </h2>
       {lead ? (
