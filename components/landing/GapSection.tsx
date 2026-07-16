@@ -1,19 +1,17 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- first-party static SVG map art; next/image adds no value for inline SVG and would need dangerouslyAllowSVG */
 import { useTranslations } from "next-intl";
 import Section from "@/components/ui/Section";
-import Eyebrow from "@/components/ui/Eyebrow";
-import Reveal from "@/components/ui/Reveal";
-import StatFigure from "@/components/ui/StatFigure";
-import GlassPanel from "@/components/ui/GlassPanel";
+import Measure from "@/components/ui/Measure";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Sidenote from "@/components/ui/Sidenote";
 
 /**
- * The dark warm "field" section: the accountability gap, framed universally
- * (most cities cannot say which sidewalks fail, or where) with the honest Costa
- * Rican anchors as proof. The dark atlas render sits behind as earned imagery,
- * so the three stat callouts can float in glass. Only the demo figure is
- * caveated.
+ * Section 02 — the accountability gap, rebuilt as thesis and evidence. The old
+ * dark imagery band is retired: a centered thesis, a left-aligned serif argument
+ * carrying two margin citations (Ley 7600, COSEVI), then the three anchoring
+ * figures as a hairline mono table. Only the demo figure is caveated; the two
+ * Costa Rican anchors are real and sourced.
  */
 export default function GapSection({
   heroPct,
@@ -22,57 +20,49 @@ export default function GapSection({
 }>) {
   const t = useTranslations("landing.gap");
 
-  const callouts = [
+  const stats = [
     { key: "1", value: t("stat1Value"), label: t("stat1Label"), note: t("stat1Note") },
     { key: "2", value: t("stat2Value"), label: t("stat2Label"), note: t("stat2Note") },
     { key: "3", value: `${heroPct}%`, label: t("stat3Label"), note: t("stat3Note") },
   ];
 
   return (
-    <Section
-      id="gap"
-      tone="field"
-      contained={false}
-      className="relative overflow-hidden"
-    >
-      <img
-        src="/render/atlas-dark.svg"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#14140f]/70 via-[#14140f]/40 to-[#14140f]/80"
-      />
+    <Section id="gap" tone="sunken" rule>
+      <Measure width="outset">
+        <SectionHeader
+          index="02"
+          eyebrow={t("eyebrow")}
+          title={t("heading")}
+          lead={t("lead")}
+        />
+      </Measure>
 
-      <div className="relative mx-auto w-full max-w-6xl px-6">
-        <Reveal className="max-w-3xl">
-          <Eyebrow tone="muted">{t("eyebrow")}</Eyebrow>
-          <h2 className="mt-3 font-display text-[clamp(1.85rem,3.9vw,2.75rem)] font-bold leading-[1.08] tracking-[-0.02em] text-ink">
-            {t("heading")}
-          </h2>
-          <p className="mt-4 max-w-2xl text-[1.05rem] leading-relaxed text-neutral-strong">
-            {t("lead")}
-          </p>
-        </Reveal>
+      <Measure width="text" className="mt-12">
+        <p className="font-serif text-[1.18rem] leading-[1.7] text-ink">
+          {t.rich("body", {
+            ley: (chunks) => <Sidenote number={1}>{chunks}</Sidenote>,
+            cosevi: (chunks) => <Sidenote number={2}>{chunks}</Sidenote>,
+          })}
+        </p>
+      </Measure>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-3">
-          {callouts.map((c, i) => (
-            <Reveal key={c.key} as="div" delay={i * 90}>
-              <GlassPanel radius="panel" elevation="popover" className="h-full p-6">
-                <StatFigure
-                  value={c.value}
-                  label={c.label}
-                  sublabel={c.note}
-                  tone="accent"
-                  size="lg"
-                />
-              </GlassPanel>
-            </Reveal>
+      <Measure width="page" className="mt-14">
+        <dl className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-3">
+          {stats.map((s) => (
+            <div key={s.key} className="flex flex-col bg-surface p-6 sm:p-7">
+              <dd className="font-mono text-[clamp(2rem,4vw,2.5rem)] font-medium leading-none tracking-tight text-ink-display">
+                {s.value}
+              </dd>
+              <dt className="mt-3 text-[0.95rem] font-medium leading-snug text-ink">
+                {s.label}
+              </dt>
+              <p className="mt-2 text-[12.5px] leading-snug text-ink-muted">
+                {s.note}
+              </p>
+            </div>
           ))}
-        </div>
-      </div>
+        </dl>
+      </Measure>
     </Section>
   );
 }
