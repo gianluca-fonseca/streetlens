@@ -150,6 +150,29 @@ body {
   height: 100%;
 }
 
+/* Mobile viewport correctness: full-height shells must track the DYNAMIC viewport
+   so the bottom edge never hides under the collapsing mobile URL bar. `100vh`
+   fallback first, then `100dvh` where supported. Used on the app shell + any
+   full-bleed surface. */
+.h-dvh-safe {
+  height: 100vh;
+  height: 100dvh;
+}
+.min-h-dvh-safe {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Safe-area inset helpers for fixed/floating chrome on notched / home-bar
+   devices. Additive so they compose with a base padding utility. Guarded by
+   `viewport-fit=cover` on the viewport (see layout). */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+.inset-b-safe {
+  bottom: env(safe-area-inset-bottom);
+}
+
 body {
   background: var(--surface-base);
   color: var(--ink);
