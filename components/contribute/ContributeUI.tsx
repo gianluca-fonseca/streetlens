@@ -41,13 +41,15 @@ const PANEL =
 // 16px on phones keeps iOS from auto-zooming the viewport on field focus; the
 // sealed 13px control returns at sm+.
 const INPUT =
-  "w-full rounded-[4px] border border-border bg-surface-elevated px-2.5 py-2 text-[16px] text-ink placeholder:text-neutral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine sm:text-[13px]";
+  "w-full rounded-[4px] border border-border bg-surface-elevated px-2.5 py-2 text-[16px] text-ink placeholder:text-neutral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink sm:text-[13px]";
 const LABEL = "mb-1 block text-[12px] font-medium text-ink";
-// Fixed dark pine so white text clears AA in BOTH themes (the token flips lighter in dark mode).
+// rev-5 primary = ink fill / paper label. Flips by theme: near-black fill + paper
+// label in light (17.49:1), creme fill + dark-paper label in dark (17.75:1). Both
+// clear AA. (Retires the rev-4 fixed-dark-pine + white-text pair.)
 const PRIMARY_BTN =
-  "inline-flex items-center justify-center gap-1.5 rounded-[4px] bg-[#1F5C4A] px-3.5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#164034] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-semibold text-surface transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated disabled:pointer-events-none disabled:opacity-50";
 const GHOST_BTN =
-  "inline-flex items-center justify-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine";
+  "inline-flex items-center justify-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink";
 
 /** Gentle one-time slide-up on mount (entrance on user action, not idle motion). */
 function SlideUp({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -188,7 +190,7 @@ function ErrorLine({ messageKey }: Readonly<{ messageKey: string | null }>) {
   return (
     <p
       role="alert"
-      className="rounded-[4px] border border-accent-text/40 bg-accent/10 px-2.5 py-1.5 text-[12px] text-ink"
+      className="rounded-[4px] border border-clay/40 bg-clay/10 px-2.5 py-1.5 text-[12px] text-ink"
     >
       {t(`errors.${messageKey}` as Parameters<typeof t>[0])}
     </p>
@@ -239,7 +241,7 @@ function ChoosePanel({
             type="button"
             onClick={onCancel}
             aria-label={t("choose.cancel")}
-            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <X size={16} strokeWidth={1.75} aria-hidden="true" />
           </button>
@@ -248,12 +250,12 @@ function ChoosePanel({
           <button
             type="button"
             onClick={onTrace}
-            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <Route
               size={18}
               strokeWidth={1.75}
-              className="mt-0.5 shrink-0 text-pine"
+              className="mt-0.5 shrink-0 text-ink-muted"
               aria-hidden="true"
             />
             <span>
@@ -268,12 +270,12 @@ function ChoosePanel({
           <button
             type="button"
             onClick={onSelect}
-            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            className="flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <PencilLine
               size={18}
               strokeWidth={1.75}
-              className="mt-0.5 shrink-0 text-pine"
+              className="mt-0.5 shrink-0 text-ink-muted"
               aria-hidden="true"
             />
             <span>
@@ -313,7 +315,7 @@ function InstructionPill({
           type="button"
           onClick={onCancel}
           aria-label={cancelLabel}
-          className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+          className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
           <X size={15} strokeWidth={1.75} aria-hidden="true" />
         </button>
@@ -334,9 +336,9 @@ function FollowStreetsToggle({
       aria-checked={on}
       onClick={onToggle}
       className={[
-        "inline-flex items-center gap-2 rounded-[4px] border px-2.5 py-1.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine",
+        "inline-flex items-center gap-2 rounded-[4px] border px-2.5 py-1.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink",
         on
-          ? "border-pine/30 bg-pine/10 text-pine"
+          ? "border-hairline-strong bg-surface-sunken text-ink"
           : "border-border bg-surface-elevated text-neutral-strong hover:border-border-strong",
       ].join(" ")}
     >
@@ -346,12 +348,12 @@ function FollowStreetsToggle({
         aria-hidden="true"
         className={[
           "ml-0.5 inline-flex h-3.5 w-6 items-center rounded-full px-0.5 transition-colors",
-          on ? "bg-pine" : "bg-neutral/40",
+          on ? "bg-accent" : "bg-hairline-strong",
         ].join(" ")}
       >
         <span
           className={[
-            "h-2.5 w-2.5 rounded-full bg-white transition-transform",
+            "h-2.5 w-2.5 rounded-full bg-paper-white transition-transform",
             on ? "translate-x-2.5" : "translate-x-0",
           ].join(" ")}
         />
@@ -423,7 +425,7 @@ function TraceControls({
             <TriangleAlert
               size={13}
               strokeWidth={1.75}
-              className="mt-px shrink-0 text-accent-text"
+              className="mt-px shrink-0 text-amber"
               aria-hidden="true"
             />
             {t("followStreets.warning")}
@@ -492,7 +494,7 @@ function AddForm({
             type="button"
             onClick={contribute.cancel}
             aria-label={t("form.cancel")}
-            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <X size={16} strokeWidth={1.75} aria-hidden="true" />
           </button>
@@ -507,11 +509,11 @@ function AddForm({
           />
 
           {contribute.hasFallback ? (
-            <p className="flex items-start gap-1.5 rounded-[4px] border border-accent-text/40 bg-accent/10 px-2.5 py-1.5 text-[11px] leading-snug text-ink">
+            <p className="flex items-start gap-1.5 rounded-[4px] border border-amber/40 bg-amber/10 px-2.5 py-1.5 text-[11px] leading-snug text-ink">
               <TriangleAlert
                 size={13}
                 strokeWidth={1.75}
-                className="mt-px shrink-0 text-accent-text"
+                className="mt-px shrink-0 text-amber"
                 aria-hidden="true"
               />
               {t("followStreets.warning")}
@@ -692,7 +694,7 @@ function UpdateForm({
             type="button"
             onClick={contribute.cancel}
             aria-label={t("form.cancel")}
-            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <X size={16} strokeWidth={1.75} aria-hidden="true" />
           </button>
@@ -837,7 +839,7 @@ function SuccessCard({
       <section aria-label={t("success.title")} className={PANEL}>
         <div className="flex flex-col gap-3 p-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-[8px] bg-pine/12 text-pine">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-[8px] bg-accent text-accent-fg">
               <MapPin size={18} strokeWidth={1.75} aria-hidden="true" />
             </span>
             <h2 className="font-display text-[1.05rem] font-semibold leading-tight text-ink">
