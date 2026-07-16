@@ -2,34 +2,26 @@ import type { ReactNode } from "react";
 import { cn } from "@/components/ui/cn";
 
 /**
- * The section eyebrow, set in IBM Plex Mono as instrument voice (rev 4): the
- * mono face is promoted to a first-class label voice across the product, so
- * eyebrows read like the caption plate on a survey instrument, not a startup
- * kicker. Wide-tracked all-caps. Never the only hierarchy (ban #14): it always
- * pairs with a headline.
+ * The kicker, set in IBM Plex Mono as the instrument voice: 12px caps, +0.12em,
+ * `--ink-muted`. It sits above a headline and is never the only hierarchy — the
+ * one positive-tracked uppercase element on the page. `tone="accent"` promotes
+ * it to accent-text (the deep magenta that clears AA on paper); everything else
+ * reads muted (brand pine is retired in rev-5).
  */
 export default function Eyebrow({
   children,
   className,
-  tone = "pine",
+  tone = "muted",
 }: Readonly<{
   children: ReactNode;
   className?: string;
-  /** "pine" on light grounds; "accent" for the road-marking-yellow highlight
-   * (dark-ochre on light, saturated yellow on dark); "muted" for dark fields. */
-  tone?: "pine" | "accent" | "muted";
+  tone?: "muted" | "accent";
 }>) {
-  const toneClass =
-    tone === "accent"
-      ? "text-accent-text"
-      : tone === "muted"
-        ? "text-neutral-strong"
-        : "text-pine";
   return (
     <p
       className={cn(
-        "font-mono text-[11px] font-medium uppercase tracking-[0.2em]",
-        toneClass,
+        "font-mono text-[12px] font-medium uppercase tracking-[0.12em] leading-[1.4]",
+        tone === "accent" ? "text-accent-text" : "text-ink-muted",
         className,
       )}
     >
