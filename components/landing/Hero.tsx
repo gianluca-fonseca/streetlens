@@ -10,6 +10,7 @@ import AuditMap from "@/components/AuditMap";
 import Logo from "@/components/ui/Logo";
 import StatFigure from "@/components/ui/StatFigure";
 import { cn } from "@/components/ui/cn";
+import { GITHUB_URL } from "@/lib/links";
 
 /**
  * The platform hero (rev 6, u21 — the mcbroken restructure). A slim top banner
@@ -329,6 +330,16 @@ export default function Hero({
             <p className="px-1 font-mono text-[11px] leading-snug text-ink-muted lg:px-0">
               {t("stats.demoFootnote")}
             </p>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 self-start px-1 font-mono text-[11px] uppercase tracking-[0.08em] text-ink-muted underline-offset-4 transition-colors hover:text-ink-display hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface lg:px-0"
+            >
+              {t("openSource")}
+              <span aria-hidden="true">→</span>
+              GitHub
+            </a>
           </div>
 
           {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}

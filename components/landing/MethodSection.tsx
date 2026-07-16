@@ -140,6 +140,26 @@ export default function MethodSection() {
           ))}
         </div>
       </Measure>
+
+      {/* The forward-looking engine: field imagery trains a computer-vision and
+          machine-learning scoring pipeline. Roadmap-framed only. No model scores a
+          street today; when one does, a person still verifies it (honesty rule). */}
+      <Measure width="outset" className="mt-16">
+        <div className="text-center">
+          <p className="font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-ink-muted">
+            {t("pipeline.eyebrow")}
+          </p>
+          <h3 className="mx-auto mt-4 max-w-[24ch] font-display text-[clamp(1.35rem,2.6vw,1.8rem)] font-bold leading-[1.14] tracking-[-0.015em] text-ink-display text-balance">
+            {t("pipeline.heading")}
+          </h3>
+        </div>
+      </Measure>
+
+      <Measure width="text" className="mt-6">
+        <p className="font-serif text-[1.08rem] leading-[1.7] text-ink">
+          {t("pipeline.body")}
+        </p>
+      </Measure>
     </Section>
   );
 }

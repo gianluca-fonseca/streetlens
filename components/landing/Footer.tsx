@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/components/ui/cn";
 import Logo from "@/components/ui/Logo";
+import { GITHUB_URL } from "@/lib/links";
 
 /**
  * A centered colophon on the sunken surface: the wordmark, the tagline, a
@@ -32,7 +33,16 @@ export default function Footer() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[12px] uppercase tracking-[0.08em]">
-          <span className="text-ink-muted">{t("github")}</span>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center gap-1 rounded-[2px] text-ink-muted underline-offset-4 transition-colors hover:text-ink-display hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {t("openSource")}
+            <span aria-hidden="true">→</span>
+            {t("github")}
+          </a>
           <span aria-hidden="true" className="h-3 w-px bg-hairline-strong" />
           <span className="text-ink-muted">{t("localeLabel")}</span>
           <ul className="flex items-center gap-1">

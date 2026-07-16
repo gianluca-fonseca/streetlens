@@ -13,6 +13,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 const FAQ_ITEMS = [
   "real",
   "scores",
+  "ai",
   "city",
   "fieldwork",
   "contribute",
