@@ -10,6 +10,9 @@
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
     "demoTag": "DEMO",
     "loading": "Cargando el mapa…",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "zoomHint": "Mantén ⌘ o Ctrl y desplázate para hacer zoom",
     "threeD": {
       "label": "Vista 3D",
       "enable": "Activar la vista 3D",

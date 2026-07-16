@@ -10,6 +10,9 @@
     "ariaLabel": "Interactive map of audited street segments in Escazú",
     "demoTag": "DEMO",
     "loading": "Loading map…",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomHint": "Hold ⌘ or Ctrl and scroll to zoom",
     "threeD": {
       "label": "3D view",
       "enable": "Enable 3D view",
