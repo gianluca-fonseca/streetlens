@@ -424,6 +424,10 @@ export default function AuditMap({
   const [threeD, setThreeD] = useState(false);
   // Transient cooperative-gesture hint (shown on a raw wheel over the hero map).
   const [wheelHint, setWheelHint] = useState(false);
+  // App surface only: true while the map is panning/zooming so the over-tile chrome
+  // (MapPanel / SegmentDetail popover / contribute panels / zoom controls) drops its
+  // glass to a solid during the move — the costly re-blur-per-frame path (u18-A3).
+  const [mapMoving, setMapMoving] = useState(false);
 
   // Map-integrated contribution flow (owns its own draw layers + handlers).
   const contribute = useContribute(mapRef, mapReady);
@@ -594,6 +598,10 @@ export default function AuditMap({
           selectFeature(map, props, f.geometry);
           setSelected(props);
         });
+        // Drop the over-tile glass chrome to solid while the map is in motion, then
+        // restore on idle (same perf swap the interactive hero applies to its chips).
+        map.on("movestart", () => setMapMoving(true));
+        map.on("moveend", () => setMapMoving(false));
       }
 
       // Interactive hero: a segment tap opens the full platform (the mcbroken
@@ -743,7 +751,7 @@ export default function AuditMap({
   }
 
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0" data-map-moving={mapMoving}>
       <div
         ref={containerRef}
         role="application"

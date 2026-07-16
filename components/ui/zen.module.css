@@ -170,6 +170,26 @@
   }
 }
 
+/* During an active app-map pan/zoom the over-tile glass re-blurs every frame (the
+   costly path on a moving map). While the map container carries data-map-moving, swap
+   the Recipe-A/C surfaces to the near-opaque solid (no blur) — visually close, zero
+   cost — and restore on idle. Mirrors the globals .sl-glass-chip move-swap (u18-A3).
+   The desktop popover is gated to ≥768px so the phone bottom sheet (solid Tailwind
+   surface, no .glassPanelDesktop glass) is never touched. */
+[data-map-moving="true"] .glassPanel,
+[data-map-moving="true"] .glassChip {
+  background: var(--glass-chip-solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+@media (min-width: 768px) {
+  [data-map-moving="true"] .glassPanelDesktop.glassPanelDesktop {
+    background: var(--glass-chip-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 /* ─── Zen-soft elevation — cards on FLAT grounds (admin, contribute) ───────────
    One top-down light, zero horizontal offset, hairline carries the sides, per-layer
    alpha ≤ 0.08. Dark elevation = surface + border + inset top highlight, NOT a
