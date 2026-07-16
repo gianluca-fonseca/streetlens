@@ -224,35 +224,36 @@ export function placeholderItemScore(
 }
 
 /*
- * Basemap palette retuned to rev-5 PAPER grounds so the live map reads as a
- * plate in the document (FIGURE 1): the land is the paper ground, roads step up
- * to the brighter paper-white, land-use/parks/water are quiet desaturated paper
- * tints (rev-4 road-yellow and saturated park-green retired), boundaries are the
- * hairline. Applied as a post-load transform over Liberty. Dark = inverted
- * paper. The sealed score RAMP stays the loud color on the page; these grounds
- * keep enough step for the ramps to stay legible. Mirror any change into
- * scripts/render-map-images.mjs BASEMAP verbatim and re-run `npm run render:maps`.
+ * Basemap palette retuned to rev-6 GRAYSCALE ZEN so the live map reads as a plate
+ * in the document (FIGURE 1): the land is the soft-white page ground, roads step
+ * up to pure-white, land-use/parks are quiet neutral grays, water is a whisper of
+ * gray-blue (the one non-neutral note, kept nearly desaturated so it reads zen),
+ * boundaries are the hairline. All warm/creme tint retired. Applied as a post-load
+ * transform over Liberty. Dark = the negative. The sealed score RAMP + flash pink
+ * stay the ONLY strong chroma on the page; these grays keep enough step for the
+ * ramps to stay legible. Mirror any change into scripts/render-map-images.mjs
+ * BASEMAP verbatim and re-run `npm run render:maps`.
  */
 export const BASEMAP = {
   light: {
-    land: "#f3f1e9", // --paper: the page/mat ground
-    landuse: "#eeebe1",
-    park: "#e7e7d8", // faint cool paper-green (desaturated)
-    water: "#dbe0dd", // cool paper-grey
-    road: "#fbfaf6", // --paper-white: brightest, the plate
-    roadMinor: "#f6f4ec",
-    building: "#e5e1d5",
-    boundary: "#dad5c7", // --hairline
+    land: "#fafafa", // --paper: the page/mat ground
+    landuse: "#f4f4f4",
+    park: "#ededed", // quiet neutral gray (park-green desaturated to zen gray)
+    water: "#e3e8ea", // quiet gray-blue (barely-there cool note)
+    road: "#ffffff", // --paper-white: brightest, the plate
+    roadMinor: "#fcfcfc",
+    building: "#ececec",
+    boundary: "#e4e4e4", // --hairline
   },
   dark: {
-    land: "#14120c", // --paper (inverted)
-    landuse: "#181610",
-    park: "#161810", // faint dark paper-green
-    water: "#101613", // cool dark
-    road: "#1e1b14", // --paper-white (inverted): brightest
-    roadMinor: "#181510",
-    building: "#201d15",
-    boundary: "#33302a", // --hairline
+    land: "#0a0a0a", // --paper (the negative)
+    landuse: "#101010",
+    park: "#0d0d0d", // quiet dark neutral gray
+    water: "#0e1214", // quiet dark gray-blue
+    road: "#141414", // --paper-white (inverted): brightest
+    roadMinor: "#111111",
+    building: "#181818",
+    boundary: "#262626", // --hairline
   },
 } as const;
 
@@ -283,19 +284,19 @@ export const TERRAIN = {
 /** Always-on hillshade layer id (subtle relief under the muted basemap). */
 export const HILLSHADE_LAYER_ID = "terrain-hillshade";
 
-/** Hillshade paint tuned to the warm muted palette so it never fights the score
- * ramps in 2D: low exaggeration, warm shadow/highlight, restrained alpha. */
+/** Hillshade paint tuned to the neutral grayscale palette so it never fights the
+ * score ramps in 2D: low exaggeration, neutral shadow/highlight, restrained alpha. */
 export const HILLSHADE_PAINT = {
   light: {
-    "hillshade-shadow-color": "rgba(25, 21, 16, 0.20)", // ink
-    "hillshade-highlight-color": "rgba(251, 250, 246, 0.34)", // paper-white
-    "hillshade-accent-color": "rgba(183, 176, 160, 0.10)", // hairline-strong
+    "hillshade-shadow-color": "rgba(0, 0, 0, 0.20)", // pure black
+    "hillshade-highlight-color": "rgba(255, 255, 255, 0.34)", // paper-white
+    "hillshade-accent-color": "rgba(198, 198, 198, 0.10)", // hairline-strong
     "hillshade-exaggeration": 0.3,
   },
   dark: {
     "hillshade-shadow-color": "rgba(0, 0, 0, 0.42)",
-    "hillshade-highlight-color": "rgba(241, 238, 227, 0.14)", // creme ink
-    "hillshade-accent-color": "rgba(51, 48, 42, 0.20)", // hairline
+    "hillshade-highlight-color": "rgba(242, 242, 242, 0.14)", // ink
+    "hillshade-accent-color": "rgba(38, 38, 38, 0.20)", // hairline
     "hillshade-exaggeration": 0.4,
   },
 } as const;
@@ -306,7 +307,7 @@ export const BUILDINGS = {
   /** Candidate layer ids in the Liberty style, most specific first. */
   layerIdCandidates: ["building-3d", "building"] as const,
   minzoom: 14,
-  color: { light: "#e4e0d3", dark: "#221f16" } as const,
+  color: { light: "#e8e8e8", dark: "#1c1c1c" } as const,
   opacity: 0.88,
   /** Coalesce the ~95% of Escazú footprints with no real height to a nicer
    * nominal box (9 m); keep genuinely tagged tall buildings/parts correct. */
