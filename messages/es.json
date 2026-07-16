@@ -353,7 +353,10 @@
     },
     "hero": {
       "wordmark": "StreetLens",
-      "question": "¿Qué tan buenas son las calles de Escazú?",
+      "question": "¿Qué tan buenas son nuestras calles?",
+      "pilot": "Programa piloto · Escazú, Costa Rica",
+      "requestCity": "¿Quieres esto para tu ciudad? Solicítalo",
+      "madeBy": "Hecho con ❤️ por Gianluca Fonseca",
       "banner": {
         "methodQuestion": "¿Cómo funciona StreetLens?",
         "methodLink": "Método",
@@ -596,6 +599,7 @@
       "tagline": "Un instrumento de campo abierto para la calle. Ahora midiendo Escazú, Costa Rica.",
       "openSource": "Código abierto",
       "github": "GitHub",
+      "madeBy": "Hecho con ❤️ por Gianluca Fonseca",
       "localeLabel": "Idioma",
       "openData": "Geometría de calles de OpenStreetMap, bajo ODbL 1.0. Las puntuaciones son datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
       "built": "Un proyecto de CUSP, el Colectivo para el Urbanismo y el Progreso Sostenible."
