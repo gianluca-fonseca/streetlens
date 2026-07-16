@@ -236,10 +236,17 @@ body {
 .maplibregl-ctrl button .maplibregl-ctrl-icon {
   filter: none;
 }
+/* Attribution as a tiny mono data-source line (rev-5: the map is FIGURE 1, its
+   source credit reads like a figure caption). */
 .maplibregl-ctrl-attrib {
   background: rgba(251, 250, 246, 0.80) !important;
-  color: var(--neutral-strong) !important;
+  color: var(--ink-muted) !important;
   border-radius: var(--radius-chip) 0 0 0 !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--ink-muted) !important;
 }
 @media (prefers-color-scheme: dark) {
   .maplibregl-ctrl-attrib {

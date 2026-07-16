@@ -140,7 +140,7 @@ export default function SegmentDetail({
           type="button"
           onClick={onClose}
           aria-label={t("close")}
-          className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine"
+          className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
           <X size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>

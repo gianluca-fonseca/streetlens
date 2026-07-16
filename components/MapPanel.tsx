@@ -57,7 +57,7 @@ export default function MapPanel({
       <header>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-pine">
+            <p className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-ink-muted">
               {t("eyebrow")}
             </p>
             <p className="font-mono text-[2.15rem] font-medium leading-none tracking-tight text-accent-text">
@@ -70,7 +70,7 @@ export default function MapPanel({
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? t("collapse") : t("expand")}
-            className="-mr-1 -mt-1 shrink-0 rounded-[4px] p-1.5 text-neutral-strong transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine md:hidden"
+            className="-mr-1 -mt-1 shrink-0 rounded-[4px] p-1.5 text-neutral-strong transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink md:hidden"
           >
             <ChevronDown
               size={18}

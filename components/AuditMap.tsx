@@ -677,7 +677,7 @@ export default function AuditMap({
             onClick={handleClose}
             aria-hidden="true"
             tabIndex={-1}
-            className="absolute inset-0 z-20 bg-[rgba(23,29,26,0.18)] md:hidden"
+            className="absolute inset-0 z-20 bg-[rgba(12,10,6,0.32)] md:hidden"
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center md:inset-x-auto md:bottom-auto md:right-4 md:top-4 md:block">
             <SegmentDetail
