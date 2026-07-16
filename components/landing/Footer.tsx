@@ -35,9 +35,9 @@ export default function Footer() {
 
           <div className="flex flex-col gap-3 text-[0.9rem]">
             <span className="font-medium text-ink">{t("github")}</span>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-neutral-strong">{t("localeLabel")}</span>
-              <ul className="flex items-center gap-2">
+              <ul className="flex items-center gap-1">
                 {LOCALES.map(({ code, label }) => {
                   const active = code === locale;
                   return (
@@ -45,7 +45,7 @@ export default function Footer() {
                       {active ? (
                         <span
                           aria-current="true"
-                          className="font-medium text-ink"
+                          className="inline-flex min-h-[44px] items-center px-2 font-medium text-ink"
                         >
                           {label}
                         </span>
@@ -54,7 +54,7 @@ export default function Footer() {
                           href={pathname}
                           locale={code}
                           className={cn(
-                            "text-neutral-strong underline-offset-4 hover:text-ink hover:underline",
+                            "inline-flex min-h-[44px] items-center rounded-[4px] px-2 text-neutral-strong underline-offset-4 hover:text-ink hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine",
                           )}
                         >
                           {label}

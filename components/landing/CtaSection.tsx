@@ -41,11 +41,21 @@ export default function CtaSection() {
               {t("support")}
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button href="/map" variant="pine" size="lg">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Button
+                href="/map"
+                variant="pine"
+                size="lg"
+                className="min-h-[48px] w-full sm:w-auto"
+              >
                 {t("explore")}
               </Button>
-              <Button href="/map" variant="ghost" size="lg">
+              <Button
+                href="/map"
+                variant="ghost"
+                size="lg"
+                className="min-h-[48px] w-full sm:w-auto"
+              >
                 {t("contribute")}
               </Button>
             </div>

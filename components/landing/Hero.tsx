@@ -74,7 +74,7 @@ export default function Hero({
 
       <div className="relative z-10 mx-auto h-full max-w-6xl px-4 sm:px-6">
         {/* Main glass panel: brand + headline + CTAs */}
-        <div className="flex h-full flex-col justify-end pb-5 md:justify-center md:pb-0">
+        <div className="flex h-full flex-col justify-end pb-[max(1.5rem,env(safe-area-inset-bottom))] md:justify-center md:pb-0">
           <GlassPanel
             as="section"
             radius="primary"
@@ -89,11 +89,21 @@ export default function Hero({
               {t("support")}
             </p>
 
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Button href="/map" variant="pine" size="lg">
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Button
+                href="/map"
+                variant="pine"
+                size="lg"
+                className="min-h-[48px] w-full sm:w-auto"
+              >
                 {t("ctaExplore")}
               </Button>
-              <Button href="#method" variant="ghost" size="lg">
+              <Button
+                href="#method"
+                variant="ghost"
+                size="lg"
+                className="min-h-[48px] w-full sm:w-auto"
+              >
                 {t("ctaMethod")}
               </Button>
             </div>
