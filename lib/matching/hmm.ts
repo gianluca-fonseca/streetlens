@@ -86,8 +86,18 @@ const DEFAULT_MIN_TRAVERSAL_FRAMES = 3;
 const DEFAULT_HEADING_WEIGHT = 0.5;
 /** Speed below which a reported heading is meaningless. */
 const HEADING_MIN_SPEED_MS = 0.5;
-/** Backtracking further than this along a segment is a real turnaround, not jitter. */
-const DEFAULT_REVERSAL_M = 15;
+/**
+ * Backtracking further than this along a segment is a real turnaround, not jitter.
+ *
+ * Must clear the ALONG-TRACK noise, which is the same sigma_z as the
+ * perpendicular noise: at sigma 10 m a walk's `location` series routinely
+ * swings 15-20 m peak-to-trough while going nowhere but forward. A real
+ * turnaround retraces the block (~100 m+), so this sits well above the noise
+ * and well below the signal.
+ */
+const DEFAULT_REVERSAL_M = 25;
+/** Half-width of the smoothing window used to detect reversals. */
+const REVERSAL_SMOOTH_HALF_WINDOW = 2;
 
 /**
  * Additive options. `types.ts` is the frozen contract; these are extras with
@@ -241,13 +251,29 @@ type Candidate = {
 };
 
 /**
- * The candidate states for one fix: every segment within the gate, nearest
- * first, capped.
+ * Project one point onto one segment.
  *
  * `location` is recomputed from OUR cumulative table rather than taken from
  * turf's `location` property. The two use slightly different length maths, and
  * a location that disagrees with `cumulative` by even a metre would corrupt
  * every route distance and traversal length downstream.
+ */
+function locateOnSegment(seg: GraphSegment, lng: number, lat: number): Omit<Candidate, "segIndex"> {
+  const snapped = nearestPointOnLine(lineString(seg.coordinates), point([lng, lat]), {
+    units: "meters",
+  });
+  const vertex = Math.min(snapped.properties.index ?? 0, seg.coordinates.length - 1);
+  const position = snapped.geometry.coordinates as Position;
+  const location = Math.max(
+    0,
+    Math.min(seg.lengthM, seg.cumulative[vertex] + haversineM(seg.coordinates[vertex], position)),
+  );
+  return { location, distM: snapped.properties.dist ?? Infinity, position };
+}
+
+/**
+ * The candidate states for one fix: every segment within the gate, nearest
+ * first, capped.
  */
 function candidatesFor(
   graph: SegmentGraph,
@@ -255,24 +281,12 @@ function candidatesFor(
   gateMeters: number,
   maxCandidates: number,
 ): Candidate[] {
-  const pt = point([fix.lng, fix.lat]);
   const found: Candidate[] = [];
 
   for (const segIndex of nearbySegments(graph, fix.lng, fix.lat, gateMeters)) {
-    const seg = graph.segments[segIndex];
-    const snapped = nearestPointOnLine(lineString(seg.coordinates), pt, { units: "meters" });
-    const distM = snapped.properties.dist ?? Infinity;
-    if (distM > gateMeters) continue;
-
-    const vertex = snapped.properties.index ?? 0;
-    const base = seg.cumulative[Math.min(vertex, seg.cumulative.length - 1)] ?? 0;
-    const position = snapped.geometry.coordinates as Position;
-    const location = Math.max(
-      0,
-      Math.min(seg.lengthM, base + haversineM(seg.coordinates[Math.min(vertex, seg.coordinates.length - 1)], position)),
-    );
-
-    found.push({ segIndex, location, distM, position });
+    const located = locateOnSegment(graph.segments[segIndex], fix.lng, fix.lat);
+    if (located.distM > gateMeters) continue;
+    found.push({ segIndex, ...located });
   }
 
   found.sort((a, b) => a.distM - b.distM);
@@ -348,13 +362,23 @@ function preprocess(
 ): KeptFix[] {
   const sorted = [...track].sort((a, b) => a.t - b.t);
 
+  const usable = sorted.filter(
+    (fix) => !(typeof fix.accuracy === "number" && fix.accuracy > maxAccuracyM),
+  );
+
   const accepted: TrackPoint[] = [];
-  for (const fix of sorted) {
-    if (typeof fix.accuracy === "number" && fix.accuracy > maxAccuracyM) continue;
+  for (const fix of usable) {
     const prev = accepted[accepted.length - 1];
     if (prev && haversineM([prev.lng, prev.lat], [fix.lng, fix.lat]) < minStepM) continue;
     accepted.push(fix);
   }
+
+  // The final fix is never redundant: it is what bounds the track in time.
+  // Walking at ~1.4 m/s means 1 Hz fixes land ~1.4 m apart, so the step filter
+  // would otherwise drop it and silently shorten every span and traversal that
+  // ends the track.
+  const lastUsable = usable[usable.length - 1];
+  if (lastUsable && accepted[accepted.length - 1] !== lastUsable) accepted.push(lastUsable);
 
   return accepted.map((fix, i) => {
     const prev = accepted[i - 1];
@@ -560,53 +584,89 @@ function viterbi(
  * Route + passes
  * ------------------------------------------------------------------ */
 
-/** One on-network move, always within a single segment. */
-type Step = {
-  segIndex: number;
-  fromLoc: number;
-  toLoc: number;
-  positions: Position[];
-  lengthM: number;
-  /** Cumulative route distance at the start / end of this step. */
-  sStart: number;
-  sEnd: number;
-  passId: number;
-};
-
+/**
+ * One pass along one segment: a contiguous range of fixes, entered at
+ * `entryLoc` and left at `exitLoc`.
+ *
+ * The pass — not the individual fix — is the unit of route geometry. A fix's
+ * `location` is the foot of the perpendicular from a noisy point, so it jitters
+ * several metres back and forth even on a dead-straight walk. Measuring travel
+ * by summing |delta location| between fixes therefore integrates the NOISE:
+ * measured that way a real 120 m walk came out at 664 m. Entry-to-exit
+ * displacement is immune to that, and it is what `lengthM` means in the
+ * contract ("metres travelled along the segment during this pass").
+ */
 type Pass = {
   id: number;
   segIndex: number;
-  fixIndices: number[];
+  /** Local fix indices within the sub-trajectory, contiguous. */
+  from: number;
+  to: number;
+  entryLoc: number;
+  exitLoc: number;
   lengthM: number;
+  /** Cumulative route distance at the start / end of this pass. */
+  sStart: number;
+  sEnd: number;
+  positions: Position[];
   frameSeqs: number[];
   nearJunctionSeqs: number[];
 };
+
+/** A maximal run of consecutive fixes matched to the same segment. */
+type Run = { segIndex: number; from: number; to: number };
+
+/**
+ * Smooth a location series for reversal DETECTION only.
+ *
+ * Detection runs on the smoothed series; the pass boundaries it returns index
+ * the original one. A centred mean over 5 samples cuts the noise by ~sqrt(5)
+ * while blurring a real turnaround by only a couple of metres, which is what
+ * lets a threshold sit cleanly between jitter and a genuine about-face.
+ */
+function smoothSeries(values: number[], halfWindow: number): number[] {
+  return values.map((_, i) => {
+    const lo = Math.max(0, i - halfWindow);
+    const hi = Math.min(values.length - 1, i + halfWindow);
+    let sum = 0;
+    for (let k = lo; k <= hi; k++) sum += values[k];
+    return sum / (hi - lo + 1);
+  });
+}
 
 /**
  * Split a run of fixes on one segment at genuine turnarounds.
  *
  * The contract is explicit that an out-and-back is TWO traversals, not one
  * merged span: which pass a frame belongs to is what tells us which side of the
- * street was filmed. Direction is taken from `location` along the segment, and
- * a reversal only counts once it exceeds `reversalM` past the running extremum,
- * so GPS jitter around a stationary point cannot manufacture a turnaround.
+ * street was filmed. This is the ZigZag rule — track the extremum reached in
+ * the current direction and pivot only once the series retraces past it by more
+ * than `reversalM` — run over the smoothed series so GPS jitter on a straight
+ * walk cannot manufacture a turnaround.
  */
 function splitAtReversals(
-  locations: number[],
+  rawLocations: number[],
   reversalM: number,
 ): number[][] {
-  if (locations.length < 2) return [locations.map((_, i) => i)];
+  if (rawLocations.length < 2) return [rawLocations.map((_, i) => i)];
 
+  const locations = smoothSeries(rawLocations, REVERSAL_SMOOTH_HALF_WINDOW);
   const groups: number[][] = [];
   let current: number[] = [0];
   let direction = 0;
   let extremum = locations[0];
 
   for (let i = 1; i < locations.length; i++) {
-    const delta = locations[i] - locations[i - 1];
     if (direction === 0) {
-      if (Math.abs(delta) > 0) direction = Math.sign(delta);
-      extremum = locations[i];
+      // Warm-up: do NOT take the direction from the first step. Noise makes the
+      // opening delta a coin flip, and a direction set backwards turns the walk
+      // that follows into a "reversal" — which reported the first few seconds
+      // of every track as its own doomed little pass. Commit only once the walk
+      // has actually gone somewhere.
+      if (Math.abs(locations[i] - locations[0]) > reversalM) {
+        direction = Math.sign(locations[i] - locations[0]);
+        extremum = locations[i];
+      }
       current.push(i);
       continue;
     }
@@ -641,133 +701,187 @@ function splitAtReversals(
   return groups.filter((g) => g.length > 0);
 }
 
-/** Group a sub-trajectory's fixes into passes: consecutive same-segment runs, split at reversals. */
-function toPasses(sub: SubTrajectory, reversalM: number, startId: number): Pass[] {
-  const passes: Pass[] = [];
-  let id = startId;
-
-  let runStart = 0;
-  for (let i = 1; i <= sub.chosen.length; i++) {
-    const ended = i === sub.chosen.length || sub.chosen[i].segIndex !== sub.chosen[runStart].segIndex;
-    if (!ended) continue;
-
-    const runIdx: number[] = [];
-    for (let k = runStart; k < i; k++) runIdx.push(k);
-    const locations = runIdx.map((k) => sub.chosen[k].location);
-
-    for (const group of splitAtReversals(locations, reversalM)) {
-      passes.push({
-        id: id++,
-        segIndex: sub.chosen[runStart].segIndex,
-        fixIndices: group.map((g) => runIdx[g]),
-        lengthM: 0,
-        frameSeqs: [],
-        nearJunctionSeqs: [],
-      });
-    }
-    runStart = i;
+/** Maximal runs of consecutive fixes on one segment. */
+function maximalRuns(chosen: Candidate[]): Run[] {
+  const runs: Run[] = [];
+  for (let i = 0; i < chosen.length; i++) {
+    const last = runs[runs.length - 1];
+    if (last && last.segIndex === chosen[i].segIndex) last.to = i;
+    else runs.push({ segIndex: chosen[i].segIndex, from: i, to: i });
   }
-  return passes;
+  return runs;
 }
 
-/** The route a sub-trajectory travelled, as steps carrying route distance and owning pass. */
-function buildSteps(
+/** Net distance travelled along the segment across a run. */
+function runNetLength(chosen: Candidate[], run: Run): number {
+  return Math.abs(chosen[run.to].location - chosen[run.from].location);
+}
+
+/**
+ * Group a sub-trajectory's fixes into passes.
+ *
+ * At a junction the two arms MEET, so a fix sitting on the corner is genuinely
+ * near-equidistant from both and the Viterbi flickers between them for a fix or
+ * two. That flicker is not a pass along a street; it is what `minRunFixes` and
+ * `minTraversalMeters` exist to kill. So: keep only the runs strong enough to
+ * be real, give every remaining fix to its nearest strong run, and let adjacent
+ * runs of the same segment merge back into one pass. Absorbing rather than
+ * blanking matters — merely dropping the flicker would leave one true pass
+ * reported as two separated by a hole, which is the artifact this removes.
+ */
+function buildPasses(
   graph: SegmentGraph,
-  sub: SubTrajectory,
-  passOfLocalFix: number[],
-): { steps: Step[]; fixS: number[] } {
-  const steps: Step[] = [];
-  const fixS: number[] = [0];
-  let s = 0;
+  chosen: Candidate[],
+  fixes: TrackPoint[],
+  minRunFixes: number,
+  minTraversalM: number,
+  reversalM: number,
+  startId: number,
+): { passes: Pass[]; locations: number[] } {
+  if (chosen.length === 0) return { passes: [], locations: [] };
 
-  for (let i = 0; i < sub.chosen.length - 1; i++) {
-    const from = sub.chosen[i];
-    const to = sub.chosen[i + 1];
+  const runs = maximalRuns(chosen);
+  const strong = runs.filter(
+    (r) => r.to - r.from + 1 >= minRunFixes && runNetLength(chosen, r) >= minTraversalM,
+  );
+  // Nothing here was a pass: a handful of fixes brushing past a street.
+  if (strong.length === 0) return { passes: [], locations: [] };
 
-    if (from.segIndex === to.segIndex) {
-      const seg = graph.segments[from.segIndex];
-      const lengthM = Math.abs(to.location - from.location);
-      steps.push({
-        segIndex: from.segIndex,
-        fromLoc: from.location,
-        toLoc: to.location,
-        positions: pathAlongSegment(seg, from.location, to.location),
-        lengthM,
-        sStart: s,
-        sEnd: s + lengthM,
-        passId: passOfLocalFix[i],
-      });
-      s += lengthM;
-      fixS.push(s);
-      continue;
-    }
-
-    // Different segments: the route leaves through the node they share.
-    const a = graph.segments[from.segIndex];
-    const b = graph.segments[to.segIndex];
-    let bestNode: string | null = null;
-    let bestTotal = Infinity;
-    for (const node of sharedNodes(a, b)) {
-      const da = distanceToNode(a, from.location, node);
-      const db = distanceToNode(b, to.location, node);
-      if (da === null || db === null) continue;
-      if (da + db < bestTotal) {
-        bestTotal = da + db;
-        bestNode = node;
+  // Every fix joins the strong run nearest in time. Strong runs are ordered and
+  // disjoint, so ownership is monotonic and the resulting blocks are contiguous.
+  const blocks: Run[] = [];
+  for (let i = 0; i < chosen.length; i++) {
+    let best = 0;
+    let bestDist = Infinity;
+    for (let k = 0; k < strong.length; k++) {
+      const r = strong[k];
+      const d = i < r.from ? r.from - i : i > r.to ? i - r.to : 0;
+      if (d < bestDist) {
+        bestDist = d;
+        best = k;
       }
     }
-
-    if (bestNode === null) {
-      // Unreachable pairs cannot survive the transition model; keep the route
-      // continuous rather than trusting an invariant we did not prove.
-      const lengthM = haversineM(from.position, to.position);
-      steps.push({
-        segIndex: to.segIndex,
-        fromLoc: to.location,
-        toLoc: to.location,
-        positions: [from.position, to.position],
-        lengthM,
-        sStart: s,
-        sEnd: s + lengthM,
-        passId: passOfLocalFix[i + 1],
-      });
-      s += lengthM;
-      fixS.push(s);
-      continue;
-    }
-
-    const exitLoc = a.startNode === bestNode ? 0 : a.lengthM;
-    const entryLoc = b.startNode === bestNode ? 0 : b.lengthM;
-
-    const outLen = Math.abs(exitLoc - from.location);
-    steps.push({
-      segIndex: from.segIndex,
-      fromLoc: from.location,
-      toLoc: exitLoc,
-      positions: pathAlongSegment(a, from.location, exitLoc),
-      lengthM: outLen,
-      sStart: s,
-      sEnd: s + outLen,
-      passId: passOfLocalFix[i],
-    });
-    s += outLen;
-
-    const inLen = Math.abs(to.location - entryLoc);
-    steps.push({
-      segIndex: to.segIndex,
-      fromLoc: entryLoc,
-      toLoc: to.location,
-      positions: pathAlongSegment(b, entryLoc, to.location),
-      lengthM: inLen,
-      sStart: s,
-      sEnd: s + inLen,
-      passId: passOfLocalFix[i + 1],
-    });
-    s += inLen;
-    fixS.push(s);
+    const segIndex = strong[best].segIndex;
+    const last = blocks[blocks.length - 1];
+    if (last && last.segIndex === segIndex) last.to = i;
+    else blocks.push({ segIndex, from: i, to: i });
   }
 
-  return { steps, fixS };
+  // An absorbed fix was matched to a DIFFERENT segment, so its `location` is a
+  // distance along that other street and means nothing here. Re-project it onto
+  // the segment it now belongs to; using the stale value reported a 3-second
+  // pass as 142 m of travel.
+  const locations = chosen.map((c) => c.location);
+  for (const block of blocks) {
+    for (let i = block.from; i <= block.to; i++) {
+      if (chosen[i].segIndex === block.segIndex) continue;
+      locations[i] = locateOnSegment(
+        graph.segments[block.segIndex],
+        fixes[i].lng,
+        fixes[i].lat,
+      ).location;
+    }
+  }
+
+  // An out-and-back on one street is two passes, not one merged span.
+  const split: Run[] = [];
+  for (const block of blocks) {
+    const series: number[] = [];
+    for (let i = block.from; i <= block.to; i++) series.push(locations[i]);
+    for (const group of splitAtReversals(series, reversalM)) {
+      split.push({
+        segIndex: block.segIndex,
+        from: block.from + group[0],
+        to: block.from + group[group.length - 1],
+      });
+    }
+  }
+
+  const passes = split.map((run, j) => {
+    const seg = graph.segments[run.segIndex];
+    const prev = split[j - 1];
+    const next = split[j + 1];
+    // A pass entered from an adjacent street starts at the node they share, not
+    // at the first fix: the walk really did cover the metres up to the corner.
+    const entryLoc =
+      prev && prev.segIndex !== run.segIndex
+        ? boundaryLocation(seg, graph.segments[prev.segIndex], locations[run.from])
+        : locations[run.from];
+    const exitLoc =
+      next && next.segIndex !== run.segIndex
+        ? boundaryLocation(seg, graph.segments[next.segIndex], locations[run.to])
+        : locations[run.to];
+
+    return {
+      id: startId + j,
+      segIndex: run.segIndex,
+      from: run.from,
+      to: run.to,
+      entryLoc,
+      exitLoc,
+      lengthM: Math.abs(exitLoc - entryLoc),
+      sStart: 0,
+      sEnd: 0,
+      positions: pathAlongSegment(seg, entryLoc, exitLoc),
+      frameSeqs: [],
+      nearJunctionSeqs: [],
+    };
+  });
+
+  return { passes, locations };
+}
+
+/**
+ * Where `seg` meets `other`: the location on `seg` of the node they share.
+ * Falls back to the fix's own location when they share none.
+ */
+function boundaryLocation(
+  seg: GraphSegment,
+  other: GraphSegment,
+  fallback: number,
+): number {
+  const shared = sharedNodes(seg, other);
+  if (shared.length === 0) return fallback;
+  let bestLoc = fallback;
+  let bestDist = Infinity;
+  for (const node of shared) {
+    const loc = seg.startNode === node ? 0 : seg.lengthM;
+    const d = Math.abs(loc - fallback);
+    if (d < bestDist) {
+      bestDist = d;
+      bestLoc = loc;
+    }
+  }
+  return bestLoc;
+}
+
+/**
+ * Lay the passes end to end into one route, and place every fix on it.
+ *
+ * `fixS` is forced non-decreasing: within a pass the walk goes one way (that is
+ * what the reversal split guarantees), so a fix whose noisy projection lands
+ * behind its predecessor is noise, and letting it move route distance backwards
+ * would break the binary search that attribution depends on.
+ */
+function layoutRoute(passes: Pass[], locations: number[]): number[] {
+  let s = 0;
+  for (const pass of passes) {
+    pass.sStart = s;
+    pass.sEnd = s + pass.lengthM;
+    s = pass.sEnd;
+  }
+
+  const fixS = new Array<number>(locations.length).fill(0);
+  let running = 0;
+  for (const pass of passes) {
+    for (let i = pass.from; i <= pass.to; i++) {
+      const along = Math.abs(locations[i] - pass.entryLoc);
+      const value = Math.max(pass.sStart, Math.min(pass.sEnd, pass.sStart + along));
+      running = Math.max(running, value);
+      fixS[i] = running;
+    }
+  }
+  return fixS;
 }
 
 /* ------------------------------------------------------------------ *
@@ -776,10 +890,12 @@ function buildSteps(
 
 type Built = {
   sub: SubTrajectory;
-  steps: Step[];
+  /** Every pass the walk made, in order. The route is these laid end to end. */
+  passes: Pass[];
   /** Route distance at each fix of the sub-trajectory. */
   fixS: number[];
-  passes: Pass[];
+  /** The passes worth reporting as traversals; a subset of `passes`. */
+  reported: Pass[];
 };
 
 export const matchTrack: MatchTrack = (track, options: MatchOptions = {}): MatchResult => {
@@ -832,27 +948,25 @@ export const matchTrack: MatchTrack = (track, options: MatchOptions = {}): Match
   const built: Built[] = [];
   let passId = 0;
   for (const sub of subTrajectories) {
-    const passes = toPasses(sub, reversalMeters, passId);
+    const { passes, locations } = buildPasses(
+      graph,
+      sub.chosen,
+      sub.fixIndices.map((i) => kept[i].fix),
+      minRunFixes,
+      minTraversalMeters,
+      reversalMeters,
+      passId,
+    );
     passId += passes.length;
-
-    const passOfLocalFix = new Array<number>(sub.chosen.length).fill(-1);
-    for (const pass of passes) {
-      for (const local of pass.fixIndices) passOfLocalFix[local] = pass.id;
-    }
-
-    const { steps, fixS } = buildSteps(graph, sub, passOfLocalFix);
-    for (const step of steps) {
-      const pass = passes.find((p) => p.id === step.passId);
-      if (pass) pass.lengthM += step.lengthM;
-    }
-    built.push({ sub, steps, fixS, passes });
+    const fixS = layoutRoute(passes, locations);
+    // The reversal split can carve a sliver off a pass, so re-apply the floor
+    // to what gets REPORTED. The route still keeps every pass: the walk went
+    // there, we just will not call a sliver a traversal of the street.
+    const reported = passes.filter(
+      (p) => p.lengthM >= minTraversalMeters && p.to - p.from + 1 >= minRunFixes,
+    );
+    built.push({ sub, passes, fixS, reported });
   }
-
-  /* ---- filter passes ---- */
-
-  const keepPass = (p: Pass) =>
-    p.fixIndices.length >= minRunFixes && p.lengthM >= minTraversalMeters;
-  for (const b of built) b.passes = b.passes.filter(keepPass);
 
   /* ---- frames ---- */
 
@@ -864,9 +978,10 @@ export const matchTrack: MatchTrack = (track, options: MatchOptions = {}): Match
       hit.pass.frameSeqs.push(frame.seq);
       if (hit.nearJunction) hit.pass.nearJunctionSeqs.push(frame.seq);
     }
-    // A pass nobody filmed is not evidence of coverage.
+    // A pass nobody filmed is not evidence of coverage: reported, it would
+    // claim a stretch of street that no frame can be read from.
     for (const b of built) {
-      b.passes = b.passes.filter((p) => p.frameSeqs.length >= minTraversalFrames);
+      b.reported = b.reported.filter((p) => p.frameSeqs.length >= minTraversalFrames);
     }
   }
 
@@ -874,9 +989,9 @@ export const matchTrack: MatchTrack = (track, options: MatchOptions = {}): Match
 
   const traversals: SegmentTraversal[] = [];
   for (const b of built) {
-    for (const pass of b.passes) {
-      const first = kept[b.sub.fixIndices[pass.fixIndices[0]]].fix;
-      const last = kept[b.sub.fixIndices[pass.fixIndices[pass.fixIndices.length - 1]]].fix;
+    for (const pass of b.reported) {
+      const first = kept[b.sub.fixIndices[pass.from]].fix;
+      const last = kept[b.sub.fixIndices[pass.to]].fix;
       traversals.push({
         segmentId: graph.segments[pass.segIndex].id,
         tEnter: first.t,
@@ -895,12 +1010,12 @@ export const matchTrack: MatchTrack = (track, options: MatchOptions = {}): Match
 
   /* ---- route line ---- */
 
+  // The route is what the walk travelled, so it is drawn from every pass, not
+  // only the reported ones.
   const routePositions: Position[] = [];
   for (const b of built) {
-    const first = b.sub.chosen[0];
-    pushPosition(routePositions, first.position);
-    for (const step of b.steps) {
-      for (const pos of step.positions) pushPosition(routePositions, pos);
+    for (const pass of b.passes) {
+      for (const pos of pass.positions) pushPosition(routePositions, pos);
     }
   }
   if (routePositions.length === 0) {
@@ -1011,19 +1126,13 @@ function attributeFrameToRoute(
     const ratio = tB > tA ? (frame.t - tA) / (tB - tA) : 0;
     const s = sA + (sB - sA) * ratio;
 
-    const step = findStep(b.steps, s);
-    if (!step) {
-      // A sub-trajectory of one fix has no steps; its single pass still owns it.
-      const pass = b.passes.find((p) => p.fixIndices.includes(i));
-      return pass ? { pass, nearJunction: false } : null;
-    }
-    const pass = b.passes.find((p) => p.id === step.passId);
+    const pass = findPass(b.passes, s);
     if (!pass) return null;
 
-    const seg = graph.segments[step.segIndex];
-    const span = step.sEnd - step.sStart;
-    const t = span > 0 ? (s - step.sStart) / span : 0;
-    const location = step.fromLoc + (step.toLoc - step.fromLoc) * t;
+    const seg = graph.segments[pass.segIndex];
+    const span = pass.sEnd - pass.sStart;
+    const t = span > 0 ? (s - pass.sStart) / span : 0;
+    const location = pass.entryLoc + (pass.exitLoc - pass.entryLoc) * t;
     const pos = positionAtLocation(seg, location);
 
     const nearJunction = [seg.startNode, seg.endNode].some((node) => {
@@ -1036,17 +1145,17 @@ function attributeFrameToRoute(
   return null;
 }
 
-/** The step containing route distance `s`. */
-function findStep(steps: Step[], s: number): Step | null {
-  if (steps.length === 0) return null;
+/** The pass containing route distance `s`. Passes are laid end to end, so this is a binary search. */
+function findPass(passes: Pass[], s: number): Pass | null {
+  if (passes.length === 0) return null;
   let lo = 0;
-  let hi = steps.length - 1;
+  let hi = passes.length - 1;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
-    if (steps[mid].sEnd < s) lo = mid + 1;
+    if (passes[mid].sEnd < s) lo = mid + 1;
     else hi = mid;
   }
-  return steps[lo] ?? null;
+  return passes[lo] ?? null;
 }
 
 /* ------------------------------------------------------------------ *
