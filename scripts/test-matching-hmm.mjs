@@ -409,8 +409,51 @@ function main() {
     );
   }
 
+  /* ============ 7. Out-and-back ============ */
+  console.log("\n7. out-and-back on one street");
+  {
+    // Up the street and back down it. The contract is explicit that this is TWO
+    // traversals, not one merged span: which pass a frame belongs to is exactly
+    // what tells us which side of the street was filmed.
+    const out = walkSegment(STRAIGHT, 30, 200, T0, 5, 31);
+    const backStart = out[out.length - 1].t + 1000;
+    const back = walkSegment(STRAIGHT, 200, 30, backStart, 5, 32);
+    const track = [...out, ...back];
+    const m = H.matchTrack(track, { segments: SEGMENTS });
+
+    check(
+      "an out-and-back on one street is TWO traversals, not one merged span",
+      m.traversals.length === 2,
+      `got ${m.traversals.length}`,
+    );
+    check(
+      "...both on the street walked",
+      m.traversals.every((t) => t.segmentId === STRAIGHT),
+      `got ${JSON.stringify(ids(m))}`,
+    );
+    check(
+      "...split at the turnaround, not at an arbitrary point",
+      m.traversals.length === 2 &&
+        Math.abs(m.traversals[0].tExit - out[out.length - 1].t) <= 10_000,
+      `first pass ends ${((m.traversals[0]?.tExit - out[out.length - 1].t) / 1000).toFixed(0)}s from the real turnaround`,
+    );
+    check(
+      "each leg measures roughly the 170 m walked (+/-20%)",
+      m.traversals.every((t) => Math.abs(t.lengthM - 170) / 170 < 0.2),
+      `got ${m.traversals.map((t) => t.lengthM.toFixed(0)).join(" / ")} m`,
+    );
+
+    // The guard: a straight one-way walk must NOT be split by the same logic.
+    const oneWay = H.matchTrack(walkSegment(STRAIGHT, 30, 200, T0, 8, 1234), { segments: SEGMENTS });
+    check(
+      "...while a one-way walk with MORE noise stays a single traversal",
+      oneWay.traversals.length === 1,
+      `got ${oneWay.traversals.length}`,
+    );
+  }
+
   /* ============ Contract edge cases ============ */
-  console.log("\n7. contract edge cases");
+  console.log("\n8. contract edge cases");
   {
     const m = H.matchTrack([], { segments: SEGMENTS });
     check(

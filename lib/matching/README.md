@@ -104,6 +104,15 @@ a real 120 m walk measured 664 m that way. A pass is measured entry-to-exit.
 This is also why `minTraversalMeters` works at all — with summed lengths, every
 one-fix flicker looked long enough to report.
 
+**Length means two different things at two different stages, and swapping them
+loses whole streets.** Deciding whether a *run* is real asks how much of the
+street it covered, so it uses the run's **extent** (`max − min` of location).
+Measuring a *pass* asks how far the walk got, so it uses **entry-to-exit
+displacement**. Using displacement for the run test silently deleted
+out-and-back walks: a walk up a street and back ends where it started, so its
+displacement is ~0, the run failed the 10 m floor, and a street that was walked
+twice reported no coverage at all.
+
 **`metadata.bbox` in `data/segments.geojson` is a footgun.** It is in Overpass's
 lat-first order (`[minLat, minLng, maxLat, maxLng]`), which is NOT the GeoJSON
 convention. Reading it would silently transpose every gate check into the ocean.

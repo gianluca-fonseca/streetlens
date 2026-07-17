@@ -712,9 +712,25 @@ function maximalRuns(chosen: Candidate[]): Run[] {
   return runs;
 }
 
-/** Net distance travelled along the segment across a run. */
-function runNetLength(chosen: Candidate[], run: Run): number {
-  return Math.abs(chosen[run.to].location - chosen[run.from].location);
+/**
+ * How much of the segment a run covers: its extent, not its net displacement.
+ *
+ * Net displacement (|end - start|) is WRONG here, and dangerously so: a walk up
+ * a street and back ends where it began, so its net displacement is ~0 and the
+ * whole run would be discarded as too short to be real — reporting no coverage
+ * at all for a street that was walked twice. Extent asks the question actually
+ * being asked at this stage: how much of this street did this run cover? The
+ * reversal split later cuts the run into its two monotonic legs, and each leg
+ * is measured entry-to-exit.
+ */
+function runExtent(chosen: Candidate[], run: Run): number {
+  let min = Infinity;
+  let max = -Infinity;
+  for (let i = run.from; i <= run.to; i++) {
+    if (chosen[i].location < min) min = chosen[i].location;
+    if (chosen[i].location > max) max = chosen[i].location;
+  }
+  return max - min;
 }
 
 /**
@@ -742,7 +758,7 @@ function buildPasses(
 
   const runs = maximalRuns(chosen);
   const strong = runs.filter(
-    (r) => r.to - r.from + 1 >= minRunFixes && runNetLength(chosen, r) >= minTraversalM,
+    (r) => r.to - r.from + 1 >= minRunFixes && runExtent(chosen, r) >= minTraversalM,
   );
   // Nothing here was a pass: a handful of fixes brushing past a street.
   if (strong.length === 0) return { passes: [], locations: [] };
