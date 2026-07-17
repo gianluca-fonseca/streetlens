@@ -774,6 +774,111 @@ async function main() {
     );
   }
 
+  /* ---------------- Retry policy ---------------- */
+  console.log("\nretry policy");
+  {
+    const { createOpenAiVisionClient } = require(path.join(BUILD_DIR, "extraction", "client.js"));
+    const mkResponse = (status, body) => ({
+      ok: false,
+      status,
+      statusText: "err",
+      async text() {
+        return body;
+      },
+      async json() {
+        return JSON.parse(body);
+      },
+    });
+
+    // A real 429 is worth backing off from.
+    let calls = 0;
+    const flaky = createOpenAiVisionClient({
+      apiKey: "sk-test",
+      sleepImpl: async () => {},
+      rand: () => 0,
+      fetchImpl: async () => {
+        calls++;
+        return calls < 3
+          ? mkResponse(429, '{"error":{"message":"Rate limit reached"}}')
+          : {
+              ok: true,
+              status: 200,
+              async json() {
+                return {
+                  status: "completed",
+                  output: [{ content: [{ type: "output_text", text: modelText(T) }] }],
+                  usage: { input_tokens: 1200, output_tokens: 100 },
+                };
+              },
+            };
+      },
+    });
+    const out = await flaky.extract({ model: "m", imageUrl: "https://x.test/f.jpg" });
+    check(
+      "an ordinary 429 is retried and can succeed",
+      out.outcome === "completed" && calls === 3,
+      `${calls} attempts`,
+    );
+
+    // insufficient_quota is a 429 that can never succeed: the account is out of
+    // money. Retrying it three times just arrives at the same answer slower and
+    // buries "check your billing" under a generic message. Found by the live
+    // smoke, which burned three attempts on exactly this.
+    let quotaCalls = 0;
+    const broke = createOpenAiVisionClient({
+      apiKey: "sk-test",
+      sleepImpl: async () => {},
+      rand: () => 0,
+      fetchImpl: async () => {
+        quotaCalls++;
+        return mkResponse(429, '{"error":{"code":"insufficient_quota","message":"You exceeded your current quota"}}');
+      },
+    });
+    let threw = null;
+    try {
+      await broke.extract({ model: "m", imageUrl: "https://x.test/f.jpg" });
+    } catch (err) {
+      threw = err;
+    }
+    check(
+      "insufficient_quota fails fast instead of backing off three times",
+      quotaCalls === 1 && threw !== null && /insufficient_quota/.test(threw.message),
+      `${quotaCalls} attempt(s)`,
+    );
+
+    let badCalls = 0;
+    const bad = createOpenAiVisionClient({
+      apiKey: "sk-test",
+      sleepImpl: async () => {},
+      fetchImpl: async () => {
+        badCalls++;
+        return mkResponse(400, '{"error":{"message":"Unsupported parameter"}}');
+      },
+    });
+    let bad400 = null;
+    try {
+      await bad.extract({ model: "m", imageUrl: "https://x.test/f.jpg" });
+    } catch (err) {
+      bad400 = err;
+    }
+    check(
+      "a 400 is our bug and is not retried",
+      badCalls === 1 && bad400 !== null,
+      `${badCalls} attempt(s)`,
+    );
+  }
+
+  /* ---------------- Request params the models accept ---------------- */
+  console.log("\nrequest parameters");
+  {
+    const body = buildRequestBody({ model: "gpt-5-nano", imageUrl: "https://x.test/f.jpg" });
+    check(
+      "no temperature — gpt-5 reasoning models 400 the whole request on it",
+      !("temperature" in body),
+      JSON.stringify(Object.keys(body)),
+    );
+  }
+
   /* ---------------- Transport ---------------- */
   console.log("\ntransport failure");
   {

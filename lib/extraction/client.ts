@@ -65,9 +65,18 @@ export class VisionTransportError extends Error {
  * Retry policy
  * ------------------------------------------------------------------ */
 
-/** Retryable: rate limits and server faults. A 400 is our bug and repeats. */
-function isRetryableStatus(status: number): boolean {
-  return status === 429 || (status >= 500 && status <= 599);
+/**
+ * Retryable: rate limits and server faults. A 400 is our bug and repeats.
+ *
+ * The exception is `insufficient_quota`, which arrives as a 429 like an ordinary
+ * rate limit but is nothing of the sort: the account is out of money, and no
+ * amount of backing off will change that. Retrying it just spends the pump's
+ * wall clock to arrive at the same answer three times, and buries the real cause
+ * ("check your billing") under a generic unavailable message.
+ */
+function isRetryable(status: number, body: string): boolean {
+  if (status === 429) return !/insufficient_quota/i.test(body);
+  return status >= 500 && status <= 599;
 }
 
 /**
@@ -200,9 +209,11 @@ export function buildRequestBody(request: VisionRequest): Record<string, unknown
       },
     ],
     text: { format: observationResponseFormat() },
-    // Nothing to sample creatively: the schema is strict and the answer is a
-    // reading of an image. Deterministic keeps re-runs comparable.
-    temperature: 0,
+    // NO `temperature`. The gpt-5 reasoning models reject it outright
+    // ("Unsupported parameter: 'temperature' is not supported with this model")
+    // and 400 the whole request, so sending it would fail every single call.
+    // Determinism would have been nice for comparing re-runs; the strict schema
+    // is what actually constrains the answer.
     store: false,
   };
 }
@@ -249,7 +260,7 @@ export function createOpenAiVisionClient(
 
         lastStatus = response.status;
         lastError = await response.text().catch(() => response.statusText);
-        if (!isRetryableStatus(response.status)) {
+        if (!isRetryable(response.status, lastError)) {
           throw new VisionTransportError(
             `openai ${response.status}: ${lastError.slice(0, 500)}`,
             response.status,
