@@ -320,7 +320,9 @@ async function main() {
   const { pumpOnce } = require(path.join(BUILD_DIR, "capture", "pump.js"));
   const { shouldEscalate, extractFrame } = require(path.join(BUILD_DIR, "extraction", "extract.js"));
   const { parseVisionPayload, buildRequestBody } = require(path.join(BUILD_DIR, "extraction", "client.js"));
-  const { SYSTEM_PROMPT, systemPromptApproxTokens } = require(path.join(BUILD_DIR, "extraction", "prompt.js"));
+  const { SYSTEM_PROMPT, systemPromptApproxTokens, staticRequestApproxTokens } = require(
+    path.join(BUILD_DIR, "extraction", "prompt.js"),
+  );
   const { downscaleFrame, FRAME_MAX_EDGE_PX } = require(path.join(BUILD_DIR, "extraction", "downscale.js"));
   const { inputTokenCeiling, describeInputTokenCeiling, IMAGE_TOKEN_BUDGET, sessionTokenBudget } =
     require(path.join(BUILD_DIR, "extraction", "config.js"));
@@ -407,7 +409,7 @@ async function main() {
     );
     check(
       "the breaker message shows what the ceiling is made of, not a bare number",
-      /static prompt/.test(db.jobs.get("frame-0").error) &&
+      /static request/.test(db.jobs.get("frame-0").error) &&
         /image budget/.test(db.jobs.get("frame-0").error),
       db.jobs.get("frame-0").error,
     );
@@ -449,26 +451,31 @@ async function main() {
   /* ---------------- The ceiling itself ---------------- */
   console.log("\nprompt-aware ceiling");
   {
-    // The ceiling used to be a flat 2600 while the cached prefix is ~2700, so it
-    // fired on every correct call — the breaker was measuring our own prompt.
-    // Deriving it from the prompt is what makes editing prompt.ts safe.
+    // The ceiling used to be a flat 2600 while the request's static part is
+    // ~4600, so it fired on every correct call — the breaker was measuring our
+    // own prompt. Deriving it is what makes editing prompt.ts or schema.ts safe.
     check(
-      "the ceiling is derived from the measured prompt, not hardcoded",
-      CEILING === systemPromptApproxTokens() + IMAGE_TOKEN_BUDGET,
-      `${CEILING} vs ~${systemPromptApproxTokens()} + ${IMAGE_TOKEN_BUDGET}`,
+      "the ceiling is derived from the measured request, not hardcoded",
+      CEILING === staticRequestApproxTokens() + IMAGE_TOKEN_BUDGET,
+      `${CEILING} vs ~${staticRequestApproxTokens()} + ${IMAGE_TOKEN_BUDGET}`,
     );
     check(
-      "it clears the whole static prefix, which a correct call always pays",
-      CEILING > systemPromptApproxTokens(),
+      "it clears the whole static request, which a correct call always pays",
+      CEILING > staticRequestApproxTokens(),
     );
     check(
-      "a full-resolution image (~3800 tokens) still trips it",
-      systemPromptApproxTokens() + 3800 > CEILING,
-      `prompt + 3800 = ${systemPromptApproxTokens() + 3800} vs ${CEILING}`,
+      "the strict schema is counted, not just the prompt — it is ~1900 billed tokens",
+      staticRequestApproxTokens() > systemPromptApproxTokens() * 1.5,
+      `static ~${staticRequestApproxTokens()} vs prompt ~${systemPromptApproxTokens()}`,
+    );
+    check(
+      "an image billed an order of magnitude over its ~470 tokens still trips it",
+      staticRequestApproxTokens() + 4700 > CEILING,
+      `static + 4700 = ${staticRequestApproxTokens() + 4700} vs ${CEILING}`,
     );
     check(
       "the composition is spelled out for whoever finds the paused session",
-      /static prompt/.test(describeInputTokenCeiling()) &&
+      /static request/.test(describeInputTokenCeiling()) &&
         /image budget/.test(describeInputTokenCeiling()),
       describeInputTokenCeiling(),
     );
