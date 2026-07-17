@@ -515,6 +515,29 @@
         "eyebrow": "El motor que viene",
         "heading": "Cada auditoría entrena a la siguiente.",
         "body": "Las auditorías de campo son la fuente de verdad, y así se quedan. Desde el piloto de agosto de 2026, cada corredor que un auditor camina también se fotografía, y esas imágenes se vuelven datos de entrenamiento etiquetados. Con el tiempo entrenarán un sistema de visión por computadora y aprendizaje automático que lee la condición de la acera y las obstrucciones directamente desde una foto, para que cada auditoría futura puntúe más rápido que la anterior. Hoy ningún modelo puntúa una calle. Cuando lo haga, una persona seguirá verificando lo que reporte."
+      },
+      "plates": {
+        "crossSection": {
+          "label": "Figura 4",
+          "claim": "Lo que leen en realidad los cuatro lentes.",
+          "support": "El derecho de vía de una calle en sección, con la acera, la franja y la calzada medidas contra la rúbrica anterior.",
+          "source": "Fuente: dibujo de StreetLens sobre los mínimos de acera del Reglamento a la Ley 7600 (Decreto 26831-MP).",
+          "alt": "Sección transversal de ingeniería del derecho de vía de una calle, que anota la acera, la franja y la calzada con los cuatro lentes de StreetLens y las dimensiones mínimas de la Ley 7600."
+        },
+        "anatomy": {
+          "label": "Figura 5",
+          "claim": "Cómo un segmento se convierte en cuatro puntuaciones.",
+          "support": "El mismo segmento en planta, con la rúbrica de auditoría, los tramos de puntuación, el canal de ancho y el marco de reportes comunitarios que resuelven el resultado anterior.",
+          "source": "Fuente: esquema de puntuación de StreetLens. Tramos de ancho según el Reglamento a la Ley 7600 (Decreto 26831-MP).",
+          "alt": "Diagrama en planta de un segmento de calle que muestra la rúbrica de auditoría, los tramos de puntuación, el canal de medición de ancho y el marco de reportes comunitarios que producen los cuatro puntajes de lente del segmento."
+        },
+        "pipeline": {
+          "label": "Figura 6",
+          "claim": "Auditorías de campo hoy. Un modelo verificado mañana.",
+          "support": "Cada corredor caminado se fotografía, y esas imágenes se vuelven datos de entrenamiento para un sistema de visión por computadora que una persona siempre revisa.",
+          "source": "Hoja de ruta, no construido. El camino de aprendizaje automático dibujado en línea discontinua no puntúa ninguna calle hoy.",
+          "alt": "Diagrama del método: las auditorías de campo fluyen hacia datos abiertos hoy, con un bucle de hoja de ruta en línea discontinua donde un modelo de visión por computadora y aprendizaje automático puntúa calles y una persona siempre verifica el resultado."
+        }
       }
     },
     "grounding": {

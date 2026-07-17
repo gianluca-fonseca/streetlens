@@ -1,11 +1,13 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- first-party static SVG engineering plates; next/image adds no value for inline SVG and would need dangerouslyAllowSVG */
 import { useTranslations } from "next-intl";
 import Section from "@/components/ui/Section";
 import Measure from "@/components/ui/Measure";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Sidenote from "@/components/ui/Sidenote";
 import StatFigure from "@/components/ui/StatFigure";
+import Figure from "@/components/ui/Figure";
 
 /**
  * Section 04 — the method. A serif argument with two margin citations (MAPS-Mini,
@@ -65,6 +67,27 @@ export default function MethodSection() {
         </div>
       </Measure>
 
+      {/* Plate 1 as Figure 4: a right-of-way cross-section that shows what the four
+          lenses read, matted as a printed sheet (the SVG carries its own paper). */}
+      <Measure width="page" className="mt-10">
+        <Figure
+          id="figure-4"
+          label={t("plates.crossSection.label")}
+          claim={t("plates.crossSection.claim")}
+          support={t("plates.crossSection.support")}
+          source={t("plates.crossSection.source")}
+          aspectClassName="aspect-[1160/760]"
+        >
+          <img
+            src="/drawings/plate-1-cross-section.svg"
+            alt={t("plates.crossSection.alt")}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </Figure>
+      </Measure>
+
       {/* Example-segment anatomy as TABLE 1: hairline-framed, mono readout. */}
       <Measure width="page" className="mt-10">
         <figure className="rounded-[4px] border border-hairline bg-surface p-6 sm:p-8">
@@ -114,6 +137,27 @@ export default function MethodSection() {
         </figure>
       </Measure>
 
+      {/* Plate 2 as Figure 5: the scoring anatomy behind the readout above, matted
+          as a printed sheet. Pairs the schematic with Table 1's concrete example. */}
+      <Measure width="page" className="mt-10">
+        <Figure
+          id="figure-5"
+          label={t("plates.anatomy.label")}
+          claim={t("plates.anatomy.claim")}
+          support={t("plates.anatomy.support")}
+          source={t("plates.anatomy.source")}
+          aspectClassName="aspect-[1160/760]"
+        >
+          <img
+            src="/drawings/plate-2-scoring-anatomy.svg"
+            alt={t("plates.anatomy.alt")}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </Figure>
+      </Measure>
+
       {/* The collection engine: two ways in, one reviewed dataset. */}
       <Measure width="outset" className="mt-16">
         <div className="text-center">
@@ -159,6 +203,27 @@ export default function MethodSection() {
         <p className="font-serif text-[1.08rem] leading-[1.7] text-ink">
           {t("pipeline.body")}
         </p>
+      </Measure>
+
+      {/* Plate 3 as Figure 6: the method pipeline. The dashed ML/CV loop IS the
+          honesty story, so the caption stays roadmap-framed (not built). */}
+      <Measure width="page" className="mt-10">
+        <Figure
+          id="figure-6"
+          label={t("plates.pipeline.label")}
+          claim={t("plates.pipeline.claim")}
+          support={t("plates.pipeline.support")}
+          source={t("plates.pipeline.source")}
+          aspectClassName="aspect-[1160/760]"
+        >
+          <img
+            src="/drawings/plate-3-method-pipeline.svg"
+            alt={t("plates.pipeline.alt")}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </Figure>
       </Measure>
     </Section>
   );

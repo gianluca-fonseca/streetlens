@@ -515,6 +515,29 @@
         "eyebrow": "The engine ahead",
         "heading": "Every audit trains the next one.",
         "body": "Field audits are the source of truth, and they stay that way. From the August 2026 pilot on, every corridor an auditor walks is also photographed, and those images become labeled training data. Over time they will train a computer-vision and machine-learning pipeline that reads sidewalk condition and obstructions straight from a photo, so every future audit scores faster than the last. No model scores a street today. When one does, a person still verifies what it reports."
+      },
+      "plates": {
+        "crossSection": {
+          "label": "Figure 4",
+          "claim": "What the four lenses actually read.",
+          "support": "A street's right-of-way in section, with the sidewalk, buffer, and carriageway each measured against the rubric above.",
+          "source": "Source: StreetLens drawing over Reglamento a la Ley 7600 (Decreto 26831-MP) sidewalk minimums.",
+          "alt": "Engineering cross-section of a street right-of-way, annotating the sidewalk, buffer, and carriageway with the four StreetLens lenses and the Ley 7600 minimum dimensions."
+        },
+        "anatomy": {
+          "label": "Figure 5",
+          "claim": "How one segment becomes four scores.",
+          "support": "The same segment in plan, with the audit rubric, score bins, width channel, and community casing that resolve to the readout above.",
+          "source": "Source: StreetLens scoring schematic. Width bins per Reglamento a la Ley 7600 (Decreto 26831-MP).",
+          "alt": "Plan-view diagram of a street segment showing the audit rubric, score bins, width measurement channel, and community-report casing that produce the segment's four lens scores."
+        },
+        "pipeline": {
+          "label": "Figure 6",
+          "claim": "Field audits today. A verified model tomorrow.",
+          "support": "Every walked corridor is photographed, and those images become training data for a computer-vision pipeline that a person always checks.",
+          "source": "Roadmap, not built. The machine-learning path drawn dashed does not score any street today.",
+          "alt": "Method pipeline diagram: field audits flow to open data today, with a dashed roadmap loop where a computer-vision and machine-learning model scores streets and a human always verifies the result."
+        }
       }
     },
     "grounding": {
