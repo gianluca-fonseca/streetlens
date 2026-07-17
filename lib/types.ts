@@ -109,6 +109,17 @@ export type CvObservation = {
   /** Provenance back to the cv_capture submission that carried it through review. */
   submission_id: string | null;
   created_at: string;
+  /**
+   * True when a reviewer corrected this observation before approving it — an item
+   * override, an excluded/deleted frame, or a hand-edited lens score (u2). The map
+   * shows a small "human-corrected" marker beside the CV chip when set.
+   */
+  human_corrected?: boolean;
+  /**
+   * Compact audit record of what the reviewer changed (u2). Opaque to the map data
+   * layer, which only reads {@link human_corrected}; kept for an auditable record.
+   */
+  overrides?: Record<string, unknown>;
 };
 
 /**

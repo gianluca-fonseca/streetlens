@@ -25,6 +25,10 @@ export const CAPTURE_REVIEW_OVERLAY_PATH = path.join(
   DATA_DIR,
   "capture-review-overlay.local.json",
 );
+export const CAPTURE_TOMBSTONES_PATH = path.join(
+  DATA_DIR,
+  "capture-frame-tombstones.local.json",
+);
 
 export type CaptureReviewOverlayEntry = {
   status: Extract<CaptureSessionStatus, "approved" | "rejected">;
@@ -50,6 +54,63 @@ async function writeJson(file: string, value: unknown): Promise<void> {
 /** Local review decisions per capture session. Missing file → none. */
 export async function readCaptureReviewOverlay(): Promise<CaptureReviewOverlay> {
   return readJson<CaptureReviewOverlay>(CAPTURE_REVIEW_OVERLAY_PATH, {});
+}
+
+/** Deleted frame seqs per session, for local mode. Missing file → none. */
+export type CaptureTombstoneOverlay = Record<string, number[]>;
+
+export async function readCaptureTombstones(): Promise<CaptureTombstoneOverlay> {
+  return readJson<CaptureTombstoneOverlay>(CAPTURE_TOMBSTONES_PATH, {});
+}
+
+export type DeleteFrameResult = {
+  mode: "live" | "local";
+  deleted: boolean;
+  /** Whether the stored bytes were removed. Live delete removes them; local can't. */
+  bytesRemoved: boolean;
+  seq: number;
+};
+
+/**
+ * Hard-delete a frame for privacy.
+ *
+ * Live mode calls the secret-gated definer RPC (0021), which removes the storage
+ * object and the capture_frames row (cascading its observations) and records a
+ * tombstone — the strongest deletion the platform exposes. Local mode has no bytes
+ * to remove, so it records a tombstone in the overlay the review read honors, which
+ * is enough to drive and screenshot the flow without a database.
+ *
+ * Deletion is always a real action here, never a fallback: a live deployment must
+ * not silently "delete" into local files the live map never reads.
+ */
+export async function deleteCaptureFrame(args: {
+  sessionId: string;
+  seq: number;
+}): Promise<DeleteFrameResult> {
+  const client = getSupabaseClient();
+  const secret = process.env.ADMIN_RPC_SECRET;
+  if (client && secret) {
+    const { data, error } = await client.rpc("capture_delete_frame", {
+      p_secret: secret,
+      p_session_id: args.sessionId,
+      p_seq: args.seq,
+    });
+    if (error) throw new Error(`capture_delete_frame: ${error.message}`);
+    const res = (data ?? {}) as { deleted?: boolean; bytesRemoved?: boolean };
+    return {
+      mode: "live",
+      deleted: res.deleted ?? true,
+      bytesRemoved: res.bytesRemoved ?? false,
+      seq: args.seq,
+    };
+  }
+
+  const overlay = await readCaptureTombstones();
+  const seqs = new Set(overlay[args.sessionId] ?? []);
+  seqs.add(args.seq);
+  overlay[args.sessionId] = [...seqs].sort((a, b) => a - b);
+  await writeJson(CAPTURE_TOMBSTONES_PATH, overlay);
+  return { mode: "local", deleted: true, bytesRemoved: false, seq: args.seq };
 }
 
 export type FinalizeArgs = {

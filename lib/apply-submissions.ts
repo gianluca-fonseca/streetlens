@@ -214,6 +214,10 @@ export type CvApplyObservation = {
   coverage: number;
   confidence: number | null;
   frame_refs: string[];
+  /** True when a reviewer corrected this segment before approving (u2). */
+  human_corrected?: boolean;
+  /** Compact audit record of the reviewer's corrections for this segment (u2). */
+  overrides?: Record<string, unknown>;
 };
 
 /** Input to the capture apply path: a session and the segments an admin approved. */
@@ -250,6 +254,8 @@ export function buildCvObservations(input: CvApplyInput): CvObservation[] {
     source: "cv",
     submission_id: input.submission_id,
     created_at: createdAt,
+    human_corrected: o.human_corrected ?? false,
+    overrides: o.overrides ?? {},
   }));
 }
 

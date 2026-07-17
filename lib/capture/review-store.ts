@@ -23,8 +23,11 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getSupabaseClient } from "@/lib/supabase";
 import { publicFrameUrl } from "./storage";
-import { readCaptureReviewOverlay } from "./review-actions";
+import { readCaptureReviewOverlay, readCaptureTombstones } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
+import type { FrameObservation } from "./review-overrides";
+
+export type { FrameObservation };
 
 const FIXTURE_PATH = path.join(
   process.cwd(),
@@ -51,11 +54,34 @@ export type ReviewSegment = {
   frames: ReviewFrame[];
 };
 
+/** Where a frame sits on the ground, as MapLibre wants it: [lng, lat]. */
+export type FramePosition = { lng: number; lat: number };
+
 export type ReviewFrame = {
   seq: number;
   storagePath: string;
   /** Public bucket URL, or null when it cannot be built (no Supabase URL set). */
   url: string | null;
+  /** The street this frame was attributed to, or null when it matched none. */
+  segmentId: string | null;
+  /**
+   * Junction frames source the two junction-sensitive items (curb_ramp,
+   * crossing_safety); mid-block frames source the other thirteen. The recompute
+   * needs this exactly as the server rollup does (lib/capture/rollup.ts).
+   */
+  nearJunction: boolean;
+  /** Whether the frame was clear enough to score. Drives coverage, per the rollup. */
+  usable: boolean;
+  /** Ground position for the review map. Null when unknown (unmatched/old fixture). */
+  position: FramePosition | null;
+  /** The frozen per-frame reading, or null when none. See {@link FrameObservation}. */
+  observation: FrameObservation | null;
+  /**
+   * A tombstone: the frame's bytes were hard-deleted by a reviewer for privacy.
+   * The seq stays so the record never lies about how many frames a walk had, but
+   * a deleted frame never scores.
+   */
+  deleted: boolean;
 };
 
 export type SessionReview = {
@@ -73,6 +99,14 @@ export type SessionReview = {
     escalated: number;
   };
   segments: ReviewSegment[];
+  /**
+   * Every frame of the walk in seq order, attributed or not, deleted or not. The
+   * segment cards read the grouped {@link ReviewSegment.frames}; the map panel and
+   * the override recompute read this full list.
+   */
+  frames: ReviewFrame[];
+  /** The GPS track of the walk as a polyline, for the review map. Empty if unknown. */
+  track: FramePosition[];
   /** Frames no segment could be attributed to. Counted, never hidden. */
   unattributedFrames: number;
   /**
@@ -118,8 +152,61 @@ type ReviewPayload = {
      * asset and get a real filmstrip to look at.
      */
     url?: string | null;
+    /**
+     * The rest are merged in from `capture_session_review_detail` (u2 migration
+     * 0021) at fetch time, or carried directly in the fixture. All optional so an
+     * un-upgraded payload still parses.
+     */
+    nearJunction?: boolean;
+    usable?: boolean;
+    position?: FramePosition | null;
+    observation?: FrameObservation | null;
+    deleted?: boolean;
   }[];
+  /** GPS track polyline, from `capture_session_review_detail` or the fixture. */
+  track?: FramePosition[] | null;
+  /** Seqs whose frames were hard-deleted; surfaced as tombstones. */
+  tombstones?: { seq: number }[] | null;
 };
+
+/** The `capture_session_review_detail` payload (u2 migration 0021). */
+type SessionDetail = {
+  track?: FramePosition[] | null;
+  frames?: {
+    seq: number;
+    nearJunction?: boolean;
+    usable?: boolean;
+    position?: FramePosition | null;
+  }[] | null;
+  tombstones?: { seq: number }[] | null;
+};
+
+/**
+ * Fold the geography/quality/track detail onto the review payload, matching frames
+ * by seq. The review RPC owns the frame's identity and observation; the detail RPC
+ * owns where it sits and whether it was usable. Frames the detail read does not
+ * mention keep their defaults, so a partial detail never drops a frame.
+ */
+function mergeDetail(payload: ReviewPayload, detail: SessionDetail | null): ReviewPayload {
+  if (!detail) return payload;
+  const bySeq = new Map<number, NonNullable<SessionDetail["frames"]>[number]>();
+  for (const d of detail.frames ?? []) bySeq.set(d.seq, d);
+  return {
+    ...payload,
+    frames: (payload.frames ?? []).map((f) => {
+      const d = bySeq.get(f.seq);
+      if (!d) return f;
+      return {
+        ...f,
+        nearJunction: d.nearJunction ?? f.nearJunction,
+        usable: d.usable ?? f.usable,
+        position: d.position ?? f.position ?? null,
+      };
+    }),
+    track: detail.track ?? payload.track ?? [],
+    tombstones: detail.tombstones ?? payload.tombstones ?? [],
+  };
+}
 
 /** Build a public frame URL, tolerating an unconfigured deployment. */
 function frameUrl(storagePath: string): string | null {
@@ -141,14 +228,24 @@ function num(value: unknown): number | null {
 }
 
 function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionReview {
+  const tombstoned = new Set((payload.tombstones ?? []).map((t) => t.seq));
+
   const framesBySegment = new Map<string, ReviewFrame[]>();
+  const allFrames: ReviewFrame[] = [];
   let unattributed = 0;
   for (const f of payload.frames ?? []) {
     const frame: ReviewFrame = {
       seq: f.seq,
       storagePath: f.storagePath,
       url: f.url ?? frameUrl(f.storagePath),
+      segmentId: f.segmentId ?? null,
+      nearJunction: f.nearJunction ?? false,
+      usable: f.usable ?? true,
+      position: f.position ?? null,
+      observation: f.observation ?? null,
+      deleted: f.deleted ?? tombstoned.has(f.seq),
     };
+    allFrames.push(frame);
     if (!f.segmentId) {
       unattributed++;
       continue;
@@ -157,6 +254,7 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     if (list) list.push(frame);
     else framesBySegment.set(f.segmentId, [frame]);
   }
+  allFrames.sort((a, b) => a.seq - b.seq);
 
   const segments: ReviewSegment[] = (payload.rollups ?? []).map((r) => ({
     segmentId: r.segmentId,
@@ -195,6 +293,11 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
       escalated: num(payload.tokens?.escalated) ?? 0,
     },
     segments,
+    frames: allFrames,
+    track: (payload.track ?? []).filter(
+      (p): p is FramePosition =>
+        !!p && Number.isFinite(p.lng) && Number.isFinite(p.lat),
+    ),
     unattributedFrames: unattributed,
     overbudget:
       payload.status === "cost_paused" || (num(jobs.overbudget) ?? 0) > 0,
@@ -232,7 +335,15 @@ export async function getSessionReview(
         p_secret: secret,
       });
       if (!error && data) {
-        return toReview(data as ReviewPayload, "live");
+        // The map panel and the override recompute need per-frame geography and
+        // quality plus the track, which the review RPC does not carry (u2 migration
+        // 0021). Fetch it and merge by seq. Best-effort: a review without it still
+        // renders (inspector + overrides degrade, the map simply has no dots).
+        const { data: detail } = await client.rpc("capture_session_review_detail", {
+          p_session_id: sessionId,
+          p_secret: secret,
+        });
+        return toReview(mergeDetail(data as ReviewPayload, detail as SessionDetail | null), "live");
       }
     } catch {
       // fall through to the fixture
@@ -252,7 +363,22 @@ export async function getSessionReview(
     ? { ...found, status: decision.status, reviewedAt: decision.reviewed_at }
     : found;
 
-  return toReview(withDecision, "fixture");
+  // Local hard-deletes live in their own overlay (deletion is irreversible, so it
+  // is not part of the resettable review decision). Fold them in as tombstones so a
+  // locally-deleted frame reads as deleted after reload, exactly as the live RPC does.
+  const tombstones = await readCaptureTombstones();
+  const deletedSeqs = tombstones[sessionId] ?? [];
+  const withTombstones: ReviewPayload = deletedSeqs.length
+    ? {
+        ...withDecision,
+        tombstones: [
+          ...(withDecision.tombstones ?? []),
+          ...deletedSeqs.map((seq) => ({ seq })),
+        ],
+      }
+    : withDecision;
+
+  return toReview(withTombstones, "fixture");
 }
 
 /** Session ids present in the fixture. Empty in a live deployment. */

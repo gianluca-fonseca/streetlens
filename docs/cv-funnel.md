@@ -149,6 +149,7 @@ restating it.
 | Worker RPCs (claim, attribute, token usage) | `supabase/migrations/0015_capture_worker.sql` |
 | Review, approval, the third community kind | `supabase/migrations/0017_capture_review.sql` |
 | Per-frame rationale + observations on the review read | `supabase/migrations/0020_observation_rationale.sql` |
+| Reviewer overrides, frame delete, review detail | `supabase/migrations/0021_review_overrides.sql`, `lib/capture/review-overrides.ts` |
 | Upload orchestration | `lib/capture/upload-client.ts` |
 
 ### The rubric is not a new vocabulary
@@ -543,6 +544,63 @@ field-verified"** and a separate "Camera observations" panel showing per-lens
 observed values (with a dash for unknown), confidence, coverage, and frame
 counts. The score ramp stays reserved for audited data.
 
+### Reviewer overrides and curation (u2)
+
+Review is not just a yes/no on the model's numbers. A reviewer can open any frame,
+see what the model read, and correct it before approving.
+
+**The inspector.** Clicking a filmstrip frame (or a dot on the review map) opens
+`components/admin/FrameInspector.tsx`: the fifteen rubric readings with value AND
+confidence (a null shown as "not assessable", never a zero), the model's rationale
+text, and whether the frame was usable, at a junction, or escalated. Every reading
+is presented as the model's, editable but clearly the model's until a person
+changes it, and an override shows its diff from the original so nothing is silently
+rewritten.
+
+**One recompute, reused not reimplemented.** All corrections flow through a single
+pure function, `recomputeReview` in `lib/capture/review-overrides.ts`, in a fixed
+order: drop deleted frames, drop excluded frames, apply item overrides, run the
+real `computeRollups` (the same rollup math the pipeline used), then let a manual
+lens-score edit win, then drop any segment that lost its last supporting frame. It
+runs client-side for the live preview and server-side in the review route as the
+authoritative persist, so the numbers a reviewer sees are the numbers that land.
+An item override carries full confidence (a human assertion, not a guess), and a
+segment with zero remaining frames cannot be approved. Locked by
+`scripts/test-review-overrides.mjs` against that same real math.
+
+**Frame curation: exclude and delete.** Excluding a frame is reversible: it leaves
+scoring immediately (the recompute treats it as gone) but stays visibly struck in
+the filmstrip and on the map. Deleting is for privacy and is irreversible. Anon has
+no storage DELETE (frames are write-once, 0013), so a reviewer cannot delete bytes
+from the client; the secret-gated `capture_delete_frame` RPC (0021), running as
+owner, removes the `storage.objects` row and the `capture_frames` row (cascading
+its observations and job) and records a `capture_frame_tombstones` row. The seq
+survives as a tombstone so the record never lies about how many frames a walk had;
+a deleted frame never scores.
+
+> **Honest deletion caveat.** Deleting the `storage.objects` row revokes all
+> access to the image immediately, which is the strongest deletion this platform
+> exposes through an RPC. It is not a guarantee about the storage provider's block
+> storage: the backing bytes may linger until the provider garbage-collects them.
+> If a stronger guarantee is ever required, it has to come from a provider-side
+> lifecycle/erasure policy, not from application code.
+
+**Provenance.** `community_cv_observations` gains `human_corrected boolean` and a
+compact `overrides jsonb` (item overrides by frame seq, excluded and deleted seqs,
+manual score edits), persisted by the extended `admin_apply_capture_session`
+(0021). On the map, `SegmentDetail.tsx` shows a small "human-corrected" marker
+beside the CV chip when any observation on the segment was corrected. The apply
+invariant still holds under correction: a corrected approval still writes only to
+`community_cv_observations` and never touches an audit
+(`scripts/test-cv-apply.mjs`).
+
+**The walk on a map.** `components/admin/ReviewMap.tsx` draws the session GPS
+track (from `capture_session_review_detail`, 0021) as a polyline, every frame as a
+numbered dot at `capture_frames.location` (the position the pipeline recorded at
+match time, not a second interpolation), and the matched segments in their real
+geometry. Unmatched frames are grey, excluded ones dim, deleted ones tombstoned.
+Selection is bidirectional with the inspector and the segment cards.
+
 ### The pump processing model
 
 Extraction is pull-based, because a serverless deployment has no long-lived
@@ -782,7 +840,8 @@ The bucket name is not an env var; it is the constant `streetlens-frames`
 
 ### Applying migrations
 
-The capture funnel is migrations `0013` through `0020`, applied in order after
+The capture funnel is migrations `0013` through `0021` (rationale in `0020`,
+reprocess in `0019`, reviewer overrides in `0021`), applied in order after
 the existing `0001..0012`. `scripts/test-capture-migrations.mjs` applies the
 whole chain to a throwaway Supabase Postgres container and exercises every RPC;
 it needs Docker, never touches the live database, and skips cleanly when Docker
@@ -873,7 +932,7 @@ Run these directly with node; none need a live database.
 | `scripts/test-capture-schemas.mjs` | contracts, rubric sync, encodings, path convention |
 | `scripts/test-matching-hmm.mjs` | the HMM against synthetic tracks, and that it beats the baseline on parallel streets |
 | `scripts/test-matching-baseline.mjs` | the matching interface against synthetic tracks |
-| `scripts/test-capture-migrations.mjs` | `0001..0020` applied to a throwaway container, every RPC exercised (needs Docker) |
+| `scripts/test-capture-migrations.mjs` | `0001..0021` applied to a throwaway container, every RPC exercised including rationale persistence, override provenance, frame delete + tombstone, and the review detail read (needs Docker) |
 | `scripts/test-reprocess-core.mjs` | the reprocess script's track-time reconstruction, match summary, and payload logic |
 | `scripts/test-mp4box-contract.mjs` | the two load-bearing demux settings (`keepMdatData`, `releaseUsedSamples`) |
 | `scripts/test-upload-client.mjs` | retry, resume, concurrency, abort |
@@ -881,7 +940,8 @@ Run these directly with node; none need a live database.
 | `scripts/test-honeypot-type.mjs` | the honeypot preserves the submitted type |
 | `scripts/test-extraction-worker.mjs` | the pump against a mocked OpenAI: breaker, budget, escalation, refusals, concurrent pumps, attempts cap, kill switch |
 | `scripts/test-capture-rollup.mjs` | items to lens scores, junction routing, weighted medians, coverage |
-| `scripts/test-cv-apply.mjs` | approval writes CV rows and leaves audited scores byte-identical |
+| `scripts/test-cv-apply.mjs` | approval writes CV rows (with reviewer-override provenance) and leaves audited scores byte-identical |
+| `scripts/test-review-overrides.mjs` | the reviewer-correction recompute equals the real rollup math, and exclusion, deletion, null overrides, junction routing, segment drop, and manual-score wins |
 
 `test-extraction-worker.mjs` drives the real `pumpOnce` against an in-memory
 `CaptureDb` whose claim mutates synchronously before yielding, the in-process

@@ -120,6 +120,9 @@ async function main() {
     check("source is cv", rows[0].source === "cv");
     check("captured_on is the WALK date, not the approval date", rows[0].captured_on === "2026-07-15T16:20:00.000Z");
     check("a null lens stays null (unknown is not zero)", rows[0].scores.drainage === null, JSON.stringify(rows[0].scores));
+    // Provenance defaults: an untouched approval is pure CV.
+    check("an untouched observation is not human_corrected", rows[0].human_corrected === false);
+    check("an untouched observation carries an empty overrides record", JSON.stringify(rows[0].overrides) === "{}");
   }
 
   /* ---------------- Approving two segments ---------------- */
@@ -212,6 +215,48 @@ async function main() {
     const stats = await getStats();
     check("cvSegments follows the retraction", stats.cvSegments === 1, `(${stats.cvSegments})`);
     check("stats.segments is STILL 535", stats.segments === 535, `(${stats.segments})`);
+  }
+
+  /* ---------------- Human-corrected provenance rides the apply path ---------------- */
+  console.log("\napprove a corrected segment alongside a pure-CV one");
+  {
+    const overrides = {
+      items: { 0: { surface_condition: 0 } },
+      excludedSeqs: [2],
+      deletedSeqs: [],
+      scores: { overall: 50 },
+    };
+    await applyApprovedCaptureSession({
+      session_id: SESSION,
+      submission_id: "sub-1",
+      captured_on: "2026-07-15T16:20:00.000Z",
+      observations: [
+        // SEG_A corrected by a reviewer; SEG_B left exactly as the model read it.
+        observation(SEG_A, { human_corrected: true, overrides, scores: { overall: 50, accessibility: 41, drainage: null, shade: 58, bike: 30 } }),
+        observation(SEG_B),
+      ],
+    });
+    const rows = JSON.parse(readFileSync(LOCAL_FILES[0], "utf8"));
+    const a = rows.find((r) => r.segment_id === SEG_A);
+    const b = rows.find((r) => r.segment_id === SEG_B);
+    check("the corrected segment persists human_corrected = true", a.human_corrected === true);
+    check("the corrected segment persists the compact overrides record", JSON.stringify(a.overrides) === JSON.stringify(overrides));
+    check("the untouched segment stays pure CV (not human_corrected)", b.human_corrected === false);
+    check("the untouched segment carries an empty overrides record", JSON.stringify(b.overrides) === "{}");
+
+    const after = await getSegments();
+    const segA = after.features.find((f) => f.properties.id === SEG_A);
+    check(
+      "human_corrected reaches the map feature for the marker",
+      segA.properties.cv_observations[0].human_corrected === true,
+    );
+    // The invariant still holds even for a corrected approval.
+    const auditedFieldsAfter = { ...segA.properties };
+    delete auditedFieldsAfter.cv_observations;
+    check(
+      "THE INVARIANT holds under correction: audited properties untouched",
+      JSON.stringify(auditedFieldsAfter) === auditedScoresBefore,
+    );
   }
 
   /* ---------------- Rejecting everything retracts everything ---------------- */
