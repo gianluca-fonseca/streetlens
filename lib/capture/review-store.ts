@@ -25,6 +25,9 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { publicFrameUrl } from "./storage";
 import { readCaptureReviewOverlay } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
+import type { FrameObservation } from "./review-overrides";
+
+export type { FrameObservation };
 
 const FIXTURE_PATH = path.join(
   process.cwd(),
@@ -51,11 +54,34 @@ export type ReviewSegment = {
   frames: ReviewFrame[];
 };
 
+/** Where a frame sits on the ground, as MapLibre wants it: [lng, lat]. */
+export type FramePosition = { lng: number; lat: number };
+
 export type ReviewFrame = {
   seq: number;
   storagePath: string;
   /** Public bucket URL, or null when it cannot be built (no Supabase URL set). */
   url: string | null;
+  /** The street this frame was attributed to, or null when it matched none. */
+  segmentId: string | null;
+  /**
+   * Junction frames source the two junction-sensitive items (curb_ramp,
+   * crossing_safety); mid-block frames source the other thirteen. The recompute
+   * needs this exactly as the server rollup does (lib/capture/rollup.ts).
+   */
+  nearJunction: boolean;
+  /** Whether the frame was clear enough to score. Drives coverage, per the rollup. */
+  usable: boolean;
+  /** Ground position for the review map. Null when unknown (unmatched/old fixture). */
+  position: FramePosition | null;
+  /** The frozen per-frame reading, or null when none. See {@link FrameObservation}. */
+  observation: FrameObservation | null;
+  /**
+   * A tombstone: the frame's bytes were hard-deleted by a reviewer for privacy.
+   * The seq stays so the record never lies about how many frames a walk had, but
+   * a deleted frame never scores.
+   */
+  deleted: boolean;
 };
 
 export type SessionReview = {
@@ -73,6 +99,14 @@ export type SessionReview = {
     escalated: number;
   };
   segments: ReviewSegment[];
+  /**
+   * Every frame of the walk in seq order, attributed or not, deleted or not. The
+   * segment cards read the grouped {@link ReviewSegment.frames}; the map panel and
+   * the override recompute read this full list.
+   */
+  frames: ReviewFrame[];
+  /** The GPS track of the walk as a polyline, for the review map. Empty if unknown. */
+  track: FramePosition[];
   /** Frames no segment could be attributed to. Counted, never hidden. */
   unattributedFrames: number;
   /**
@@ -118,7 +152,21 @@ type ReviewPayload = {
      * asset and get a real filmstrip to look at.
      */
     url?: string | null;
+    /**
+     * The rest are merged in from `capture_session_review_detail` (u2 migration
+     * 0021) at fetch time, or carried directly in the fixture. All optional so an
+     * un-upgraded payload still parses.
+     */
+    nearJunction?: boolean;
+    usable?: boolean;
+    position?: FramePosition | null;
+    observation?: FrameObservation | null;
+    deleted?: boolean;
   }[];
+  /** GPS track polyline, from `capture_session_review_detail` or the fixture. */
+  track?: FramePosition[] | null;
+  /** Seqs whose frames were hard-deleted; surfaced as tombstones. */
+  tombstones?: { seq: number }[] | null;
 };
 
 /** Build a public frame URL, tolerating an unconfigured deployment. */
@@ -141,14 +189,24 @@ function num(value: unknown): number | null {
 }
 
 function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionReview {
+  const tombstoned = new Set((payload.tombstones ?? []).map((t) => t.seq));
+
   const framesBySegment = new Map<string, ReviewFrame[]>();
+  const allFrames: ReviewFrame[] = [];
   let unattributed = 0;
   for (const f of payload.frames ?? []) {
     const frame: ReviewFrame = {
       seq: f.seq,
       storagePath: f.storagePath,
       url: f.url ?? frameUrl(f.storagePath),
+      segmentId: f.segmentId ?? null,
+      nearJunction: f.nearJunction ?? false,
+      usable: f.usable ?? true,
+      position: f.position ?? null,
+      observation: f.observation ?? null,
+      deleted: f.deleted ?? tombstoned.has(f.seq),
     };
+    allFrames.push(frame);
     if (!f.segmentId) {
       unattributed++;
       continue;
@@ -157,6 +215,7 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     if (list) list.push(frame);
     else framesBySegment.set(f.segmentId, [frame]);
   }
+  allFrames.sort((a, b) => a.seq - b.seq);
 
   const segments: ReviewSegment[] = (payload.rollups ?? []).map((r) => ({
     segmentId: r.segmentId,
@@ -195,6 +254,11 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
       escalated: num(payload.tokens?.escalated) ?? 0,
     },
     segments,
+    frames: allFrames,
+    track: (payload.track ?? []).filter(
+      (p): p is FramePosition =>
+        !!p && Number.isFinite(p.lng) && Number.isFinite(p.lat),
+    ),
     unattributedFrames: unattributed,
     overbudget:
       payload.status === "cost_paused" || (num(jobs.overbudget) ?? 0) > 0,
