@@ -120,11 +120,15 @@ function items(T, { confidence = 0.9, value } = {}) {
   return out;
 }
 
+/** The default rationale a scripted model "returns"; overridable per case. */
+const RATIONALE = "Narrow paved residential street, no sidewalk either side; open gutter at the right edge; scattered canopy overhead.";
+
 function modelText(T, opts = {}) {
   return JSON.stringify({
     schemaVersion: "cv-v1",
     items: items(T, opts),
     frameQuality: { usable: opts.usable ?? true, reason: opts.reason ?? null },
+    rationale: opts.rationale ?? RATIONALE,
   });
 }
 
@@ -385,6 +389,11 @@ async function main() {
       "observation records the model and token usage",
       db.state.observations[0].model === "gpt-5-nano" &&
         db.state.observations[0].inputTokens === 1200,
+    );
+    check(
+      "the model's per-frame rationale flows through to the write path",
+      db.state.observations.every((o) => o.rationale === RATIONALE),
+      JSON.stringify(db.state.observations[0].rationale),
     );
     check(
       "session rolled up and marked review_ready",
@@ -673,10 +682,11 @@ async function main() {
   console.log("\nescalation");
   {
     const db = makeDb({ frameCount: 10 });
+    const ESC_RATIONALE = "Stronger model: clearly a two-lane street with an intact gutter on both edges.";
     const vision = makeVision((req) =>
       req.model === "gpt-5-nano"
         ? ok(T, { confidence: 0.2 }) // hedging: below the 0.35 threshold
-        : ok(T, { confidence: 0.95 }),
+        : ok(T, { confidence: 0.95, rationale: ESC_RATIONALE }),
     );
     await run(db, vision, { concurrency: 1 });
 
@@ -685,6 +695,11 @@ async function main() {
       "a low-confidence frame escalates to the stronger model",
       escalated.length >= 1 && escalated[0].model === "gpt-5.4-mini",
       `${escalated.length} escalated`,
+    );
+    check(
+      "the escalated row carries the STRONGER model's rationale, not the cheap one's",
+      escalated.length >= 1 && escalated[0].rationale === ESC_RATIONALE,
+      escalated[0] && JSON.stringify(escalated[0].rationale),
     );
     check(
       "escalation is capped at 10% of session frames",
@@ -787,6 +802,27 @@ async function main() {
     await run(db, vision);
     check(
       "an out-of-range value is rejected even though strict json_schema 'guaranteed' it",
+      db.state.observations.length === 0 && /schema/.test(db.jobs.get("frame-0").error),
+      db.jobs.get("frame-0").error,
+    );
+  }
+
+  {
+    const db = makeDb({ frameCount: 1 });
+    // rationale is required now; a response that drops it is a schema failure,
+    // not a silently-stored blank. Strict json_schema should make this
+    // unreachable from the real API, but the zod re-validation is what we trust.
+    const noRationale = JSON.parse(modelText(T));
+    delete noRationale.rationale;
+    const vision = makeVision(() => ({
+      outcome: "completed",
+      text: JSON.stringify(noRationale),
+      detail: null,
+      usage: USAGE(900),
+    }));
+    await run(db, vision);
+    check(
+      "a response missing the rationale is rejected, not stored blank",
       db.state.observations.length === 0 && /schema/.test(db.jobs.get("frame-0").error),
       db.jobs.get("frame-0").error,
     );
@@ -976,6 +1012,12 @@ async function main() {
       body.text.format.schema.properties.items.required.length === 15 &&
         T.RUBRIC_ITEM_KEYS.every((k) => body.text.format.schema.properties.items.required.includes(k)),
     );
+    check(
+      "the schema requires a per-frame rationale string alongside the items",
+      body.text.format.schema.required.includes("rationale") &&
+        body.text.format.schema.properties.rationale.type === "string",
+      JSON.stringify(body.text.format.schema.required),
+    );
 
     const a = buildRequestBody({ model: "m", imageUrl: "https://x.test/1.jpg" });
     const b = buildRequestBody({ model: "m", imageUrl: "https://x.test/2.jpg" });
@@ -1041,6 +1083,7 @@ async function main() {
         schemaVersion: "cv-v1",
         items: items(T),
         frameQuality: { usable: true, reason: null },
+        rationale: RATIONALE,
       }),
       detail: null,
       usage: USAGE(1000),
@@ -1061,6 +1104,7 @@ async function main() {
         schemaVersion: "cv-v1",
         items: items(T, { value: null, confidence: 0.1 }),
         frameQuality: { usable: false, reason: "motion_blur" },
+        rationale: "Whole frame is motion-blurred; the street cannot be read at all.",
       }),
       detail: null,
       usage: USAGE(1000),

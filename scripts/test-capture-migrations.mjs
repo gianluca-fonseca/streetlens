@@ -139,12 +139,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0019", files.some((f) => f.startsWith("0019")), files.join(" "));
+    check("found the full migration chain through 0020", files.some((f) => f.startsWith("0020")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -160,9 +160,14 @@ function main() {
       psql(readFileSync(path.join(MIGRATIONS, "0014_submission_types.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0017_capture_review.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0019_capture_reprocess.sql"), "utf8"));
-      check("0013 + 0014 + 0017 + 0019 are re-runnable (idempotent)", true);
+      // 0020 last, on purpose: re-running 0013 recreates the old 9-arg
+      // capture_complete_job and reverts capture_session_review to its pre-rationale
+      // body. 0020 re-applied afterward drops that stale overload and re-establishes
+      // the review read WITH per-frame observations, which the assertions below rely on.
+      psql(readFileSync(path.join(MIGRATIONS, "0020_observation_rationale.sql"), "utf8"));
+      check("0013 + 0014 + 0017 + 0019 + 0020 are re-runnable (idempotent)", true);
     } catch (err) {
-      check("0013 + 0014 + 0017 + 0019 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
+      check("0013 + 0014 + 0017 + 0019 + 0020 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
     }
 
     /* ---------------- Schema shape ---------------- */
@@ -379,20 +384,33 @@ function main() {
 
     const frameId = psql(`select id from capture_frames where session_id='${sid}' and seq=0;`).trim();
     psql(`select capture_complete_job('${frameId}'::uuid, 'gpt-5-mini',
-            '{"sidewalk_present":{"value":1,"confidence":0.9}}'::jsonb, true, 0.87, 1200, 300, false, 'test-secret');`);
+            '{"sidewalk_present":{"value":1,"confidence":0.9}}'::jsonb, true, 0.87, 1200, 300, false,
+            'Narrow paved street, no sidewalk either side; open gutter at the right edge.', 'test-secret');`);
     check(
       "capture_complete_job stores the observation and closes the job",
       psql(`select count(*) from capture_observations where frame_id='${frameId}';`).trim() === "1" &&
         psql(`select status from capture_frame_jobs where frame_id='${frameId}';`).trim() === "done",
     );
+    check(
+      "capture_complete_job persists the per-frame rationale (0020)",
+      psql(`select rationale from capture_observations where frame_id='${frameId}' and model='gpt-5-mini';`).trim() ===
+        "Narrow paved street, no sidewalk either side; open gutter at the right edge.",
+    );
     psql(`select capture_complete_job('${frameId}'::uuid, 'gpt-5-mini',
-            '{"sidewalk_present":{"value":0,"confidence":0.4}}'::jsonb, true, 0.4, 1200, 300, false, 'test-secret');`);
+            '{"sidewalk_present":{"value":0,"confidence":0.4}}'::jsonb, true, 0.4, 1200, 300, false,
+            'On second look the gutter is silted but present.', 'test-secret');`);
     check(
       "re-running one model REPLACES its answer rather than double-counting",
       psql(`select count(*) from capture_observations where frame_id='${frameId}';`).trim() === "1",
     );
+    check(
+      "the re-run overwrites the rationale too, not just the items",
+      psql(`select rationale from capture_observations where frame_id='${frameId}' and model='gpt-5-mini';`).trim() ===
+        "On second look the gutter is silted but present.",
+    );
     psql(`select capture_complete_job('${frameId}'::uuid, 'gpt-5',
-            '{"sidewalk_present":{"value":1,"confidence":0.99}}'::jsonb, true, 0.99, 2000, 400, true, 'test-secret');`);
+            '{"sidewalk_present":{"value":1,"confidence":0.99}}'::jsonb, true, 0.99, 2000, 400, true,
+            'Escalated read: clearly a two-lane street with intact gutters.', 'test-secret');`);
     check(
       "a DIFFERENT model on the same frame is kept alongside (A/B, escalation)",
       psql(`select count(*) from capture_observations where frame_id='${frameId}';`).trim() === "2",
@@ -408,6 +426,39 @@ function main() {
       "an invalid job status is rejected",
       psqlExpectError(`select capture_fail_job('${frame2}'::uuid, 'vibing', 'x', 'test-secret');`) !== null,
     );
+
+    /* ---------------- 0020: per-frame observation on the review read ---------------- */
+    // sid now has seq 0 scored twice (gpt-5-mini, then escalated gpt-5) and seq 1
+    // never scored (failed_overbudget). The FROZEN CONTRACT hangs an `observation`
+    // off every frame: the winning row for a scored frame, null for an unscored one.
+    {
+      const rv = JSON.parse(psql(`select capture_session_review('${sid}'::uuid, 'test-secret');`).trim());
+      const bySeq = Object.fromEntries((rv.frames ?? []).map((f) => [f.seq, f]));
+      const scored = bySeq[0];
+      const unscored = bySeq[1];
+      check(
+        "a scored frame carries observation { items, rationale, escalated, model }",
+        scored && scored.observation &&
+          typeof scored.observation.items === "object" &&
+          typeof scored.observation.rationale === "string" &&
+          typeof scored.observation.escalated === "boolean" &&
+          typeof scored.observation.model === "string",
+        JSON.stringify(scored && scored.observation),
+      );
+      check(
+        "the escalated row wins the frame's observation, with its rationale",
+        scored && scored.observation &&
+          scored.observation.escalated === true &&
+          scored.observation.model === "gpt-5" &&
+          scored.observation.rationale === "Escalated read: clearly a two-lane street with intact gutters.",
+        JSON.stringify(scored && scored.observation),
+      );
+      check(
+        "an unscored/failed frame reports observation: null (not an empty object)",
+        unscored !== undefined && unscored.observation === null,
+        JSON.stringify(unscored),
+      );
+    }
 
     psql(`select capture_upsert_rollup('${sid}'::uuid, 'esc-sa-0001',
             '{"overall":72.5,"accessibility":60,"drainage":80,"shade":45,"bike":30}'::jsonb,

@@ -46,6 +46,7 @@ function observation(T, overrides = {}) {
     model: "gpt-5-mini",
     items,
     frameQuality: { usable: true },
+    rationale: "Narrow paved street, no sidewalk either side; gutter at the right edge.",
     ...overrides,
   };
 }
@@ -216,6 +217,20 @@ function main() {
   {
     const o = observation(T, { schemaVersion: "cv-v2" });
     check("wrong schemaVersion is rejected", !S.captureObservationSchema.safeParse(o).success);
+  }
+  {
+    const o = observation(T);
+    delete o.rationale;
+    check("a missing per-frame rationale is rejected", !S.captureObservationSchema.safeParse(o).success);
+  }
+  {
+    const o = observation(T, { rationale: "  a trimmed note  " });
+    const out = S.captureObservationSchema.safeParse(o);
+    check(
+      "the rationale is trimmed and kept",
+      out.success && out.data.rationale === "a trimmed note",
+      out.success ? out.data.rationale : JSON.stringify(out.error.issues[0]),
+    );
   }
   {
     const o = observation(T, { frameQuality: { usable: false, reason: "motion_blur" } });
