@@ -15,6 +15,10 @@
   <rect x="18" y="18" width="1124" height="724" fill="none" stroke="#111111" stroke-width="1.4"/>
   <rect x="30" y="30" width="1100" height="700" fill="none" stroke="#C6C6C6" stroke-width="1"/>
 
+  <!-- LAYOUT RULE · text keep-out: keep all labels ≥24px inside the inner frame
+       (safe box x 54–1106, y 54–706). Any label crossing a line or hatch gets a
+       #FAFAFA halo rect behind it. Title-block cell text must clear the x=996 divider. -->
+
   <text x="52" y="66" font-size="20" letter-spacing="1.5" fill="#111111" font-weight="700">PLATE 3 · METHOD PIPELINE</text>
   <text x="52" y="88" font-size="12.5" letter-spacing="0.5" fill="#5C5C5C">From a walked street to open data. The machine-learning path is a roadmap loop that a person always verifies.</text>
   <line x1="52" y1="102" x2="1108" y2="102" stroke="#C6C6C6" stroke-width="1"/>

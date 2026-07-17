@@ -23,6 +23,10 @@
   <rect x="18" y="18" width="1124" height="724" fill="none" stroke="#111111" stroke-width="1.4"/>
   <rect x="30" y="30" width="1100" height="700" fill="none" stroke="#C6C6C6" stroke-width="1"/>
 
+  <!-- LAYOUT RULE · text keep-out: keep all labels ≥24px inside the inner frame
+       (safe box x 54–1106, y 54–706). Any label crossing a line or hatch gets a
+       #FAFAFA halo rect behind it. Title-block cell text must clear the x=996 divider. -->
+
   <text x="52" y="66" font-size="20" letter-spacing="1.5" fill="#111111" font-weight="700">PLATE 2 · SCORING ANATOMY</text>
   <text x="52" y="88" font-size="12.5" letter-spacing="0.5" fill="#5C5C5C">One segment in plan. How a rubric reading becomes a color, a width, and a bin, the same way in any city.</text>
   <line x1="52" y1="102" x2="1108" y2="102" stroke="#C6C6C6" stroke-width="1"/>
@@ -167,7 +171,7 @@
   <text x="740" y="552" font-size="11" letter-spacing="0.8" fill="#5C5C5C" font-weight="700">F · COMMUNITY CASING</text>
   <line x1="745" y1="574" x2="885" y2="574" stroke="#6B7069" stroke-width="3.5" stroke-dasharray="6 4.5"/>
   <text x="905" y="571" font-size="10" fill="#111111">Community (unverified)</text>
-  <text x="905" y="586" font-size="9.5" fill="#5C5C5C">#6B7069 · no score until field-audited</text>
+  <text x="905" y="586" font-size="8.8" fill="#5C5C5C">#6B7069 · no score until field-audited</text>
 
   <!-- ============ TITLE BLOCK (bottom-right) ============ -->
   <g>
