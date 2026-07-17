@@ -464,6 +464,21 @@ export function useVideoUpload() {
         };
         manifestRef.current = done;
         await store.putManifest(done);
+        // The frames are on the server now, so the local copies are dead weight.
+        // The same sweep the live path does, for the same reason, and the manifest
+        // is marked `uploaded` BEFORE it rather than instead of it: if the discard
+        // dies half way, the phase is already on disk saying these frames are
+        // spoken for, and `isRecoverable` will not offer them back.
+        //
+        // Skipping this costs more here than it would on a walk. A walk is a few
+        // dozen frames; an extraction is up to 400, and there is no other
+        // collector. `discard()` on the done screen only runs if the contributor
+        // asks for another video, so a tab simply closed on "Your video is in"
+        // stranded every frame on the device permanently, and the next upload
+        // stranded a fresh set beside it. Found by the u28 drive, which asserts
+        // the sweep on the wire.
+        await store.discard(done.localId);
+
         setSessionId(result.sessionId);
         setPhase("done");
       } catch (err) {
