@@ -57,6 +57,7 @@ import {
   appendVideoFrame,
   createVideoManifest,
   deriveVideoStartMs,
+  isResumableExtraction,
   isVideoSessionManifest,
   setVideoRoute,
   setVideoStart,
@@ -101,6 +102,8 @@ export type VideoUploadState = {
   decodePath: DecodePath | null;
   progress: ExtractionProgress | null;
   framesKept: number;
+  /** The seq a resumed extraction picked up from, or null if it started fresh. */
+  resumedFrom: number | null;
   /** The route as supplied, or null until the contributor gives us one. */
   route: VideoRoute | null;
   track: readonly TrackPoint[];
@@ -156,6 +159,14 @@ export function useVideoUpload() {
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [uploadFailure, setUploadFailure] = useState<VideoUploadFailure | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  /**
+   * The seq an extraction resumed from, or null on a fresh start.
+   *
+   * Exposed so the UI can tell the contributor their killed tab did not cost
+   * them the decode. Silently resuming would look identical to silently
+   * restarting, and the whole point is that it is not.
+   */
+  const [resumedFrom, setResumedFrom] = useState<number | null>(null);
 
   const storeRef = useRef<CaptureStore | null>(null);
   // The manifest lives in a ref for the same reason the recorder's does: it is
@@ -233,6 +244,7 @@ export function useVideoUpload() {
       setStorageFull(false);
       setFramesKept(0);
       setProgress(null);
+      setResumedFrom(null);
       setFile(picked);
       setPhase("probing");
 
@@ -258,14 +270,48 @@ export function useVideoUpload() {
           size: picked.size,
           lastModified: picked.lastModified,
         };
-        let manifest = createVideoManifest({
-          localId: localId(),
-          startedAt: Date.now(),
-          file: source,
-          plan: probed.plan,
-          videoStartMs: deriveVideoStartMs(source, probed.plan),
-        });
+
+        // Pick up where a killed tab stopped, if this is the same file.
+        //
+        // This is what makes the checkpoint mean anything. Without it the store
+        // is written after every frame and never read, and a tab killed at frame
+        // 380 of 400 decodes the whole video again from zero while the evidence
+        // that it did not have to is sitting on disk.
+        //
+        // Identity is (name, size, lastModified) because OPFS deliberately does
+        // NOT hold the source: a multi-gigabyte file has no business being copied
+        // into origin storage, so a resumed session cannot compare bytes and has
+        // to ask the contributor to re-pick. Those three fields are exactly why
+        // `VideoSourceFile` is persisted. They are not a checksum and they are
+        // not pretending to be: two different videos could collide on all three.
+        // The failure that guards against is far-fetched (same name, same byte
+        // count, same mtime, different footage) and the cost of being wrong is
+        // one confused extraction the contributor can discard, against the cost
+        // of never resuming at all, which is certain.
+        const resumable = (await store.listManifests())
+          .filter(isVideoSessionManifest)
+          .find(
+            (m) =>
+              m.phase !== "uploaded" &&
+              m.video.file.name === source.name &&
+              m.video.file.size === source.size &&
+              m.video.file.lastModified === source.lastModified &&
+              isResumableExtraction(m),
+          );
+
+        let manifest =
+          resumable ??
+          createVideoManifest({
+            localId: localId(),
+            startedAt: Date.now(),
+            file: source,
+            plan: probed.plan,
+            videoStartMs: deriveVideoStartMs(source, probed.plan),
+          });
+
+        setResumedFrom(resumable ? manifest.video.framesExtracted : null);
         publish(manifest);
+        setFramesKept(manifest.frames.length);
         await store.putManifest(manifest);
 
         setPhase("extracting");
@@ -418,7 +464,6 @@ export function useVideoUpload() {
         };
         manifestRef.current = done;
         await store.putManifest(done);
-
         setSessionId(result.sessionId);
         setPhase("done");
       } catch (err) {
@@ -442,6 +487,7 @@ export function useVideoUpload() {
     setDecodePath(null);
     setProgress(null);
     setFramesKept(0);
+    setResumedFrom(null);
     setRoute(null);
     setTrack([]);
     setClockOffsetMs(0);
@@ -459,6 +505,7 @@ export function useVideoUpload() {
     decodePath,
     progress,
     framesKept,
+    resumedFrom,
     route,
     track,
     clockOffsetMs,
