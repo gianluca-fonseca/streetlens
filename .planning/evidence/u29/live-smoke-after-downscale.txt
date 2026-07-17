@@ -1,0 +1,106 @@
+u29 live extraction smoke, after server-side downscale + prompt-aware ceiling
+RESULT: PASS
+Run: 2026-07-16, RUN_LIVE_SMOKE=1, gpt-5-nano, real funded key from .env.local
+Fixture: scripts/fixtures/street-san-antonio-escazu.jpg (164 KB, 960x666)
+
+---- Before / after ----
+                          billed input    ceiling    verdict
+  before (full-res URL)       5276          2600      BREAKER FIRED
+  after  (512px inline)       4619          5828      PASS (1209 headroom)
+
+---- What the breaker was actually catching: our own request ----
+The brief's premise was that detail:"low" was being ignored and the IMAGE was
+billed ~2565 tokens. Measured against the real API, that is not what happened.
+The static part of the request is simply much larger than the old 2600 ceiling,
+and the first cut of this fix repeated the mistake in a smaller way:
+
+  SYSTEM_PROMPT (the cacheable prefix)   ~2711 tokens
+  strict JSON response schema            ~1898 tokens   <- was never counted
+  user instruction                         ~20 tokens
+  ------------------------------------------------------
+  static request, estimated              ~4628 tokens
+  static request, actual (cached_tokens)  4480 tokens   <- estimate runs ~3% high
+
+So a CORRECT call cannot come in under ~4500 tokens no matter what the image
+costs. The old flat 2600 ceiling sat ~1900 tokens BELOW the floor of a correct
+call: it was never a cost breaker, it was a tripwire on our own prompt. A first
+attempt at this fix derived the ceiling from the prompt alone (3911) and still
+fired on a correct call at 4619 — the schema is ~40% of the static request and
+is billed like anything else. inputTokenCeiling() now measures prompt + schema
++ user turn, so editing either file cannot silently break the breaker.
+
+The image itself, by subtraction (4619 billed - 4480 cached):
+  512px image cost ~139 tokens, against a 1200-token budget.
+  Full-res 960x666 cost ~1052 tokens (5276 billed - 4224 cached).
+Both are well below the ~2565 the brief inferred, but the downscale still cuts
+the image cost ~7x and, more importantly, makes it BOUNDED: no provider can
+bill for pixels we did not send, whatever it does with the detail hint.
+
+---- Cost ----
+  input_tokens   : 4619   (cached 4480 — prompt caching is engaging)
+  output_tokens  : 2425
+  latency        : 17655 ms
+  cost this frame: $0.001201  (@ $0.05/1M in, $0.4/1M out)
+  400-frame run  : $0.4804
+
+---- A defect this run found (pre-existing, NOT introduced here) ----
+The model answered usable:false, reason:"no_street_visible", every item null.
+That is the model being RIGHT: the fixture is not a street. It is the inside of
+a pulpería (shelves, hanging bags, a shopkeeper). It was picked off a Wikimedia
+title starting "Street Photography ..." — the genre, not the subject.
+
+Ruled out that the downscale caused it, by asking the same model the same
+question at three resolutions (three real calls, ~$0.004):
+
+  full-res 960x666   usable=false  no_street_visible  scored 0/15  input=5276
+  downscaled 512     usable=false  no_street_visible  scored 0/15  input=4619
+  768 q80            usable=false  no_street_visible  scored 0/15  input=4943
+
+Identical at every resolution, so legibility at 512 px is untouched by this
+change — and also UNEVIDENCED by it, because the model has never been shown a
+street. scripts/fixtures/README.md now says so plainly. A fixture that really is
+a residential street is needed before anything can be claimed about the
+extractor's answers; choosing one is a ground-truth judgement, so it is left for
+a deliberate decision rather than taken here.
+
+---- Raw output ----
+live smoke: gpt-5-nano on street-san-antonio-escazu.jpg (164 KB)
+  static prefix  ~2711 tokens (cacheable)
+  static request ~4628 tokens (prompt + schema)
+  sent as        52 KB, downscaled to 512 px
+  ceiling        5828 = ~4628 static request (prompt + schema) + 1200 image budget
+
+  [ok ] input_tokens 4619 <= 5828 — the bill is bounded (1209 tokens of headroom)
+  [ok ] the 512 px image is not billed like a full-resolution one billed 4619 vs ~4628 static + 1200 image budget
+  [ok ] a real response parses against the strict schema and our zod 15 items
+  [ok ] every rubric item came back
+  [ok ] every item's value respects its response type
+  [ok ] confidences are in 0..1
+
+  ---- what it actually cost ----
+  input_tokens   : 4619
+  cached_tokens  : 4480
+  output_tokens  : 2425
+  latency        : 17655 ms
+  cost this frame: $0.001201  (@ $0.05/1M in, $0.4/1M out)
+  400-frame run  : $0.4804
+  usable         : false (no_street_visible)
+
+  ---- what it saw ----
+  sidewalk_present      null  conf 0.1
+  sidewalk_width        null  conf 0.1
+  surface_condition     null  conf 0.1
+  curb_ramp             null  conf 0.1
+  obstruction_free      null  conf 0.1
+  drain_present         null  conf 0.1
+  standing_water        null  conf 0.1
+  curb_gutter           null  conf 0.1
+  canopy_cover          null  conf 0.1
+  midday_shade          null  conf 0.1
+  lighting              null  conf 0.1
+  crossing_safety       null  conf 0.1
+  bike_lane_present     null  conf 0.1
+  bike_separation       null  conf 0.1
+  bike_surface          null  conf 0.1
+
+PASS — live extraction smoke
