@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 760" width="1160" height="760" font-family="'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace" role="img" aria-label="Plate 3 — audit method pipeline: field audit to open data today, with the computer-vision and machine-learning path drawn as a roadmap loop that a human always verifies">
-  <title>StreetLens Plate 3 — Audit method pipeline (today, and the roadmap loop)</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 760" width="1160" height="760" font-family="'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace" role="img" aria-label="Plate 3 · audit method pipeline: field audit to open data today, with the computer-vision and machine-learning path drawn as a roadmap loop that a human always verifies">
+  <title>StreetLens Plate 3 · Audit method pipeline (today, and the roadmap loop)</title>
 
   <defs>
     <marker id="ar3" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
@@ -20,7 +20,7 @@
   <line x1="52" y1="102" x2="1108" y2="102" stroke="#C6C6C6" stroke-width="1"/>
 
   <!-- band labels -->
-  <text x="60" y="150" font-size="11" letter-spacing="0.8" fill="#111111" font-weight="700">TODAY — the pilot from August 2026</text>
+  <text x="60" y="150" font-size="11" letter-spacing="0.8" fill="#111111" font-weight="700">TODAY · the pilot from August 2026</text>
   <line x1="292" y1="146" x2="980" y2="146" stroke="#C6C6C6" stroke-width="1"/>
 
   <!-- ============ TODAY ROW ============ -->
@@ -56,7 +56,7 @@
   </g>
 
   <!-- ============ ROADMAP LOOP ============ -->
-  <text x="60" y="360" font-size="11" letter-spacing="0.8" fill="#5C5C5C" font-weight="700">ON THE ROADMAP — every audit trains the next one</text>
+  <text x="60" y="360" font-size="11" letter-spacing="0.8" fill="#5C5C5C" font-weight="700">ON THE ROADMAP · every audit trains the next one</text>
   <line x1="452" y1="356" x2="980" y2="356" stroke="#C6C6C6" stroke-width="1"/>
 
   <!-- CORPUS cylinder (under B2) -->
@@ -82,7 +82,7 @@
   <text x="480" y="602" font-size="9.5" fill="#5C5C5C" text-anchor="middle">a faster first pass,</text>
   <text x="480" y="615" font-size="9.5" fill="#5C5C5C" text-anchor="middle">never the final word</text>
 
-  <!-- HUMAN VERIFY (solid — required; pink accent) -->
+  <!-- HUMAN VERIFY (solid · required; pink accent) -->
   <rect x="630" y="540" width="200" height="94" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.5"/>
   <rect x="630" y="540" width="6" height="94" fill="#F0268C"/>
   <text x="736" y="580" font-size="13" font-weight="700" fill="#111111" text-anchor="middle">HUMAN VERIFY</text>
