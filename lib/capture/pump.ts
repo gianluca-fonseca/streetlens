@@ -42,6 +42,7 @@ import type { CaptureDb, ClaimedJob } from "./db";
 import { getCaptureDb } from "./db";
 import { publicFrameUrl } from "./storage";
 import { computeRollups, type RollupObservation } from "./rollup";
+import { emitCaptureSubmission } from "@/lib/submissions-sink";
 import type { PumpResponse } from "./schemas";
 
 export type PumpDeps = {
@@ -51,6 +52,8 @@ export type PumpDeps = {
   frameUrl?: (storagePath: string) => string;
   /** Injectable so tests drive the real downscale without fetching anything. */
   prepareImage?: ImagePreparer;
+  /** Injectable so tests assert the queue emit without writing a real queue file. */
+  emitSubmission?: (sessionId: string) => Promise<void>;
   limit?: number;
   concurrency?: number;
 };
@@ -88,12 +91,13 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
   const vision = deps?.vision ?? createOpenAiVisionClient();
   const frameUrl = deps?.frameUrl ?? publicFrameUrl;
   const prepareImage = deps?.prepareImage ?? downscaleFrame;
+  const emitSubmission = deps?.emitSubmission ?? emitCaptureSubmission;
   const batch = deps?.limit ?? PUMP_BATCH_SIZE;
   const concurrency = deps?.concurrency ?? PUMP_CONCURRENCY;
 
   const jobs = await db.claimJobs(batch);
   if (jobs.length === 0) {
-    await rollupDrainedSessions(db);
+    await rollupDrainedSessions(db, emitSubmission);
     return emptyResult(await db.pendingJobCount().catch(() => 0));
   }
 
@@ -136,7 +140,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
     ),
   );
 
-  await rollupDrainedSessions(db);
+  await rollupDrainedSessions(db, emitSubmission);
 
   return {
     claimed: jobs.length,
@@ -334,7 +338,10 @@ async function pauseSession(
  * and tolerant of failure: a session that fails to roll up stays `extracting`
  * and is retried on the next pump rather than blocking the others.
  */
-async function rollupDrainedSessions(db: CaptureDb): Promise<void> {
+async function rollupDrainedSessions(
+  db: CaptureDb,
+  emitSubmission: (sessionId: string) => Promise<void>,
+): Promise<void> {
   let sessionIds: string[];
   try {
     sessionIds = await db.drainedSessions(ROLLUP_BATCH_SIZE);
@@ -344,7 +351,7 @@ async function rollupDrainedSessions(db: CaptureDb): Promise<void> {
 
   for (const sessionId of sessionIds) {
     try {
-      await rollupSession(db, sessionId);
+      await rollupSession(db, sessionId, emitSubmission);
     } catch (err) {
       console.warn(`[capture] rollup failed for ${sessionId}: ${errText(err)}`);
     }
@@ -352,7 +359,11 @@ async function rollupDrainedSessions(db: CaptureDb): Promise<void> {
 }
 
 /** Aggregate one session and mark it ready for a human. Exported for tests. */
-export async function rollupSession(db: CaptureDb, sessionId: string): Promise<number> {
+export async function rollupSession(
+  db: CaptureDb,
+  sessionId: string,
+  emitSubmission: (sessionId: string) => Promise<void>,
+): Promise<number> {
   const rows = await db.listObservations(sessionId);
 
   const observations: RollupObservation[] = rows.map((r) => ({
@@ -378,9 +389,21 @@ export async function rollupSession(db: CaptureDb, sessionId: string): Promise<n
     });
   }
 
+  // File it into the review queue BEFORE flipping the status, because the status
+  // write below is a one-way latch: drainedSessions only selects `extracting`, so
+  // a session that reaches review_ready is never drained again. Emitting after it
+  // would mean a throw here strands a finished walk with no queue row and no
+  // retry — invisible to every human forever. Emitting first means a throw simply
+  // leaves the session `extracting` for the next pump, and the emit is idempotent
+  // precisely so that retry is free. Ordering mirrors reviewSubmission's "land the
+  // data first" rule (lib/submissions.ts).
+  await emitSubmission(sessionId);
+
   // review_ready even with zero rollups: a session where every frame failed has
   // finished extracting and needs a human to look at it, which is exactly what
-  // review_ready means. Leaving it `extracting` would strand it forever.
+  // review_ready means. Leaving it `extracting` would strand it forever. It is
+  // filed above for the same reason — a walk that produced nothing is still a
+  // walk someone should be told about.
   await db.setSessionStatus(sessionId, "review_ready");
   return rollups.length;
 }

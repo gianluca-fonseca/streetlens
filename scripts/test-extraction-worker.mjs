@@ -160,6 +160,10 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
     observations: [],
     rollups: [],
     statusWrites: [],
+    /** Session ids filed into the review queue (u30). */
+    emits: [],
+    /** Ordered trace of emits and status writes, so ordering can be asserted. */
+    events: [],
   };
 
   const db = {
@@ -217,6 +221,7 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
     async setSessionStatus(_sessionId, s) {
       state.sessionStatus = s;
       state.statusWrites.push(s);
+      state.events.push(`status:${s}`);
     },
     async pendingJobCount() {
       return [...jobs.values()].filter((j) => j.status === "pending").length;
@@ -338,8 +343,29 @@ async function main() {
   const storage = makeFixtureFetch();
   /** The real downscale, over faked storage. */
   const prepareImage = (url) => downscaleFrame(url, { fetchImpl: storage.fetchImpl });
+  /**
+   * The queue emit, injected (u30).
+   *
+   * Injected rather than defaulted because the real emitter writes
+   * data/pending-submissions.local.json when Supabase is unconfigured, which is
+   * exactly the case here — an un-injected pump would have this suite quietly
+   * appending to a developer's real local queue on every run.
+   */
+  const emitter = (db, impl) => async (sessionId) => {
+    db.state.emits.push(sessionId);
+    db.state.events.push(`emit:${sessionId}`);
+    if (impl) await impl(sessionId);
+  };
   const run = (db, vision, opts = {}) =>
-    pumpOnce({ db, vision, frameUrl, prepareImage, concurrency: 4, ...opts });
+    pumpOnce({
+      db,
+      vision,
+      frameUrl,
+      prepareImage,
+      emitSubmission: emitter(db, opts.emitImpl),
+      concurrency: 4,
+      ...opts,
+    });
 
   /* ---------------- Happy path ---------------- */
   console.log("\nhappy path");
@@ -369,6 +395,55 @@ async function main() {
       "rollup carries lens scores",
       typeof db.state.rollups[0].scores.accessibility === "number",
       JSON.stringify(db.state.rollups[0].scores),
+    );
+    check(
+      "session filed into the review queue exactly once (u30)",
+      db.state.emits.length === 1 && db.state.emits[0] === SID,
+      JSON.stringify(db.state.emits),
+    );
+    check(
+      "filed BEFORE the review_ready latch (u30)",
+      db.state.events.indexOf(`emit:${SID}`) <
+        db.state.events.indexOf("status:review_ready"),
+      JSON.stringify(db.state.events),
+    );
+  }
+
+  /* ---------------- Queue emit is the gate on review_ready (u30) ---------------- */
+  console.log("\nqueue emit failure leaves the session retryable");
+  {
+    // review_ready is a one-way latch: drainedSessions only returns `extracting`
+    // sessions. If the emit could fail AFTER that write, the walk would be
+    // finished, unqueued, and never drained again — invisible to every human.
+    const db = makeDb({ frameCount: 1 });
+    const vision = makeVision(() => ok(T));
+    let attempt = 0;
+    await run(db, vision, {
+      emitImpl: async () => {
+        attempt++;
+        throw new Error("queue unavailable");
+      },
+    });
+
+    check(
+      "a failed emit does NOT flip the session to review_ready",
+      db.state.sessionStatus === "extracting",
+      `status=${db.state.sessionStatus}`,
+    );
+    check("the emit was attempted", attempt === 1, `attempts=${attempt}`);
+    check(
+      "no review_ready was ever written",
+      !db.state.statusWrites.includes("review_ready"),
+      JSON.stringify(db.state.statusWrites),
+    );
+
+    // The frames are done, so the next pump claims nothing but still drains —
+    // which is what makes the retry real rather than theoretical.
+    const retry = await run(db, vision);
+    check(
+      "the next pump re-files it and lands review_ready",
+      db.state.sessionStatus === "review_ready" && db.state.emits.length === 2,
+      `status=${db.state.sessionStatus} emits=${db.state.emits.length} claimed=${retry.claimed}`,
     );
   }
 
