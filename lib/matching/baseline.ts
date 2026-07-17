@@ -26,7 +26,6 @@ import type {
   AttributeFrames,
   FrameAttributionResult,
   FrameTime,
-  MatchOptions,
   MatchResult,
   MatchSegment,
   MatchTrack,
