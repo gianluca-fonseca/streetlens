@@ -6,6 +6,8 @@
  * across the worker.
  */
 
+import { staticRequestApproxTokens } from "./prompt";
+
 /* ------------------------------------------------------------------ *
  * Models
  * ------------------------------------------------------------------ */
@@ -43,30 +45,76 @@ export function extractionEnabled(): boolean {
  * ------------------------------------------------------------------ */
 
 /**
+ * What one frame's image is allowed to cost, on top of the prompt.
+ *
+ * lib/extraction/downscale.ts sends at most a 512 px JPEG: ~192 patches ~= 470
+ * tokens at gpt-5-nano's 2.46x multiplier, measured. 1200 is ~2.5x that, which
+ * absorbs a different model's multiplier and the ~10% the static estimate
+ * overshoots by, while still catching a provider that bills an order of
+ * magnitude more than the pixels it was handed.
+ *
+ * Note what this budget no longer has to survive: a 4K frame billed at full
+ * resolution. Nobody can bill us for pixels we did not send.
+ */
+export const IMAGE_TOKEN_BUDGET = 1200;
+
+/**
  * Hard per-frame input-token ceiling. Exceeding it fails the job and pauses the
  * whole session.
  *
- * THIS IS THE POINT OF THE GUARD, not a formality. `detail: "low"` is supposed
- * to cap an image at ~85 tokens, but a provider that ignores the hint and bills
- * full resolution instead turns a 400-frame session into orders of magnitude
- * more spend, silently and successfully — every response still looks fine. The
- * only way to notice is to assert the number we were actually billed.
+ * THIS IS THE POINT OF THE GUARD, not a formality. A provider that bills full
+ * resolution instead of what it was sent turns a 400-frame session into orders
+ * of magnitude more spend, silently and successfully — every response still
+ * looks fine. The only way to notice is to assert the number we were billed.
  *
- * 2600 sits well above a correct low-detail call (~85 image + ~1.3k prompt) and
- * well below a full-resolution one, so it discriminates cleanly without tripping
- * on ordinary variation.
+ * DERIVED, NOT FLAT. It used to be a hardcoded 2600, which quietly became a
+ * tripwire on our own request: the cached prefix alone is deliberately ~2700
+ * tokens (it has to clear 1024 for prompt caching to engage at all) and the
+ * strict schema is ~1900 more, so the ceiling fired on every correct call. A
+ * ceiling that has to be re-tuned by hand whenever the rubric text changes is a
+ * ceiling that will be raised until it means nothing. Measuring the request
+ * instead means editing prompt.ts or schema.ts cannot silently break the
+ * breaker, in either direction.
+ *
+ * `CV_INPUT_TOKEN_CEILING` overrides it outright, for a model whose image
+ * multiplier makes the derived number wrong.
  */
-export const MAX_INPUT_TOKENS_PER_FRAME = 2600;
+export function inputTokenCeiling(): number {
+  const override = Number(process.env.CV_INPUT_TOKEN_CEILING);
+  if (Number.isFinite(override) && override > 0) return Math.floor(override);
+  return staticRequestApproxTokens() + IMAGE_TOKEN_BUDGET;
+}
+
+/** The ceiling's composition, for the message a tripped breaker leaves behind. */
+export function describeInputTokenCeiling(): string {
+  const override = Number(process.env.CV_INPUT_TOKEN_CEILING);
+  if (Number.isFinite(override) && override > 0) {
+    return `${Math.floor(override)} (CV_INPUT_TOKEN_CEILING override)`;
+  }
+  return `${inputTokenCeiling()} = ~${staticRequestApproxTokens()} static request (prompt + schema) + ${IMAGE_TOKEN_BUDGET} image budget`;
+}
 
 /**
- * Per-session input-token budget: frames x this. A session that blows through
- * it is paused rather than allowed to keep spending, even if no single frame
- * ever trips the per-frame ceiling.
+ * Per-session input-token allowance, per frame. The session budget is frames x
+ * this, and a session that blows through it is paused rather than allowed to
+ * keep spending.
+ *
+ * Derived from the per-frame ceiling plus the escalation cap, because those two
+ * together are what a healthy session can legitimately reach: no frame may bill
+ * above the ceiling, and at most ESCALATION_MAX_FRACTION of them are asked
+ * twice. A session past this has drifted in a way no single frame's ceiling
+ * could see, which is the whole reason the session guard exists alongside it.
+ *
+ * `CV_SESSION_TOKENS_PER_FRAME` overrides it.
  */
-export const SESSION_INPUT_TOKENS_PER_FRAME = 1500;
+export function sessionInputTokensPerFrame(): number {
+  const override = Number(process.env.CV_SESSION_TOKENS_PER_FRAME);
+  if (Number.isFinite(override) && override > 0) return Math.floor(override);
+  return Math.ceil(inputTokenCeiling() * (1 + ESCALATION_MAX_FRACTION));
+}
 
 export function sessionTokenBudget(frameCount: number): number {
-  return Math.max(1, frameCount) * SESSION_INPUT_TOKENS_PER_FRAME;
+  return Math.max(1, frameCount) * sessionInputTokensPerFrame();
 }
 
 /* ------------------------------------------------------------------ *

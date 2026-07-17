@@ -21,7 +21,12 @@ const RESPONSES_URL = "https://api.openai.com/v1/responses";
 
 export type VisionRequest = {
   model: string;
-  /** Public URL of the frame. The bucket is public-read (0013 section 4). */
+  /**
+   * The image to send, as extractFrame prepared it: a base64 JPEG data URL of
+   * the frame downscaled to 512 px, NOT the public storage URL. See
+   * lib/extraction/downscale.ts — sending the original and asking for
+   * `detail: "low"` is what stopped working.
+   */
   imageUrl: string;
 };
 
@@ -186,6 +191,9 @@ export type OpenAiVisionClientOptions = {
  * `detail: "low"` is actually sent, and that the cached prefix rides in
  * `instructions` (first position, byte-identical every call) rather than being
  * interpolated into the per-frame turn.
+ *
+ * Whatever `imageUrl` holds goes through verbatim. Bounding it is extractFrame's
+ * job, not this function's.
  */
 export function buildRequestBody(request: VisionRequest): Record<string, unknown> {
   return {
@@ -200,9 +208,10 @@ export function buildRequestBody(request: VisionRequest): Record<string, unknown
           {
             type: "input_image",
             image_url: request.imageUrl,
-            // The whole cost model rests on this. lib/extraction/config.ts
-            // asserts the billed tokens afterwards, because a provider that
-            // ignores this hint still returns a perfectly normal-looking 200.
+            // Belt, not braces. This hint has been measured being ignored (a
+            // 200, a normal answer, full-resolution billing), so the braces are
+            // the 512 px image we send it with — and the breaker in extract.ts,
+            // which asserts what we were actually billed either way.
             detail: "low",
           },
         ],

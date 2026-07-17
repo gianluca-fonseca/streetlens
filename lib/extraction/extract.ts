@@ -17,8 +17,10 @@ import type { VisionClient, VisionUsage } from "./client";
 import { VisionTransportError } from "./client";
 import {
   ESCALATION_CONFIDENCE_THRESHOLD,
-  MAX_INPUT_TOKENS_PER_FRAME,
+  describeInputTokenCeiling,
+  inputTokenCeiling,
 } from "./config";
+import { downscaleFrame } from "./downscale";
 
 export type ExtractOutcome =
   | {
@@ -32,10 +34,28 @@ export type ExtractOutcome =
    * because the response may have been perfectly good — the problem is the
    * price, and the right reaction is to stop the session rather than retry it.
    */
-  | { kind: "overbudget"; usage: VisionUsage; model: string; inputTokens: number }
+  | {
+      kind: "overbudget";
+      usage: VisionUsage;
+      model: string;
+      inputTokens: number;
+      /** The ceiling and what it is made of, for the pause message. */
+      ceiling: string;
+    }
   | { kind: "failed"; reason: string; usage: VisionUsage; model: string };
 
 const NO_USAGE: VisionUsage = { inputTokens: 0, outputTokens: 0, cachedTokens: 0 };
+
+/**
+ * Turn a frame URL into the image the model is actually sent.
+ *
+ * Injectable so the tests drive the real resize against fixture bytes with no
+ * network, and so the pump can fetch and shrink a frame once even when it asks
+ * two models about it.
+ */
+export type ImagePreparer = (imageUrl: string) => Promise<string>;
+
+export type ExtractOptions = { prepareImage?: ImagePreparer };
 
 /**
  * Reconcile the wire's `reason` with the canonical one.
@@ -62,6 +82,11 @@ function normalizeFrameQuality(raw: unknown): unknown {
 /**
  * Ask one model about one frame.
  *
+ * The image is downscaled here rather than at the call site, so there is no path
+ * to a model that skips it: what leaves this function is always a bounded 512 px
+ * JPEG, whatever the caller passed in. See lib/extraction/downscale.ts for why
+ * that is not something we ask the provider to do for us any more.
+ *
  * Order matters: the token assertion runs BEFORE the response is parsed. An
  * over-budget response that happens to contain valid JSON is still over budget,
  * and accepting it would mean the breaker only fires on frames we were going to
@@ -71,10 +96,26 @@ export async function extractFrame(
   client: VisionClient,
   imageUrl: string,
   model: string,
+  options: ExtractOptions = {},
 ): Promise<ExtractOutcome> {
+  let prepared: string;
+  try {
+    prepared = await (options.prepareImage ?? downscaleFrame)(imageUrl);
+  } catch (err) {
+    // The frame could not be fetched or decoded. Nothing was billed, and asking
+    // the model about a full-resolution image instead is exactly the trade this
+    // downscale exists to refuse.
+    return {
+      kind: "failed",
+      reason: `image_prepare: ${err instanceof Error ? err.message : String(err)}`,
+      usage: NO_USAGE,
+      model,
+    };
+  }
+
   let response;
   try {
-    response = await client.extract({ model, imageUrl });
+    response = await client.extract({ model, imageUrl: prepared });
   } catch (err) {
     // A transport failure that survived the retry policy. No usage to report:
     // nothing was billed for a request that never landed.
@@ -87,12 +128,13 @@ export async function extractFrame(
 
   // THE COST BREAKER. Checked on every response including refusals and
   // truncations, because those are billed too.
-  if (response.usage.inputTokens > MAX_INPUT_TOKENS_PER_FRAME) {
+  if (response.usage.inputTokens > inputTokenCeiling()) {
     return {
       kind: "overbudget",
       usage: response.usage,
       model,
       inputTokens: response.usage.inputTokens,
+      ceiling: describeInputTokenCeiling(),
     };
   }
 

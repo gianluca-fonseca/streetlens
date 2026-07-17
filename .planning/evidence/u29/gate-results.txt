@@ -59,6 +59,22 @@ Full session lifecycle                              15/16 steps green
 scripts/live-smoke-extraction.mjs                   BLOCKED (see live-smoke-extraction.txt)
   Found 2 real bugs on real calls, then hit 429 insufficient_quota. Not passed.
 
+---- Re-run 2026-07-16 with a funded key (see live-smoke-after-downscale.txt) ----
+All gates re-run after the downscale + prompt-aware ceiling fix:
+npx tsc --noEmit                                    PASS (clean)
+npm run lint                                        PASS (clean)
+npm run build                                       PASS
+scripts/test-extraction-worker.mjs                  PASS (75 checks)
+scripts/test-capture-rollup.mjs                     PASS
+scripts/test-capture-schemas.mjs                    PASS
+scripts/test-upload-client.mjs                      PASS
+scripts/test-matching-baseline.mjs                  PASS
+scripts/test-rate-limit-namespaces.mjs              PASS
+scripts/test-honeypot-type.mjs                      PASS
+RUN_LIVE_SMOKE=1 scripts/live-smoke-extraction.mjs  PASS
+  billed 5276 -> 4619 input tokens; ceiling 2600 -> 5828; 1209 headroom.
+  cached_tokens 4480 — prompt caching engages. $0.0012/frame, $0.48 per 400.
+
 ---- Defects found and fixed in this unit ----
 1. frameQuality.reason: strict json_schema cannot omit a key, so "nothing was
    wrong" arrives as reason:null, but the frozen captureFrameQualitySchema types

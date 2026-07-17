@@ -25,6 +25,7 @@ import {
   CAPTURE_SCHEMA_VERSION,
   type RubricItemKey,
 } from "@/lib/capture/types";
+import { observationResponseFormat } from "./schema";
 
 /**
  * Per-item guidance: what the item means, and what each scale point looks like.
@@ -182,4 +183,26 @@ export function systemPromptApproxTokens(): number {
   // ~4 chars per token is close enough to assert we clear the 1024 floor; the
   // live smoke checks the real number the provider reports.
   return Math.ceil(SYSTEM_PROMPT.length / 4);
+}
+
+/**
+ * Rough token count of EVERYTHING in a request except the image: the prompt, the
+ * user turn, and the strict response schema.
+ *
+ * The schema is the part that gets forgotten, and it is not small — 15 items
+ * with per-item value/confidence properties is ~1900 tokens, comparable to the
+ * prompt itself. It is billed as input on every call like anything else. A
+ * ceiling derived from the prompt alone therefore under-counts by nearly half,
+ * which is exactly how the first attempt at this fix still fired on a correct
+ * call (billed 4619 against a 3911 ceiling).
+ *
+ * ~4 chars per token OVERESTIMATES here by roughly 10% (JSON tokenizes denser
+ * than prose), and that is the direction to be wrong in: a ceiling that is a
+ * little loose costs a little vigilance, while one that is a little tight pauses
+ * real sessions and gets raised until it means nothing. The live smoke measures
+ * the number that is actually billed.
+ */
+export function staticRequestApproxTokens(): number {
+  const schema = JSON.stringify(observationResponseFormat());
+  return Math.ceil((SYSTEM_PROMPT.length + USER_INSTRUCTION.length + schema.length) / 4);
 }
