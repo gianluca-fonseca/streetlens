@@ -647,7 +647,7 @@ async function main() {
   /* ---------- Path A: the happy path, capture routes mocked ---------- */
 
   const context = await newContext(browser, "en");
-  const { sessionId, seen } = await mockCaptureApi(context);
+  const { seen } = await mockCaptureApi(context);
   await mockStorage(context);
 
   const page = await context.newPage();
