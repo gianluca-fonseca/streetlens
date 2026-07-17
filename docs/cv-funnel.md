@@ -147,12 +147,50 @@ is written against the interface, so those cases should pass for the HMM too.
 
 ## Cost
 
-**Filled by unit-frame-extraction.** The shape is in place: `capture_frame_jobs`
-records attempts and distinguishes `failed_overbudget` (retryable the moment
-budget returns) from `failed` (not), `capture_observations` records
-`input_tokens`/`output_tokens`/`escalated` per model per frame, and
-`cost_paused` exists as a session state. The budget ceiling, the model ladder
-and the escalation rule are that unit's to define.
+Five guards, each enforced where it can actually stop spending.
+
+| Guard | Ceiling | What happens |
+| --- | --- | --- |
+| Kill switch | `CV_EXTRACTION_ENABLED` ≠ `"true"` | The pump no-ops before claiming. Finalize still matches and enqueues, so flipping it back on drains the backlog. |
+| Per-frame tokens | 2600 input tokens | Job → `failed_overbudget`, session → `cost_paused`, that session stops yielding work. |
+| Per-session budget | frames × 1500 input tokens | Session → `cost_paused` with its jobs back on `pending`. |
+| Escalation | 10% of a session's frames | Further low-confidence frames keep the cheap model's answer. |
+| Attempts | 3 claims per job | Job → `failed`. |
+
+The per-frame ceiling is the one that matters most, and it is the reason the
+guard exists at all. `detail: "low"` should cap an image around 85 tokens, but a
+provider that ignores the hint and bills full resolution still returns a
+perfectly normal-looking 200 — nothing about the response looks wrong, and a
+400-frame session quietly costs orders of magnitude more. The only way to notice
+is to assert the tokens we were actually billed, on every response, including
+refusals and truncations. `lib/extraction/extract.ts` checks it before it even
+parses the answer: an over-budget response that happens to contain good JSON is
+still over budget.
+
+`cost_paused` is a deliberate stop, not an error. The frames survive and a human
+resumes the session.
+
+### The pump and its cron
+
+`POST /api/capture/pump` claims ≤ 40 jobs with `FOR UPDATE SKIP LOCKED`
+(`capture_claim_jobs_with_frames`, 0015) and runs them at `p-limit(8)`. Racing
+pumps are the ordinary case — an `after()` kick and a cron tick will overlap —
+and the lock is what makes that safe, so no frame is ever billed twice.
+
+It is called by finalize's `after()`, by the cron, or by an operator. It is
+**gated on `ADMIN_RPC_SECRET`** (or Vercel's `CRON_SECRET`), because each call
+can bill 40 model requests. A session uuid does not authorize it: the uuid
+capability lets you act on your own session, not start work on the whole queue.
+The contributor's status page therefore cannot pump, and should not — that would
+put an unbounded model bill behind an anonymous GET that anyone can hold open in
+a tab.
+
+`vercel.json` schedules a **daily** sweep (`0 3 * * *`) as a backstop for
+sessions whose `after()` kick died mid-flight. Daily is a plan constraint, not a
+design preference: **Hobby allows only daily cron, and per-minute schedules
+require Pro.** The queue does not depend on it — `after()` drains a session
+immediately — so the cron is a safety net, and on Pro it is worth tightening to
+`* * * * *` for prompt retries.
 
 ## Review
 
