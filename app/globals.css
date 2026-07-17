@@ -1,26 +1,588 @@
 @import "tailwindcss";
 
+/*
+ * StreetLens design tokens — sealed from docs/design-direction.md (rev 6, 2026-07-16).
+ * "Zen Instrument": pure black-and-white zen (Japanese-zen meets Notion), one loud
+ * FLASH-PINK signal. Light = soft-white page, pure-black ink. Dark = near-black page,
+ * pure-white ink. Flat grounds carry structure through hairlines + zen-soft diffuse
+ * shadows (large radius, very low alpha); glass (backdrop-blur) survives ONLY over
+ * live map tiles. Pink is signal-only. All warm/creme tints are retired.
+ *
+ * Token strategy (unchanged from u13): the rev-4 names components already consume
+ * (--surface-*, --ink, --neutral-*, --border*, --pine*, --accent*, --ring) are KEPT
+ * and re-valued; the rev-5/6 vocabulary (--paper*, --ink-display/muted/faint,
+ * --hairline*, --amber, --clay, --accent-fg) is the primary source of truth, and the
+ * legacy names alias onto it via var() so both spellings resolve to one value. --pine
+ * is an INTERIM ink hold kept alive only so un-reskinned components build.
+ * Every ratio in the comments is computed AA (see the u16 report contrast tables).
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Grounds (light) — white zen: soft white page, pure-white plates. No tint. */
+  --paper: #fafafa; /* page ground (soft white, not glaring) */
+  --paper-white: #ffffff; /* plates, cards, long-reading blocks */
+  --paper-sunken: #f1f1f1; /* recessed zones, zebra, sunken wells */
+  --surface-base: var(--paper);
+  --surface-elevated: var(--paper-white);
+  --surface-sunken: var(--paper-sunken);
+
+  /* Ink ramp (pure neutral gray; display is truest black). */
+  --ink: #111111; /* body (min 16.72:1 across grounds) */
+  --ink-display: #000000; /* bold-black headlines, pure black (min 18.59:1) */
+  --ink-muted: #5c5c5c; /* captions/meta (AA: 6.41 paper / 6.69 pw / 5.92 sunken) */
+  --ink-faint: #9a9a9a; /* ticks/disabled — graphic/large only, sub-AA by design */
+  --neutral-strong: var(--ink-muted);
+  --neutral: var(--ink-faint);
+
+  /* Hairlines (flat grounds carry structure through rules, not shadow). */
+  --hairline: #e4e4e4; /* 1px rules, plate borders */
+  --hairline-strong: #c6c6c6; /* stronger dividers, active borders */
+  --neutral-soft: var(--hairline);
+  --border: var(--hairline);
+  --border-strong: var(--hairline-strong);
+
+  /* INTERIM: brand pine is retired (primary chrome goes ink). Held to ink values
+     so any un-reskinned pine reference reads ink; removed once refs clear. */
+  --pine: #111111;
+  --pine-strong: #000000;
+
+  /* FLASH PINK — signal only (CTA fill, active state, underline, tick, LIVE dot). */
+  --accent: #f0268c; /* graphic signal */
+  --accent-strong: #cf1273; /* press/hover form */
+  --accent-text: #c0106b; /* deep magenta for accent TEXT on white (AA: 5.27–5.95) */
+  --accent-fg: #000000; /* fixed pure-black label on pink fills — AA in BOTH themes
+                           (5.36 on light pink, 6.90 on dark pink); never re-valued. */
+
+  /* Terracotta: DATA ONLY (score ramps / geometry viz). Banned from chrome. */
+  --terracotta: #e07a3f;
+
+  /* Status semantics (admin): pending amber + destructive clay. Hue semantics kept;
+     re-verified AA on the neutral grounds (amber 5.64–6.37, clay 5.28–5.96). */
+  --amber: #7a5a0e;
+  --clay: #b23a22;
+
+  /* Focus ring = ink. */
+  --ring: #111111;
+
+  /* Zen-soft elevation (rev-6 research §2): one top-down light, zero horizontal
+     offset, growing negative spread, per-layer alpha <= 0.08, hairline carries the
+     structure. Three tiers of one family: T1 rest = --shadow-panel, T2 raised =
+     --shadow-raised (hover, exactly one tier up), T3 overlay = --shadow-popover.
+     Penumbra filled (no hollow 4-16px band), contact tightened, no inset emboss. */
+  --shadow-panel:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-raised:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 8px -2px rgba(0, 0, 0, 0.05),
+    0 12px 24px -4px rgba(0, 0, 0, 0.06);
+  --shadow-popover:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 12px -3px rgba(0, 0, 0, 0.05),
+    0 16px 32px -6px rgba(0, 0, 0, 0.07), 0 28px 48px -10px rgba(0, 0, 0, 0.08);
+
+  /* Card hover surface lift. Light plate does not tint (shadow + rise sell it);
+     dark plate lifts +8/255 (#141414 -> #1c1c1c) — the dual-channel Notion cue. */
+  --surface-raised: #ffffff;
+
+  /* Radius: plates are square-ish (big radius reads SaaS). */
+  --radius-chip: 2px;
+  --radius-panel: 4px;
+  --radius-primary: 6px;
+
+  /* Glass — permitted ONLY over live map tiles (never on flat grounds). Neutral
+     white tint. --glass-blur is the sanctioned blur radius; wire it into the glass
+     primitive in u18 (blur is currently hardcoded in GlassPanel — see u16 report).
+     Refined per research §1: alpha .66 -> .72 for standalone text, saturate() is the
+     missing tell, blur 20px panels. u18 consumes these for over-tile panels. */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-blur: 20px;
+  --glass-saturate: 150%;
+
+  /* Floating over-tile CHIPS (research §1 Recipe C): small elements can sit fully
+     over a bright OR dark tile, so push alpha up + blur down (14px). Near-opaque
+     enough that short labels clear AA over any tile without a scrim (worst case
+     ~10:1 light / ~6.9:1 dark; see u17 AA notes). --glass-chip-solid is the
+     no-blur swap used during map pan/zoom + as the @supports/no-backdrop fallback. */
+  --glass-chip-bg: rgba(255, 255, 255, 0.78);
+  --glass-chip-border: rgba(0, 0, 0, 0.10);
+  --glass-blur-chip: 14px; /* chip/control blur (Recipe C): lower than panels so a
+                              small pill over a bright OR dark spot stays crisp. */
+  --glass-chip-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --glass-chip-lift: 0 2px 8px rgba(0, 0, 0, 0.16);
+  --glass-chip-solid: rgba(255, 255, 255, 0.92);
+
+  /* Motion (research §3): opacity + transform only, decelerated so the page
+     "arrives and settles". Theme-independent. */
+  --dur-instant: 100ms;
+  --dur-fast: 150ms;
+  --dur-base: 200ms; /* workhorse: hover-lift enter, popovers, most enters */
+  --dur-slow: 300ms; /* overlays, section reveal, hero chrome */
+  --dur-settle: 420ms; /* the single largest hero element (map plate) only */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* default: moves, hover, enters */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1); /* hero enters — luxurious settle */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1); /* exits / dismissals */
+
+  /* LIVE pulse ring colour (flash pink), fading to transparent — the halo's last
+     30% is fully invisible; that gap IS the ma. */
+  --sl-pulse-from: rgba(240, 38, 140, 0.45);
+  --sl-pulse-to: rgba(240, 38, 140, 0);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Legacy names (components consume these utilities today). */
+  --color-surface: var(--surface-base);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-neutral-strong: var(--neutral-strong);
+  --color-neutral: var(--neutral);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-pine: var(--pine);
+  --color-pine-strong: var(--pine-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-text: var(--accent-text);
+  --color-terracotta: var(--terracotta);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  /* rev-5 vocabulary (paper/ink/hairline/status/pink-fg) for u14 + u15. */
+  --color-paper: var(--paper);
+  --color-paper-white: var(--paper-white);
+  --color-paper-sunken: var(--paper-sunken);
+  --color-ink-display: var(--ink-display);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-accent-fg: var(--accent-fg);
+  --color-amber: var(--amber);
+  --color-clay: var(--clay);
+
+  --color-background: var(--surface-base);
+  --color-foreground: var(--ink);
+
+  /* Space Grotesk 700 display + UI/sans, Newsreader serif (landing/prose voice —
+     NEVER a headline), IBM Plex Mono instrument. */
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, "Times New Roman",
+    serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-chip: var(--radius-chip);
+  --radius-panel: var(--radius-panel);
+  --radius-primary: var(--radius-primary);
+
+  --shadow-panel: var(--shadow-panel);
+  --shadow-popover: var(--shadow-popover);
 }
 
+/* Dark mode: black zen (the negative). Near-black ground, pure-white ink. Overrides
+   base-token VALUES only; the legacy aliases above re-resolve through var(), so
+   components style through the same names as light. Auto via prefers-color-scheme. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #0a0a0a;
+    --paper-white: #141414;
+    --paper-sunken: #050505;
+
+    --ink: #f2f2f2; /* min 16.46:1 on dark grounds */
+    --ink-display: #ffffff; /* pure-white headlines (min 18.42:1) */
+    --ink-muted: #a3a3a3; /* AA 7.30–8.08 on dark grounds */
+    --ink-faint: #666666; /* graphic/large only */
+
+    --hairline: #262626;
+    --hairline-strong: #3d3d3d;
+
+    --pine: #f2f2f2; /* interim ink hold */
+    --pine-strong: #ffffff;
+
+    --accent: #ff4fa3; /* flash pink pops on near-black */
+    --accent-strong: #ff77b8;
+    --accent-text: #ff6fb0; /* AA 7.15–7.91 on dark grounds */
+    /* --accent-fg intentionally NOT re-valued: stays #000000 (black label on pink). */
+
+    --terracotta: #ef8f56;
+
+    --amber: #e0a93a; /* AA 8.69–9.61 */
+    --clay: #f0876b; /* AA 7.35–8.14 */
+
+    --ring: #f2f2f2;
+
+    /* Dark elevation (research §2): lighter surface + border + inset top highlight
+       lead; black shadow supports. Each tier's own stack (a light stack is invisible
+       on black). Inset white highlight <= 0.06 or it reads as a glowing seam. */
+    --shadow-panel:
+      0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    --shadow-raised:
+      0 1px 2px rgba(0, 0, 0, 0.40), 0 8px 24px -6px rgba(0, 0, 0, 0.50),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-popover:
+      0 1px 2px rgba(0, 0, 0, 0.50), 0 12px 32px -8px rgba(0, 0, 0, 0.60),
+      0 24px 48px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+    /* Card hover lifts the surface +8/255 (the dual-channel tint+lift cue on black). */
+    --surface-raised: #1c1c1c;
+
+    --glass-bg: rgba(12, 12, 12, 0.64);
+    --glass-border: rgba(255, 255, 255, 0.10);
+
+    --glass-chip-bg: rgba(14, 14, 14, 0.70);
+    --glass-chip-border: rgba(255, 255, 255, 0.14);
+    --glass-chip-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    --glass-chip-lift: 0 2px 10px rgba(0, 0, 0, 0.5);
+    --glass-chip-solid: rgba(10, 10, 10, 0.90);
+
+    --sl-pulse-from: rgba(255, 79, 163, 0.45);
+    --sl-pulse-to: rgba(255, 79, 163, 0);
   }
 }
 
+* {
+  border-color: var(--border);
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+}
+
+/* Mobile viewport correctness: full-height shells must track the DYNAMIC viewport
+   so the bottom edge never hides under the collapsing mobile URL bar. `100vh`
+   fallback first, then `100dvh` where supported. Used on the app shell + any
+   full-bleed surface. */
+.h-dvh-safe {
+  height: 100vh;
+  height: 100dvh;
+}
+.min-h-dvh-safe {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Safe-area inset helpers for fixed/floating chrome on notched / home-bar
+   devices. Additive so they compose with a base padding utility. Guarded by
+   `viewport-fit=cover` on the viewport (see layout). */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+.inset-b-safe {
+  bottom: env(safe-area-inset-bottom);
+}
+
+body {
+  background: var(--surface-base);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  /* Flat paper: no micro-grain, no tiled texture. Hairlines carry all structure. */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* rev-4 topographic contour texture is RETIRED. The class is kept as a no-op
+   (positioning context only) so any lingering reference is harmless until u15
+   removes the last call sites. No tiled background renders. */
+.contour-field {
+  position: relative;
+  isolation: isolate;
+}
+
+/* MapLibre popup/control overrides so nothing ships looking default. The zoom/nav
+   control group floats over live map tiles, so it is a Recipe-C glass chip (u18-A2):
+   the same recipe as .sl-glass-chip — chip-blur + saturate, chip alpha, inner-top
+   hairline + small lift. Solid fallbacks below. Attribution uses paper tints. */
+.maplibregl-ctrl-group {
+  background: var(--glass-chip-bg) !important;
+  border: 1px solid var(--glass-chip-border) !important;
+  border-radius: var(--radius-panel) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur-chip)) saturate(160%);
+  box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift) !important;
+}
+@media (prefers-color-scheme: dark) {
+  .maplibregl-ctrl-group {
+    -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+    backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+  }
+}
+/* During pan/zoom the backdrop re-blurs every frame; the app map container carries
+   data-map-moving, so swap the controls to the near-opaque solid (no blur) while it
+   moves and restore on idle — mirrors the .sl-glass-chip move-swap. */
+[data-map-moving="true"] .maplibregl-ctrl-group {
+  background: var(--glass-chip-solid) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* No backdrop-filter support (or Increase Contrast): fall back to a solid so the
+   glyphs never sit on raw tiles. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .maplibregl-ctrl-group {
+    background: var(--glass-chip-solid) !important;
+  }
+}
+@media (prefers-contrast: more) {
+  .maplibregl-ctrl-group {
+    background: var(--glass-chip-solid) !important;
+    border-color: var(--ink-muted) !important;
+  }
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--glass-chip-border) !important;
+}
+.maplibregl-ctrl button .maplibregl-ctrl-icon {
+  filter: none;
+}
+/* Attribution as a tiny mono data-source line (the map is FIGURE 1, its source
+   credit reads like a figure caption). Neutral zen white/near-black tints. */
+.maplibregl-ctrl-attrib {
+  background: rgba(255, 255, 255, 0.80) !important;
+  color: var(--ink-muted) !important;
+  border-radius: var(--radius-chip) 0 0 0 !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--ink-muted) !important;
+}
+@media (prefers-color-scheme: dark) {
+  .maplibregl-ctrl-attrib {
+    background: rgba(10, 10, 10, 0.80) !important;
+  }
+}
+
+/* ─── u15 landing utilities (added at end, clearly namespaced) ───────────────
+   Sidenote apparatus (see components/ui/Sidenote.tsx). A mono superscript marker
+   sits in the text; the note floats into the right gutter at >=1180px and
+   collapses to an inline tap-reveal below that. Pink markers are the one
+   sanctioned signal in prose (apparatus ticks / link colour, not decoration). */
+.sl-sidenote-marker {
+  font-family: var(--font-mono);
+  color: var(--accent-text);
+  line-height: 0;
+  vertical-align: baseline;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0 0.05em;
+}
+.sl-sidenote-marker sup {
+  font-size: 0.72em;
+  font-weight: 500;
+}
+.sl-sidenote-marker:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.sl-sidenote {
+  display: none;
+}
+.sl-sidenote.is-open {
+  display: block;
+  margin: 0.75rem 0;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--accent);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.sl-sidenote-num {
+  font-family: var(--font-mono);
+  color: var(--accent-text);
+  font-size: 0.7em;
+  margin-right: 0.35em;
+  vertical-align: baseline;
+}
+@media (min-width: 1180px) {
+  .sl-sidenote-marker {
+    cursor: default;
+  }
+  .sl-sidenote,
+  .sl-sidenote.is-open {
+    display: block;
+    float: right;
+    clear: right;
+    width: 11.5rem;
+    margin: 0.15rem -13rem 1rem 0;
+    padding-left: 0;
+    border-left: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    text-align: left;
+  }
+}
+
+/* ─── u17 platform-hero: motion + over-tile glass + reveals ───────────────────
+   The rev-6 "Zen Instrument" motion system (research §3) and the over-tile glass
+   chip recipe (research §1 Recipe C). Everything opacity + transform only, all
+   motion-safe; the reduced-motion block at the end collapses it to plain fades. */
+
+/* Larger tap target for footnote superscripts on coarse pointers (wave-8 finding
+   b): pad the hit box to >=24x24px without touching font-size; negative margin
+   keeps the inline flow stable. */
+@media (pointer: coarse) {
+  .sl-sidenote-marker {
+    padding: 8px 7px;
+    margin: -8px -5px;
+  }
+}
+
+/* Smooth in-page scrolling honours reduced motion (the scroll container carries
+   `scroll-smooth`; anchor targets clear the top edge with scroll-margin). */
+section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* Over-tile glass chip (Recipe C): a designed material, not a translucent box —
+   backdrop blur + the missing saturate(), a bright inner-top hairline, a small
+   outer lift. Caller owns radius (pill / 10px). Neutral only; pink lives on a
+   SOLID sub-element (dot / border / text), never a tint on the glass. */
+.sl-glass-chip {
+  background: var(--glass-chip-bg);
+  border: 1px solid var(--glass-chip-border);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift);
+}
+@media (prefers-color-scheme: dark) {
+  .sl-glass-chip {
+    -webkit-backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
+    backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
+  }
+}
+/* During active pan/zoom the backdrop re-blurs every frame (the costly path on a
+   moving map). Swap to a near-opaque solid, no blur — visually close, zero cost —
+   while the plate carries data-map-moving; restore on idle. */
+[data-map-moving="true"] .sl-glass-chip {
+  background: var(--glass-chip-solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* No backdrop-filter support (or Increase Contrast): fall back to solid so text
+   never sits on raw tiles. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .sl-glass-chip {
+    background: var(--glass-chip-solid);
+  }
+}
+@media (prefers-contrast: more) {
+  .sl-glass-chip {
+    background: var(--glass-chip-solid);
+    border-color: var(--ink-muted);
+  }
+}
+
+/* LIVE dot: solid pink core, a calm breathing halo via box-shadow (2.6s; the last
+   30% is invisible — the ma). Static solid dot under reduced motion (presence
+   without a pulse; no fabricated timestamp — honesty rule). Pauses when hidden. */
+.sl-live-dot {
+  background: var(--accent);
+  animation: sl-live-pulse 2600ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes sl-live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--sl-pulse-from);
+  }
+  70% {
+    box-shadow: 0 0 0 8px var(--sl-pulse-to);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--sl-pulse-to);
+  }
+}
+
+/* Hero settle (research §3): map focuses into place first (420ms), then the rail
+   chrome cascades on top. One-shot on mount (fill-mode both holds the from-state
+   during the delay, so nothing flashes and JS-off still animates). Total < 850ms. */
+@keyframes sl-settle-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sl-settle-y, 10px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sl-settle-map {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* fill-mode `backwards` holds the from-state during the delay (no flash, JS-off
+   still animates) but reverts to base styles after finishing — so a settled card
+   is free to take the hover-lift transform (a `both` fill would pin transform). */
+.sl-hero-map {
+  animation: sl-settle-map var(--dur-settle) var(--ease-out-soft) backwards;
+}
+.sl-hero-el {
+  animation: sl-settle-up var(--dur-slow) var(--ease-out-soft) backwards;
+}
+
+/* Card hover-lift: up one shadow tier + rise, leaves faster than it enters (enter
+   200ms / leave 150ms). Dark also lifts the surface (dual-channel). No colored
+   glow — transform + box-shadow + background-color only. */
+.sl-card {
+  box-shadow: var(--shadow-panel);
+  transition:
+    transform var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+@media (hover: hover) {
+  .sl-card:hover {
+    transition-duration: var(--dur-base);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-raised);
+    background-color: var(--surface-raised);
+  }
+}
+
+/* Section reveal — the single sanctioned variant (research §3): opacity + 8px rise,
+   once-only, no child stagger. The REVEALED state is the CSS default so content is
+   visible with JS off; the hidden pre-state applies ONLY under `.js-enabled` (set
+   by an inline script before paint), and JS adds `.is-visible` when it scrolls in. */
+.js-enabled .sl-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out-soft),
+    transform var(--dur-slow) var(--ease-out-soft);
+}
+.js-enabled .sl-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Reduced motion (research §3): disable translate/scale/pulse/hover-lift and the
+   smooth scroll; KEEP short opacity fades, colour feedback, focus rings, the solid
+   live dot. Author the reduced variant, do not blanket-strip presence. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sl-hero-el,
+  .sl-hero-map,
+  .sl-reveal {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .sl-live-dot {
+    animation: none !important;
+  }
+  .sl-card:hover {
+    transform: none !important;
+  }
 }

@@ -1,31 +1,657 @@
 {
   "metadata": {
     "title": "StreetLens",
-    "description": "Open street audits for Costa Rica. Mapping sidewalk quality, accessibility, drainage, and shade in Escazú, one segment at a time."
+    "description": "A field instrument for the street. Open-source, portable audits of sidewalk accessibility, drainage, shade, and bike infrastructure. Now measuring Escazú, Costa Rica."
   },
   "demoBanner": {
-    "message": "Demo data: field pilot begins August 2026"
-  },
-  "home": {
-    "title": "StreetLens",
-    "tagline": "Open street audits for Costa Rica",
-    "subtext": "Mapping sidewalk quality, accessibility, drainage, and shade in Escazú, one segment at a time.",
-    "stat": {
-      "value": "61",
-      "unit": "/100",
-      "label": "Average sidewalk score, San Antonio pilot corridor",
-      "demoNote": "Demo figure. Not a real measurement."
-    },
-    "mapHeading": "Escazú pilot map"
+    "message": "Demo data over real street geometry. Field pilot begins August 2026: no number shown is a real measurement."
   },
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
     "demoTag": "DEMO",
-    "scores": {
-      "overall": "Overall",
-      "accessibility": "Accessibility",
-      "drainage": "Drainage",
-      "shade": "Shade"
+    "loading": "Loading map…",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomHint": "Hold ⌘ or Ctrl and scroll to zoom",
+    "threeD": {
+      "label": "3D view",
+      "enable": "Enable 3D view",
+      "disable": "Disable 3D view"
+    }
+  },
+  "layers": {
+    "switcherLabel": "Score layer",
+    "overall": {
+      "name": "Overall",
+      "short": "Composite sidewalk score"
+    },
+    "accessibility": {
+      "name": "Accessibility",
+      "short": "Ley 7600 compliance"
+    },
+    "drainage": {
+      "name": "Drainage",
+      "short": "Flood and ponding risk"
+    },
+    "shade": {
+      "name": "Shade",
+      "short": "Tree canopy and cover"
+    },
+    "bike": {
+      "name": "Bike",
+      "short": "Bike infrastructure"
+    }
+  },
+  "legend": {
+    "title": "Legend",
+    "scaleHint": "Higher is better (0–100)",
+    "community": "Community (unverified)",
+    "widthNote": "Thicker lines mark lower-scoring segments.",
+    "bins": {
+      "poor": "Poor",
+      "fair": "Fair",
+      "good": "Good",
+      "excellent": "Excellent"
+    }
+  },
+  "panel": {
+    "eyebrow": "Escazú pilot",
+    "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",
+    "heroDemoNote": "Demo figure. Not a real measurement.",
+    "expand": "Show full pilot stats and legend",
+    "collapse": "Hide pilot stats and legend",
+    "segmentsLabel": "Segments audited",
+    "kmLabel": "Corridor km",
+    "coverageLabel": "Pilot coverage",
+    "unitKm": "km",
+    "unitPct": "%"
+  },
+  "detail": {
+    "auditedLabel": "Audited",
+    "scoresHeading": "Scores by layer",
+    "breakdownHeading": "Rubric breakdown",
+    "photosHeading": "Photos",
+    "photoPlaceholder": "Photo pending fieldwork",
+    "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
+    "close": "Close detail panel",
+    "communityPending": "Community: pending field verification",
+    "communityNote": "Community-contributed. Not yet field-verified, so it carries no audit scores.",
+    "communityReportsHeading": "Community reports",
+    "communityReportLabel": "Community report"
+  },
+  "rubric": {
+    "overall": {
+      "surface": "Surface condition",
+      "width": "Effective width",
+      "obstruction": "Obstructions"
+    },
+    "accessibility": {
+      "ramp": "Curb ramps",
+      "tactile": "Tactile paving",
+      "crossing": "Safe crossings"
+    },
+    "drainage": {
+      "grate": "Grates and inlets",
+      "slope": "Cross slope",
+      "ponding": "Ponding history"
+    },
+    "shade": {
+      "canopy": "Tree canopy",
+      "awning": "Awnings and cover",
+      "exposure": "Sun exposure"
+    },
+    "bike": {
+      "lane": "Bike lane or path",
+      "separation": "Separation from traffic",
+      "connectivity": "Network connectivity"
+    }
+  },
+  "admin": {
+    "brand": "StreetLens Admin",
+    "nav": {
+      "dashboard": "Overview",
+      "queue": "Verification queue",
+      "import": "Bulk import",
+      "logout": "Log out",
+      "publicMap": "Public map"
+    },
+    "login": {
+      "title": "Admin access",
+      "subtitle": "Enter the shared admin password to review contributions.",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Admin password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "errorInvalid": "Incorrect password.",
+      "errorRateLimited": "Too many attempts. Try again in {seconds}s.",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "dashboard": {
+      "title": "Overview",
+      "subtitle": "Live figures from the current dataset.",
+      "segments": "Segments audited",
+      "km": "Corridor km",
+      "coverage": "Pilot coverage",
+      "hero": "Fail Ley 7600",
+      "pending": "Pending review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "queueLink": "Open the verification queue",
+      "districtHeading": "By district",
+      "colDistrict": "District",
+      "colSegments": "Segments",
+      "colAvg": "Avg. overall",
+      "demoNote": "Demo dataset over real OSM geometry. No figure is a real measurement until field collection begins."
+    },
+    "queue": {
+      "title": "Verification queue",
+      "subtitleZero": "No submissions awaiting review.",
+      "subtitleOne": "{count} submission awaiting review.",
+      "subtitleMany": "{count} submissions awaiting review.",
+      "empty": "The queue is clear. New contributions will appear here.",
+      "typeAdd": "New segment",
+      "typeUpdate": "Edit",
+      "submittedAt": "Submitted",
+      "previewLabel": "Geometry preview",
+      "fieldName": "Name",
+      "fieldHighway": "Road type",
+      "fieldNote": "Note",
+      "fieldReason": "Contributor reason",
+      "diffHeading": "Proposed changes",
+      "current": "Current",
+      "proposed": "Proposed",
+      "unset": "—",
+      "unchanged": "unchanged",
+      "approve": "Approve",
+      "reject": "Reject",
+      "reasonLabel": "Review reason",
+      "reasonPlaceholder": "Why are you approving or rejecting this?",
+      "reasonRequired": "A reason is required.",
+      "working": "Saving…",
+      "errorGeneric": "Could not save the review. Please try again.",
+      "localNote": "No database configured. Reviews are staged locally for a post-database apply step."
+    },
+    "import": {
+      "title": "Bulk import",
+      "subtitle": "Validate field geometry, then import. Dry-run first: nothing is written until you confirm.",
+      "fileLabel": "GeoJSON or CSV file",
+      "fileHint": "A GeoJSON FeatureCollection of LineStrings, or a CSV with name, highway, and coordinates columns.",
+      "verifiedLabel": "Mark as field-verified",
+      "verifiedHint": "Only for field-team data. A verified import needs an auditor name.",
+      "auditorLabel": "Auditor",
+      "auditorPlaceholder": "e.g. J. Rodríguez",
+      "dryRun": "Validate (dry run)",
+      "validating": "Validating…",
+      "emptyState": "Choose a file and run validation to see a preview. Nothing is imported yet.",
+      "previewHeading": "Validation preview",
+      "summaryValid": "{count} valid",
+      "summaryInvalid": "{count} invalid",
+      "summaryDuplicate": "{count} duplicate",
+      "summaryOutOfBounds": "{count} out of bounds",
+      "colRow": "Row",
+      "colName": "Name",
+      "colHighway": "Road type",
+      "colStatus": "Status",
+      "colIssues": "Issues",
+      "statusValid": "Valid",
+      "statusInvalid": "Invalid",
+      "statusDuplicate": "Duplicate id",
+      "issueBbox": "Outside the Escazú area",
+      "issueDuplicate": "Id already exists",
+      "commit": "Import {count} features",
+      "committing": "Importing…",
+      "commitSuccess": "Imported {count} features into the community dataset.",
+      "noValid": "No valid features to import. Fix the errors above and re-validate.",
+      "auditorRequired": "Enter an auditor name to import as verified.",
+      "errorParse": "Could not read the file. Upload a GeoJSON FeatureCollection of LineStrings or a CSV.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "localNote": "No database configured. Imports are written to the local community dataset."
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "contribute": {
+    "fab": "Contribute",
+    "fabClose": "Close contribution menu",
+    "choose": {
+      "title": "Help map Escazú",
+      "subtitle": "Add a street we missed, or flag a correction on one we mapped. A reviewer checks every submission before anything changes.",
+      "addSegment": "Add a missing street",
+      "addSegmentHint": "Trace the sidewalk on the map",
+      "proposeUpdate": "Propose a correction",
+      "proposeUpdateHint": "Pick a mapped segment and tell us what's off",
+      "cancel": "Cancel"
+    },
+    "trace": {
+      "title": "Trace the street",
+      "hint": "Click to drop points along the sidewalk. Double-click, or press Finish, when you reach the end.",
+      "points": "{count, plural, =0 {No points yet} one {# point} other {# points}}",
+      "undo": "Undo point",
+      "clear": "Start over",
+      "finish": "Finish",
+      "needMore": "Add at least two points to continue.",
+      "cancel": "Cancel"
+    },
+    "followStreets": {
+      "label": "Follow streets",
+      "warning": "Couldn't follow streets for part of this path. Those spans are drawn dashed."
+    },
+    "select": {
+      "title": "Pick a segment",
+      "hint": "Click any mapped street to propose a correction to it.",
+      "cancel": "Cancel"
+    },
+    "form": {
+      "addTitle": "New street details",
+      "updateTitle": "Propose a correction",
+      "editingSegment": "Editing",
+      "nameLabel": "Street name",
+      "namePlaceholder": "e.g. Calle del Roble",
+      "highwayLabel": "Street type",
+      "highwayPlaceholder": "Select a type",
+      "conditionsTitle": "Sidewalk condition",
+      "conditionsHint": "Answer what you can. Skip anything you're unsure about.",
+      "noteLabel": "Anything else?",
+      "noteOptional": "optional",
+      "notePlaceholder": "A short note for the reviewer.",
+      "reasonLabel": "What should change?",
+      "reasonPlaceholder": "Tell the reviewer what's wrong or out of date.",
+      "contactLabel": "Contact",
+      "contactOptional": "optional",
+      "contactPlaceholder": "Email, only if you'd like a reply",
+      "contactHint": "Never published. Used only to follow up on your submission.",
+      "photoLabel": "Photo",
+      "photoSoon": "Photo upload arrives with the field pilot. For now, describe it in your note.",
+      "pathPoints": "{count, plural, one {Path traced · # point} other {Path traced · # points}}",
+      "redraw": "Re-draw path",
+      "viewTrace": "View my trace",
+      "submit": "Submit for review",
+      "submitting": "Submitting…",
+      "back": "Back",
+      "cancel": "Cancel",
+      "honestNote": "Submissions land as pending proposals. Nothing on the public map changes until a reviewer approves it."
+    },
+    "conditions": {
+      "surface": {
+        "label": "Walking surface",
+        "options": {
+          "good": "Smooth and walkable",
+          "fair": "Some cracks or bumps",
+          "poor": "Broken or blocked",
+          "none": "No sidewalk at all"
+        }
+      },
+      "accessibility": {
+        "label": "Accessibility",
+        "options": {
+          "good": "Ramps, even, step-free",
+          "partial": "Partly accessible",
+          "poor": "Not wheelchair-friendly",
+          "unsure": "Not sure"
+        }
+      },
+      "drainage": {
+        "label": "Drainage",
+        "options": {
+          "good": "Drains well",
+          "fair": "Puddles sometimes",
+          "poor": "Floods often",
+          "unsure": "Not sure"
+        }
+      },
+      "shade": {
+        "label": "Shade",
+        "options": {
+          "good": "Plenty of shade",
+          "fair": "Some shade",
+          "poor": "Little or no shade",
+          "unsure": "Not sure"
+        }
+      },
+      "bike": {
+        "label": "Bike infrastructure",
+        "options": {
+          "protected": "Protected bike lane",
+          "lane": "Painted bike lane",
+          "shared": "Shared with traffic",
+          "none": "No bike infrastructure"
+        }
+      }
+    },
+    "highways": {
+      "residential": "Residential street",
+      "tertiary": "Tertiary road",
+      "secondary": "Secondary road",
+      "unclassified": "Unclassified road",
+      "footway": "Footway / sidewalk",
+      "path": "Path",
+      "living_street": "Living street"
+    },
+    "compiledNoteHeading": "Condition report",
+    "success": {
+      "title": "Submitted for review",
+      "body": "Thank you. Your proposal is pending review. A reviewer will check it before anything on the map changes.",
+      "addAnother": "Contribute another",
+      "close": "Done"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "rateLimited": "You've sent a few submissions quickly. Please wait a moment and try again.",
+      "invalid": "Please check the highlighted fields and try again.",
+      "network": "Couldn't reach the server. Check your connection and try again."
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "StreetLens: every street can be measured",
+      "description": "Every street can be measured. Most never are. StreetLens is an open-source field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure, segment by segment. Now measuring Escazú, Costa Rica, on demo data until fieldwork begins in August 2026.",
+      "ogTitle": "Every street can be measured. Most never are.",
+      "ogDescription": "An open-source field instrument for the street: accessibility, drainage, shade, and bike infrastructure, scored segment by segment. Now measuring Escazú, Costa Rica."
+    },
+    "hero": {
+      "wordmark": "StreetLens",
+      "byCusp": "by CUSP",
+      "question": "How good are our streets?",
+      "subtitle": "Cleaner, more livable cities for everyone start with streets you can measure.",
+      "pilot": "Pilot program · Escazú, Costa Rica",
+      "requestCity": "Want this for your city? Request it",
+      "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
+      "banner": {
+        "methodQuestion": "How does StreetLens work?",
+        "methodLink": "Method",
+        "platform": "Open the platform"
+      },
+      "segments": {
+        "title": "Lowest-scoring streets",
+        "caveat": "Demo scores over real geometry. Not real measurements.",
+        "activate": "Open {name} in the platform"
+      },
+      "stats": {
+        "failLabel": "Fail Ley 7600 minimums",
+        "coverageLabel": "Corridor coverage",
+        "segmentsLabel": "Segments audited",
+        "kmLabel": "Street network audited",
+        "bikeLabel": "Avg. bike infrastructure",
+        "demoFootnote": "Fail rate and averages are demo figures over real OSM geometry."
+      },
+      "map": {
+        "live": "Live map",
+        "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform."
+      },
+      "openSource": "The code is public: view / contribute"
+    },
+    "mission": {
+      "eyebrow": "The mission",
+      "heading": "Cleaner, more livable cities for all.",
+      "lead": "We want cities that are cleaner, calmer, and more livable for everyone who moves through them. That does not begin with a bigger plan. It begins with an honest look at the street.",
+      "body": {
+        "p1": "Street quality is not just pavement. It is where infrastructure, daily life, and community intersect, and its condition quietly decides who a city serves and who it leaves behind.",
+        "p2": "StreetLens is the instrument for that. The method is open and the same rubric applies in any city, so anyone can read a street the same way and check the result. Today the pilot runs on demo data over real geometry, and fieldwork in Escazú begins in August 2026."
+      },
+      "principles": {
+        "measure": {
+          "label": "Measure what matters",
+          "desc": "Accessibility, drainage, shade, and bike infrastructure, scored segment by segment. A city that goes unmeasured cannot be made fair."
+        },
+        "implement": {
+          "label": "Implement, don't just propose",
+          "desc": "We would rather measure one real street than publish another plan. Every reading is built to be concrete and actionable, and the data will grow into a public record other cities can learn from."
+        },
+        "together": {
+          "label": "Grassroots and systemic",
+          "desc": "Residents can score the streets they walk every day, while open data gives policymakers a shared, checkable picture. That is how better, cleaner, more livable cities get built for everyone."
+        }
+      }
+    },
+    "measure": {
+      "eyebrow": "What we measure",
+      "heading": "Four lenses on every street.",
+      "lead": "Walkability breaks down into parts you can measure. Every segment is scored on four independent rubrics, the same way in any city. Two of them are climate resilience: shade tracks heat exposure, and drainage tracks flood risk. Each ramp is colorblind-safe and paired with a line-width channel, and every legend shows its bins.",
+      "plateAlt": "{name} scores across the pilot street network",
+      "items": {
+        "accessibility": {
+          "fig": "Figure 2a",
+          "name": "Accessibility",
+          "desc": "Curb ramps, tactile paving, and safe crossings. Whether everyone can actually use the sidewalk.",
+          "low": "Fails minimums",
+          "high": "Fully accessible"
+        },
+        "drainage": {
+          "fig": "Figure 2b",
+          "name": "Drainage",
+          "desc": "Grates, cross slope, and ponding history. From flood-prone to well-drained.",
+          "low": "Floods",
+          "high": "Drains well"
+        },
+        "shade": {
+          "fig": "Figure 2c",
+          "name": "Shade",
+          "desc": "Tree canopy and cover, and the heat they hold off. From exposed pavement to full canopy.",
+          "low": "Exposed",
+          "high": "Full canopy"
+        },
+        "bike": {
+          "fig": "Figure 2d",
+          "name": "Bike",
+          "desc": "Bike lanes and separation from traffic. From none to protected.",
+          "low": "None",
+          "high": "Protected"
+        }
+      }
+    },
+    "gap": {
+      "eyebrow": "Why it matters",
+      "heading": "Accountability begins with a number.",
+      "lead": "You cannot budget, fix, or answer for what you never measured. A complete street starts as a measured one, and most cities cannot say which sidewalks fail, or where.",
+      "body": "Accessibility, drainage, and shade are almost never measured segment by segment, so they never enter a budget or a work order.<ley>Ley 7600, Costa Rica's equal-opportunity law, has required accessible sidewalks since 1996. No municipality yet publishes a compliance map.</ley> The cost of not knowing is not abstract. It is counted in people.<cosevi>COSEVI, the national road-safety council, publishes Costa Rica's annual road-safety counts.</cosevi>",
+      "stat1Value": "1,601",
+      "stat1Label": "pedestrians run over in Costa Rica in 2024",
+      "stat1Note": "COSEVI road-safety data.",
+      "stat2Value": "30",
+      "stat2Label": "years of Ley 7600, still with no municipal compliance map",
+      "stat2Note": "Ley 7600 took effect in 1996.",
+      "stat3Label": "of audited segments fail the accessibility minimum",
+      "stat3Note": "Demo figure over real geometry. Not a measurement."
+    },
+    "pilot": {
+      "eyebrow": "The pilot",
+      "heading": "Escazú first. Then every corridor that will have us.",
+      "lead": "Every instrument needs a first street. Ours is San Antonio de Escazú, mapped segment by segment over real geometry. Field collection begins in August 2026, corridor by corridor.",
+      "figure": {
+        "label": "Figure 3",
+        "claim": "The pilot corridor, mapped in full.",
+        "support": "San Antonio de Escazú over real OpenStreetMap geometry. The rest of the canton follows, on the same rubric.",
+        "source": "Source: StreetLens over OpenStreetMap geometry. Demo scores until fieldwork begins August 2026.",
+        "alt": "Rendered map of the San Antonio de Escazú pilot corridor"
+      },
+      "statSegments": "Segments mapped",
+      "statKm": "Corridor km",
+      "statCoverage": "Pilot coverage",
+      "beginning": "This is a pilot, and a beginning.",
+      "demoNote": "Demo audit over real geometry. No score shown is a measurement until fieldwork begins in August 2026."
+    },
+    "method": {
+      "eyebrow": "Method",
+      "heading": "We walk the street, then we score it.",
+      "lead": "Each segment is audited against an established rubric. Nothing is inferred from a desk.",
+      "body": "An auditor walks the segment, records each item on site, and the score is computed from those observations.<maps>MAPS-Mini is a validated microscale audit of pedestrian streetscapes: sidewalks, crossings, and buffers.</maps> The same instrument runs on any street network, and every number traces back to something a person saw and wrote down.<lanamme>LANAMME-UCR is Costa Rica's national road-materials laboratory at the University of Costa Rica, the source for pavement and condition standards.</lanamme>",
+      "items": {
+        "maps": {
+          "title": "MAPS-Mini",
+          "desc": "A validated microscale audit of pedestrian streetscapes: sidewalks, crossings, and buffers."
+        },
+        "lanamme": {
+          "title": "LANAMME-UCR",
+          "desc": "Costa Rica's national road-materials laboratory at the University of Costa Rica, for pavement and condition standards."
+        },
+        "ley": {
+          "title": "Ley 7600",
+          "desc": "Costa Rica's equal-opportunity law, which sets the accessibility minimums a sidewalk must meet."
+        },
+        "field": {
+          "title": "Field audit",
+          "desc": "Every score traces to an on-site observation and, in time, a photo."
+        }
+      },
+      "anatomyLabel": "Table 1",
+      "anatomySegment": "Calle Central, San Antonio",
+      "anatomyCaption": "Example segment. Demo audit over real OSM geometry, not a measurement.",
+      "collect": {
+        "eyebrow": "How the data is collected",
+        "heading": "Two ways in, one reviewed dataset.",
+        "field": {
+          "title": "Field audits",
+          "desc": "A trained auditor walks a corridor and records the rubric on site. This is the source of truth."
+        },
+        "community": {
+          "title": "Community reports",
+          "desc": "Anyone can add a street we missed or flag a correction from the map. Every submission is reviewed before it changes anything public."
+        }
+      },
+      "pipeline": {
+        "eyebrow": "The engine ahead",
+        "heading": "Every audit trains the next one.",
+        "body": "Field audits are the source of truth, and they stay that way. From the August 2026 pilot on, every corridor an auditor walks is also photographed, and those images become labeled training data. Over time they will train a computer-vision and machine-learning pipeline that reads sidewalk condition and obstructions straight from a photo, so every future audit scores faster than the last. No model scores a street today. When one does, a person still verifies what it reports."
+      },
+      "plates": {
+        "crossSection": {
+          "label": "Figure 4",
+          "claim": "What the four lenses actually read.",
+          "support": "A street's right-of-way in section, with the sidewalk, buffer, and carriageway each measured against the rubric above.",
+          "source": "Source: StreetLens drawing over Reglamento a la Ley 7600 (Decreto 26831-MP) sidewalk minimums.",
+          "alt": "Engineering cross-section of a street right-of-way, annotating the sidewalk, buffer, and carriageway with the four StreetLens lenses and the Ley 7600 minimum dimensions."
+        },
+        "anatomy": {
+          "label": "Figure 5",
+          "claim": "How one segment becomes four scores.",
+          "support": "The same segment in plan, with the audit rubric, score bins, width channel, and community casing that resolve to the readout above.",
+          "source": "Source: StreetLens scoring schematic. Width bins per Reglamento a la Ley 7600 (Decreto 26831-MP).",
+          "alt": "Plan-view diagram of a street segment showing the audit rubric, score bins, width measurement channel, and community-report casing that produce the segment's four lens scores."
+        },
+        "pipeline": {
+          "label": "Figure 6",
+          "claim": "Field audits today. A verified model tomorrow.",
+          "support": "Every walked corridor is photographed, and those images become training data for a computer-vision pipeline that a person always checks.",
+          "source": "Roadmap, not built. The machine-learning path drawn dashed does not score any street today.",
+          "alt": "Method pipeline diagram: field audits flow to open data today, with a dashed roadmap loop where a computer-vision and machine-learning model scores streets and a human always verifies the result."
+        }
+      }
+    },
+    "grounding": {
+      "eyebrow": "References",
+      "heading": "Open data, or it didn't happen.",
+      "lead": "StreetLens is not a black box. It leans on established rubrics and open datasets, every score ships with its formula, and the code is public.",
+      "items": {
+        "maps": {
+          "name": "MAPS-Mini",
+          "note": "Microscale Audit of Pedestrian Streetscapes."
+        },
+        "lanamme": {
+          "name": "LANAMME-UCR",
+          "note": "National road-materials laboratory, University of Costa Rica."
+        },
+        "ley": {
+          "name": "Ley 7600",
+          "note": "Equal Opportunities for Persons with Disabilities Act."
+        },
+        "osm": {
+          "name": "OpenStreetMap",
+          "note": "Street geometry, under ODbL 1.0."
+        },
+        "cosevi": {
+          "name": "COSEVI",
+          "note": "National Road Safety Council road-safety data."
+        }
+      },
+      "openSource": {
+        "label": "Open source",
+        "note": "The whole platform is public on GitHub: the code, the rubric, and the scoring method, open for anyone to read, run, or fork."
+      },
+      "openData": {
+        "label": "Open data",
+        "note": "Every segment exports with its geometry and its score formula."
+      }
+    },
+    "roadmap": {
+      "eyebrow": "Where this goes",
+      "heading": "From one corridor to an open standard.",
+      "lead": "The pilot is step one. The instrument is built to scale, from a single corridor to a whole canton, across cantons, and out to anyone who needs the data.",
+      "steps": {
+        "pilot": {
+          "title": "Pilot corridor",
+          "desc": "San Antonio de Escazú, mapped over real geometry. Field collection begins August 2026.",
+          "status": "Now"
+        },
+        "canton": {
+          "title": "Full canton",
+          "desc": "Every corridor in Escazú, audited on the same rubric.",
+          "status": "Planned"
+        },
+        "compare": {
+          "title": "Canton comparison",
+          "desc": "Neighboring cantons measured the same way, so results compare directly.",
+          "status": "Planned"
+        },
+        "api": {
+          "title": "Open API and data",
+          "desc": "Governments and researchers query the scored network directly.",
+          "status": "Planned"
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "heading": "Honest answers.",
+      "items": {
+        "real": {
+          "q": "Is this real data?",
+          "a": "Not yet. Every score you see today is demo data generated over real OpenStreetMap geometry, so the map behaves exactly as it will with field data. Real measurements replace it corridor by corridor once fieldwork begins in August 2026."
+        },
+        "scores": {
+          "q": "How are scores computed?",
+          "a": "Each layer is scored 0 to 100 from a rubric of observed items, where higher is better. The map pairs a colorblind-safe color ramp with a line-width channel, and the legend always shows the value bins. Every score ships with its formula."
+        },
+        "ai": {
+          "q": "Does StreetLens use machine learning or computer vision?",
+          "a": "Not to score streets today. Every score you see is demo data, and real scores will come from auditors in the field. Their photos become the training data for a computer-vision and machine-learning pipeline that will speed up future audits, and a person will always verify what it produces. Machine learning and computer vision are on the roadmap, not in today's numbers."
+        },
+        "city": {
+          "q": "Can my city use this?",
+          "a": "That is the goal. The rubric, the app, and the data format are open and portable, built to run on any street network. Today only the Escazú pilot is live. If you want to bring StreetLens to your city, reach out through the project on GitHub."
+        },
+        "fieldwork": {
+          "q": "When does fieldwork start?",
+          "a": "Field collection in San Antonio de Escazú is planned for August 2026. Until then the pilot runs on demo data over the real corridor."
+        },
+        "contribute": {
+          "q": "Can I contribute?",
+          "a": "Yes. You can add a street we missed or flag a correction from the map. A reviewer checks every submission before anything on the public map changes."
+        },
+        "who": {
+          "q": "Who is behind this?",
+          "a": "StreetLens is a project of CUSP, the Collective for Urbanism and Sustainable Progress, led by Gianluca Fonseca. It is open source and built in the open."
+        }
+      }
+    },
+    "cta": {
+      "eyebrow": "The call",
+      "heading": "Measure what the city forgot to.",
+      "support": "Open the live map, or add a street you know. Every score ships with its formula.",
+      "explore": "Explore the live map",
+      "contribute": "Contribute a street"
+    },
+    "footer": {
+      "tagline": "An open field instrument for the street. Now measuring Escazú, Costa Rica.",
+      "openSource": "Open source",
+      "github": "GitHub",
+      "byCusp": "by CUSP",
+      "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
+      "localeLabel": "Language",
+      "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins in August 2026.",
+      "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress."
     }
   }
 }

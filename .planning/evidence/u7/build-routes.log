@@ -1,0 +1,25 @@
+Route (app)
+┌ ○ /_not-found
+├ ● /[locale]
+│ ├ /en
+│ └ /es
+├ ƒ /[locale]/admin
+├ ƒ /[locale]/admin/import
+├ ● /[locale]/admin/login
+│ ├ /en/admin/login
+│ └ /es/admin/login
+├ ƒ /[locale]/admin/queue
+├ ƒ /api/admin/import
+├ ƒ /api/admin/login
+├ ƒ /api/admin/logout
+├ ƒ /api/admin/review
+├ ƒ /api/routing-network
+└ ƒ /api/submissions
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -40,3 +40,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.planning/evidence/dev-server.log
+
+# admin runtime submission data (u3 queue + local review overlay/staging)
+/data/pending-submissions.local.json
+/data/submission-reviews.local.json
+/data/approved-submissions.local.json
+
+# community-apply local store (u7 apply pipeline, DB fallback; never committed)
+/data/community-segments.local.json
+/data/community-reports.local.json
+
+# transient tsc→cjs build dirs used by the node test/smoke scripts
+/.smoke-build/
+/.test-build-*/
+  # Local anonymous-submission queue (DB fallback; never committed)
+data/pending-submissions.local.json
+
+# Local QA scratch (screenshots + playwright output)
+.playwright-mcp/
+/qa-*.png
+/hero-*-check.png
+/gap-check.png
+/render-qa-*.png
