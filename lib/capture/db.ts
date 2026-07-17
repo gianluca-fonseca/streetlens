@@ -90,6 +90,8 @@ export type CompleteJobArgs = {
   inputTokens: number;
   outputTokens: number;
   escalated: boolean;
+  /** The model's per-frame plain-language note (0020). */
+  rationale: string;
 };
 
 export type RollupWrite = {
@@ -293,6 +295,7 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
         p_input_tokens: args.inputTokens,
         p_output_tokens: args.outputTokens,
         p_escalated: args.escalated,
+        p_rationale: args.rationale,
         p_secret: adminSecret(),
       });
     },
