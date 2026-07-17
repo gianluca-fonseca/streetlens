@@ -221,6 +221,32 @@ Run these directly with node; none need a live database.
 | `scripts/test-upload-client.mjs` | retry, resume, concurrency, abort |
 | `scripts/test-rate-limit-namespaces.mjs` | capture ceiling, namespace isolation |
 | `scripts/test-honeypot-type.mjs` | the honeypot preserves the submitted type |
+| `scripts/test-extraction-worker.mjs` | the pump against a mocked OpenAI: breaker, budget, escalation, refusals, concurrent pumps, attempts cap, kill switch |
+| `scripts/test-capture-rollup.mjs` | items → lens scores, junction routing, weighted medians, coverage, track hygiene |
+
+`test-extraction-worker.mjs` drives the real `pumpOnce` against an in-memory
+`CaptureDb` whose claim mutates synchronously before yielding — the in-process
+equivalent of `FOR UPDATE SKIP LOCKED`. A looser fake would let the concurrency
+case pass while proving nothing.
+
+### The live smoke
+
+`scripts/live-smoke-extraction.mjs` is gated behind `RUN_LIVE_SMOKE=1` and makes
+**one** real `gpt-5-nano` call on a committed CC BY-SA street photo of San
+Antonio de Escazú. Run it once; do not loop it.
+
+```
+RUN_LIVE_SMOKE=1 node --env-file=.env.local scripts/live-smoke-extraction.mjs
+```
+
+It exists because the mocked tests prove how the worker *reacts* to a response,
+and cannot prove the response we actually get is the one we assumed. Two things
+are only knowable against the real API: **what we were billed** (the whole
+premise of the cost breaker), and **that a real answer parses** against our zod.
+
+It has already earned it. On its first real call it found that gpt-5 reasoning
+models reject `temperature` and 400 the whole request — every extraction call in
+production would have failed, and no mock would ever have said so.
 
 `test-capture-migrations.mjs` needs docker and **never touches the live
 database**. It applies the whole chain to a scratch container running the real
