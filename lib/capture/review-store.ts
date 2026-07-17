@@ -23,7 +23,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getSupabaseClient } from "@/lib/supabase";
 import { publicFrameUrl } from "./storage";
-import { readCaptureReviewOverlay } from "./review-actions";
+import { readCaptureReviewOverlay, readCaptureTombstones } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
 import type { FrameObservation } from "./review-overrides";
 
@@ -363,7 +363,22 @@ export async function getSessionReview(
     ? { ...found, status: decision.status, reviewedAt: decision.reviewed_at }
     : found;
 
-  return toReview(withDecision, "fixture");
+  // Local hard-deletes live in their own overlay (deletion is irreversible, so it
+  // is not part of the resettable review decision). Fold them in as tombstones so a
+  // locally-deleted frame reads as deleted after reload, exactly as the live RPC does.
+  const tombstones = await readCaptureTombstones();
+  const deletedSeqs = tombstones[sessionId] ?? [];
+  const withTombstones: ReviewPayload = deletedSeqs.length
+    ? {
+        ...withDecision,
+        tombstones: [
+          ...(withDecision.tombstones ?? []),
+          ...deletedSeqs.map((seq) => ({ seq })),
+        ],
+      }
+    : withDecision;
+
+  return toReview(withTombstones, "fixture");
 }
 
 /** Session ids present in the fixture. Empty in a live deployment. */

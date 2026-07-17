@@ -45,11 +45,12 @@ const QUEUE_PATH = path.join(DATA, "pending-submissions.local.json");
 const REVIEWS_PATH = path.join(DATA, "submission-reviews.local.json");
 const APPROVED_PATH = path.join(DATA, "approved-submissions.local.json");
 const OVERLAY_PATH = path.join(DATA, "capture-review-overlay.local.json");
+const TOMBSTONES_PATH = path.join(DATA, "capture-frame-tombstones.local.json");
 const CV_PATH = path.join(DATA, "community-cv-observations.local.json");
 const FRAME_SRC = path.join(ROOT, "scripts", "fixtures", "street-san-antonio-escazu.jpg");
 const FRAME_DEST = path.join(PUBLIC, "u2-fixture-frame.jpg");
 
-const WRITES = [REVIEW_PATH, QUEUE_PATH, REVIEWS_PATH, APPROVED_PATH, OVERLAY_PATH, CV_PATH];
+const WRITES = [REVIEW_PATH, QUEUE_PATH, REVIEWS_PATH, APPROVED_PATH, OVERLAY_PATH, TOMBSTONES_PATH, CV_PATH];
 
 /** The 15 rubric items and their response encodings, mirrored from lib/capture/types.ts. */
 const RESPONSE = {
@@ -215,6 +216,7 @@ function main() {
   writeFileSync(QUEUE_PATH, JSON.stringify(queue, null, 2) + "\n");
   writeFileSync(REVIEWS_PATH, JSON.stringify({}, null, 2) + "\n");
   writeFileSync(OVERLAY_PATH, JSON.stringify({}, null, 2) + "\n");
+  writeFileSync(TOMBSTONES_PATH, JSON.stringify({}, null, 2) + "\n");
   writeFileSync(CV_PATH, JSON.stringify([], null, 2) + "\n");
 
   console.log("seeded a review_ready camera walk with the full u2 shape (local mode)");
