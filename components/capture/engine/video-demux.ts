@@ -35,6 +35,7 @@ import {
   type Track,
   type VisualSampleEntry,
 } from "mp4box";
+import { readRotation } from "@/components/capture/engine/video-plan";
 
 /**
  * Bytes per slice.
@@ -59,6 +60,23 @@ export type VideoTrackInfo = {
   timescale: number;
   durationMs: number;
   nbSamples: number;
+  /**
+   * Clockwise display rotation in degrees, from the track's transform matrix.
+   *
+   * This exists because a phone does not rotate the pixels it records. It writes
+   * the sensor's native landscape frame and a matrix saying "turn this 90
+   * degrees to show it", and a portrait POV walk is therefore a LANDSCAPE H.264
+   * stream plus that instruction.
+   *
+   * A `<video>` element honours the matrix for free. `VideoDecoder` cannot: we
+   * demux the container ourselves, so the decoder never sees the matrix and hands
+   * back the raw sensor frame. Ignoring this would ship sideways JPEGs from the
+   * WebCodecs path and upright ones from the seek path, for the same video, which
+   * is precisely the "same artifact either way" invariant that everything else in
+   * this subsystem is built to protect. It is also invisible in every count,
+   * every progress bar and every test that does not look at the picture.
+   */
+  rotation: 0 | 90 | 180 | 270;
   /**
    * The codec-private bytes (avcC / hvcC / av1C / vpcC payload) VideoDecoder
    * wants as `description`. Null when the sample entry carries none, which is
@@ -147,6 +165,7 @@ function trackInfo(iso: ISOFile, movie: Movie, track: Track): VideoTrackInfo {
         ? (track.movie_duration / track.movie_timescale) * 1_000
         : (movie.duration / (movie.timescale || 1)) * 1_000,
     nbSamples: track.nb_samples,
+    rotation: readRotation(track.matrix),
     description: entry ? readCodecDescription(entry) : null,
     creationTimeMs: movie.created instanceof Date ? movie.created.getTime() : null,
   };

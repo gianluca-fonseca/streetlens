@@ -1,14 +1,19 @@
 /**
- * How densely to sample an uploaded video, and at which offsets.
+ * The pure video arithmetic: how densely to sample, at which offsets, and which
+ * way is up.
  *
- * This is a separate module from `video-extract.ts` for one concrete reason:
- * testability. The extractor imports mp4box, which is ESM-only, and the repo's
- * test harness compiles TypeScript to CommonJS and `require()`s the result. A
- * `require()` of an ESM-only package throws, so any pure function that shares a
- * file with that import is untestable in the harness we actually have. The
- * sampling decision is the part most worth pinning with a test (it is arithmetic
- * with a cap and a rounding rule, and it decides how much of a street gets
- * covered), so it lives where a test can reach it.
+ * This is a separate module from `video-extract.ts` and `video-demux.ts` for one
+ * concrete reason: testability. Both of those import mp4box, which is ESM-only,
+ * and the repo's test harness compiles TypeScript to CommonJS and `require()`s
+ * the result. A `require()` through an ESM-only package throws, so any pure
+ * function sharing a file with that import is untestable in the harness we
+ * actually have.
+ *
+ * What lives here is what is worth pinning, and both earn it by failing quietly
+ * rather than loudly. The sampling decision is arithmetic with a hard cap that
+ * silently decides how much of a street gets covered. The rotation read decides
+ * which way every frame faces, and a wrong answer produces a complete,
+ * correct-looking set of sideways JPEGs.
  *
  * Nothing here touches the DOM, WebCodecs or a file. It is arithmetic.
  */
@@ -90,4 +95,49 @@ export function sampleTargetsMs(plan: ExtractionPlan): number[] {
     targets.push(Math.round(i * plan.intervalMs + plan.intervalMs / 2));
   }
   return targets;
+}
+
+/* ------------------------------------------------------------------ *
+ * Which way is up
+ * ------------------------------------------------------------------ */
+
+/** Clockwise display rotation, the only four values a camera ever writes. */
+export type FrameRotation = 0 | 90 | 180 | 270;
+
+/**
+ * Read the clockwise display rotation out of a track's transform matrix.
+ *
+ * This exists because a phone does not rotate the pixels it records. It writes
+ * the sensor's native landscape frame plus a matrix saying "turn this 90 degrees
+ * to show it", so a portrait POV walk is a LANDSCAPE stream and an instruction.
+ * A `<video>` element honours that instruction for free. A raw `VideoDecoder`
+ * never sees it, because we demux the container ourselves, so without this the
+ * WebCodecs path would ship sideways frames while the seek path shipped upright
+ * ones for the same video.
+ *
+ * The tkhd matrix is `[a, b, u, c, d, v, x, y, w]` (ISO 14496-12). Rotation lives
+ * in the `a`/`b` pair, and `atan2(b, a)` recovers it without caring that the
+ * values are 16.16 fixed point, because the scale cancels.
+ *
+ * Snapped to the four right angles, and anything else is treated as no rotation.
+ * A camera only ever writes a right angle, so an off-axis result means the matrix
+ * is corrupt or exotic. Rounding that into the nearest quarter turn would rotate
+ * every frame of the walk on the strength of a value we already know we do not
+ * understand, and doing nothing is the same thing an element does with a matrix
+ * it cannot make sense of.
+ */
+export function readRotation(
+  matrix: ArrayLike<number> | undefined | null,
+): FrameRotation {
+  if (!matrix || matrix.length < 2) return 0;
+
+  const a = Number(matrix[0]);
+  const b = Number(matrix[1]);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return 0;
+  // The identity of "no information": atan2(0, 0) is 0, which would read as an
+  // upright frame rather than as the absent matrix it actually is.
+  if (a === 0 && b === 0) return 0;
+
+  const degrees = (Math.round((Math.atan2(b, a) * 180) / Math.PI) + 360) % 360;
+  return degrees === 90 || degrees === 180 || degrees === 270 ? degrees : 0;
 }

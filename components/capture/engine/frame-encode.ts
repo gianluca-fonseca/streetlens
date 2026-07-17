@@ -25,6 +25,9 @@
  */
 
 import { CAPTURE_TUNING } from "@/components/capture/engine/tuning";
+// The single definition lives with the matrix read that produces it, so the
+// encoder and the demux cannot disagree about what a rotation is.
+import type { FrameRotation } from "@/components/capture/engine/video-plan";
 import {
   fitDimensions,
   laplacianVariance,
@@ -51,12 +54,14 @@ export type FrameEncoder = {
   /**
    * `srcW`/`srcH` are passed explicitly rather than read off the source: a
    * VideoFrame reports `displayWidth`, an HTMLVideoElement reports `videoWidth`,
-   * and a canvas has neither. The caller knows which it holds.
+   * and a canvas has neither. The caller knows which it holds. They are the
+   * CODED dimensions; `rotation` is applied on top of them here.
    */
   encode(
     source: CanvasImageSource,
     srcW: number,
     srcH: number,
+    rotation?: FrameRotation,
   ): Promise<EncodedFrame | null>;
 };
 
@@ -102,6 +107,41 @@ function createCanvas(readFrequently: boolean): Canvas2D | null {
 }
 
 /**
+ * Draw `source` into a `destW` x `destH` canvas, turned `rotation` degrees
+ * clockwise and filling the destination.
+ *
+ * The transform is set and then reset rather than saved and restored, because
+ * this runs a few hundred times per video and the context has no other state
+ * worth preserving.
+ *
+ * `destW`/`destH` are the POST-rotation dimensions, so for a quarter turn the
+ * source has to be drawn at the swapped extents inside the rotated frame. Getting
+ * this backwards does not throw. It silently letterboxes every frame, which is
+ * the sort of thing that ships.
+ */
+function drawUpright(
+  ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D,
+  source: CanvasImageSource,
+  destW: number,
+  destH: number,
+  rotation: FrameRotation,
+): void {
+  if (rotation === 0) {
+    ctx.drawImage(source, 0, 0, destW, destH);
+    return;
+  }
+
+  const upright = rotation === 90 || rotation === 270;
+  const drawW = upright ? destH : destW;
+  const drawH = upright ? destW : destH;
+
+  ctx.translate(destW / 2, destH / 2);
+  ctx.rotate((rotation * Math.PI) / 180);
+  ctx.drawImage(source, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+/**
  * Build an encoder holding its own two canvases.
  *
  * The canvases are created once and resized per frame rather than allocated per
@@ -119,19 +159,29 @@ export function createFrameEncoder(): FrameEncoder | null {
   const size = CAPTURE_TUNING.graySize;
 
   return {
-    async encode(source, srcW, srcH) {
-      const { width, height } = fitDimensions(srcW, srcH, CAPTURE_TUNING.maxLongestSide);
+    async encode(source, srcW, srcH, rotation = 0) {
+      // A quarter turn swaps what "longest side" even means, so the clamp is
+      // applied to the DISPLAY shape, not the coded one. Fitting first and
+      // rotating after would clamp the wrong axis and letterbox a portrait walk.
+      const upright = rotation === 90 || rotation === 270;
+      const { width, height } = fitDimensions(
+        upright ? srcH : srcW,
+        upright ? srcW : srcH,
+        CAPTURE_TUNING.maxLongestSide,
+      );
       if (width === 0 || height === 0) return null;
 
       jpeg.resize(width, height);
-      jpeg.ctx.drawImage(source, 0, 0, width, height);
+      drawUpright(jpeg.ctx, source, width, height, rotation);
       const blob = await jpeg.toBlob();
       if (!blob) return null;
 
       // Squashed to a square, aspect deliberately NOT preserved. Both dedupe and
       // blur are scale-free, and this is exactly what the live recorder measures.
+      // Rotated anyway: a square of a sideways frame is not the same pixels as a
+      // square of an upright one, and the seek path would measure the upright one.
       gray.resize(size, size);
-      gray.ctx.drawImage(source, 0, 0, size, size);
+      drawUpright(gray.ctx, source, size, size, rotation);
       const bytes = toGray(gray.ctx.getImageData(0, 0, size, size).data);
 
       return { blob, width, height, blurScore: laplacianVariance(bytes, size), gray: bytes };

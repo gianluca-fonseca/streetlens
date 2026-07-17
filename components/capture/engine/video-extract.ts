@@ -211,7 +211,15 @@ export async function extractFramesWithWebCodecs(
 
       if (seq < resumeFromSeq) return; // Already on disk from an earlier run.
 
-      const encoded = await encoder.encode(frame, frame.displayWidth, frame.displayHeight);
+      // `info.rotation` and not the frame: the decoder never saw the container's
+      // transform matrix, so a portrait walk arrives here as a sideways sensor
+      // frame and only the demux knows to turn it back.
+      const encoded = await encoder.encode(
+        frame,
+        frame.displayWidth,
+        frame.displayHeight,
+        info?.rotation ?? 0,
+      );
       if (!encoded) return;
       if (encoded.blob.size > CAPTURE_LIMITS.maxFrameBytes) return;
 

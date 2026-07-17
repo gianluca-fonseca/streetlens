@@ -13,6 +13,11 @@
  * sparser rather than truncated, and the sampling grid must not sit on the
  * second boundary where it would align with keyframes.
  *
+ * The rotation read is here for the same reason. A phone records the sensor's
+ * landscape frame and a matrix saying "turn this 90 degrees"; a `<video>` element
+ * obeys it and a raw `VideoDecoder` never sees it. Get it wrong and the WebCodecs
+ * path emits a complete, correct-looking set of sideways JPEGs.
+ *
  * Run: node scripts/test-video-plan.mjs
  */
 
@@ -79,7 +84,7 @@ function main() {
 
   const PLAN = require(path.join(BUILD_DIR, "components/capture/engine/video-plan.js"));
   const TYPES = require(path.join(BUILD_DIR, "lib/capture/types.js"));
-  const { planExtraction, sampleTargetsMs, IDEAL_INTERVAL_MS } = PLAN;
+  const { planExtraction, sampleTargetsMs, IDEAL_INTERVAL_MS, readRotation } = PLAN;
   const MAX = TYPES.CAPTURE_LIMITS.maxFrames;
 
   /* ---------------- The ideal case ---------------- */
@@ -184,12 +189,58 @@ function main() {
   check("an injected cap is honoured", tiny.targetFrames <= 3, `got ${tiny.targetFrames}`);
   check("an injected cap marks sparser", tiny.sparser === true);
 
+  /* ---------------- Which way is up ---------------- */
+
+  // A phone writes the sensor's landscape frame plus a matrix saying "turn this".
+  // Misread it and every frame of the walk is sideways, while every count, every
+  // progress bar and every other test still reads correct.
+  const ONE = 65536; // 16.16 fixed point 1.0, which is how a real tkhd stores it.
+  const identity = [ONE, 0, 0, 0, ONE, 0, 0, 0, 1 << 30];
+  const rot90 = [0, ONE, 0, -ONE, 0, 0, 0, 0, 1 << 30];
+  const rot180 = [-ONE, 0, 0, 0, -ONE, 0, 0, 0, 1 << 30];
+  const rot270 = [0, -ONE, 0, ONE, 0, 0, 0, 0, 1 << 30];
+
+  check("an identity matrix is upright", readRotation(identity) === 0, `got ${readRotation(identity)}`);
+  check("a portrait iPhone matrix reads 90", readRotation(rot90) === 90, `got ${readRotation(rot90)}`);
+  check("an upside-down matrix reads 180", readRotation(rot180) === 180, `got ${readRotation(rot180)}`);
+  check("the other quarter turn reads 270", readRotation(rot270) === 270, `got ${readRotation(rot270)}`);
+
+  check(
+    "fixed-point scale does not matter",
+    // atan2 cancels the scale, so a matrix stored as plain 1s must read the same
+    // as one stored in 16.16. Both appear in the wild.
+    readRotation([0, 1, 0, -1, 0, 0, 0, 0, 1]) === 90,
+  );
+  check("an Int32Array matrix works", readRotation(Int32Array.from(rot90)) === 90);
+
+  check("a missing matrix is upright, not a throw", readRotation(undefined) === 0);
+  check("a null matrix is upright", readRotation(null) === 0);
+  check("a truncated matrix is upright", readRotation([ONE]) === 0);
+  // atan2(0,0) is 0, which would read as "upright" rather than as the absent
+  // information it really is. Same answer, but it must not come from luck.
+  check("an all-zero matrix is upright", readRotation([0, 0, 0, 0, 0, 0, 0, 0, 0]) === 0);
+  check("a NaN matrix is upright", readRotation([NaN, NaN, 0, 0, 0, 0, 0, 0, 0]) === 0);
+
+  // A camera only ever writes a right angle. An off-axis value means the matrix
+  // is corrupt, and snapping it would rotate the whole walk on the strength of a
+  // number we already know we do not understand.
+  check(
+    "an off-axis matrix is left alone rather than snapped",
+    readRotation([Math.round(ONE * Math.cos(0.6)), Math.round(ONE * Math.sin(0.6))]) === 0,
+  );
+  check(
+    "every rotation is one of the four legal values",
+    [identity, rot90, rot180, rot270, undefined, [0, 0]].every((m) =>
+      [0, 90, 180, 270].includes(readRotation(m)),
+    ),
+  );
+
   rmSync(BUILD_DIR, { recursive: true, force: true });
   rmSync(TSCONFIG, { force: true });
 
   console.log(
     failures.length === 0
-      ? "\nPASS — the sampling plan never exceeds the cap and never truncates a walk"
+      ? "\nPASS — the plan never exceeds the cap, never truncates a walk, and knows which way is up"
       : `\nFAIL — ${failures.length} failing: ${failures.join(", ")}`,
   );
   process.exit(failures.length === 0 ? 0 : 1);
