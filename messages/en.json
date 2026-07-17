@@ -223,6 +223,8 @@
       "addSegmentHint": "Trace the sidewalk on the map",
       "proposeUpdate": "Propose a correction",
       "proposeUpdateHint": "Pick a mapped segment and tell us what's off",
+      "recordWalk": "Record a walk",
+      "recordWalkHint": "Capture the street with your camera as you walk it",
       "cancel": "Cancel"
     },
     "trace": {
@@ -603,6 +605,155 @@
       "localeLabel": "Language",
       "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins in August 2026.",
       "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress."
+    }
+  },
+  "collect": {
+    "meta": {
+      "title": "Record a walk | StreetLens",
+      "description": "Record a street with your phone as you walk it. StreetLens stamps every frame with GPS and matches it to a segment, so sidewalk condition gets measured where nobody has measured it."
+    },
+    "start": {
+      "eyebrow": "RECORD A WALK",
+      "title": "Walk a street. Record what is actually there.",
+      "lead": "Your phone keeps a frame every few metres and stamps it with GPS. A reviewer checks the walk before any of it becomes public data.",
+      "howEyebrow": "HOW TO HOLD IT",
+      "how1": "Portrait. Camera pointed forward down the sidewalk, not at the ground.",
+      "how2": "Walk at a normal pace. A frame is kept about once a second and every six metres.",
+      "how3": "Keep this screen in front of you. The camera stops the moment you switch apps.",
+      "asksEyebrow": "WHAT THIS NEEDS",
+      "askCamera": "Camera",
+      "askCameraHint": "Frames of the street ahead. Nothing leaves your phone until you review it.",
+      "askLocation": "Location",
+      "askLocationHint": "Stamps each frame so it can be matched to a street.",
+      "askScreen": "Screen stays awake",
+      "askScreenHint": "Released the moment you stop.",
+      "cta": "Start recording",
+      "ctaStarting": "Starting the camera",
+      "privacy": "Frames become public data after review. Do not record people close up, and do not record inside private property."
+    },
+    "hud": {
+      "rec": "REC",
+      "paused": "PAUSED",
+      "elapsed": "Elapsed",
+      "frames": "Frames kept",
+      "distance": "Distance",
+      "gps": "GPS",
+      "gpsWaiting": "Waiting for a fix",
+      "gpsWarn": "Weak GPS. Fixes above {meters} m get dropped when your walk is matched.",
+      "gpsDenied": "Location is off, so frames cannot be placed and none are being kept.",
+      "gpsUnavailable": "No GPS signal. This happens indoors and under heavy cover.",
+      "stop": "Stop",
+      "wakeFailed": "Your screen may sleep. Keep it awake yourself if you can.",
+      "notDurable": "This browser cannot save frames to disk. Do not reload or switch apps, or the walk is lost."
+    },
+    "paused": {
+      "title": "Recording stopped",
+      "body": "The camera cannot run while this page is in the background. Everything up to now is saved. Resuming starts a new segment, because we will not pretend the gap did not happen.",
+      "resume": "Resume recording",
+      "finish": "Finish and review"
+    },
+    "review": {
+      "eyebrow": "REVIEW",
+      "title": "Your walk",
+      "frames": "Frames kept",
+      "distance": "Distance walked",
+      "duration": "Duration",
+      "fixes": "GPS fixes",
+      "mapLabel": "The route your phone recorded",
+      "droppedEyebrow": "DROPPED FRAMES",
+      "droppedLead": "Frames the recorder chose not to keep, and why.",
+      "noneDropped": "Nothing was dropped.",
+      "capFrames": "Recording stopped on its own at the {count} frame limit.",
+      "capDuration": "Recording stopped on its own at the {minutes} minute limit.",
+      "storageFull": "Recording stopped because storage filled up. The walk up to that point is safe.",
+      "contactLabel": "Email (optional)",
+      "contactHint": "Only used if a reviewer needs to ask you something about this walk.",
+      "consent": "Uploading means these frames become public data once a reviewer approves them.",
+      "upload": "Upload walk",
+      "discard": "Discard walk",
+      "discardConfirm": "Discard this walk? The frames are deleted from this device and cannot be recovered.",
+      "tooShort": "A walk needs at least one frame and two GPS fixes before it can be uploaded."
+    },
+    "upload": {
+      "title": "Uploading",
+      "keepOpen": "Keep this screen open.",
+      "progress": "{uploaded} of {total} frames",
+      "creating_session": "Opening the session",
+      "registering_frames": "Registering frames",
+      "uploading_frames": "Uploading frames",
+      "finalizing": "Finalizing",
+      "done": "Done"
+    },
+    "uploadError": {
+      "retry": "Retry upload",
+      "detail": "Detail",
+      "backend_not_live_title": "Uploads are not switched on yet",
+      "backend_not_live_body": "Your walk is saved on this device and nothing was lost. The part of the pipeline that receives walks is still being built. Come back later and it will still be here.",
+      "storage_not_configured_title": "Frame storage is not configured",
+      "storage_not_configured_body": "This build cannot reach the frame store. Your walk is saved on this device.",
+      "offline_title": "No connection",
+      "offline_body": "Your frames are safe on this device. Retry once you are back online.",
+      "rate_limited_title": "Too many uploads from here",
+      "rate_limited_body": "This device uploaded recently. Your walk is saved. Try again later.",
+      "rejected_title": "The server would not take this walk",
+      "rejected_body": "Your walk is saved on this device. This usually means it fell outside the mapped area.",
+      "unknown_title": "Upload failed",
+      "unknown_body": "Your frames are safe on this device. You can retry."
+    },
+    "done": {
+      "eyebrow": "SUBMITTED",
+      "title": "Your walk is in",
+      "body": "It is queued for matching and review. Frames become public data once a reviewer approves them.",
+      "statusLink": "Track this walk",
+      "again": "Record another walk"
+    },
+    "recover": {
+      "eyebrow": "UNFINISHED WALK",
+      "title": "You have a walk that was never uploaded",
+      "body": "{frames} frames over {distance}, still saved on this device.",
+      "upload": "Review and upload it",
+      "discard": "Discard it"
+    },
+    "unsupported": {
+      "eyebrow": "CANNOT RECORD HERE",
+      "title": "This browser cannot record a walk",
+      "insecure_context": "Recording needs a secure connection. Browsers only hand the camera to pages served over https, and this page was not.",
+      "no_camera_api": "This browser does not give web pages a camera. Try Safari on iPhone, or Chrome on Android.",
+      "no_geolocation": "This browser does not give web pages your location, so frames could not be matched to a street.",
+      "backToMap": "Back to the map"
+    },
+    "camera": {
+      "denied_title": "Camera access was refused",
+      "denied_body": "Recording needs the camera. Allow it for this site in your browser settings, then try again.",
+      "not_found_title": "No rear camera found",
+      "not_found_body": "This device did not offer a camera facing away from you.",
+      "in_use_title": "The camera is busy",
+      "in_use_body": "Another app or tab has it. Close that one, then try again.",
+      "insecure_context_title": "Not a secure connection",
+      "insecure_context_body": "Browsers only hand the camera to pages served over https.",
+      "unsupported_title": "No camera support",
+      "unsupported_body": "This browser does not give web pages a camera.",
+      "unknown_title": "The camera did not start",
+      "unknown_body": "Try again. If it keeps failing, reload the page."
+    },
+    "drops": {
+      "no_fix": "No GPS fix yet",
+      "cadence": "Too soon after the last one",
+      "displacement": "Phone had not moved far enough",
+      "duplicate": "Same picture as the frame before",
+      "blurry": "Too blurry to score",
+      "oversize": "Too large to store"
+    },
+    "status": {
+      "meta": {
+        "title": "Walk status | StreetLens",
+        "description": "The processing status of a walk recorded with StreetLens."
+      },
+      "eyebrow": "WALK STATUS",
+      "title": "Processing starts shortly",
+      "body": "This walk has been received. Matching and review run in a part of the pipeline that is not live yet, so there is nothing to show here for now.",
+      "sessionLabel": "SESSION",
+      "backToMap": "Back to the map"
     }
   }
 }
