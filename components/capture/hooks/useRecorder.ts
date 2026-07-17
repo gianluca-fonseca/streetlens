@@ -45,6 +45,7 @@ import {
   openSegment,
   type SessionManifest,
 } from "@/components/capture/engine/session";
+import { looksLikeVideoSession } from "@/components/capture/engine/video-session";
 import { CAPTURE_TUNING } from "@/components/capture/engine/tuning";
 import {
   isCameraSupported,
@@ -196,7 +197,18 @@ export function useRecorder() {
       if (cancelled) return;
       storeRef.current = store;
 
-      const found = (await store.listManifests()).find(isRecoverable) ?? null;
+      // Video-upload sessions share this store and are a structural superset of
+      // a walk's manifest, so they pass `isRecoverable` on their own merits.
+      // Without this filter the recorder would offer to "recover" someone's
+      // half-extracted video as an unfinished walk, and recovering it would put
+      // a camera session on top of frames that never came from this camera.
+      // `looksLikeVideoSession` and not `isVideoSessionManifest`: the strict
+      // guard also checks the inner version, so a stale video manifest would
+      // fail it and leak straight back into this prompt.
+      const found =
+        (await store.listManifests()).find(
+          (manifest) => !looksLikeVideoSession(manifest) && isRecoverable(manifest),
+        ) ?? null;
       if (cancelled) return;
 
       setDurable(store.durable);

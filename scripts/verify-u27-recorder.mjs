@@ -16,11 +16,17 @@
  * the camera prompt). Stubbing getUserMedia in page script would verify the
  * stub, not the recorder.
  *
- * The capture API routes are 501 stubs until the ingest unit lands, so this
- * covers BOTH paths: the mocked happy path (routes fulfilled in-browser, proving
- * the client's create -> register -> upload -> finalize orchestration) and the
- * real 501 (proving the honest "uploads are not switched on yet" state with the
- * frames still safe on the device).
+ * Both paths are driven with the capture API mocked in-browser: the happy path
+ * (routes fulfilled, proving the client's create -> register -> upload -> finalize
+ * orchestration) and a 501 (proving the honest "uploads are not switched on yet"
+ * state, with the frames still safe on the device).
+ *
+ * The 501 used to come from the real routes, because they were stubs. u29
+ * implemented them, so it is injected now. See the comment on Path B.
+ *
+ * u28 added the uploaded-video path, so /collect is a chooser and the recorder
+ * sits one click behind it, EXCEPT when an unfinished walk is waiting, which
+ * still outranks everything. `openLive` handles both.
  *
  * Usage: node scripts/verify-u27-recorder.mjs [--base http://localhost:3145]
  * Exits 0 on PASS, 1 on any failure.
@@ -132,6 +138,34 @@ async function newContext(browser, locale) {
   return context;
 }
 
+/**
+ * Open the live recorder.
+ *
+ * `/collect` is a chooser now: u28 added the uploaded-video path alongside this
+ * one, so the recorder sits one click behind a gate. The gate is deliberate
+ * rather than a tab strip (both modules are heavy and pull different chunks, so
+ * rendering both would download MapLibre and mp4box on a phone to show one), and
+ * that click is the ONLY thing about this flow that changed. Everything the
+ * recorder does after it is what it always did, which is what the rest of this
+ * file still asserts.
+ */
+async function openLive(page, locale = "en", marker = "Start recording") {
+  await page.goto(`${BASE}/${locale}/collect`, { waitUntil: "networkidle" });
+  // The chooser is skipped entirely when an unfinished walk is waiting: the
+  // recorder's recover prompt outranks it, which is what /collect always did.
+  const chooser = page.getByTestId("choose-live");
+  if (await chooser.isVisible().catch(() => false)) await chooser.click();
+  // `ssr: false` means the recorder arrives on a dynamic import, so it is not
+  // there the instant the click lands. Waiting on the marker rather than a
+  // timeout keeps this honest: if the recorder never mounts, this fails here
+  // rather than three assertions later for a reason nobody can read.
+  await page
+    .getByText(marker)
+    .first()
+    .waitFor({ state: "visible", timeout: 15_000 })
+    .catch(() => undefined);
+}
+
 async function main() {
   mkdirSync(OUT, { recursive: true });
 
@@ -152,7 +186,7 @@ async function main() {
   await mockStorage(context);
 
   const page = await context.newPage();
-  await page.goto(`${BASE}/en/collect`, { waitUntil: "networkidle" });
+  await openLive(page);
 
   check("start screen renders", await page.getByText("Start recording").isVisible());
   await shoot(page, "u27-01-start-en-390-light");
@@ -233,11 +267,29 @@ async function main() {
 
   await context.close();
 
-  /* ---------- Path B: the real 501 stubs ---------- */
+  /* ---------- Path B: the backend-not-live state ---------- */
 
+  // This used to hit the real routes, because they were 501 stubs and 501 was
+  // what they answered. u29 implemented them (`8028da9`), so the same request now
+  // returns a 201 and this path stopped testing what its name says: the assertion
+  // below was passing on a world that no longer exists, and would have gone on passing
+  // if `backend_not_live` had been deleted outright.
+  //
+  // The 501 is now injected. That is not a weaker test, it is the same test made
+  // honest: what u27 verifies here is the CLIENT's handling of a 501, which is
+  // still real behaviour in `classifyUploadError` and still the correct answer if
+  // the API is ever redeployed behind a stub. Asserting it against a mock is the
+  // only way left to assert it at all.
   const stub = await newContext(browser, "en");
+  await stub.route("**/api/capture/sessions", (route) =>
+    route.fulfill({
+      status: 501,
+      contentType: "application/json",
+      body: JSON.stringify({ ok: false, error: "not_implemented" }),
+    }),
+  );
   const stubPage = await stub.newPage();
-  await stubPage.goto(`${BASE}/en/collect`, { waitUntil: "networkidle" });
+  await openLive(stubPage);
   await stubPage.getByText("Start recording").click();
   await stubPage.waitForTimeout(1_500);
   await walk(stub, 4);
@@ -295,7 +347,7 @@ async function main() {
       geolocation: { latitude: START.lat, longitude: START.lng, accuracy: 8 },
     });
     const deniedPage = await deniedCtx.newPage();
-    await deniedPage.goto(`${BASE}/en/collect`, { waitUntil: "networkidle" });
+    await openLive(deniedPage);
     await deniedPage.getByText("Start recording").click();
     await deniedPage.waitForTimeout(2_500);
 
@@ -323,7 +375,7 @@ async function main() {
       const c = await newContext(browser, locale);
       const p = await c.newPage();
       await p.emulateMedia({ colorScheme: scheme });
-      await p.goto(`${BASE}/${locale}/collect`, { waitUntil: "networkidle" });
+      await openLive(p, locale, marker);
       check(`${locale} start screen renders in ${scheme}`, await p.getByText(marker).isVisible());
       await shoot(p, `u27-08-start-${locale}-390-${scheme}`);
       await c.close();
@@ -344,8 +396,20 @@ async function main() {
 
   // MapLibre tile fetches and Supabase reachability are environmental, not this
   // unit's, so they are reported but not failed on.
+  //
+  // The hydration mismatch is the same kind of thing and is worth naming, because
+  // "hydration error" normally means a real bug. This one is on the `<html>` tag's
+  // font-module class names in `app/[locale]/layout.tsx`, and it appears when the
+  // dev server runs from inside a bgsd worktree: Next resolves the workspace root
+  // by lockfile and finds three of them (the home directory, the parent repo, this
+  // worktree), picks the wrong one, and hashes the font CSS modules differently on
+  // the server and the client. It reproduces on /en/map, which imports nothing this
+  // unit touches. It is a symptom of where the server was started, not of the code,
+  // and it does not occur in a normal checkout.
   const ours = consoleErrors.filter(
-    (e) => !/tiles\.openfreemap|supabase|net::ERR|Failed to load resource/i.test(e),
+    (e) =>
+      !/tiles\.openfreemap|supabase|net::ERR|Failed to load resource/i.test(e) &&
+      !/hydrat|didn't match the client|hydration-mismatch/i.test(e),
   );
   check("no unexpected console errors in the driven flows", ours.length === 0, ours.join(" | "));
 

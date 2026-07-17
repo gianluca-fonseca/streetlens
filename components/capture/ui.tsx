@@ -143,18 +143,29 @@ export function Action({
   variant = "primary",
   disabled,
   type = "button",
+  testId,
 }: Readonly<{
   children: ReactNode;
   onClick?: () => void;
   variant?: "primary" | "accent" | "ghost";
   disabled?: boolean;
   type?: "button" | "submit";
+  /**
+   * A `data-testid` for the end-to-end drives.
+   *
+   * Passed explicitly rather than by spreading arbitrary props onto the button.
+   * A spread would quietly let a caller override `type`, `className` or the
+   * disabled state and take the sealed styling with it; this opens exactly one
+   * door, and it is the one the Playwright drives need.
+   */
+  testId?: string;
 }>) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      data-testid={testId}
       className={cn(
         styles.controlSoft,
         BUTTON_BASE,
