@@ -123,7 +123,8 @@ Correct answer (abbreviated):
  "bike_lane_present":{"value":0,"confidence":0.9},
  "bike_separation":{"value":null,"confidence":0.85},
  "bike_surface":{"value":2,"confidence":0.5},
- "frameQuality":{"usable":true,"reason":null}}
+ "frameQuality":{"usable":true,"reason":null},
+ "rationale":"Two-lane paved street with no sidewalk on either side; a clean concrete gutter runs along the right edge. Mature trees on the right shade about a third of the corridor. Power poles carry a luminaire roughly every 40 m. No crossing or junction in shot."}
 
 EXAMPLE 2 — a frame ruined by a passing vehicle.
 What is visible: the near half of the frame is filled by the side of a white truck,
@@ -135,7 +136,8 @@ kerb, and do NOT infer from what a Costa Rican street usually looks like. A conf
 guess here is worse than no answer, because it reaches the map looking like a
 measurement.
 Correct answer (abbreviated): every item {"value":null,"confidence":0.1},
- "frameQuality":{"usable":false,"reason":"obstructed_by_vehicle"}`;
+ "frameQuality":{"usable":false,"reason":"obstructed_by_vehicle"},
+ "rationale":"The near half of the frame is filled by the blurred side of a passing white truck; only a sliver of kerb is visible and nothing else about the street can be made out."`;
 
 /**
  * The frozen system prompt. Built once; identical bytes on every call.
@@ -165,7 +167,9 @@ export const SYSTEM_PROMPT: string = [
   ``,
   EXEMPLARS,
   ``,
-  `OUTPUT. Return JSON matching the provided schema exactly: schemaVersion "${CAPTURE_SCHEMA_VERSION}", an "items" object with all 15 keys above (each {value, confidence}), and "frameQuality". No prose, no commentary, no extra keys.`,
+  `OUTPUT. Return JSON matching the provided schema exactly: schemaVersion "${CAPTURE_SCHEMA_VERSION}", an "items" object with all 15 keys above (each {value, confidence}), a "frameQuality", and a "rationale". No prose outside these fields, no commentary, no extra keys.`,
+  ``,
+  `THE RATIONALE. One to three short, plain sentences describing what you actually see in this frame and why the notable scores are what they are, e.g. "Narrow paved road, no sidewalk on either side; dense canopy on the left; standing water pooling at the right edge." It is a SINGLE per-frame note, not a justification for each item. Describe only what is visible, the same honesty the three rules demand: do not speculate, do not infer from what such a street usually looks like, and if the frame is unusable say briefly what ruined it. Keep it under 60 words.`,
 ].join("\n");
 
 /**

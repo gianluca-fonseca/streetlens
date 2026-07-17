@@ -287,6 +287,8 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
       inputTokens: result.usage.inputTokens,
       outputTokens: result.usage.outputTokens,
       escalated,
+      // Whichever answer won (escalated or not) carries its own rationale.
+      rationale: result.observation.rationale,
     });
   } catch (err) {
     await db.failJob(job.frame_id, "pending", `complete_job: ${errText(err)}`);

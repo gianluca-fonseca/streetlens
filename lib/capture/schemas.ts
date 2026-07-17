@@ -190,6 +190,16 @@ export const captureObservationSchema = z.object({
   model: z.string().trim().min(1).max(120),
   items: captureObservationItemsSchema,
   frameQuality: captureFrameQualitySchema,
+  /**
+   * The per-frame free-text rationale (target under 60 words; the prompt and the
+   * JSON-schema description carry that instruction). The hard cap here is
+   * deliberately loose — 1000 chars, well above three honest sentences — for the
+   * same reason the token ceiling is loose: a cap tight enough to reject a
+   * slightly-long answer would throw away a frame we already paid to score. Empty
+   * is tolerated (`.min` is absent) so a terse-but-present note never fails a
+   * paid frame; the strict wire schema still guarantees the field is present.
+   */
+  rationale: z.string().trim().max(1000),
 });
 export type CaptureObservationInput = z.input<typeof captureObservationSchema>;
 export type CaptureObservationParsed = z.output<typeof captureObservationSchema>;

@@ -148,6 +148,7 @@ restating it.
 | Submission type vocabulary | `supabase/migrations/0014_submission_types.sql` |
 | Worker RPCs (claim, attribute, token usage) | `supabase/migrations/0015_capture_worker.sql` |
 | Review, approval, the third community kind | `supabase/migrations/0017_capture_review.sql` |
+| Per-frame rationale + observations on the review read | `supabase/migrations/0020_observation_rationale.sql` |
 | Upload orchestration | `lib/capture/upload-client.ts` |
 
 ### The rubric is not a new vocabulary
@@ -425,6 +426,22 @@ percent `number|null`), plus a `frameQuality: { usable, reason }`.
 `additionalProperties: false` everywhere. The `model` field is stamped after the
 parse, not requested.
 
+**The per-frame rationale.** Alongside the 15 items the model returns one
+required free-text `rationale`: one to three plain sentences on what it saw and
+why the notable scores are what they are ("Narrow paved road, no sidewalk on
+either side; dense canopy left; standing water at the right edge"). It is a
+single per-FRAME note, not a justification per item, which would be 15x the noise
+and cost for little review value. It exists for the human reviewer, who reads one
+honest paragraph faster than fifteen. The prompt asks for honest, concrete,
+non-speculative description under 60 words; the JSON-schema description carries
+that instruction rather than a `maxLength` (strict outputs do not honour one, and
+a hard cap that fails a paid frame over a few extra words is the wrong trade),
+and the zod side keeps a loose 1000-char ceiling. Cost is small and bounded: the
+longer response schema adds a handful of input tokens per call (folded into the
+derived ceiling automatically), and the rationale itself is a few dozen output
+tokens. It is stored on `capture_observations.rationale` (migration 0020, nullable
+so pre-rationale rows simply have none).
+
 **Prompt caching.** The cacheable prefix is the `SYSTEM_PROMPT`, sent first in
 the `instructions` field, byte-identical on every call (it interpolates nothing
 per frame). The per-frame user turn is a constant instruction plus the image,
@@ -490,6 +507,14 @@ into the payload). This is the third kind of community record, after
 unique index on the session id plus `on conflict do nothing`) and happens
 *before* the session flips to `review_ready`, because that flip is a one-way
 drain latch and emitting after it would strand the session with no queue row.
+
+**The review read carries per-frame observations.** `capture_session_review`
+(0017, extended in 0020) hangs an `observation` off every frame in its `frames`
+array: `{ items, rationale, escalated, model }`, or `null` for a frame nothing
+scored (unscored or failed). A frame that escalated has two observation rows; the
+escalated one wins, the same "the stronger answer counts" rule the rollup uses.
+This is what lets the review UI show a reviewer the readings and the model's
+rationale next to each frame in the filmstrip, not just the per-segment rollup.
 
 **Approval is per segment, and it lands data before it closes.** The admin
 review UI (`components/admin/CaptureReview.tsx`, route
@@ -757,7 +782,7 @@ The bucket name is not an env var; it is the constant `streetlens-frames`
 
 ### Applying migrations
 
-The capture funnel is migrations `0013` through `0017`, applied in order after
+The capture funnel is migrations `0013` through `0020`, applied in order after
 the existing `0001..0012`. `scripts/test-capture-migrations.mjs` applies the
 whole chain to a throwaway Supabase Postgres container and exercises every RPC;
 it needs Docker, never touches the live database, and skips cleanly when Docker
@@ -848,7 +873,7 @@ Run these directly with node; none need a live database.
 | `scripts/test-capture-schemas.mjs` | contracts, rubric sync, encodings, path convention |
 | `scripts/test-matching-hmm.mjs` | the HMM against synthetic tracks, and that it beats the baseline on parallel streets |
 | `scripts/test-matching-baseline.mjs` | the matching interface against synthetic tracks |
-| `scripts/test-capture-migrations.mjs` | `0001..0019` applied to a throwaway container, every RPC exercised (needs Docker) |
+| `scripts/test-capture-migrations.mjs` | `0001..0020` applied to a throwaway container, every RPC exercised (needs Docker) |
 | `scripts/test-reprocess-core.mjs` | the reprocess script's track-time reconstruction, match summary, and payload logic |
 | `scripts/test-mp4box-contract.mjs` | the two load-bearing demux settings (`keepMdatData`, `releaseUsedSamples`) |
 | `scripts/test-upload-client.mjs` | retry, resume, concurrency, abort |
