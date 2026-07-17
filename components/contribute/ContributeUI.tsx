@@ -15,6 +15,7 @@ import {
   Undo2,
   X,
 } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { submissionSchema, type Submission } from "@/lib/schemas";
 import {
   CONDITION_KEYS,
@@ -289,6 +290,29 @@ function ChoosePanel({
               </span>
             </span>
           </button>
+          {/* The recorder is a page, not a mode: it needs a camera, a wake lock
+              and its own full-screen chrome, none of which fit inside a panel
+              floating over the map. So this one is a Link and not a button, and
+              it leaves the map behind rather than mutating contribute's state. */}
+          <Link
+            href="/collect"
+            className={`${styles.control} flex items-start gap-3 rounded-[8px] border border-border bg-surface-elevated p-3 text-left hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink`}
+          >
+            <Camera
+              size={18}
+              strokeWidth={1.75}
+              className="mt-0.5 shrink-0 text-ink-muted"
+              aria-hidden="true"
+            />
+            <span>
+              <span className="block text-[13px] font-semibold text-ink">
+                {t("choose.recordWalk")}
+              </span>
+              <span className="mt-0.5 block text-[12px] text-neutral-strong">
+                {t("choose.recordWalkHint")}
+              </span>
+            </span>
+          </Link>
         </div>
       </section>
     </SlideUp>
