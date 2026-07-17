@@ -61,7 +61,7 @@ NOT verified (honest gaps — see MANUAL-VERIFY.md):
     the ingest unit, landing this same wave. Proven at the wave boundary, not here.
 
 POST-REVIEW FIXES (adversarial review of the u27 diff; 7 real bugs found and fixed,
-commit 0a1c2f3 — each was a path the gates could not see):
+commit 35116ae — each was a path the gates could not see):
   1. A refused camera still entered "recording", unmounting the only screen that
      renders the camera error. Walker saw a black preview, a live REC dot and a
      frozen frame count with no explanation. useCamera.start now RETURNS its
