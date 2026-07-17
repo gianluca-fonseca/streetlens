@@ -1,0 +1,23 @@
+  [ok ] a honeypotted cv_capture is filed as cv_capture, NOT add_segment (the bug) got type=cv_capture
+  [ok ] it is still rejected with 400
+  [ok ] it is still recorded as rejected + honeypot_tripped
+  [ok ] a honeypotted update_segment is still update_segment got update_segment
+  [ok ] a honeypotted add_segment is still add_segment got add_segment
+  [ok ] an unrecognized type is filed as `unknown`, not mislabelled add_segment got unknown
+  [ok ] the raw submitted type is kept in the payload for forensics {"rejected":"honeypot","submitted_type":"wat"}
+  [ok ] an unrecognized type still yields 400, never a 500
+  [ok ] a 5000-char type does not reach the type column
+  [ok ] the forensic copy is truncated (never an unbounded attacker string) len=64
+  [ok ] still a 400
+  [ok ] a non-string type is filed as unknown got unknown
+  [ok ] a non-string type records no forensic string {"rejected":"honeypot"}
+  [ok ] a missing type is filed as unknown got unknown
+  [ok ] the rejected payload still records the honeypot reason {"rejected":"honeypot"}
+  [ok ] the source ip is hashed, never raw
+  [ok ] a clean add_segment still returns 201 got 201
+  [ok ] a clean add_segment still persists as pending
+  [ok ] a clean add_segment is not flagged
+  [ok ] an invalid payload still returns 400
+  [ok ] a clean cv_capture is still rejected (no envelope schema yet — later unit) got 400
+
+PASS — honeypot preserves the submitted type

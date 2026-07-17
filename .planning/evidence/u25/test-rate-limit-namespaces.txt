@@ -1,0 +1,17 @@
+  [ok ] submissions still allows 5 per minute
+  [ok ] the 6th submission in a minute is blocked (unchanged) yyyyyn
+  [ok ] a blocked caller gets a Retry-After hint
+  [ok ] a null key is never rate-limited (no derivable IP)
+  [ok ] capture allows 3 per hour
+  [ok ] the 4th capture session in an hour is blocked yyyn
+  [ok ] capture is exhausted for this origin
+  [ok ] the SAME origin can still post a text submission (namespaces are isolated)
+  [ok ] submissions is exhausted for this origin
+  [ok ] the SAME origin can still open a capture session
+  [ok ] the ceiling is per-origin: another IP is unaffected
+  [ok ] capture is blocked immediately after the 3rd
+  [ok ] still blocked 20 minutes later (one token needs 20 min at 3/hour)
+  [ok ] a token is back after 21 minutes
+  [ok ] a full hour restores the whole allowance
+
+PASS — rate-limit namespaces isolated, submissions unchanged

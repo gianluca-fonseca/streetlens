@@ -2,11 +2,12 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ImageOff, Users, X } from "lucide-react";
+import { ImageOff, ScanLine, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
 import {
   parseCommunityReport,
   parseCommunityReports,
+  parseCvObservations,
 } from "@/lib/parse-feature-props";
 import {
   LAYER_ORDER,
@@ -16,6 +17,20 @@ import {
   seedFromId,
 } from "@/components/mapConfig";
 import styles from "@/components/ui/zen.module.css";
+
+/**
+ * Placeholder for a value the camera never established. Deliberately not "0":
+ * a 0 would claim the camera looked and saw a failing street, when in fact no
+ * frame supported that lens at all.
+ */
+const UNSET = "—";
+
+/** 0-1 ratio → whole percent. Non-numeric/non-finite reads as unset, not 0%. */
+function asPercent(value: unknown): string | null {
+  return typeof value === "number" && Number.isFinite(value)
+    ? `${Math.round(value * 100)}%`
+    : null;
+}
 
 /**
  * Elevated detail panel shown when a segment is selected (popover elevation).
@@ -88,6 +103,12 @@ export default function SegmentDetail({
   for (const r of allReports) reportMap.set(r.id, r);
   const reports = [...reportMap.values()];
 
+  // Approved camera observations. A proposal an admin accepted, NOT an audit:
+  // rendered in the provisional idiom, never mixed into `scores` above
+  // (docs/cv-funnel.md — "CV output is a proposal, not data").
+  const cvObservations = parseCvObservations(segment.cv_observations);
+  const hasCv = cvObservations.length > 0;
+
   return (
     <section
       role="dialog"
@@ -135,10 +156,20 @@ export default function SegmentDetail({
               </>
             ) : null}
           </p>
-          {isUnverified ? (
-            <span className="mt-2 inline-flex items-center gap-1.5 rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-2 py-1 text-[10.5px] font-medium text-neutral-strong">
-              <Users size={12} strokeWidth={1.75} aria-hidden="true" />
-              {t("communityPending")}
+          {isUnverified || hasCv ? (
+            <span className="mt-2 flex flex-wrap items-center gap-1.5">
+              {isUnverified ? (
+                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-2 py-1 text-[10.5px] font-medium text-neutral-strong">
+                  <Users size={12} strokeWidth={1.75} aria-hidden="true" />
+                  {t("communityPending")}
+                </span>
+              ) : null}
+              {hasCv ? (
+                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-2 py-1 text-[10.5px] font-medium text-neutral-strong">
+                  <ScanLine size={12} strokeWidth={1.75} aria-hidden="true" />
+                  {t("cvChip")}
+                </span>
+              ) : null}
             </span>
           ) : null}
         </div>
@@ -247,8 +278,73 @@ export default function SegmentDetail({
           </>
         ) : null}
 
-        {reports.length > 0 ? (
+        {hasCv ? (
           <div className={isCommunity ? "" : "mt-4"}>
+            <h3 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+              {t("cvHeading")}
+            </h3>
+            <p className="mb-2 text-[12px] leading-snug text-neutral-strong">
+              {t("cvNote")}
+            </p>
+            <ul className="flex flex-col divide-y divide-border rounded-[8px] border border-border">
+              {cvObservations.map((o) => {
+                const frames = Array.isArray(o.frame_refs)
+                  ? o.frame_refs.length
+                  : 0;
+                const confidence = asPercent(o.confidence);
+                const coverage = asPercent(o.coverage);
+                return (
+                  <li key={o.id} className="px-3 py-2">
+                    <p className="font-mono text-[10.5px] text-neutral-strong">
+                      {t("cvObservationLabel")}
+                      {typeof o.captured_on === "string" && o.captured_on
+                        ? ` · ${o.captured_on.slice(0, 10)}`
+                        : ""}
+                    </p>
+                    {/* Observed lens values. Mono numerals, no ramp dots: the
+                        ramp is reserved for audited data, and these are not it. */}
+                    <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
+                      {LAYER_ORDER.map((layer) => {
+                        const observed = o.scores[layer];
+                        const known = typeof observed === "number";
+                        return (
+                          <li
+                            key={layer}
+                            className="flex items-center justify-between gap-2"
+                          >
+                            <span className="truncate text-[12.5px] leading-snug text-ink">
+                              {tl(`${layer}.name`)}
+                            </span>
+                            <span
+                              className="font-mono text-[12.5px] font-medium text-neutral-strong"
+                              title={known ? undefined : t("cvUnknown")}
+                            >
+                              {known ? observed : UNSET}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <p className="mt-1.5 font-mono text-[10.5px] text-neutral-strong">
+                      {t("cvConfidenceLabel")} {confidence ?? UNSET}
+                      <span className="mx-1.5">·</span>
+                      {t("cvCoverageLabel")} {coverage ?? UNSET}
+                      <span className="mx-1.5">·</span>
+                      {/* Label + count rather than an ICU plural: this codebase
+                          has no plural/select syntax anywhere and branches
+                          plurals in TS (see admin.queue's subtitleZero/One/Many).
+                          A label sidesteps the grammatical number entirely. */}
+                      {t("cvFramesLabel")} {frames}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
+
+        {reports.length > 0 ? (
+          <div className={isCommunity && !hasCv ? "" : "mt-4"}>
             <h3 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
               {t("communityReportsHeading")}
             </h3>

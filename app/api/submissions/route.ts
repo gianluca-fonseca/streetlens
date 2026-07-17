@@ -19,6 +19,7 @@ import { submissionSchema } from "@/lib/schemas";
 import { clientIpFromHeaders, hashIp } from "@/lib/ip";
 import { consumeToken } from "@/lib/rate-limit";
 import { persistSubmission } from "@/lib/submissions-sink";
+import { isSubmissionType, type SubmissionType } from "@/lib/types";
 
 // Node runtime: we use node:crypto (IP hashing) and node:fs (local queue).
 export const runtime = "nodejs";
@@ -44,10 +45,26 @@ export async function POST(request: Request) {
       ? ((body as { honeypot: string }).honeypot as string)
       : "";
   if (honeypot.trim().length > 0) {
-    const type = (body as { type?: unknown })?.type;
+    const rawType = (body as { type?: unknown })?.type;
+    // The rejected row records the type that was actually submitted. This used
+    // to coerce anything that was not `update_segment` into `add_segment`,
+    // which mislabelled the row — a honeypotted cv_capture would have been
+    // filed as a segment proposal it had nothing to do with.
+    //
+    // The type is preserved only when it is one we recognize: `type` carries a
+    // CHECK constraint, so persisting an attacker's arbitrary string verbatim
+    // would fail the insert and turn this clean 400 into a 500. Anything else
+    // lands as `unknown`, with the raw string kept (truncated, untrusted) in
+    // the payload for forensics.
+    const type: SubmissionType = isSubmissionType(rawType) ? rawType : "unknown";
     await persistSubmission({
-      type: type === "update_segment" ? "update_segment" : "add_segment",
-      payload: { rejected: "honeypot" },
+      type,
+      payload: {
+        rejected: "honeypot",
+        ...(type === "unknown" && typeof rawType === "string"
+          ? { submitted_type: rawType.slice(0, 64) }
+          : {}),
+      },
       status: "rejected",
       source_ip_hash: ipHash,
       honeypot_tripped: true,

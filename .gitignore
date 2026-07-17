@@ -63,3 +63,20 @@ data/pending-submissions.local.json
 /hero-*-check.png
 /gap-check.png
 /render-qa-*.png
+
+# bgsd — runtime artifacts (local only)
+# Ignore all runtime artifacts; commit only the persistent records.
+.bgsd/*
+!.bgsd/seshs/
+!.bgsd/memory/
+!.bgsd/ledger.md
+!.bgsd/config.json
+.bgsd-tmp/
+.vercel
+
+# u30 capture review: fixture + local review state (runtime data, seeded by
+# scripts/seed-u30-fixture.mjs)
+/data/capture-review.local.json
+/data/capture-review-overlay.local.json
+/data/community-cv-observations.local.json
+/public/u30-fixture-frame.jpg

@@ -1,0 +1,108 @@
+
+# walking real segment esc-sa-0001 (3 vertices)
+
+=== 1. honeypot ===
+POST /api/capture/sessions (honeypot set) -> 400 {"ok":false,"error":"rejected"}
+
+=== 2. honeypot, non-string (the u25 type-coercion class) ===
+POST /api/capture/sessions (honeypot: 1) -> 400 {"ok":false,"error":"rejected"}
+
+=== 3. invalid mode ===
+POST /api/capture/sessions (bad mode) -> 400 {"ok":false,"error":"invalid","issues":{"errors":[],"properties":{"mode":{"errors":["Invalid option: expected one of \"l
+
+=== 4. create session ===
+POST /api/capture/sessions -> 201 {"sessionId":"f2b547b6-fa55-4dfb-9ad4-e7192cde26cd","uploadPrefix":"captures/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd","maxFrames":400,"maxFrameBytes":2097152}
+
+=== 5. register frames ===
+POST .../frames (client-chosen path) -> 400 {"ok":false,"error":"invalid","issues":{"errors":[],"properties":{"frames":{"errors":[],"items":[{"errors":[],"properties":{"storagePath":{"errors":["
+POST .../frames (3 valid) -> 200 {"accepted":[0,1,2]}
+POST .../frames (re-register seq 0) -> 200 {"accepted":[0,1,2]}  <- resume cursor, still 3
+
+=== 6. upload the bytes (direct to storage, anon) ===
+  PUT captures/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd/frame-0000.jpg -> 400 {"statusCode":"403","error":"Unauthorized","message":"new row violates row-level security policy"}
+  PUT captures/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd/frame-0001.jpg -> 400 {"statusCode":"403","error":"Unauthorized","message":"new row violates row-level security policy"}
+  PUT captures/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd/frame-0002.jpg -> 400 {"statusCode":"403","error":"Unauthorized","message":"new row violates row-level security policy"}
+
+=== 7. storage RLS: an unregistered path must be refused ===
+  PUT unregistered frame-0099.jpg -> 400 {"statusCode":"403","error":"Unauthorized","message":"new row violates row-level security policy"}
+
+=== 8. status before finalize ===
+GET /api/capture/sessions/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd -> 200 {"status":"uploading","frameCount":3,"jobs":{"pending":0,"done":0,"failed":0}}
+
+=== 9. finalize with a bad track (too few fixes for live) ===
+POST .../finalize (3 fixes) -> 400 {"ok":false,"error":"invalid_track","reason":"insufficient_fixes"}
+
+=== 10. finalize (real track, matching + attribution + enqueue) ===
+POST .../finalize -> 200 {"status":"extracting"}
+
+=== 11. finalize is one-way ===
+POST .../finalize (again) -> 409 {"ok":false,"error":"already_finalized"}
+
+=== 12. frames must be refused after finalize ===
+POST .../frames (post-finalize) -> 409 {"ok":false,"error":"session_closed"}
+
+=== 13. status after finalize ===
+GET /api/capture/sessions/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd -> 200 {"status":"extracting","frameCount":3,"jobs":{"pending":3,"done":0,"failed":0}}
+
+=== 14. pump auth ===
+POST /api/capture/pump (no secret) -> 401 {"ok":false,"error":"unauthorized"}
+POST /api/capture/pump (wrong secret) -> 401 {"ok":false,"error":"unauthorized"}
+
+=== 15. pump with the real secret ===
+POST /api/capture/pump -> 200 {"claimed":3,"done":0,"failed":3,"remaining":3}
+
+=== 16. final status ===
+GET /api/capture/sessions/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd -> 200 {"status":"extracting","frameCount":3,"jobs":{"pending":3,"done":0,"failed":0}}
+
+# session f2b547b6-fa55-4dfb-9ad4-e7192cde26cd
+# uploadPrefix=captures/f2b547b6-fa55-4dfb-9ad4-e7192cde26cd maxFrames=400 maxFrameBytes=2097152
+
+
+================================================================
+DEFECT FOUND: the 0013 storage upload policy can never pass
+================================================================
+Step 6 above shows registration succeeding (200 {"accepted":[0,1,2]}) and the
+upload of those exact registered paths then failing:
+  403 "new row violates row-level security policy"
+
+DIAGNOSIS (by elimination, then by mechanism)
+
+Every clause of the 0013 policy is satisfied:
+  - bucket exists. Control test distinguishes the two failure modes:
+      GET /object/public/streetlens-frames/... -> "Object not found"   (bucket IS there)
+      GET /object/public/definitely-not-a-bucket/x.jpg -> "Bucket not found"
+    (The empty `GET /storage/v1/bucket` list and its 404 are just RLS hiding
+    bucket metadata from anon. That is normal and was a red herring.)
+  - path regex matches: verified against the policy's own regex, true for all 3.
+  - rows registered at exactly those paths: confirmed via capture_list_frames:
+      seq=0 path="captures/f2b547b6-.../frame-0000.jpg"
+  - session status was `uploading`.
+
+That leaves one clause: the exists() subquery over capture_frames/capture_sessions.
+
+MECHANISM. A policy expression is evaluated as the CALLING role (anon), and RLS
+applies to tables referenced inside a policy just as anywhere else. 0013 section
+3 puts capture_frames and capture_sessions under RLS with ZERO policies, and
+grants anon nothing on them. So for anon that subquery matches nothing, ever,
+regardless of what was registered.
+
+0013's two halves are each correct and mutually exclusive:
+  "deny anon all table access"  AND
+  "check anon's upload against those tables, in a policy that runs as anon"
+cannot both hold.
+
+IMPACT: the funnel's upload leg is completely non-functional. No contributor
+could ever upload a frame, and extraction has no image to fetch. This is not
+reachable by any mocked test — registration returns 200 and looks healthy; only
+a real anon upload against the real policy shows it.
+
+FIX: supabase/migrations/0016_capture_storage_policy_fix.sql — move the lookup
+into a narrow SECURITY DEFINER function (returns one boolean for one path, no
+enumeration, no data) and have the policy call it. This is the standard
+resolution for a policy that must consult an RLS-protected table. 0013's posture
+is preserved exactly: the check still runs in the database, registration is
+still what authorizes the upload, and anon still cannot read capture_frames.
+
+STATUS: 0016 is committed but NOT APPLIED. Per the seed I do not run DDL myself.
+The upload leg stays broken, and step 6 stays red, until the Conductor applies it
+— at which point re-running this lifecycle should show 200s at step 6.

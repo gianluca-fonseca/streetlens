@@ -79,6 +79,10 @@ The ramps, bins, and width channel live in `components/mapConfig.ts` and are tre
 
 ---
 
+## The CV data-collection funnel
+
+Alongside the manual audit flow, a contributor can film a street (live on the phone or by uploading a video) and have a vision model score the frames against the same rubric v0.1 a human auditor uses. Frames are placed on the street network by map matching, scored one call per frame, and rolled up into per-segment lens scores. The result is a **proposal, not data**: it enters the same review queue a manual contribution does, and nothing reaches the published map without a human approving it. See [`docs/cv-funnel.md`](docs/cv-funnel.md) for the full architecture, cost model, edge-case catalog, and ops runbook.
+
 ## Method
 
 The rubric derives from validated instruments rather than invented ones: **MAPS-Mini** (the Microscale Audit of Pedestrian Streetscapes), the **LANAMME-UCR** sidewalk-condition work, Costa Rica's **Ley 7600** accessibility law, and open drainage-mapping practice. Rubric **v0.1** is 15 items across the lenses, each with a fixed response type. The rubric is data, not code, and every version is permanent so old audits stay interpretable.
@@ -92,7 +96,7 @@ The path from a walked street to a public score is deliberately honest about wha
 3. **Rubric score.** 0 to 100 per lens, versioned, published with its formula.
 4. **Open map and data.** Public map, GeoJSON and CSV exports, sidewalk geometry contributed back to OpenStreetMap.
 
-Every audit trains the next one. The photos accumulate into a labeled-imagery corpus that, over time, is meant to train a computer-vision and machine-learning pipeline reading sidewalk condition straight from a photo, so future audits score faster than the last. **No model scores a street today.** When one does, a person still verifies what it reports. That loop, and the line between today and the roadmap, is Plate 3.
+Every audit trains the next one. The photos accumulate into a labeled-imagery corpus that, over time, is meant to train a computer-vision and machine-learning pipeline reading sidewalk condition straight from a photo, so future audits score faster than the last. Today a vision model can pre-score filmed streets through the [CV data-collection funnel](docs/cv-funnel.md), but its output is a proposal only: a person verifies every reading before it reaches the map. That loop, and the line between today and the roadmap, is Plate 3.
 
 ---
 

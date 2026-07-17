@@ -1,0 +1,13 @@
+  live      capture_list_frames
+  live      capture_attribute_frames
+  live      capture_claim_jobs_with_frames
+  live      capture_fail_unattributed_jobs
+  live      capture_session_token_usage
+  live      capture_drained_sessions
+  live      capture_pending_job_count
+  live      capture_list_observations
+
+  secret gate rejects a bad secret: YES
+  RLS denies direct select on capture_sessions: YES
+
+ALL 0015 RPCs LIVE

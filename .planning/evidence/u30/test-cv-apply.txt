@@ -1,0 +1,41 @@
+  [ok ] baseline: the demo collection is 535 audited segments (535)
+
+builders
+  [ok ] id derives from session + segment (so re-approving upserts) cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0001
+  [ok ] source is cv
+  [ok ] captured_on is the WALK date, not the approval date
+  [ok ] a null lens stays null (unknown is not zero) {"overall":62.5,"accessibility":41,"drainage":null,"shade":58,"bike":30}
+
+approve two segments
+  [ok ] applied locally {"mode":"local","kind":"cv_observation","session_id":"3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b","ids":["cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0001","cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0002"]}
+  [ok ] two observations landed ["cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0001","cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0002"]
+  [ok ] the audited segment now carries cv_observations
+  [ok ] and its cv_observation keeps the null lens as null
+  [ok ] THE INVARIANT: the audited segment's own properties are untouched 
+    before: {"id":"esc-sa-0001","name":"Calle 130","district":"San Antonio","score_overall":73,"score_accessibility":74,"score_drainage":71,"score_shade":72,"score_bike":15,"audited_at":"2026-07-10","demo":true}
+    after:  {"id":"esc-sa-0001","name":"Calle 130","district":"San Antonio","score_overall":73,"score_accessibility":74,"score_drainage":71,"score_shade":72,"score_bike":15,"audited_at":"2026-07-10","demo":true}
+  [ok ] a segment the walk never saw carries no cv_observations
+  [ok ] stats.segments is STILL 535 (a camera pass is not an audit) (535)
+  [ok ] cvSessionsReviewed counts the session (1)
+  [ok ] cvSegments counts the covered segments (2)
+  [ok ] communitySegments is unaffected (0)
+  [ok ] km/coverage/hero are untouched by CV {"km":76.84,"coveragePct":80.3,"heroPct":29}
+  [ok ] the collection gained NO features (CV attaches, it does not add segments) (535 vs 535)
+
+re-approve the same set
+  [ok ] still exactly two rows (upsert, not duplicate) (2)
+  [ok ] and the counts did not drift
+
+re-approve with one segment unticked
+  [ok ] the retracted segment is gone from the store ["esc-sa-0001"]
+  [ok ] and it no longer carries cv_observations on the map
+  [ok ] while the still-ticked segment keeps its observation
+  [ok ] cvSegments follows the retraction (1)
+  [ok ] stats.segments is STILL 535 (535)
+
+approve nothing (a full retraction)
+  [ok ] the store is empty for that session (0)
+  [ok ] the CV counts go back to zero
+  [ok ] and the audited dataset is exactly where it started
+
+PASS — CV apply attaches, upserts, retracts, and never touches an audit

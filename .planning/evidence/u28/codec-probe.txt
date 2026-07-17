@@ -1,0 +1,13 @@
+{
+  "isSecureContext": true,
+  "VideoDecoder": true,
+  "VideoEncoder": true,
+  "OffscreenCanvas": true,
+  "opfs": true,
+  "h264": false,
+  "vp8": true,
+  "vp9": true,
+  "h264enc": false,
+  "mp4rec": false,
+  "webmrec": true
+}

@@ -1,0 +1,37 @@
+
+the loop (EN, 1440, light)
+  [ok ] the queue is guarded (anonymous lands on login) http://localhost:3560/en/admin/login?from=%2Fen%2Fadmin%2Fqueue
+  [ok ] the queue shows the camera walk
+  [ok ] with its segment and frame counts
+  [ok ] overbudget and failed are shown as DIFFERENT things
+  [ok ] no inline approve/reject on a walk (it is judged per segment)
+  [ok ] the review page renders both segment rollups
+  [ok ] a lens no frame supported renders as unset, NOT 0 drainage on esc-sa-0001
+  [ok ] the cost readout is present
+  [ok ] unattributed frames are counted, not hidden
+  [ok ] the filmstrip rendered frames 5 frames
+  [ok ] and they are lazy (a 400-frame walk must not fetch on open)
+  [ok ] the walk reads as approved afterwards
+  [ok ] and it leaves the queue, like any reviewed submission
+
+the map
+  [ok ] the CV segment opens on the map
+  [ok ] SegmentDetail shows the CV chip
+  [ok ] and the camera observation section
+  [ok ] THE INVARIANT, visibly: the audited scores are untouched (73/74/71/72/15) audited grid
+  [ok ] while the camera's own reading sits apart and disagrees (62.5 / 41)
+  [ok ] the camera's unknown lens is unset, not 0
+  [ok ] confidence and coverage are shown
+
+the contributor's status page
+  [ok ] the status page reports the approval WALK STATUS |  | Your walk |  | This page updates itself while your walk is processed. A person re
+  [ok ] and never shows admin-only cost data
+
+public surfaces: 390 + 1440, EN + ES, light + dark
+  [ok ] captured the full public matrix (2 locales x 2 widths x 2 themes)
+
+console
+  [ok ] zero console errors introduced by u30
+  [note] 22 PRE-EXISTING hydration-mismatch errors filtered (reproduces on /admin/import, which u30 never touched)
+
+PASS — the review loop closes: queue → review → approve → map → status
