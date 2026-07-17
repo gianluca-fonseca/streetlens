@@ -262,6 +262,25 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
     return "failed";
   }
 
+  // Budget check AFTER the spend is recorded, not only before it.
+  //
+  // The pre-check above stops a frame from STARTING once the budget is gone,
+  // which is worth nothing on the last frame of a session: there is no next
+  // frame to block, so a session could overrun its cap and still finish
+  // review_ready with the overrun never surfacing. Checking here means an
+  // exceeded budget always ends as cost_paused in front of a human.
+  //
+  // The observation is written first on purpose — the frame is already paid for,
+  // and throwing away data we have been billed for helps nobody.
+  if (session.inputTokens > session.budget) {
+    await pauseSession(
+      db,
+      job.session_id,
+      session,
+      `session budget exhausted (${session.inputTokens}/${session.budget} input tokens)`,
+    );
+  }
+
   return "done";
 }
 

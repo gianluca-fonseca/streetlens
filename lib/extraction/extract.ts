@@ -38,6 +38,28 @@ export type ExtractOutcome =
 const NO_USAGE: VisionUsage = { inputTokens: 0, outputTokens: 0, cachedTokens: 0 };
 
 /**
+ * Reconcile the wire's `reason` with the canonical one.
+ *
+ * These two disagree, and both are right. `strict` json_schema requires every
+ * property to be present, so "no reason" has to travel as an explicit
+ * `reason: null` — there is no way to ask for an omitted key. But
+ * captureFrameQualitySchema (frozen, lib/capture/schemas.ts) types reason as an
+ * OPTIONAL string, and zod's `.optional()` admits `undefined`, not `null`.
+ *
+ * So a perfectly good answer for a perfectly good frame — the common case —
+ * would fail validation on the one field that says nothing was wrong. Dropping
+ * the null here is the translation between the two, and it belongs at the
+ * boundary rather than in either contract.
+ */
+function normalizeFrameQuality(raw: unknown): unknown {
+  const quality = (raw as { frameQuality?: unknown })?.frameQuality;
+  if (!quality || typeof quality !== "object") return quality;
+
+  const { reason, ...rest } = quality as { reason?: unknown };
+  return reason === null || reason === undefined ? rest : { ...rest, reason };
+}
+
+/**
  * Ask one model about one frame.
  *
  * Order matters: the token assertion runs BEFORE the response is parsed. An
@@ -102,6 +124,7 @@ export async function extractFrame(
     ...(raw as Record<string, unknown>),
     schemaVersion: CAPTURE_SCHEMA_VERSION,
     model,
+    frameQuality: normalizeFrameQuality(raw),
   };
 
   const parsed = captureObservationSchema.safeParse(candidate);
