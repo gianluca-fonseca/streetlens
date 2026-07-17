@@ -401,6 +401,23 @@ async function main() {
     );
   }
 
+  // Canton bounding box, kept LAT-FIRST [south, west, north, east] to match the
+  // pilot's Overpass-order convention (lib/matching/baseline.ts warns about this
+  // footgun; scripts/test-matching-baseline.mjs guards that it stays lat-first).
+  let minLat = Infinity,
+    minLon = Infinity,
+    maxLat = -Infinity,
+    maxLon = -Infinity;
+  for (const f of allFeatures) {
+    for (const [lon, lat] of f.geometry.coordinates) {
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+      if (lon < minLon) minLon = lon;
+      if (lon > maxLon) maxLon = lon;
+    }
+  }
+  const cantonBbox = [minLat, minLon, maxLat, maxLon];
+
   const collection = {
     type: "FeatureCollection",
     metadata: {
@@ -408,6 +425,7 @@ async function main() {
       license: "ODbL 1.0",
       canton: CANTON_NAME,
       canton_id: CANTON_ID,
+      bbox: cantonBbox,
       generated_at: new Date().toISOString(),
       segment_count: allFeatures.length,
       audited_km: Number(cantonAudited.toFixed(2)),

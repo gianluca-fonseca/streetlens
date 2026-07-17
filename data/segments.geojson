@@ -5,7 +5,13 @@
     "license": "ODbL 1.0",
     "canton": "Escazú",
     "canton_id": "esc",
-    "generated_at": "2026-07-17T20:43:05.265Z",
+    "bbox": [
+      9.886664,
+      -84.186221,
+      9.97244,
+      -84.121212
+    ],
+    "generated_at": "2026-07-17T20:54:11.580Z",
     "segment_count": 1457,
     "audited_km": 203.74,
     "network_km": 320.38,
