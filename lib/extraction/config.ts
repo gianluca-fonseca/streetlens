@@ -6,7 +6,7 @@
  * across the worker.
  */
 
-import { systemPromptApproxTokens } from "./prompt";
+import { staticRequestApproxTokens } from "./prompt";
 
 /* ------------------------------------------------------------------ *
  * Models
@@ -47,11 +47,14 @@ export function extractionEnabled(): boolean {
 /**
  * What one frame's image is allowed to cost, on top of the prompt.
  *
- * lib/extraction/downscale.ts sends at most a 512 px JPEG, which is ~256 patches
- * ~= 630 tokens at gpt-5-nano's 2.46x multiplier. 1200 leaves room for the user
- * turn, a different model's multiplier, and ordinary provider drift, while still
- * sitting far below a full-resolution image (~3800 tokens) — so the guard keeps
- * discriminating even though the bytes we send are now bounded by construction.
+ * lib/extraction/downscale.ts sends at most a 512 px JPEG: ~192 patches ~= 470
+ * tokens at gpt-5-nano's 2.46x multiplier, measured. 1200 is ~2.5x that, which
+ * absorbs a different model's multiplier and the ~10% the static estimate
+ * overshoots by, while still catching a provider that bills an order of
+ * magnitude more than the pixels it was handed.
+ *
+ * Note what this budget no longer has to survive: a 4K frame billed at full
+ * resolution. Nobody can bill us for pixels we did not send.
  */
 export const IMAGE_TOKEN_BUDGET = 1200;
 
@@ -65,11 +68,12 @@ export const IMAGE_TOKEN_BUDGET = 1200;
  * looks fine. The only way to notice is to assert the number we were billed.
  *
  * DERIVED, NOT FLAT. It used to be a hardcoded 2600, which quietly became a
- * tripwire on our own prompt: the cached prefix is deliberately ~2700 tokens (it
- * has to clear 1024 for prompt caching to engage at all), so the ceiling fired on
- * every correct call. A ceiling that has to be re-tuned by hand whenever the
- * rubric text changes is a ceiling that will be raised until it means nothing.
- * Measuring the prompt instead means editing prompt.ts cannot silently break the
+ * tripwire on our own request: the cached prefix alone is deliberately ~2700
+ * tokens (it has to clear 1024 for prompt caching to engage at all) and the
+ * strict schema is ~1900 more, so the ceiling fired on every correct call. A
+ * ceiling that has to be re-tuned by hand whenever the rubric text changes is a
+ * ceiling that will be raised until it means nothing. Measuring the request
+ * instead means editing prompt.ts or schema.ts cannot silently break the
  * breaker, in either direction.
  *
  * `CV_INPUT_TOKEN_CEILING` overrides it outright, for a model whose image
@@ -78,7 +82,7 @@ export const IMAGE_TOKEN_BUDGET = 1200;
 export function inputTokenCeiling(): number {
   const override = Number(process.env.CV_INPUT_TOKEN_CEILING);
   if (Number.isFinite(override) && override > 0) return Math.floor(override);
-  return systemPromptApproxTokens() + IMAGE_TOKEN_BUDGET;
+  return staticRequestApproxTokens() + IMAGE_TOKEN_BUDGET;
 }
 
 /** The ceiling's composition, for the message a tripped breaker leaves behind. */
@@ -87,7 +91,7 @@ export function describeInputTokenCeiling(): string {
   if (Number.isFinite(override) && override > 0) {
     return `${Math.floor(override)} (CV_INPUT_TOKEN_CEILING override)`;
   }
-  return `${inputTokenCeiling()} = ~${systemPromptApproxTokens()} static prompt + ${IMAGE_TOKEN_BUDGET} image budget`;
+  return `${inputTokenCeiling()} = ~${staticRequestApproxTokens()} static request (prompt + schema) + ${IMAGE_TOKEN_BUDGET} image budget`;
 }
 
 /**
