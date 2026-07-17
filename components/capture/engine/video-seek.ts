@@ -248,6 +248,59 @@ async function seekTo(
  * same honoured `resumeFromSeq` / `onFrame` / `onProgress` / `maxFrames` /
  * `signal`); only the result narrows. See `SeekTrackInfo` for why.
  */
+/**
+ * Read a video's duration and dimensions off a `<video>` element, then stop.
+ *
+ * The container probe in `video-demux.ts` is the better answer when it works,
+ * but it only works on what mp4box can parse. This is the fallback's fallback:
+ * the element will report a duration for anything the browser can play at all,
+ * including containers mp4box has never heard of.
+ *
+ * The caller needs this BEFORE extraction rather than during it, because the
+ * checkpoint manifest is built from the plan and the plan is built from the
+ * duration. Committing to a manifest only once the first frame arrived would
+ * mean a tab killed during the first minute of a long decode had nothing to
+ * resume from, which is the exact case checkpointing exists for.
+ *
+ * `extractFramesWithSeek` re-derives the plan from the same duration rather than
+ * taking it as an argument. That is deliberate: `planExtraction` is pure, so the
+ * two calls cannot disagree, and the extractor stays usable on its own.
+ */
+export async function probeVideoElement(
+  file: Blob,
+  signal?: AbortSignal,
+): Promise<SeekTrackInfo> {
+  if (typeof document === "undefined") throw new VideoExtractError("no_video_element");
+
+  const url = URL.createObjectURL(file);
+  const video = document.createElement("video");
+  video.preload = "metadata";
+  video.muted = true;
+  video.playsInline = true;
+  video.src = url;
+
+  try {
+    video.load();
+    await waitForEvent(video, "loadedmetadata", METADATA_TIMEOUT_MS, "video_load_failed", signal);
+
+    const durationMs = video.duration * 1_000;
+    if (!Number.isFinite(durationMs) || durationMs <= 0) {
+      throw new VideoExtractError("unknown_duration");
+    }
+
+    return {
+      width: video.videoWidth,
+      height: video.videoHeight,
+      durationMs,
+      source: "video_element",
+    };
+  } finally {
+    video.removeAttribute("src");
+    video.load();
+    URL.revokeObjectURL(url);
+  }
+}
+
 export async function extractFramesWithSeek(
   file: Blob,
   opts: ExtractOptions,
