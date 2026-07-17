@@ -30,7 +30,13 @@ import {
   visionModel,
   escalationModel,
 } from "@/lib/extraction/config";
-import { extractFrame, observationConfidence, shouldEscalate } from "@/lib/extraction/extract";
+import {
+  extractFrame,
+  observationConfidence,
+  shouldEscalate,
+  type ImagePreparer,
+} from "@/lib/extraction/extract";
+import { downscaleFrame } from "@/lib/extraction/downscale";
 import { createOpenAiVisionClient, type VisionClient } from "@/lib/extraction/client";
 import type { CaptureDb, ClaimedJob } from "./db";
 import { getCaptureDb } from "./db";
@@ -43,6 +49,8 @@ export type PumpDeps = {
   vision: VisionClient;
   /** Injectable so tests can assert URL construction without Supabase env. */
   frameUrl?: (storagePath: string) => string;
+  /** Injectable so tests drive the real downscale without fetching anything. */
+  prepareImage?: ImagePreparer;
   limit?: number;
   concurrency?: number;
 };
@@ -79,6 +87,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
 
   const vision = deps?.vision ?? createOpenAiVisionClient();
   const frameUrl = deps?.frameUrl ?? publicFrameUrl;
+  const prepareImage = deps?.prepareImage ?? downscaleFrame;
   const batch = deps?.limit ?? PUMP_BATCH_SIZE;
   const concurrency = deps?.concurrency ?? PUMP_CONCURRENCY;
 
@@ -120,7 +129,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
     jobs.map((job) =>
       limit(async () => {
         touchedSessions.add(job.session_id);
-        const outcome = await runJob(job, { db, vision, frameUrl, loadSession });
+        const outcome = await runJob(job, { db, vision, frameUrl, prepareImage, loadSession });
         if (outcome === "done") done++;
         else failed++;
       }),
@@ -141,11 +150,12 @@ type JobDeps = {
   db: CaptureDb;
   vision: VisionClient;
   frameUrl: (storagePath: string) => string;
+  prepareImage: ImagePreparer;
   loadSession: (sessionId: string) => Promise<SessionState>;
 };
 
 async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"> {
-  const { db, vision, frameUrl, loadSession } = deps;
+  const { db, vision, frameUrl, prepareImage, loadSession } = deps;
 
   // The claim RPC increments attempts, so this counts claims. A job whose worker
   // died mid-call still converges on failure instead of being retried forever.
@@ -184,8 +194,14 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
     return "failed";
   }
 
+  // Fetched and shrunk once, then reused if this frame escalates: the stronger
+  // model is asked about the same 512 px image, not sent back to storage for the
+  // full-resolution original.
+  let preparing: Promise<string> | null = null;
+  const prepareOnce: ImagePreparer = (u) => (preparing ??= prepareImage(u));
+
   const model = visionModel();
-  const first = await extractFrame(vision, url, model);
+  const first = await extractFrame(vision, url, model, { prepareImage: prepareOnce });
   session.inputTokens += first.usage.inputTokens;
 
   if (first.kind === "overbudget") {
@@ -195,12 +211,12 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
       db,
       job.session_id,
       session,
-      `frame billed ${first.inputTokens} input tokens over the per-frame ceiling`,
+      `frame billed ${first.inputTokens} input tokens, over a ceiling of ${first.ceiling}`,
     );
     await db.failJob(
       job.frame_id,
       "failed_overbudget",
-      `input_tokens=${first.inputTokens} exceeds per-frame ceiling`,
+      `input_tokens=${first.inputTokens} exceeds the per-frame ceiling of ${first.ceiling}`,
     );
     return "failed";
   }
@@ -219,7 +235,9 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
   let escalated = false;
   if (shouldEscalate(first.observation) && session.escalated < session.escalationCap) {
     session.escalated++;
-    const second = await extractFrame(vision, url, escalationModel());
+    const second = await extractFrame(vision, url, escalationModel(), {
+      prepareImage: prepareOnce,
+    });
     session.inputTokens += second.usage.inputTokens;
 
     if (second.kind === "overbudget") {
@@ -227,12 +245,12 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
         db,
         job.session_id,
         session,
-        `escalated frame billed ${second.inputTokens} input tokens over the per-frame ceiling`,
+        `escalated frame billed ${second.inputTokens} input tokens, over a ceiling of ${second.ceiling}`,
       );
       await db.failJob(
         job.frame_id,
         "failed_overbudget",
-        `escalation input_tokens=${second.inputTokens} exceeds per-frame ceiling`,
+        `escalation input_tokens=${second.inputTokens} exceeds the per-frame ceiling of ${second.ceiling}`,
       );
       return "failed";
     }
