@@ -1,0 +1,75 @@
+Starting public.ecr.aws/supabase/postgres:17.6.1.143...
+  [ok ] found the full migration chain through 0017 0001_extensions.sql 0002_geography.sql 0003_rubric.sql 0004_audits.sql 0005_submissions.sql 0006_rls.sql 0007_admin_rpcs.sql 0008_views.sql 0009_views_district_audited_at.sql 0010_admin_list_rpc.sql 0011_bike_layer.sql 0012_community.sql 0013_capture.sql 0014_submission_types.sql 0015_capture_worker.sql 0016_capture_storage_policy_fix.sql 0017_capture_review.sql
+  [ok ] 0013_capture.sql applies cleanly
+  [ok ] 0014_submission_types.sql applies cleanly
+  [ok ] 0017_capture_review.sql applies cleanly
+  [ok ] 0013 + 0014 + 0017 are re-runnable (idempotent)
+  [ok ] all five capture tables exist capture_frame_jobs capture_frames capture_observations capture_segment_rollups capture_sessions
+  [ok ] capture_sessions.track is geography, not geometry
+  [ok ] capture_frames.t is bigint (epoch ms overflows int4)
+  [ok ] RLS is enabled on every capture table
+  [ok ] capture tables have ZERO policies (deny-by-default; RPCs are the only way in) 0 policies
+  [ok ] the GIST indexes exist
+  [ok ] the frames bucket is public-read, 2 MB, jpeg-only true|2097152|image/jpeg
+  [ok ] storage has exactly one INSERT policy and no update/delete policy capture_frames_anon_insert:INSERT
+  [ok ] submissions accepts cv_capture
+  [ok ] submissions accepts unknown (the honeypot landing place)
+  [ok ] submissions still rejects a garbage type
+  [ok ] the two original types still work (manual flow unchanged)
+  [ok ] capture_create_session returns a session uuid efab6033-c501-4947-8c42-ecd0a695fb98
+  [ok ] a new session starts at pending_upload
+  [ok ] an invalid mode is rejected
+  [ok ] a 4th session from one origin within the hour is rate_limited IN THE DATABASE
+  [ok ] the ceiling is per-origin: a different ip hash is unaffected
+  [ok ] capture_register_frames returns the accepted seqs {0,1}
+  [ok ] registering moves the session to uploading and counts the frames
+  [ok ] the storage path is DERIVED server-side, never taken from the client
+  [ok ] a client-supplied storagePath is ignored
+  [ok ] re-registering the same seq is idempotent (retry-safe), not a duplicate
+  [ok ] an oversized frame is rejected by the CHECK
+  [ok ] seq >= 400 is rejected by the CHECK
+  [ok ] capture_session_status returns the progress shape {"status" : "uploading", "frameCount" : 2, "jobs" : {"pending" : 0, "done" : 0, "failed" : 0}, "rollups" : []}
+  [ok ] session status leaks NO ip hash and NO contact {"status" : "uploading", "frameCount" : 2, "jobs" : {"pending" : 0, "done" : 0, "failed" : 0}, "rollups" : []}
+  [ok ] reading an unknown session raises rather than returning null
+  [ok ] capture_finalize_session hands the session to the matcher matching
+  [ok ] finalize writes a real geography LineString
+  [ok ] finalize records the clock offset without touching the track
+  [ok ] finalize enqueues exactly one job per frame
+  [ok ] a finalized session cannot be finalized again (no track rewrite)
+  [ok ] a finalized session no longer accepts frames
+  [ok ] capture_claim_jobs without the secret is unauthorized
+  [ok ] the secret gate holds even when app_secrets has no row yet
+  [ok ] capture_claim_jobs claims the pending jobs with the right secret 2
+  [ok ] claiming marks them running and counts the attempt
+  [ok ] a second claim returns nothing (no double-spend on the same frame)
+  [ok ] capture_complete_job stores the observation and closes the job
+  [ok ] re-running one model REPLACES its answer rather than double-counting
+  [ok ] a DIFFERENT model on the same frame is kept alongside (A/B, escalation)
+  [ok ] failed_overbudget is recorded distinctly from failed (it is retryable)
+  [ok ] an invalid job status is rejected
+  [ok ] capture_upsert_rollup writes the per-segment rollup
+  [ok ] re-rolling one segment updates in place (one row per session+segment)
+  [ok ] an out-of-range score is rejected by the CHECK
+  [ok ] the rollup now surfaces in the public session status
+  [ok ] capture_set_session_status stamps the lifecycle timestamp
+  [ok ] status transitions are secret-gated too
+  [ok ] capture_emit_submission is secret-gated
+  [ok ] emitting for a session that does not exist raises
+  [ok ] the drained session is filed as a pending cv_capture row
+  [ok ] re-emitting is a no-op, so the pump's retry cannot double-file the walk
+  [ok ] admin_apply_capture_session is secret-gated
+  [ok ] approving two segments lands exactly two observations
+  [ok ] a lens no frame supported stays NULL rather than becoming a zero
+  [ok ] the observation keeps its provenance and capture date
+  [ok ] re-approving is idempotent for the segments that stayed ticked
+  [ok ] an UNTICKED segment is retracted, not left published
+  [ok ] retraction is scoped to its own session
+  [ok ] an out-of-range CV score is rejected by the CHECK
+  [ok ] approving a capture NEVER writes an audit (the prime invariant)
+  [ok ] deleting a session cascades to its CV observations
+  [ok ] deleting a session cascades to frames, jobs, observations and rollups
+  [ok ] the owner CAN see the session (so the next check is not vacuous)
+  [ok ] anon cannot read that session directly — only the RPCs let anything out anon saw: 0
+  [ok ] anon cannot forge a capture_frames row (which would authorize an upload)
+
+PASS — migrations apply and the capture RPCs behave
