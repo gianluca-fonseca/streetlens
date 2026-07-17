@@ -260,6 +260,15 @@ export type CaptureObservation = {
   model: string;
   items: Record<RubricItemKey, CaptureObservationItem>;
   frameQuality: CaptureFrameQuality;
+  /**
+   * One short, plain-language sentence or three describing what the model saw and
+   * why the notable scores are what they are ("Narrow paved road, no sidewalk on
+   * either side; dense canopy left; standing water at the right edge"). This is a
+   * per-FRAME rationale, not per-item: it exists for a human reviewer, who reads
+   * one honest paragraph far faster than 15 justifications. Stored on the
+   * observation row (0020); old rows predate it and simply have none.
+   */
+  rationale: string;
 };
 
 /* ------------------------------------------------------------------ *

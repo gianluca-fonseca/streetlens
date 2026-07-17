@@ -72,7 +72,16 @@ function itemSchema(key: RubricItemKey): JsonSchema {
   };
 }
 
-/** The full response schema: exactly the 15 items, plus quality and provenance. */
+/**
+ * The full response schema: exactly the 15 items, a per-frame rationale, plus
+ * quality and provenance.
+ *
+ * `rationale` is a required free-text string (max-length lives in its description,
+ * not as a schema `maxLength` — strict structured outputs do not honour it, and a
+ * hard cap that fails a paid frame over a few extra words is the wrong trade; the
+ * zod side keeps a loose ceiling). It is the ONE piece of prose the model returns;
+ * everything else stays strictly typed.
+ */
 export function buildObservationJsonSchema(): JsonSchema {
   const properties: Record<string, JsonSchema> = {};
   for (const key of RUBRIC_ITEM_KEYS) {
@@ -82,11 +91,16 @@ export function buildObservationJsonSchema(): JsonSchema {
   return {
     type: "object",
     additionalProperties: false,
-    required: ["schemaVersion", "items", "frameQuality"],
+    required: ["schemaVersion", "items", "frameQuality", "rationale"],
     properties: {
       schemaVersion: {
         type: "string",
         enum: [CAPTURE_SCHEMA_VERSION],
+      },
+      rationale: {
+        type: "string",
+        description:
+          "One to three plain-language sentences describing what you actually see in THIS frame and why the notable scores are what they are (e.g. \"Narrow paved road, no sidewalk on either side; dense canopy on the left; standing water pooling at the right edge\"). Describe only what is visible; do not speculate or infer from what such a street usually looks like. Keep it under 60 words. This is a single per-frame note, not a justification per item.",
       },
       items: {
         type: "object",
