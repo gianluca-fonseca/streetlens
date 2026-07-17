@@ -202,6 +202,13 @@ export type StreetStats = {
    * the official audited figure.
    */
   communitySegments: number;
+  /**
+   * u30, on exactly the same terms: capture sessions with at least one approved
+   * observation, and the distinct segments those observations cover. A camera
+   * pass is not an audit, so these never touch `segments`, `km`, or `heroPct`.
+   */
+  cvSessionsReviewed: number;
+  cvSegments: number;
 };
 
 /**
