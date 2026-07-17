@@ -31,6 +31,7 @@ import {
 import { LENS_KEYS, type LensKey } from "@/lib/capture/scoring";
 import type { RubricItemKey } from "@/lib/capture/types";
 import FrameInspector from "./FrameInspector";
+import ReviewMap, { type MatchedGeometry } from "./ReviewMap";
 import styles from "@/components/ui/zen.module.css";
 
 const LENS_ORDER = LENS_KEYS;
@@ -47,7 +48,8 @@ function freshCorrections(): ReviewCorrections {
 
 export default function CaptureReview({
   review,
-}: Readonly<{ review: SessionReview }>) {
+  matchedGeometry = [],
+}: Readonly<{ review: SessionReview; matchedGeometry?: MatchedGeometry[] }>) {
   const t = useTranslations("admin.capture");
   const tl = useTranslations("layers");
   const locale = useLocale();
@@ -121,6 +123,10 @@ export default function CaptureReview({
     () => (selectedSeq === null ? null : review.frames.find((f) => f.seq === selectedSeq) ?? null),
     [selectedSeq, review.frames],
   );
+  const selectedSegmentId = selectedFrame?.segmentId ?? null;
+
+  const hasMap =
+    review.track.length > 0 || review.frames.some((f) => f.position !== null);
 
   const inspectorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -348,6 +354,24 @@ export default function CaptureReview({
           ) : null}
         </ul>
       </section>
+
+      {hasMap ? (
+        <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-3`}>
+          <h2 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+            {t("mapHeading")}
+          </h2>
+          <ReviewMap
+            track={review.track}
+            frames={review.frames}
+            matchedGeometry={matchedGeometry}
+            excludedSeqs={corrections.excluded}
+            deletedSeqs={corrections.deleted}
+            selectedSeq={selectedSeq}
+            selectedSegmentId={selectedSegmentId}
+            onSelectFrame={(seq) => setSelectedSeq((s) => (s === seq ? null : seq))}
+          />
+        </section>
+      ) : null}
 
       <div className="lg:grid lg:grid-cols-[1fr_minmax(300px,360px)] lg:items-start lg:gap-4">
         <div className="flex flex-col gap-3">

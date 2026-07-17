@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ImageOff, ScanLine, Users, X } from "lucide-react";
+import { ImageOff, Pencil, ScanLine, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
 import {
   parseCommunityReport,
@@ -108,6 +108,9 @@ export default function SegmentDetail({
   // (docs/cv-funnel.md — "CV output is a proposal, not data").
   const cvObservations = parseCvObservations(segment.cv_observations);
   const hasCv = cvObservations.length > 0;
+  // A reviewer corrected at least one of these readings before approving (u2). Shown
+  // as a small, honest marker beside the CV chip — not loud, but not hidden.
+  const hasHumanCorrected = cvObservations.some((o) => o.human_corrected);
 
   return (
     <section
@@ -168,6 +171,12 @@ export default function SegmentDetail({
                 <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-2 py-1 text-[10.5px] font-medium text-neutral-strong">
                   <ScanLine size={12} strokeWidth={1.75} aria-hidden="true" />
                   {t("cvChip")}
+                </span>
+              ) : null}
+              {hasHumanCorrected ? (
+                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-2 py-1 text-[10.5px] font-medium text-neutral-strong">
+                  <Pencil size={12} strokeWidth={1.75} aria-hidden="true" />
+                  {t("cvHumanCorrected")}
                 </span>
               ) : null}
             </span>

@@ -16,8 +16,10 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSessionReview } from "@/lib/capture/review-store";
+import { getSegments } from "@/lib/segments";
 import AdminHeader from "@/components/admin/AdminHeader";
 import CaptureReview from "@/components/admin/CaptureReview";
+import type { MatchedGeometry } from "@/components/admin/ReviewMap";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +35,30 @@ export default async function AdminCaptureReviewPage({
   const review = await getSessionReview(id);
   if (!review) notFound();
 
+  // Real geometry for the matched segments, so the review map draws them where they
+  // actually are. Joined by id from the same collection the public map reads; a
+  // segment with no geometry (unknown id) is simply skipped.
+  const matchedIds = new Set(
+    review.frames.map((f) => f.segmentId).filter((id): id is string => Boolean(id)),
+  );
+  let matchedGeometry: MatchedGeometry[] = [];
+  if (matchedIds.size > 0) {
+    try {
+      const collection = await getSegments();
+      matchedGeometry = collection.features
+        .filter((f) => matchedIds.has(f.properties.id))
+        .map((f) => ({
+          id: f.properties.id,
+          coordinates: f.geometry.coordinates.map(
+            (c) => [c[0], c[1]] as [number, number],
+          ),
+        }));
+    } catch {
+      // The map degrades to track + dots without segment highlights; not fatal.
+      matchedGeometry = [];
+    }
+  }
+
   return (
     <>
       <AdminHeader locale={locale} active="queue" />
@@ -46,7 +72,7 @@ export default async function AdminCaptureReviewPage({
           </p>
         </div>
 
-        <CaptureReview review={review} />
+        <CaptureReview review={review} matchedGeometry={matchedGeometry} />
       </main>
     </>
   );
