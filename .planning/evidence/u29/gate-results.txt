@@ -1,0 +1,84 @@
+u29 ingest + extraction worker — gate results
+Run: 2026-07-16. Node v24.18.0, Next 16.2.10.
+
+---- Static gates ----
+npx tsc --noEmit                                    PASS (clean)
+npx eslint .                                        PASS (clean, whole repo)
+npx next build                                      PASS
+    all five capture routes registered dynamic:
+      ƒ /api/capture/pump
+      ƒ /api/capture/sessions
+      ƒ /api/capture/sessions/[id]
+      ƒ /api/capture/sessions/[id]/finalize
+      ƒ /api/capture/sessions/[id]/frames
+
+---- Node tests (no network, no DB, no bill) ----
+scripts/test-extraction-worker.mjs                  PASS (55 checks)
+scripts/test-capture-rollup.mjs                     PASS (40 checks)
+scripts/test-capture-schemas.mjs                    PASS (pre-existing, unbroken)
+scripts/test-matching-baseline.mjs                  PASS (pre-existing, unbroken)
+scripts/test-rate-limit-namespaces.mjs              PASS (pre-existing, unbroken)
+scripts/test-honeypot-type.mjs                      PASS (pre-existing, unbroken)
+scripts/test-upload-client.mjs                      PASS (pre-existing, unbroken)
+
+Worker coverage: happy path (3 frames -> observations -> rollup), cost breaker
+trip, breaker precedence over a valid answer, per-session budget, escalation +
+its 10% cap, unusable frames not escalating, refusal / incomplete / unparsable /
+out-of-range handling, attempts cap (terminal + no-spend-past-cap), concurrent
+pump safety, kill switch (off and unset), request shape (detail:low, URL not
+base64, cacheable prefix, strict schema, 15 items, no temperature), retry policy
+(429 retried, insufficient_quota fails fast, 400 not retried), transport failure.
+
+---- Live database (real Supabase, dev server :3894) ----
+0015 RPC probe                                      PASS — all 8 live
+  secret gate rejects a bad secret                  YES
+  RLS denies direct select on capture_sessions      YES
+Full session lifecycle                              15/16 steps green
+  honeypot (string value)                -> 400 rejected
+  honeypot (non-string, u25 class)       -> 400 rejected
+  invalid mode                           -> 400 invalid
+  create session                         -> 201 {sessionId, uploadPrefix, 400, 2097152}
+  client-chosen storagePath              -> 400 invalid
+  register 3 frames                      -> 200 {"accepted":[0,1,2]}
+  re-register seq 0                      -> 200 {"accepted":[0,1,2]} (idempotent cursor)
+  upload bytes to storage                -> 403 *** RED: see the 0013 policy defect ***
+  status before finalize                 -> 200 uploading, frameCount 3
+  finalize, 3 fixes                      -> 400 invalid_track/insufficient_fixes
+  finalize, real 12-fix track            -> 200 {"status":"extracting"}, 3 jobs enqueued
+                                            (matched the real segment esc-sa-0001)
+  finalize again                         -> 409 already_finalized
+  frames after finalize                  -> 409 session_closed
+  status after finalize                  -> 200 extracting, jobs {pending:3}
+  pump, no secret / wrong secret         -> 401 / 401
+  pump, real secret                      -> 200 {claimed:3, done:0, failed:3, remaining:3}
+                                            failed+requeued because of the OpenAI
+                                            quota blocker; jobs correctly went back
+                                            to pending rather than burning attempts
+
+---- Live model smoke ----
+scripts/live-smoke-extraction.mjs                   BLOCKED (see live-smoke-extraction.txt)
+  Found 2 real bugs on real calls, then hit 429 insufficient_quota. Not passed.
+
+---- Defects found and fixed in this unit ----
+1. frameQuality.reason: strict json_schema cannot omit a key, so "nothing was
+   wrong" arrives as reason:null, but the frozen captureFrameQualitySchema types
+   reason as .optional() (undefined, not null). EVERY usable frame would have
+   failed validation. Found by the mocked test on its first run.
+2. Per-session budget could not fire on a session's last frame: the pre-check
+   only blocks a frame from STARTING, so with no next frame to block a session
+   could overrun its cap and still finish review_ready, overrun unsurfaced.
+3. temperature: gpt-5 reasoning models 400 the entire request. Every production
+   call would have failed. Found by the live smoke's first real call.
+4. insufficient_quota (a 429) was retried 3x with backoff though it can never
+   succeed. Now fails fast.
+
+---- Blockers needing Conductor action ----
+A. CRITICAL — the 0013 storage upload policy can never pass; nobody can upload a
+   frame. Its exists() subquery over capture_frames runs as anon, and 0013 puts
+   capture_frames under RLS with zero policies, so it matches nothing, ever.
+   Fix committed as 0016 (NOT applied; I do not run DDL per the seed).
+B. HIGH — OPENAI_API_KEY has no quota, so the real token counts, prompt-cache
+   behaviour and cost math are unverified.
+
+Neither is in this unit's code. A is a defect in the frozen u25 migration; B is
+account state.
