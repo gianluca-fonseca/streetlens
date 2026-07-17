@@ -2,7 +2,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegmentDetail } from "@/lib/segments";
 import { getPendingSubmissions } from "@/lib/submissions";
-import type { AddSegmentPayload, UpdateSegmentPayload } from "@/lib/schemas";
+import { getSessionReview } from "@/lib/capture/review-store";
+import type {
+  AddSegmentPayload,
+  CvCapturePayload,
+  UpdateSegmentPayload,
+} from "@/lib/schemas";
 import AdminHeader from "@/components/admin/AdminHeader";
 import QueueList, { type QueueItemView } from "@/components/admin/QueueList";
 
@@ -35,6 +40,42 @@ export default async function AdminQueuePage({
             highway: payload.highway,
             note: payload.note ?? null,
           },
+        };
+      }
+
+      if (item.type === "cv_capture") {
+        // The row carries only {session_id} (0014) — capture data lives in the
+        // capture_* tables and is deliberately not copied into the payload, so
+        // the card reads it rather than trusting a snapshot that could drift.
+        const payload = item.payload as CvCapturePayload;
+        const review = await getSessionReview(payload.session_id);
+        return {
+          id: item.id,
+          type: "cv_capture",
+          createdAt: item.created_at,
+          geometry: [],
+          proposed: {},
+          capture: review
+            ? {
+                sessionId: payload.session_id,
+                segments: review.segments.length,
+                frames: review.frameCount,
+                failedFrames: review.jobs.failed - review.jobs.overbudget,
+                overbudget: review.overbudget,
+                escalated: review.tokens.escalated,
+              }
+            : {
+                // The queue row outlived its session. Say so plainly rather than
+                // rendering a walk with zeroes, which would read as "the camera
+                // saw nothing" instead of "this cannot be read".
+                sessionId: payload.session_id,
+                segments: 0,
+                frames: 0,
+                failedFrames: 0,
+                overbudget: false,
+                escalated: 0,
+                unreadable: true,
+              },
         };
       }
 

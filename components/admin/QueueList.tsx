@@ -3,15 +3,40 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Check, FlaskConical, Plus, PencilLine, X } from "lucide-react";
+import {
+  Camera,
+  Check,
+  FlaskConical,
+  Plus,
+  PencilLine,
+  TriangleAlert,
+  X,
+} from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import StatusBadge from "./StatusBadge";
 import GeometryPreview from "./GeometryPreview";
 import styles from "@/components/ui/zen.module.css";
 
+/** What a finished camera walk shows in the queue (u30). */
+export type QueueCaptureView = {
+  sessionId: string;
+  /** Segments the walk produced a rollup for. */
+  segments: number;
+  frames: number;
+  /** Frames whose extraction failed outright (a bad frame, not a budget stop). */
+  failedFrames: number;
+  /** The money ran out: paused mid-extraction, or frames failed for budget. */
+  overbudget: boolean;
+  /** Frames sent to the stronger model because the first pass was unsure. */
+  escalated: number;
+  /** The session could not be read (fixture/live mismatch, or deleted). */
+  unreadable?: boolean;
+};
+
 /** A queue item prepared by the (server) queue page for display. */
 export type QueueItemView = {
   id: string;
-  type: "add_segment" | "update_segment";
+  type: "add_segment" | "update_segment" | "cv_capture";
   createdAt: string;
   geometry: [number, number][];
   proposed: { name?: string; highway?: string; note?: string | null };
@@ -21,6 +46,8 @@ export type QueueItemView = {
     note?: string | null;
   };
   contributorReason?: string | null;
+  /** Present only for `cv_capture`. */
+  capture?: QueueCaptureView;
 };
 
 const DIFF_FIELDS = ["name", "highway", "note"] as const;
@@ -105,6 +132,7 @@ export default function QueueList({
       ) : null}
 
       {list.map((item) => {
+        const isCapture = item.type === "cv_capture";
         const isAdd = item.type === "add_segment";
         const changed = DIFF_FIELDS.filter(
           (f) => item.proposed[f as DiffField] !== undefined,
@@ -117,18 +145,23 @@ export default function QueueList({
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status="pending" label={ts("pending")} />
               <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-neutral-strong">
-                {isAdd ? (
+                {isCapture ? (
+                  <Camera size={12} strokeWidth={2} aria-hidden="true" />
+                ) : isAdd ? (
                   <Plus size={12} strokeWidth={2} aria-hidden="true" />
                 ) : (
                   <PencilLine size={12} strokeWidth={2} aria-hidden="true" />
                 )}
-                {isAdd ? t("typeAdd") : t("typeUpdate")}
+                {isCapture ? t("typeCapture") : isAdd ? t("typeAdd") : t("typeUpdate")}
               </span>
               <span className="ml-auto font-mono text-[11.5px] text-neutral-strong">
                 {t("submittedAt")} {dateFmt.format(new Date(item.createdAt))}
               </span>
             </div>
 
+            {isCapture ? (
+              <CaptureCardBody item={item} t={t} />
+            ) : (
             <div className="mt-3 flex flex-col gap-3 sm:flex-row">
               <GeometryPreview
                 coordinates={item.geometry}
@@ -221,9 +254,26 @@ export default function QueueList({
                 )}
               </div>
             </div>
+            )}
 
+            {isCapture ? (
+              // No inline verdict for a walk. A capture is approved per SEGMENT
+              // (an admin takes the segments the camera got right and leaves the
+              // rest), which this card cannot express and /api/admin/review
+              // refuses outright. The decision lives on the review page.
+              <div className="mt-3 border-t border-border pt-3">
+                <Link
+                  href={`/admin/capture/${item.capture?.sessionId ?? ""}`}
+                  className={`${styles.controlSoft} inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-1.5 text-[12.5px] font-semibold text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated`}
+                >
+                  <Camera size={14} strokeWidth={2.25} aria-hidden="true" />
+                  {t("captureReviewCta")}
+                </Link>
+              </div>
+            ) : (
             <div className="mt-3 border-t border-border pt-3">
               <label className="flex flex-col gap-1">
+
                 <span className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
                   {t("reasonLabel")}
                 </span>
@@ -269,9 +319,74 @@ export default function QueueList({
                 </button>
               </div>
             </div>
+            )}
           </article>
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * The body of a camera-walk card: what the walk produced, and what went wrong.
+ *
+ * Deliberately shows the bad news on the card rather than only on the review
+ * page, so an admin can see which walks need attention without opening each one.
+ * `failed` and `overbudget` are reported separately because they are different
+ * events: a failed frame was unreadable, an overbudget one was never looked at.
+ */
+function CaptureCardBody({
+  item,
+  t,
+}: Readonly<{
+  item: QueueItemView;
+  t: ReturnType<typeof useTranslations<"admin.queue">>;
+}>) {
+  const c = item.capture;
+  if (!c) return null;
+
+  if (c.unreadable) {
+    return (
+      <p
+        role="status"
+        className="mt-3 flex items-center gap-2 rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-3 py-2 text-[12.5px] text-neutral-strong"
+      >
+        <TriangleAlert size={14} strokeWidth={1.75} aria-hidden="true" />
+        {t("captureUnreadable")}
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-3">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[13px]">
+        <dt className="text-neutral-strong">{t("captureSegments")}</dt>
+        <dd className="font-mono font-medium text-ink">{c.segments}</dd>
+        <dt className="text-neutral-strong">{t("captureFrames")}</dt>
+        <dd className="font-mono font-medium text-ink">{c.frames}</dd>
+      </dl>
+
+      {c.overbudget || c.failedFrames > 0 || c.escalated > 0 ? (
+        <ul className="mt-2 flex flex-wrap gap-1.5">
+          {c.overbudget ? (
+            <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-amber/45 bg-amber/10 px-2 py-0.5 text-[11px] font-medium text-ink">
+              <TriangleAlert size={12} strokeWidth={2} aria-hidden="true" />
+              {t("captureOverbudget")}
+            </li>
+          ) : null}
+          {c.failedFrames > 0 ? (
+            <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-clay/45 bg-clay/10 px-2 py-0.5 text-[11px] font-medium text-clay">
+              <X size={12} strokeWidth={2} aria-hidden="true" />
+              {t("captureFailedFrames", { count: c.failedFrames })}
+            </li>
+          ) : null}
+          {c.escalated > 0 ? (
+            <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-neutral-strong">
+              {t("captureEscalated", { count: c.escalated })}
+            </li>
+          ) : null}
+        </ul>
+      ) : null}
     </div>
   );
 }

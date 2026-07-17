@@ -105,7 +105,20 @@ type ReviewPayload = {
     confidence: number | null;
     escalated: number | null;
   }[];
-  frames: { seq: number; storagePath: string; segmentId: string | null }[];
+  frames: {
+    seq: number;
+    storagePath: string;
+    segmentId: string | null;
+    /**
+     * Fixture-only escape hatch: a ready-made URL for a frame.
+     *
+     * The live RPC never sets this — it returns storage paths and the app builds
+     * bucket URLs, so the database stays ignorant of deployment URLs. A local
+     * fixture has no bucket to build from, so it may point frames at a local
+     * asset and get a real filmstrip to look at.
+     */
+    url?: string | null;
+  }[];
 };
 
 /** Build a public frame URL, tolerating an unconfigured deployment. */
@@ -134,7 +147,7 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     const frame: ReviewFrame = {
       seq: f.seq,
       storagePath: f.storagePath,
-      url: frameUrl(f.storagePath),
+      url: f.url ?? frameUrl(f.storagePath),
     };
     if (!f.segmentId) {
       unattributed++;
