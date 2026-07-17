@@ -249,7 +249,7 @@ const PILL_CLASS =
 function AttributionPills() {
   const t = useTranslations("landing.hero");
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
       <a
         href={AUTHOR_LINKEDIN}
         target="_blank"
@@ -351,9 +351,9 @@ export default function Hero({
         <div className="grid grid-cols-1 gap-x-[clamp(1.25rem,2.2vw,2.5rem)] gap-y-8 lg:h-[78vh] lg:max-h-[52rem] lg:grid-cols-[clamp(280px,20vw,360px)_minmax(0,1fr)_clamp(220px,17vw,320px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-y-6">
           {/* ── LEFT zone head: lockup, pilot status, question, request +
                attribution pills ──────────────────────────────────────── */}
-          <div className="lg:col-start-1 lg:row-start-1">
+          <div className="flex flex-col items-center lg:col-start-1 lg:row-start-1 lg:block">
             <div
-              className="sl-hero-el flex flex-col items-start text-ink-display"
+              className="sl-hero-el flex flex-col items-center text-ink-display lg:items-start"
               style={{ animationDelay: "120ms" }}
             >
               <Logo withWordmark size={20} title={t("wordmark")} />
@@ -364,8 +364,7 @@ export default function Hero({
                 href={CUSP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group mt-0.5 inline-flex items-center font-mono text-[11px] font-medium text-ink-muted underline-offset-[3px] transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                style={{ marginLeft: "26.4px" }}
+                className="group mt-0.5 ml-0 inline-flex items-center font-mono text-[11px] font-medium text-ink-muted underline-offset-[3px] transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface lg:ml-[26.4px]"
               >
                 <span className="group-hover:underline group-hover:decoration-accent group-hover:decoration-2">
                   {t("byCusp")}
@@ -379,13 +378,13 @@ export default function Hero({
               {t("pilot")}
             </p>
             <h1
-              className="sl-hero-el mt-3 max-w-[20ch] font-display text-[clamp(1.35rem,1.9vw,1.6rem)] font-bold leading-[1.12] tracking-[-0.02em] text-ink-display text-balance dark:tracking-[-0.015em]"
+              className="sl-hero-el mt-3 max-w-[20ch] text-center font-display text-[clamp(1.35rem,1.9vw,1.6rem)] font-bold leading-[1.12] tracking-[-0.02em] text-ink-display text-balance lg:text-left dark:tracking-[-0.015em]"
               style={{ animationDelay: "200ms" }}
             >
               {t("question")}
             </h1>
             <p
-              className="sl-hero-el mt-2 max-w-[38ch] text-[12.5px] leading-[1.45] text-ink-muted text-pretty"
+              className="sl-hero-el mt-2 max-w-[38ch] text-center text-[12.5px] leading-[1.45] text-ink-muted text-pretty lg:text-left"
               style={{ animationDelay: "220ms" }}
             >
               {t("subtitle")}
@@ -463,14 +462,14 @@ export default function Hero({
                 delay={700}
               />
             </div>
-            <p className="px-1 font-mono text-[11px] leading-snug text-ink-muted lg:px-0">
+            <p className="px-1 text-center font-mono text-[11px] leading-snug text-ink-muted lg:px-0 lg:text-left">
               {t("stats.demoFootnote")}
             </p>
           </div>
 
           {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}
           <div className="flex flex-col lg:col-start-1 lg:row-start-2 lg:min-h-0">
-            <div className="shrink-0">
+            <div className="shrink-0 text-center lg:text-left">
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
                 {t("segments.title")}
               </p>
