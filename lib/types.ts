@@ -248,7 +248,35 @@ export type PhotoRow = {
   taken_at: string;
 };
 
-export type SubmissionType = "add_segment" | "update_segment";
+/**
+ * Submission types, mirroring the CHECK on `submissions.type` (0005 + 0014).
+ *
+ * `cv_capture` (u25) is a finished capture session entering the same review
+ * queue as a manual contribution; its payload is `{ session_id }` and the data
+ * itself lives in the capture_* tables.
+ *
+ * `unknown` is the honest landing place for a submission whose type we do not
+ * recognize — a bot can post any string, and recording it as `add_segment`
+ * would be a lie in the review queue. See the honeypot branch in
+ * `app/api/submissions/route.ts`.
+ */
+export const SUBMISSION_TYPES = [
+  "add_segment",
+  "update_segment",
+  "cv_capture",
+  "unknown",
+] as const;
+
+export type SubmissionType = (typeof SUBMISSION_TYPES)[number];
+
+/** Narrow an untrusted value to a persistable submission type. */
+export function isSubmissionType(value: unknown): value is SubmissionType {
+  return (
+    typeof value === "string" &&
+    (SUBMISSION_TYPES as readonly string[]).includes(value)
+  );
+}
+
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 
 export type SubmissionRow = {
