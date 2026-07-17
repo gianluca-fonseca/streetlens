@@ -1,0 +1,205 @@
+live E2E against http://localhost:3560
+  fixture street-real.jpg 960x640 136 KB
+  segment esc-sa-0001, 4 frames (=4 real extraction calls)
+
+=== 1. create session ===
+  POST /api/capture/sessions -> 201 {"sessionId":"a218b85f-153a-411d-a193-f7d36f85bd56","uploadPrefix":"captures/a218b85f-153a-411d-a193-f7d36f85bd56","maxFrames":400,"maxFrameBytes":2097152}
+  [ok ] session created (201)
+
+=== 2. register frames ===
+  POST .../frames (4) -> 200 {"accepted":[0,1,2,3]}
+  [ok ] frames registered (200)
+
+=== 3. upload frame bytes to storage (0016 registration-armed policy) ===
+  PUT captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0000.jpg -> ok
+  [ok ] frame 0 uploaded to a registered path
+  PUT captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0001.jpg -> ok
+  [ok ] frame 1 uploaded to a registered path
+  PUT captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0002.jpg -> ok
+  [ok ] frame 2 uploaded to a registered path
+  PUT captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0003.jpg -> ok
+  [ok ] frame 3 uploaded to a registered path
+
+=== 4. storage RLS negative control (unregistered path refused) ===
+  PUT captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0099.jpg (never registered) -> refused: new row violates row-level security policy
+  [ok ] an unregistered path is refused
+
+=== 5. status before finalize ===
+  GET .../a218b85f-153a-411d-a193-f7d36f85bd56 -> 200 {"status":"uploading","frameCount":4,"jobs":{"pending":0,"done":0,"failed":0}}
+  [ok ] status is uploading with the frames on record
+
+=== 6. finalize (real track along esc-sa-0001, HMM match + attribution + enqueue) ===
+  POST .../finalize (12 fixes) -> 200 {"status":"extracting"}
+  [ok ] finalize accepted, session extracting
+
+=== 7. pump the job queue (session-scoped; real gpt-5-nano extraction @ 512 px) ===
+  kick pump -> 200 {"ok":true,"claimed":0,"done":0,"failed":0,"remaining":4,"status":"extracting"}
+  poll #1 -> status=extracting jobs={"pending":4,"done":0,"failed":0}
+  poll #2 -> status=extracting jobs={"pending":4,"done":0,"failed":0}
+  poll #3 -> status=extracting jobs={"pending":4,"done":0,"failed":0}
+  poll #4 -> status=extracting jobs={"pending":4,"done":0,"failed":0}
+    nudge pump -> 200 claimed 0 done 0 failed 0 status extracting
+  poll #5 -> status=extracting jobs={"pending":1,"done":3,"failed":0}
+  poll #6 -> status=review_ready jobs={"pending":0,"done":4,"failed":0}
+  [ok ] session reached review_ready (status review_ready)
+
+=== 8. capture_session_review — the full admin review payload ===
+  payload:
+    {
+      "jobs": {
+        "done": 4,
+        "failed": 0,
+        "pending": 0,
+        "overbudget": 0
+      },
+      "mode": "live",
+      "frames": [
+        {
+          "seq": 0,
+          "segmentId": "esc-sa-0001",
+          "storagePath": "captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0000.jpg"
+        },
+        {
+          "seq": 1,
+          "segmentId": "esc-sa-0001",
+          "storagePath": "captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0001.jpg"
+        },
+        {
+          "seq": 2,
+          "segmentId": "esc-sa-0001",
+          "storagePath": "captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0002.jpg"
+        },
+        {
+          "seq": 3,
+          "segmentId": "esc-sa-0001",
+          "storagePath": "captures/a218b85f-153a-411d-a193-f7d36f85bd56/frame-0003.jpg"
+        }
+      ],
+      "status": "review_ready",
+      "tokens": {
+        "escalated": 0,
+        "inputTokens": 18380,
+        "observations": 4,
+        "outputTokens": 13068
+      },
+      "rollups": [
+        {
+          "scores": {
+            "bike": 16.67,
+            "shade": 40,
+            "overall": 20,
+            "drainage": 33.33,
+            "accessibility": 0
+          },
+          "coverage": 1,
+          "escalated": 0,
+          "segmentId": "esc-sa-0001",
+          "confidence": 0.665,
+          "itemMedians": {
+            "lighting": {
+              "value": 2,
+              "frames": 3,
+              "confidence": 0.567
+            },
+            "curb_ramp": {
+              "value": null,
+              "frames": 0,
+              "confidence": null
+            },
+            "curb_gutter": {
+              "value": 0,
+              "frames": 1,
+              "confidence": 0.8
+            },
+            "bike_surface": {
+              "value": 2,
+              "frames": 4,
+              "confidence": 0.575
+            },
+            "canopy_cover": {
+              "value": 30,
+              "frames": 4,
+              "confidence": 0.525
+            },
+            "midday_shade": {
+              "value": 2,
+              "frames": 4,
+              "confidence": 0.525
+            },
+            "drain_present": {
+              "value": 0,
+              "frames": 4,
+              "confidence": 0.625
+            },
+            "sidewalk_width": {
+              "value": null,
+              "frames": 0,
+              "confidence": null
+            },
+            "standing_water": {
+              "value": 4,
+              "frames": 4,
+              "confidence": 0.675
+            },
+            "bike_separation": {
+              "value": 0,
+              "frames": 1,
+              "confidence": 0.6
+            },
+            "crossing_safety": {
+              "value": null,
+              "frames": 0,
+              "confidence": null
+            },
+            "obstruction_free": {
+              "value": null,
+              "frames": 0,
+              "confidence": null
+            },
+            "sidewalk_present": {
+              "value": 0,
+              "frames": 4,
+              "confidence": 0.938
+            },
+            "bike_lane_present": {
+              "value": 0,
+              "frames": 4,
+              "confidence": 0.825
+            },
+            "surface_condition": {
+              "value": null,
+              "frames": 0,
+              "confidence": null
+            }
+          }
+        }
+      ],
+      "sessionId": "a218b85f-153a-411d-a193-f7d36f85bd56",
+      "capturedOn": "2026-07-17T16:13:00.30331+00:00",
+      "frameCount": 4,
+      "reviewedAt": null
+    }
+  [ok ] review status is review_ready
+  [ok ] tokens billed for the extracted frames (input 18380, obs 4)
+  [ok ] a rollup exists for esc-sa-0001
+  [ok ] the rollup carries scores + coverage (overall 20, coverage 1)
+  [ok ] frames come back with their segment attribution
+
+=== 9. capture_emit_submission — files/keeps the cv_capture queue row (idempotent) ===
+  capture_emit_submission -> ok (row present; second call is a no-op)
+  [ok ] emit succeeds and is idempotent
+
+=== 10. capture_close_review('reject') — leave NO approved data behind ===
+  capture_close_review(reject) -> ok
+  [ok ] session rejected cleanly
+  GET .../a218b85f-153a-411d-a193-f7d36f85bd56 -> 200 status=rejected
+  [ok ] session status is now rejected
+
+=== 11. community_cv_observations stays EMPTY for this session (we never approved) ===
+  select community_cv_observations where session=a218b85f-153a-411d-a193-f7d36f85bd56 -> 0 rows
+  [ok ] no approved CV observations exist for this session
+
+=== 12. storage cleanup (best effort — anon may lack DELETE) ===
+  remove -> deleted 0 object(s)
+
+PASS — live E2E lifecycle (session ended rejected; map untouched)
