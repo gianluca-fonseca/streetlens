@@ -372,6 +372,34 @@ frame seq to `{ segmentId, nearJunction }`, with unmatched frames mapping to
 > transposes every gate check into the ocean. Compute bboxes from geometry. A
 > test keeps this warning from going stale.
 
+### Network coverage: the whole canton, one audited corridor
+
+The matcher works over the entire street network of the cantón of Escazú, so a
+capture walk anywhere in the canton pins to real segments. `segments.geojson`
+now spans all three districts:
+
+| District | id prefix | `district_id` | segments |
+| --- | --- | --- | --- |
+| San Antonio de Escazú (pilot) | `esc-sa-` | `esc-san-antonio` | 535 |
+| Escazú centro | `esc-ce-` | `esc-escazu` | 93 |
+| San Rafael de Escazú | `esc-sr-` | `esc-san-rafael` | 829 |
+
+`scripts/import-osm-corridor.mjs` imports San Antonio first, on its original
+bounding box and cache, so the pilot's 535 features stay byte-for-byte identical
+across a canton re-import; `scripts/test-canton-identity.mjs` freezes that
+against a content hash. The two new districts are fetched by OSM administrative
+boundary (Overpass `area`), each raw response cached under `data/raw/` for
+offline re-runs. `scripts/build-routing-graph.mjs` unions the same caches into a
+canton-wide street-following graph for the client trace tool.
+
+The pilot corridor remains the audited ground truth: only `esc-sa-*` segments
+carry rubric scores, and the official stats (`getStats`) count only them. The
+rest of the canton is imported unscored (`data/canton-import-segments.json`,
+`source: "import"`) and rendered with the neutral community casing, never a score
+color, until fieldwork reaches it. `scripts/test-matching-canton.mjs` proves the
+production HMM matches a synthetic walk on a real Escazú centro street to its
+`esc-ce` segment without flipping districts.
+
 ### Extraction
 
 The extraction worker (`lib/extraction/`) scores each frame with one API call.

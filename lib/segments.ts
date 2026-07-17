@@ -55,6 +55,10 @@ export type {
 const DATA_DIR = path.join(process.cwd(), "data");
 const DEMO_SEGMENTS_PATH = path.join(DATA_DIR, "demo-segments.geojson");
 const DEMO_AUDITS_PATH = path.join(DATA_DIR, "demo-audits.json");
+// Unaudited canton network (esc-ce/esc-sr) outside the audited pilot, emitted by
+// generate-demo-audits.mjs as source:"import" records. Committed (not the local
+// runtime community store), read on the same neutral-casing terms as community.
+const IMPORT_SEGMENTS_PATH = path.join(DATA_DIR, "canton-import-segments.json");
 
 /* ------------------------------------------------------------------ *
  * Static file readers (cached per process)
@@ -99,6 +103,7 @@ type DemoAuditsFile = {
 
 let demoCollectionCache: DemoCollection | undefined;
 let demoAuditsCache: DemoAuditsFile | undefined;
+let importSegmentsCache: CommunitySegment[] | undefined;
 
 /**
  * Guarantee the frozen SegmentProperties shape on a static feature. The
@@ -146,6 +151,35 @@ async function readDemoAudits(): Promise<DemoAuditsFile> {
     ) as DemoAuditsFile;
   }
   return demoAuditsCache;
+}
+
+/**
+ * The committed unaudited canton network (esc-ce/esc-sr) as source:"import"
+ * CommunitySegments. Cached per process; a missing file → no canton overlay.
+ * These merge into the read path exactly like the local community store, so the
+ * map renders them with the neutral casing and the audited stats never move.
+ */
+async function readImportSegments(): Promise<CommunitySegment[]> {
+  if (!importSegmentsCache) {
+    try {
+      const parsed = JSON.parse(await fs.readFile(IMPORT_SEGMENTS_PATH, "utf8"));
+      importSegmentsCache = Array.isArray(parsed)
+        ? (parsed as CommunitySegment[])
+        : [];
+    } catch {
+      importSegmentsCache = [];
+    }
+  }
+  return importSegmentsCache;
+}
+
+/** Applied community adds plus the committed canton import overlay. */
+async function readAllContributedSegments(): Promise<CommunitySegment[]> {
+  const [community, imported] = await Promise.all([
+    readCommunitySegments(),
+    readImportSegments(),
+  ]);
+  return [...community, ...imported];
 }
 
 /* ------------------------------------------------------------------ *
@@ -300,7 +334,7 @@ function attachCommunity(
  */
 export async function getSegments(): Promise<SegmentCollection> {
   const [community, reports, cvObservations] = await Promise.all([
-    readCommunitySegments(),
+    readAllContributedSegments(),
     readCommunityReports(),
     readCvObservations(),
   ]);
@@ -362,7 +396,7 @@ export async function getSegmentDetail(
   const feature = collection.features.find((f) => f.properties.id === id);
   if (!feature) {
     // A community/import segment carries geometry but no rubric audit.
-    const community = await readCommunitySegments();
+    const community = await readAllContributedSegments();
     const cs = community.find((c) => c.id === id);
     if (!cs) return null;
     return {
@@ -412,7 +446,10 @@ export async function getStats(): Promise<StreetStats> {
   const demo = await readDemoCollection();
   const networkKm = demo.metadata?.network_km;
   // Community/import segments are counted separately; never folded into the
-  // official audited figure (contract v3, ruling 1). Same for CV (u30).
+  // official audited figure (contract v3, ruling 1). Same for CV (u30). This is
+  // the CONTRIBUTION counter (the apply pipeline's community adds); the committed
+  // canton network overlay is baseline context, not a contribution, so it is not
+  // tallied here (and, like community adds, never touches the audited figure).
   const communitySegments = (await readCommunitySegments()).length;
   const cv = await readCvObservations();
   const cvSessionsReviewed = new Set(cv.map((o) => o.session_id)).size;

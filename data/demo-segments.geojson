@@ -13,7 +13,7 @@
       9.922,
       -84.135
     ],
-    "generated_at": "2026-07-15T01:28:00.947Z",
+    "generated_at": "2026-07-17T20:43:05.265Z",
     "segment_count": 535,
     "audited_km": 76.84,
     "network_km": 95.69,
@@ -21,7 +21,7 @@
     "demo": true,
     "note": "Synthetic demo scores over real OSM geometry. Not real measurements.",
     "rubric_version_id": "v0.1",
-    "scored_at": "2026-07-15T01:28:00.992Z"
+    "scored_at": "2026-07-17T20:48:09.097Z"
   },
   "features": [
     {
