@@ -24,8 +24,19 @@ import { CAPTURE_TUNING, type CaptureTuning } from "@/components/capture/engine/
  * - `displacement` — the phone has not moved far enough since the last kept frame.
  * - `duplicate` — visually identical to the previous frame.
  * - `blurry` — too soft to score.
+ * - `oversize` — encoded past the storage contract's per-frame byte ceiling.
+ *
+ * `oversize` is the one reason `evaluateFrame` never returns: it is only knowable
+ * after JPEG encoding, so the recorder tallies it. Drop reasons are a session
+ * ledger, not solely gate output.
  */
-export type DropReason = "no_fix" | "cadence" | "displacement" | "duplicate" | "blurry";
+export type DropReason =
+  | "no_fix"
+  | "cadence"
+  | "displacement"
+  | "duplicate"
+  | "blurry"
+  | "oversize";
 
 export const DROP_REASONS: readonly DropReason[] = [
   "no_fix",
@@ -33,12 +44,13 @@ export const DROP_REASONS: readonly DropReason[] = [
   "displacement",
   "duplicate",
   "blurry",
+  "oversize",
 ] as const;
 
 export type DropCounts = Record<DropReason, number>;
 
 export function emptyDropCounts(): DropCounts {
-  return { no_fix: 0, cadence: 0, displacement: 0, duplicate: 0, blurry: 0 };
+  return { no_fix: 0, cadence: 0, displacement: 0, duplicate: 0, blurry: 0, oversize: 0 };
 }
 
 /**
