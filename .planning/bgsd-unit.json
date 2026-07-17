@@ -1,0 +1,19 @@
+{
+  "unit_id": "unit-cv-funnel-docs-f4ae",
+  "run_id": "bgsd-0002-cv-data-collection-funne",
+  "scale": "feature",
+  "title": "cv funnel docs",
+  "scope": "docs/cv-funnel.md: full architecture with mermaid data-flow, edge-case catalog (visibility, stale frames, GPS dropout, junctions, cost breaker, iOS quirks, clock sync), cost model table, ops runbook (env, migrations, bucket, kill switch, Vercel plan notes), README update. No app code changes.",
+  "criteria": [],
+  "touched": [
+    "docs/",
+    "README.md"
+  ],
+  "model_assignment": {
+    "tier": "heavy",
+    "reason": "fixed session routing"
+  },
+  "model": "claude-opus-4-8",
+  "advisor_path": null,
+  "advisor_checkpoints": []
+}
