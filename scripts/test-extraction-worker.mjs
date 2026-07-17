@@ -12,9 +12,14 @@
  * a single-threaded runtime). If it were looser, the concurrency case below
  * would pass without proving anything.
  *
+ * The one exception is the image downscale, which runs FOR REAL against the
+ * committed fixture — only the fetch is faked. A mocked resize would prove
+ * nothing about the thing that costs money (the pixels that reach the model),
+ * which is precisely what the live smoke caught us being wrong about.
+ *
  * Covers: the happy path, the cost breaker, the per-session budget, escalation
  * and its cap, refusal/incomplete handling, concurrent pump safety, the attempts
- * cap, and the kill switch.
+ * cap, the kill switch, and the frame downscale.
  *
  * Exits 0 on PASS, 1 on any failure.
  */
@@ -22,13 +27,14 @@
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import Module from "node:module";
-import { rmSync, mkdirSync, writeFileSync } from "node:fs";
+import { rmSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".test-build-extraction");
+const FIXTURE = path.join(__dirname, "fixtures", "street-san-antonio-escazu.jpg");
 const require = createRequire(import.meta.url);
 
 const failures = [];
@@ -63,6 +69,7 @@ function compile() {
         paths: { "@/*": ["./*"] },
       },
       files: [
+        "../lib/extraction/downscale.ts",
         "../lib/capture/pump.ts",
         "../lib/capture/rollup.ts",
         "../lib/capture/scoring.ts",
@@ -258,6 +265,30 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
   return db;
 }
 
+/**
+ * Storage, faked at the fetch boundary — the 960x666 fixture, for any URL.
+ *
+ * Faked HERE and no higher: everything above it (the resize, the JPEG encode,
+ * the data URL) is the real code path, so a test that says "the model was sent
+ * 512 px" means it.
+ */
+function makeFixtureFetch() {
+  const bytes = readFileSync(FIXTURE);
+  const fetches = [];
+  const fetchImpl = async (url) => {
+    fetches.push(url);
+    return {
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      async arrayBuffer() {
+        return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      },
+    };
+  };
+  return { fetchImpl, fetches };
+}
+
 /** A model that answers from a script, recording every call. */
 function makeVision(responder) {
   const calls = [];
@@ -290,14 +321,23 @@ async function main() {
   const { shouldEscalate, extractFrame } = require(path.join(BUILD_DIR, "extraction", "extract.js"));
   const { parseVisionPayload, buildRequestBody } = require(path.join(BUILD_DIR, "extraction", "client.js"));
   const { SYSTEM_PROMPT, systemPromptApproxTokens } = require(path.join(BUILD_DIR, "extraction", "prompt.js"));
+  const { downscaleFrame, FRAME_MAX_EDGE_PX } = require(path.join(BUILD_DIR, "extraction", "downscale.js"));
+  const { inputTokenCeiling, describeInputTokenCeiling, IMAGE_TOKEN_BUDGET, sessionTokenBudget } =
+    require(path.join(BUILD_DIR, "extraction", "config.js"));
+  const sharp = require("sharp");
 
   process.env.CV_EXTRACTION_ENABLED = "true";
   process.env.OPENAI_VISION_MODEL = "gpt-5-nano";
   process.env.OPENAI_VISION_ESCALATION_MODEL = "gpt-5.4-mini";
 
+  const CEILING = inputTokenCeiling();
+
   const frameUrl = (p) => `https://example.test/${p}`;
+  const storage = makeFixtureFetch();
+  /** The real downscale, over faked storage. */
+  const prepareImage = (url) => downscaleFrame(url, { fetchImpl: storage.fetchImpl });
   const run = (db, vision, opts = {}) =>
-    pumpOnce({ db, vision, frameUrl, concurrency: 4, ...opts });
+    pumpOnce({ db, vision, frameUrl, prepareImage, concurrency: 4, ...opts });
 
   /* ---------------- Happy path ---------------- */
   console.log("\nhappy path");
@@ -334,7 +374,8 @@ async function main() {
   console.log("\ncost breaker");
   {
     const db = makeDb({ frameCount: 3 });
-    // Over the 2600 per-frame ceiling: a provider silently ignoring detail:low.
+    // Far over the per-frame ceiling: a provider billing a full-resolution image
+    // for the 512 px one it was sent.
     const vision = makeVision(() => ({
       outcome: "completed",
       text: modelText(T),
@@ -364,6 +405,12 @@ async function main() {
       "the untouched frames go back to pending, not failed",
       db.jobs.get("frame-1").status === "pending" && db.jobs.get("frame-2").status === "pending",
     );
+    check(
+      "the breaker message shows what the ceiling is made of, not a bare number",
+      /static prompt/.test(db.jobs.get("frame-0").error) &&
+        /image budget/.test(db.jobs.get("frame-0").error),
+      db.jobs.get("frame-0").error,
+    );
   }
 
   /* ---------------- Over-budget with valid JSON ---------------- */
@@ -374,12 +421,169 @@ async function main() {
       outcome: "completed",
       text: modelText(T),
       detail: null,
-      usage: USAGE(2601),
+      usage: USAGE(CEILING + 1),
     }));
     await run(db, vision);
     check(
       "a perfectly valid answer one token over the ceiling is still rejected",
       db.jobs.get("frame-0").status === "failed_overbudget" && db.state.observations.length === 0,
+    );
+  }
+
+  {
+    const db = makeDb({ frameCount: 1 });
+    const vision = makeVision(() => ({
+      outcome: "completed",
+      text: modelText(T),
+      detail: null,
+      usage: USAGE(CEILING),
+    }));
+    await run(db, vision);
+    check(
+      "a frame exactly at the ceiling is accepted — the guard is >, not >=",
+      db.jobs.get("frame-0").status === "done" && db.state.observations.length === 1,
+      db.jobs.get("frame-0").error ?? "",
+    );
+  }
+
+  /* ---------------- The ceiling itself ---------------- */
+  console.log("\nprompt-aware ceiling");
+  {
+    // The ceiling used to be a flat 2600 while the cached prefix is ~2700, so it
+    // fired on every correct call — the breaker was measuring our own prompt.
+    // Deriving it from the prompt is what makes editing prompt.ts safe.
+    check(
+      "the ceiling is derived from the measured prompt, not hardcoded",
+      CEILING === systemPromptApproxTokens() + IMAGE_TOKEN_BUDGET,
+      `${CEILING} vs ~${systemPromptApproxTokens()} + ${IMAGE_TOKEN_BUDGET}`,
+    );
+    check(
+      "it clears the whole static prefix, which a correct call always pays",
+      CEILING > systemPromptApproxTokens(),
+    );
+    check(
+      "a full-resolution image (~3800 tokens) still trips it",
+      systemPromptApproxTokens() + 3800 > CEILING,
+      `prompt + 3800 = ${systemPromptApproxTokens() + 3800} vs ${CEILING}`,
+    );
+    check(
+      "the composition is spelled out for whoever finds the paused session",
+      /static prompt/.test(describeInputTokenCeiling()) &&
+        /image budget/.test(describeInputTokenCeiling()),
+      describeInputTokenCeiling(),
+    );
+
+    process.env.CV_INPUT_TOKEN_CEILING = "999";
+    check(
+      "CV_INPUT_TOKEN_CEILING overrides it, and says so",
+      inputTokenCeiling() === 999 && /override/.test(describeInputTokenCeiling()),
+      describeInputTokenCeiling(),
+    );
+    process.env.CV_INPUT_TOKEN_CEILING = "";
+    check("an empty override falls back to the derived ceiling", inputTokenCeiling() === CEILING);
+    process.env.CV_INPUT_TOKEN_CEILING = "not-a-number";
+    check("a junk override does not disable the breaker", inputTokenCeiling() === CEILING);
+    delete process.env.CV_INPUT_TOKEN_CEILING;
+  }
+
+  /* ---------------- The frame we actually send ---------------- */
+  console.log("\nframe downscale");
+  {
+    const db = makeDb({ frameCount: 1 });
+    const vision = makeVision(() => ok(T));
+    await run(db, vision);
+
+    const sent = vision.calls[0].imageUrl;
+    check(
+      "the model is sent inline JPEG bytes, not the storage URL",
+      sent.startsWith("data:image/jpeg;base64,"),
+      sent.slice(0, 40),
+    );
+    check(
+      "the storage URL is never what reaches the model",
+      !sent.includes("example.test"),
+    );
+
+    const meta = await sharp(Buffer.from(sent.split(",")[1], "base64")).metadata();
+    check(
+      `the image is downscaled to ${FRAME_MAX_EDGE_PX} px on the longest side`,
+      Math.max(meta.width, meta.height) === FRAME_MAX_EDGE_PX,
+      `${meta.width}x${meta.height} (fixture is 960x666)`,
+    );
+    check(
+      "aspect ratio is preserved — the model sees the street, not a squash",
+      Math.abs(meta.width / meta.height - 960 / 666) < 0.01,
+      `${(meta.width / meta.height).toFixed(3)}`,
+    );
+
+    // ~256 patches at 512 px. This is the bound that holds even when detail:low
+    // is ignored, which is the entire point of doing the resize ourselves.
+    const patches = Math.ceil(meta.width / 32) * Math.ceil(meta.height / 32);
+    check(
+      "the bounded image cannot cost more than the image budget, hint or no hint",
+      Math.ceil(patches * 2.46) < IMAGE_TOKEN_BUDGET,
+      `${patches} patches ~= ${Math.ceil(patches * 2.46)} tokens vs a ${IMAGE_TOKEN_BUDGET} budget`,
+    );
+  }
+
+  {
+    // The escalation call must not send the stronger model back to storage for
+    // the full-resolution original: same frame, same bytes, one fetch.
+    const db = makeDb({ frameCount: 1 });
+    const storage1 = makeFixtureFetch();
+    const vision = makeVision((req) =>
+      req.model === "gpt-5-nano" ? ok(T, { confidence: 0.2 }) : ok(T, { confidence: 0.95 }),
+    );
+    await run(db, vision, {
+      prepareImage: (url) => downscaleFrame(url, { fetchImpl: storage1.fetchImpl }),
+    });
+    check(
+      "an escalated frame is fetched and shrunk once, not twice",
+      vision.calls.length === 2 && storage1.fetches.length === 1,
+      `${vision.calls.length} model calls, ${storage1.fetches.length} fetch(es)`,
+    );
+    check(
+      "both models are asked about the same downscaled bytes",
+      vision.calls[0].imageUrl === vision.calls[1].imageUrl,
+    );
+  }
+
+  {
+    const db = makeDb({ frameCount: 1 });
+    const vision = makeVision(() => ok(T));
+    await run(db, vision, {
+      prepareImage: async () => {
+        throw new Error("404 gone");
+      },
+    });
+    check(
+      "a frame that cannot be fetched fails the attempt without paying a model",
+      vision.calls.length === 0 &&
+        db.state.observations.length === 0 &&
+        /image_prepare/.test(db.jobs.get("frame-0").error),
+      db.jobs.get("frame-0").error,
+    );
+  }
+
+  {
+    // The live smoke feeds the fixture as a data: URL, so this path has to work
+    // without a fetch at all.
+    const asDataUrl = `data:image/jpeg;base64,${readFileSync(FIXTURE).toString("base64")}`;
+    const out = await downscaleFrame(asDataUrl, {
+      fetchImpl: async () => {
+        throw new Error("a data: URL must not be fetched");
+      },
+    });
+    const meta = await sharp(Buffer.from(out.split(",")[1], "base64")).metadata();
+    check(
+      "a data: URL is decoded directly and downscaled the same way",
+      Math.max(meta.width, meta.height) === FRAME_MAX_EDGE_PX,
+      `${meta.width}x${meta.height}`,
+    );
+    check(
+      "the downscaled frame is a fraction of the original's bytes",
+      out.length < asDataUrl.length / 4,
+      `${Math.round(out.length / 1024)} KB vs ${Math.round(asDataUrl.length / 1024)} KB`,
     );
   }
 
@@ -541,21 +745,29 @@ async function main() {
   console.log("\nconcurrent pump safety");
   {
     const db = makeDb({ frameCount: 8 });
-    const seen = [];
-    const vision = makeVision(async (req) => {
-      seen.push(req.imageUrl);
+    // Every frame now reaches the model as a data URL of the same fixture, so
+    // the model call can no longer tell them apart. The fetch can: one per frame
+    // processed, carrying the storage path.
+    const storage8 = makeFixtureFetch();
+    const prepare8 = (url) => downscaleFrame(url, { fetchImpl: storage8.fetchImpl });
+    const vision = makeVision(async () => {
       // Yield, so two pumps genuinely interleave rather than running in turn.
       await new Promise((r) => setTimeout(r, 5));
       return ok(T);
     });
 
-    const [a, b] = await Promise.all([run(db, vision), run(db, vision)]);
+    const [a, b] = await Promise.all([
+      run(db, vision, { prepareImage: prepare8 }),
+      run(db, vision, { prepareImage: prepare8 }),
+    ]);
 
-    const unique = new Set(seen);
+    const unique = new Set(storage8.fetches);
     check(
       "two concurrent pumps never process the same frame twice",
-      seen.length === unique.size && seen.length === 8,
-      `${seen.length} calls over ${unique.size} distinct frames`,
+      storage8.fetches.length === unique.size &&
+        unique.size === 8 &&
+        vision.calls.length === 8,
+      `${vision.calls.length} calls over ${unique.size} distinct frames`,
     );
     check(
       "between them they claim every job exactly once",
@@ -592,8 +804,29 @@ async function main() {
   /* ---------------- Session budget ---------------- */
   console.log("\nper-session budget");
   {
+    // Pinned rather than derived, so this case keeps testing the session guard
+    // instead of drifting with the prompt: the numbers below only have to sit
+    // under the per-frame ceiling, and the allowance only has to sit under them.
+    process.env.CV_SESSION_TOKENS_PER_FRAME = "1500";
+    check(
+      "CV_SESSION_TOKENS_PER_FRAME sets the per-frame allowance",
+      sessionTokenBudget(2) === 3000,
+      `${sessionTokenBudget(2)}`,
+    );
+    check(
+      "unset, the allowance is derived from the ceiling plus the escalation cap",
+      (() => {
+        delete process.env.CV_SESSION_TOKENS_PER_FRAME;
+        const derived = sessionTokenBudget(1);
+        process.env.CV_SESSION_TOKENS_PER_FRAME = "1500";
+        return derived === Math.ceil(CEILING * 1.1) && derived > CEILING;
+      })(),
+    );
+  }
+
+  {
     const db = makeDb({ frameCount: 2 });
-    // Budget is frames x 1500 = 3000. Each frame bills 2500 — under the 2600
+    // Budget is frames x 1500 = 3000. Each frame bills 2500 — under the
     // per-frame ceiling, so ONLY the session cap can catch this.
     const vision = makeVision(() => ({
       outcome: "completed",
@@ -635,6 +868,7 @@ async function main() {
       db.state.sessionStatus === "review_ready" && db.state.observations.length === 3,
       `status=${db.state.sessionStatus}`,
     );
+    delete process.env.CV_SESSION_TOKENS_PER_FRAME;
   }
 
   /* ---------------- The request we actually send ---------------- */
@@ -642,8 +876,14 @@ async function main() {
   {
     const body = buildRequestBody({ model: "gpt-5-nano", imageUrl: "https://x.test/f.jpg" });
     const image = body.input[0].content.find((c) => c.type === "input_image");
-    check("detail:low is actually sent — the whole cost model rests on it", image.detail === "low");
-    check("the image goes by URL, not inlined base64", image.image_url === "https://x.test/f.jpg");
+    check(
+      "detail:low still rides along as belt-and-braces, even though it is ignored",
+      image.detail === "low",
+    );
+    check(
+      "the image the caller prepared goes through verbatim",
+      image.image_url === "https://x.test/f.jpg",
+    );
     check(
       "the cacheable prefix rides in instructions, not the per-frame turn",
       body.instructions === SYSTEM_PROMPT,
@@ -887,7 +1127,9 @@ async function main() {
         throw new Error("ECONNRESET");
       },
     };
-    const out = await extractFrame(throwing, "https://x.test/f.jpg", "m");
+    const out = await extractFrame(throwing, "https://x.test/f.jpg", "m", {
+      prepareImage: async (u) => u,
+    });
     check(
       "a transport failure is a failed attempt reporting no spend",
       out.kind === "failed" && out.usage.inputTokens === 0 && /transport/.test(out.reason),
