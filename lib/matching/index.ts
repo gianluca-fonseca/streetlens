@@ -24,6 +24,9 @@ export type {
   UnmatchedSpan,
 } from "./types";
 
-// The active implementation. BASELINE today — see baseline.ts for what it
-// knowingly gets wrong and why the HMM replaces it.
-export { matchTrack, attributeFrames } from "./baseline";
+// The active implementation: the Newson-Krumm HMM (see hmm.ts, and README.md
+// for the parameters). `baseline.ts` stays in the tree deliberately — it is the
+// regression guard in scripts/test-matching-hmm.mjs, where the parallel-street
+// case asserts that the naive matcher DOES flip where the HMM does not.
+export { matchTrack, attributeFrames } from "./hmm";
+export type { HmmOptions } from "./hmm";
