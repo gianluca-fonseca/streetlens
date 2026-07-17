@@ -1,5 +1,26 @@
 # Test fixtures
 
+## street-real.jpg
+
+A real street-level photograph of a rural/suburban road: a paved single-track
+lane with grass verges (shoulders) on both sides, hedgerow edges, a utility
+pole, and a cluster of houses in the distance. This is an honest street scene,
+so the extraction model has something real to score (road surface, edges, and a
+shoulder situation), unlike `street-san-antonio-escazu.jpg` below, which is the
+inside of a shop and was never a street.
+
+- **Source:** [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hurst_Lane_takes_on_a_Hard_Surface_-_geograph.org.uk_-_7863103.jpg) (originally [Geograph Britain and Ireland](https://www.geograph.org.uk/photo/7863103))
+- **Author:** Chris Heaton
+- **License:** CC BY-SA 2.0 (https://creativecommons.org/licenses/by-sa/2.0)
+- **Credit:** Geograph Britain and Ireland
+- **Fetched:** 2026-07-17, downscaled to 960 px wide (136 KB, 960x640, baseline JPEG)
+
+Used by `scripts/live-smoke-extraction.mjs` (env-gated behind `RUN_LIVE_SMOKE=1`)
+when pointed at it via `SMOKE_FIXTURE=scripts/fixtures/street-real.jpg`. It is
+committed rather than downloaded at test time so the smoke does not depend on
+Wikimedia being up, and so the bytes the model saw are the bytes in the repo.
+The frame is downscaled to 512 px before the call, exactly as a real frame is.
+
 ## street-san-antonio-escazu.jpg
 
 A real photograph from **San Antonio de Escazú**, the pilot area itself.

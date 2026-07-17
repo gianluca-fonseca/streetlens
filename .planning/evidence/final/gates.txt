@@ -1,0 +1,26 @@
+# Gate results — final integration-evidence pass (2026-07-17T16:13:38Z)
+
+npx tsc --noEmit            : PASS (exit 0)
+npm run lint                : PASS (0 errors, 1 warning cleared)
+npm run build               : PASS (exit 0)
+
+## scripts/test-*.mjs suites
+scripts/test-apply-submissions.mjs : PASS (exit 0) APPLY-TEST PASS
+scripts/test-capture-gating.mjs    : PASS (exit 0) PASS — recorder gating locked
+scripts/test-capture-migrations.mjs : PASS (exit 0) PASS — migrations apply and the capture RPCs behave
+scripts/test-capture-rollup.mjs    : PASS (exit 0) PASS — capture rollup + scoring
+scripts/test-capture-route.mjs     : PASS (exit 0) PASS — GPX parse and route distribution locked
+scripts/test-capture-schemas.mjs   : PASS (exit 0) PASS — capture contracts locked
+scripts/test-cv-apply.mjs          : PASS (exit 0) PASS — CV apply attaches, upserts, retracts, and never touches an audit
+scripts/test-extraction-worker.mjs : PASS (exit 0) PASS — extraction worker
+scripts/test-honeypot-type.mjs     : PASS (exit 0) PASS — honeypot preserves the submitted type
+scripts/test-import-dryrun.mjs     : PASS (exit 0) DRYRUN-TEST PASS
+scripts/test-matching-baseline.mjs : PASS (exit 0) PASS — matching contract holds
+scripts/test-matching-hmm.mjs      : PASS (exit 0) PASS — 0 failing check(s)
+scripts/test-mp4box-contract.mjs   : PASS (exit 0) PASS — mp4box still behaves the way video-demux.ts assumes
+scripts/test-parse-feature-props.mjs : PASS (exit 0) PASS: all parse-feature-props checks green
+scripts/test-rate-limit-namespaces.mjs : PASS (exit 0) PASS — rate-limit namespaces isolated, submissions unchanged
+scripts/test-submission-counts.mjs : PASS (exit 0) COUNTS-TEST PASS
+scripts/test-upload-client.mjs     : PASS (exit 0) PASS — upload client survives the failure paths
+scripts/test-video-plan.mjs        : PASS (exit 0) PASS — the plan never exceeds the cap, never truncates a walk, and knows which w
+OVERALL_TESTS_EXIT=0

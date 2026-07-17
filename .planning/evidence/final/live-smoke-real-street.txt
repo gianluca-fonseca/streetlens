@@ -1,0 +1,41 @@
+
+live smoke: gpt-5-nano on street-real.jpg (136 KB)
+  static prefix  ~2711 tokens (cacheable)
+  static request ~4628 tokens (prompt + schema)
+  sent as        29 KB, downscaled to 512 px
+  ceiling        5828 = ~4628 static request (prompt + schema) + 1200 image budget
+
+  [ok ] input_tokens 4595 <= 5828 — the bill is bounded (1233 tokens of headroom)
+  [ok ] the 512 px image is not billed like a full-resolution one billed 4595 vs ~4628 static + 1200 image budget
+  [ok ] a real response parses against the strict schema and our zod 15 items
+  [ok ] every rubric item came back
+  [ok ] every item's value respects its response type
+  [ok ] confidences are in 0..1
+
+  ---- what it actually cost ----
+  input_tokens   : 4595
+  cached_tokens  : 0
+  output_tokens  : 4050
+  latency        : 30920 ms
+  cost this frame: $0.001850  (@ $0.05/1M in, $0.4/1M out)
+  400-frame run  : $0.7399
+  usable         : true
+
+  ---- what it saw ----
+  sidewalk_present         0  conf 0.9
+  sidewalk_width        null  conf 0.8
+  surface_condition     null  conf 0.8
+  curb_ramp             null  conf 0.8
+  obstruction_free      null  conf 0.8
+  drain_present            0  conf 0.9
+  standing_water           4  conf 0.6
+  curb_gutter              0  conf 0.8
+  canopy_cover            25  conf 0.6
+  midday_shade             2  conf 0.6
+  lighting                 0  conf 0.8
+  crossing_safety       null  conf 0.9
+  bike_lane_present        0  conf 0.85
+  bike_separation          0  conf 0.75
+  bike_surface             2  conf 0.6
+
+PASS — live extraction smoke
