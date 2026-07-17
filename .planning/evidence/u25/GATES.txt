@@ -1,0 +1,27 @@
+u25 verification gates — 2026-07-17T00:34:53Z
+
+npx tsc --noEmit            : PASS (clean)
+npm run lint                : PASS (0 errors, 0 warnings)
+npm run build               : PASS (all 5 capture routes registered dynamic)
+
+New tests (this unit):
+  test-capture-schemas.mjs        PASS  43 checks — contracts, rubric sync, encodings, paths
+  test-matching-baseline.mjs      PASS  34 checks — matching interface, gate, smoothing, attribution
+  test-capture-migrations.mjs     PASS  58 checks — 0001..0014 applied to real supabase/postgres image, every RPC
+  test-upload-client.mjs          PASS  26 checks — retry, resume, concurrency, abort, progress
+  test-rate-limit-namespaces.mjs  PASS  15 checks — capture ceiling, namespace isolation
+  test-honeypot-type.mjs          PASS  21 checks — type preserved, manual flow unchanged
+
+Pre-existing repo tests (regression — manual flow untouched):
+  test-apply-submissions.mjs      PASS
+  test-parse-feature-props.mjs    PASS
+  test-submission-counts.mjs      PASS
+  test-import-dryrun.mjs          PASS
+
+Live stub routes (next start :3149): all 5 -> HTTP 501 with contract JSON.
+  See curl-stub-routes.txt. /en/map still 200; /api/submissions still 400 on honeypot+invalid.
+
+NOT verified (honest gaps):
+  - uploadFrameBytes storage PUT: the bucket does not exist until the Conductor applies 0013.
+    Behind an injectable seam, marked TODO(unit-capture-ingest). Orchestration around it IS tested.
+  - Migrations are verified against a scratch container, NOT applied to live Supabase (per seed).

@@ -1,0 +1,27 @@
+u25 stub-route verification against next start :3149
+date: 2026-07-17T00:34:39Z
+
+POST /api/capture/sessions -> HTTP 501
+  error: not_implemented | endpoint: POST /api/capture/sessions | implementedBy: unit-capture-ingest
+  response: ["sessionId","uploadPrefix","maxFrames","maxFrameBytes"]
+
+GET /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e -> HTTP 501
+  error: not_implemented | endpoint: GET /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e | implementedBy: unit-capture-ingest
+  response: ["status","frameCount","jobs","rollups"]
+
+POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames -> HTTP 501
+  error: not_implemented | endpoint: POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames | implementedBy: unit-capture-ingest
+  response: ["accepted"]
+
+POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/finalize -> HTTP 501
+  error: not_implemented | endpoint: POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/finalize | implementedBy: unit-capture-ingest
+  response: ["status"]
+
+POST /api/capture/pump -> HTTP 501
+  error: not_implemented | endpoint: POST /api/capture/pump | implementedBy: unit-frame-extraction
+  response: ["claimed","done","failed","remaining"]
+
+REGRESSION — manual contribution flow unchanged:
+  POST /api/submissions honeypot=bot type=cv_capture -> HTTP 400 body: {"ok":false,"error":"rejected"}
+  POST /api/submissions invalid payload           -> HTTP 400 body: {"ok":false,"error":"invalid","issues":{"errors":[],"propert...
+  GET  /en/map (existing page still renders)      -> HTTP 200

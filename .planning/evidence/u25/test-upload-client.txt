@@ -1,0 +1,28 @@
+  [ok ] uploadCapture returns the session id and final status {"sessionId":"0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e","status":"matching","uploadedSeqs":[0,1,2]}
+  [ok ] every frame is uploaded [0,1,2]
+  [ok ] the call order is create -> register -> finalize ["POST /api/capture/sessions","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/finalize"]
+  [ok ] frames are uploaded BEFORE finalize (the one-way door closes last)
+  [ok ] the session request sends mode, an empty honeypot and contact {"mode":"video","honeypot":"","contact":"me@example.com"}
+  [ok ] finalize carries the track, its source and the clock offset {"track":[{"lat":9.907,"lng":-84.152,"t":1784000000000},{"lat":9.907,"lng":-84.15,"t":1784000009000}],"source":"trace","clockOffsetMs":-1500}
+  [ok ] a transient 503 is retried until it succeeds
+  [ok ] it took 3 attempts 3
+  [ok ] fetch rejecting outright (offline) is retried
+  [ok ] a 429 is retried (the server asked us to slow down, not to stop)
+  [ok ] a 400 is NOT retried 1 attempts
+  [ok ] the 400 surfaces as a CaptureUploadError carrying the status CaptureUploadError/400
+  [ok ] retries are bounded by maxRetries 2 attempts
+  [ok ] a permanently failing call eventually throws
+  [ok ] a flaky frame upload is retried too 3 attempts
+  [ok ] resuming re-uploads ONLY the frames the server acknowledged [3,4]
+  [ok ] resuming does not open a second session ["POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/finalize"]
+  [ok ] the resumed run still finalizes
+  [ok ] a frame already in storage counts as done
+  [ok ] concurrency is bounded (never exceeds the limit) peak 4
+  [ok ] concurrency is actually used (not serial) peak 4
+  [ok ] progress reports every phase in order, ending done creating_session -> registering_frames -> uploading_frames -> uploading_frames -> uploading_frames -> uploading_frames -> finalizing -> done
+  [ok ] progress counts climb to the frame total [0,0,0,1,2,3,3,3]
+  [ok ] aborting stops the run AbortError
+  [ok ] an aborted run never finalizes ["POST /api/capture/sessions","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames"]
+  [ok ] getSessionStatus reads the progress shape {"status":"uploading","frameCount":2,"jobs":{"pending":2,"done":0,"failed":0}}
+
+PASS — upload client survives the failure paths

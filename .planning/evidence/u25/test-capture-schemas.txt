@@ -1,0 +1,51 @@
+  [ok ] frame path is zero-padded to 4 digits captures/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frame-0007.jpg
+  [ok ] frame path pads the high end without truncating
+  [ok ] frame paths sort lexicographically in capture order
+  [ok ] negative seq throws rather than producing frame--001.jpg
+  [ok ] non-integer seq throws
+  [ok ] prefix matches the path's parent
+  [ok ] parsed 15 rubric keys out of generate-demo-audits.mjs got 15
+  [ok ] RUBRIC_ITEM_KEYS matches the generator exactly, in order 
+    gen: ["sidewalk_present","sidewalk_width","surface_condition","curb_ramp","obstruction_free","drain_present","standing_water","curb_gutter","canopy_cover","midday_shade","lighting","crossing_safety","bike_lane_present","bike_separation","bike_surface"]
+    lib: ["sidewalk_present","sidewalk_width","surface_condition","curb_ramp","obstruction_free","drain_present","standing_water","curb_gutter","canopy_cover","midday_shade","lighting","crossing_safety","bike_lane_present","bike_separation","bike_surface"]
+  [ok ] response types match the generator item-for-item 
+    gen: ["boolean","scale_0_4","scale_0_4","boolean","scale_0_4","boolean","scale_0_4","scale_0_4","percent","scale_0_4","scale_0_4","scale_0_4","boolean","scale_0_4","scale_0_4"]
+    lib: ["boolean","scale_0_4","scale_0_4","boolean","scale_0_4","boolean","scale_0_4","scale_0_4","percent","scale_0_4","scale_0_4","scale_0_4","boolean","scale_0_4","scale_0_4"]
+  [ok ] every key has a scoring lens
+  [ok ] canonical observation parses
+  [ok ] boolean true/false normalizes to 1/0 -> 1/0
+  [ok ] boolean item rejects 2
+  [ok ] scale_0_4 rejects 5
+  [ok ] scale_0_4 rejects a non-integer
+  [ok ] percent rejects 101
+  [ok ] percent accepts a fractional value
+  [ok ] null is accepted for every response type and stays null (never coerced to 0)
+  [ok ] confidence > 1 rejected
+  [ok ] a missing rubric item is rejected
+  [ok ] an invented rubric item is rejected
+  [ok ] wrong schemaVersion is rejected
+  [ok ] unusable frame with a reason parses
+  [ok ] observation drops model-asserted attribution (segmentId/nearJunction)
+  [ok ] a two-fix track parses
+  [ok ] a one-fix track is rejected
+  [ok ] seconds-since-epoch timestamp is rejected
+  [ok ] a fix outside Costa Rica is rejected
+  [ok ] finalize defaults clockOffsetMs to 0
+  [ok ] finalize rejects an implausible clock offset (> 1h)
+  [ok ] finalize rejects an unknown track source
+  [ok ] a valid frame batch parses
+  [ok ] a client-chosen storagePath is rejected
+  [ok ] a path belonging to ANOTHER session is rejected
+  [ok ] a duplicate seq within the batch is rejected
+  [ok ] an oversized frame is rejected at the schema, not the bucket
+  [ok ] seq >= maxFrames is rejected
+  [ok ] an empty batch is rejected
+  [ok ] a session request parses
+  [ok ] honeypot content is rejected by the schema
+  [ok ] an unknown mode is rejected
+  [ok ] maxFrameBytes stays in step with the bucket file_size_limit (2 MiB)
+  [ok ] every declared status is accepted
+  [ok ] an unknown status is rejected
+  [ok ] uploadable statuses are a subset of all statuses
+
+PASS — capture contracts locked
