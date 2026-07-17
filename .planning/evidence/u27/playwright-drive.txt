@@ -1,4 +1,4 @@
-u27 recorder verification — 2026-07-17T04:06:08.180Z
+u27 recorder verification — 2026-07-17T04:24:59.065Z
 base: http://localhost:3905
 chromium: fake media device + fake media UI; geolocation scripted over Escazú
 

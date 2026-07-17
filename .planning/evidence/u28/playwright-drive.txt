@@ -1,6 +1,6 @@
-u28 uploaded-video verification — 2026-07-17T04:17:21.301Z
+u28 uploaded-video verification — 2026-07-17T04:27:09.285Z
 base: http://localhost:3905
-video: synthesized in-browser, canvas -> captureStream -> MediaRecorder(video/webm;codecs=vp8), 12s, 1211593 B
+video: synthesized in-browser, canvas -> captureStream -> MediaRecorder(video/webm;codecs=vp8), 12s, 1190603 B
 route: a timed GPX fixture of 12 points over Escazú, built in memory
 
 DECODER COVERAGE, STATED PLAINLY:
@@ -55,13 +55,13 @@ WHY THE FAILURE STATES ARE MOCKED AND NOT PROVOKED:
   classifyUploadError mapping. 'backend_not_live' is now a branch that the live
   backend cannot actually produce; it is pinned as copy, not as a live state.
 
-PASS  a decodable video was synthesized in-browser  (1211593 B webm/vp8)
+PASS  a decodable video was synthesized in-browser  (1190603 B webm/vp8)
 PASS  the chooser renders both ways in
 PASS  choose-upload reaches the video start screen
 PASS  picking a video reaches the extract screen
 PASS  the seek fallback ran, not WebCodecs  (["DECODER Video element"])
 PASS  the route screen is reached
-PASS  OPFS holds exactly one session  (["video-mrofd2uk-zzqcyv"])
+PASS  OPFS holds exactly one session  (["video-mrofq2cg-b08g3c"])
 PASS  the manifest carries the video member with its plan  ({"targetFrames":11,"intervalMs":1000,"framesExtracted":11,"routeSource":null,"clockOffsetMs":0})
 PASS  the plan sampled at one frame a second  (interval 1000 ms)
 PASS  the plan targets one frame per second of video  (11 planned for a ~12s video)
@@ -118,25 +118,25 @@ console errors seen: 21 (21 filtered, 0 ours)
   of which pre-existing app-wide hydration mismatches (not this unit's): 9
 
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
-  - [0:00:00.499] [BoxParser] Invalid box type: 'B'
+  - [0:00:00.503] [BoxParser] Invalid box type: 'B'
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
   - [0:00:00.357] [BoxParser] Invalid box type: 'B'
   - Failed to load resource: the server responded with a status of 501 (Not Implemented)
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
-  - [0:00:00.357] [BoxParser] Invalid box type: 'B'
+  - [0:00:00.408] [BoxParser] Invalid box type: 'B'
   - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
   - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
   - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
   - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
-  - [0:00:00.458] [BoxParser] Invalid box type: 'B'
+  - [0:00:00.450] [BoxParser] Invalid box type: 'B'
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
-  - [0:00:00.433] [BoxParser] Invalid box type: 'B'
+  - [0:00:00.406] [BoxParser] Invalid box type: 'B'
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
-  - [0:00:00.340] [BoxParser] Invalid box type: 'B'
+  - [0:00:00.449] [BoxParser] Invalid box type: 'B'
   - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
-  - [0:00:00.418] [BoxParser] Invalid box type: 'B'
+  - [0:00:00.334] [BoxParser] Invalid box type: 'B'
 
 RESULT: PASS
