@@ -8,7 +8,7 @@ not that they work.
 
 The items are ordered by how badly they hurt if they are wrong.
 
-## Why the automated drive cannot cover the fast path (measured, not assumed)
+## What the automated drive can and cannot reach (measured, not assumed)
 
 Probed directly against Playwright's Chromium 141 on this machine, over
 localhost so that the secure-context gate is satisfied:
@@ -28,16 +28,39 @@ Two consequences, and they are the reason items 1 and 2 below exist at all:
 1. **Playwright's Chromium cannot decode H.264 at all**, so it can never take the
    WebCodecs path for a real phone video. `canDecodeWithWebCodecs` correctly
    returns false there.
-2. The only video this environment can synthesize is **VP8 in WebM**
-   (`MediaRecorder`), and mp4box cannot demux WebM. So the drive's file goes
-   `probeVideo` fails -> `probeVideoElement` -> **seek fallback**.
+2. `MediaRecorder` here can only produce **VP8 in WebM**, and mp4box cannot demux
+   WebM. So a MediaRecorder file goes `probeVideo` fails -> `probeVideoElement`
+   -> **seek fallback**.
 
-So the automated drive exercises the FALLBACK path end to end and the WebCodecs
-path **not at all**. That is not a gap in the test, it is a property of the
-browser available here: there is no H.264 to decode and Playwright's bundled
-ffmpeg is built `--disable-everything` with only VP8 and WebM, so it cannot
-produce an MP4 either. The fast path that every real iPhone will take is
-therefore verified by item 1 below and by nothing else. Treat it accordingly.
+### CORRECTION (superseded in part by `scripts/verify-u28-video.mjs`)
+
+This section used to conclude that the WebCodecs path was exercised "not at all"
+and that this environment "cannot produce an MP4 either". **Both of those claims
+were wrong, and the drive now disproves them**, so they are corrected here rather
+than left to contradict `playwright-drive.txt`.
+
+The reasoning missed a route: `MediaRecorder` is not the only encoder available.
+`VideoEncoder` encodes **VP9** here, and mp4box can **write** an MP4 as well as
+read one. `verify-u28-video.mjs` therefore muxes a VP9-in-MP4 fixture at run time
+and drives the real fast path with it, asserting from the screen that WebCodecs
+ran and not the fallback. Both decoders are now covered by the automated drive.
+
+What that fixture does **not** cover, and what item 1 below is still the only
+cover for:
+
+- **H.264 specifically.** Still undecodable here. Every real iPhone video is
+  H.264 or HEVC, and neither has ever been through this code.
+- **Progressive MP4s.** mp4box's `addSample` writer emits a *fragmented* file
+  (`ftyp + moov(mvex) + a moof/mdat pair per sample`). Phone videos are
+  progressive (`ftyp + moov` with populated `stbl` + one big `mdat`), which is a
+  different demux path. Measured: on the synthetic fixture `createFile(false)`
+  still returns all 300 samples with bytes intact, so **the fixture would not
+  have caught the inverted-`keepMdatData` bug of `ddbc59f`**.
+  `scripts/test-mp4box-contract.mjs` remains the only cover for that.
+- **The rotation matrix**, which a synthetic file writes as identity. See item 8.
+
+So item 1 is still a BLOCKER and is still the only thing standing between us and
+a fast path that has never met a real phone stream. Treat it accordingly.
 
 ## 1. iOS Safari actually decodes a real phone video (BLOCKER if it fails)
 

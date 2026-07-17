@@ -1,0 +1,225 @@
+u28 gates — 2026-07-17T04:13:11Z
+Verbatim output. Run from the worktree root.
+
+==============================================================
+$ npx tsc --noEmit
+==============================================================
+[exit 0]
+
+==============================================================
+$ npm run lint
+==============================================================
+
+> streetlens@0.1.0 lint
+> eslint
+
+
+/Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0002-cv-data-collection-funne/worktrees/unit-video-upload-intake-a48e/scripts/verify-u28-video.mjs
+  650:11  warning  'sessionId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)
+
+[exit 0]
+
+==============================================================
+$ npm run build
+==============================================================
+
+> streetlens@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/filippofonseca/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0002-cv-data-collection-funne/worktrees/unit-video-upload-intake-a48e/package-lock.json
+   * /Users/filippofonseca/Developer/Projects/streetlens/package-lock.json
+
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.6s
+  Running TypeScript ...
+  Finished TypeScript in 6.1s ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/26) ...
+  Generating static pages using 9 workers (6/26) 
+  Generating static pages using 9 workers (12/26) 
+  Generating static pages using 9 workers (19/26) 
+✓ Generating static pages using 9 workers (26/26) in 551ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /_not-found
+├ ● /[locale]
+│ ├ /en
+│ └ /es
+├ ƒ /[locale]/admin
+├ ƒ /[locale]/admin/import
+├ ● /[locale]/admin/login
+│ ├ /en/admin/login
+│ └ /es/admin/login
+├ ƒ /[locale]/admin/queue
+├ ● /[locale]/collect
+│ ├ /en/collect
+│ └ /es/collect
+├ ƒ /[locale]/collect/status/[id]
+├ ● /[locale]/map
+│ ├ /en/map
+│ └ /es/map
+├ ƒ /api/admin/import
+├ ƒ /api/admin/login
+├ ƒ /api/admin/logout
+├ ƒ /api/admin/review
+├ ƒ /api/capture/pump
+├ ƒ /api/capture/sessions
+├ ƒ /api/capture/sessions/[id]
+├ ƒ /api/capture/sessions/[id]/finalize
+├ ƒ /api/capture/sessions/[id]/frames
+├ ƒ /api/routing-network
+├ ƒ /api/submissions
+└ ○ /icon.svg
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+[exit 0]
+
+==============================================================
+$ node scripts/test-capture-route.mjs
+==============================================================
+  [ok ] a timed GPX parses
+  [ok ] a timed GPX yields every trackpoint
+  [ok ] a fully timed GPX reports hasTimes
+  [ok ] lat and lon map onto lat/lng
+  [ok ] ele is parsed when present
+  [ok ] time is parsed to epoch ms UTC 1784210400000
+  [ok ] points come out in document order, unsorted
+  [ok ] a timed GPX carries no non-finite numbers
+  [ok ] an untimed GPX still parses
+  [ok ] an untimed GPX reports hasTimes false
+  [ok ] an untimed GPX keeps its geometry
+  [ok ] self-closing trkpt is read
+  [ok ] self-closing trkpt has no time, so hasTimes is false
+  [ok ] attribute order reversed and single quotes both read
+  [ok ] a partially timed GPX is demoted to untimed
+  [ok ] a demoted GPX carries no leftover timestamps
+  [ok ] an unparseable time makes the point untimed, not invalid
+  [ok ] an empty string is not_gpx
+  [ok ] arbitrary XML is not_gpx
+  [ok ] a GPX with no trackpoints is no_trackpoints
+  [ok ] latitude past the pole is malformed_coordinates
+  [ok ] longitude past the antimeridian is malformed_coordinates
+  [ok ] a non-numeric coordinate is malformed_coordinates
+  [ok ] a trkpt missing lon is malformed_coordinates
+  [ok ] one bad point rejects the whole file rather than silently cutting a corner
+  [ok ] pathLengthMeters matches a known 1 km separation 999.6 m
+  [ok ] pathLengthMeters sums pairwise legs
+  [ok ] pathLengthMeters of one vertex is zero
+  [ok ] pathLengthMeters of an empty path is zero
+  [ok ] every vertex gets a timestamp
+  [ok ] the first vertex lands exactly on startT
+  [ok ] the last vertex lands exactly on endT
+  [ok ] an evenly spaced midpoint lands on the midpoint time 10000 ms in
+  [ok ] times ascend strictly
+  [ok ] geometry is carried through untouched
+  [ok ] no accuracy is invented, so validateTrack keeps every fix
+  [ok ] distributed times carry no non-finite numbers
+  [ok ] the result is a valid trace track
+  [ok ] no fix is dropped by the accuracy filter
+  [ok ] an unevenly spaced vertex is timed by distance, not by index 8180.908180908568 ms of 10000
+  [ok ] an empty path distributes to an empty track
+  [ok ] a single vertex gets startT and comes back alone
+  [ok ] a single vertex is not a track, and validateTrack says so
+  [ok ] coincident vertices spread evenly by index rather than dividing by zero
+  [ok ] a zero-length path produces no NaN
+  [ok ] the even index spread hits the expected thirds 0, 10000, 20000, 30000
+  [ok ] endT before startT clamps the span to zero rather than running time backwards
+  [ok ] an inverted span produces no NaN
+  [ok ] a zero-span track still sorts and validates as a trace
+  [ok ] interpolateAt at the midpoint time returns the midpoint vertex 9.918790, -84.140800
+  [ok ] interpolateAt a quarter in lands on the path between vertices
+  [ok ] a frame shot before the video started is not placed
+  [ok ] a frame shot after the video ended is not placed
+  [ok ] positionAtFraction of an empty path is null
+  [ok ] fraction 0 is the first vertex
+  [ok ] fraction 1 is the last vertex
+  [ok ] fraction 0.5 is the midpoint of an evenly spaced path 9.91879
+  [ok ] fraction 0.5 measures by distance on an uneven path, so it sits early
+  [ok ] an overshooting fraction clamps to the end
+  [ok ] an undershooting fraction clamps to the start
+  [ok ] a NaN fraction reads as 0 rather than returning NaN
+  [ok ] a zero-length path returns its only place, not NaN
+  [ok ] a one-vertex path returns that vertex
+  [ok ] a timed GPX validates straight through as a gpx track
+  [ok ] an untimed GPX's geometry can be timed by the route maths instead
+
+PASS — GPX parse and route distribution locked
+[exit 0]
+
+==============================================================
+$ node scripts/test-video-plan.mjs
+==============================================================
+  [ok ] a 60 s video samples at 1 fps got 1000
+  [ok ] a 60 s video plans 60 frames got 60
+  [ok ] a 60 s video is not marked sparser
+  [ok ] a video exactly at the cap stays at 1 fps interval 1000 sparser false
+  [ok ] a video exactly at the cap plans exactly the cap got 400
+  [ok ] no duration ever plans past the frame cap
+  [ok ] a 20 min video is marked sparser
+  [ok ] a 20 min video stretches past 1 s got 3000
+  [ok ] a 20 min video still covers the whole walk last target 1198500 of 1200000
+  [ok ] a 5 s video yields 5 targets got 5
+  [ok ] targets sit mid-interval, not on the second boundary got 500, 1500
+  [ok ] targets are strictly ascending
+  [ok ] no target falls outside the video
+  [ok ] no target is NaN
+  [ok ] a zero-length video plans nothing
+  [ok ] a sub-second video still gets its one frame got 1
+  [ok ] a negative duration plans nothing rather than throwing
+  [ok ] an Infinity duration does not produce NaN targetFrames 0
+  [ok ] a NaN duration does not produce NaN got 0
+  [ok ] an injected cap is honoured got 2
+  [ok ] an injected cap marks sparser
+  [ok ] an identity matrix is upright got 0
+  [ok ] a portrait iPhone matrix reads 90 got 90
+  [ok ] an upside-down matrix reads 180 got 180
+  [ok ] the other quarter turn reads 270 got 270
+  [ok ] fixed-point scale does not matter
+  [ok ] an Int32Array matrix works
+  [ok ] a missing matrix is upright, not a throw
+  [ok ] a null matrix is upright
+  [ok ] a truncated matrix is upright
+  [ok ] an all-zero matrix is upright
+  [ok ] a NaN matrix is upright
+  [ok ] an off-axis matrix is left alone rather than snapped
+  [ok ] every rotation is one of the four legal values
+
+PASS — the plan never exceeds the cap, never truncates a walk, and knows which way is up
+[exit 0]
+
+==============================================================
+$ node scripts/test-mp4box-contract.mjs
+==============================================================
+  [ok ] createFile(true) keeps the sample bytes discardMdatData=false
+  [ok ] createFile(false) would silently discard them discardMdatData=true
+  [ok ] the default is the discarding one so the argument is never optional for us
+  [ok ] ISOFile.appendBuffer exists
+  [ok ] ISOFile.flush exists
+  [ok ] ISOFile.start exists
+  [ok ] ISOFile.setExtractionOptions exists
+  [ok ] ISOFile.releaseUsedSamples exists
+  [ok ] ISOFile.getTrackById exists
+  [ok ] MP4BoxBuffer.fromArrayBuffer carries the fileStart
+  [ok ] a non-video file does not crash the parser
+  [ok ] a non-video file yields no moov
+
+PASS — mp4box still behaves the way video-demux.ts assumes
+[exit 0]
+

@@ -1,0 +1,142 @@
+u28 uploaded-video verification — 2026-07-17T04:17:21.301Z
+base: http://localhost:3905
+video: synthesized in-browser, canvas -> captureStream -> MediaRecorder(video/webm;codecs=vp8), 12s, 1211593 B
+route: a timed GPX fixture of 12 points over Escazú, built in memory
+
+DECODER COVERAGE, STATED PLAINLY:
+  BOTH decoders are driven here, on two synthetic files, and which one ran is
+  asserted from the screen rather than assumed.
+
+  SEEK path (probeVideoElement + extractFramesWithSeek), on a VP8 WebM. Taken by
+  construction: mp4box cannot demux WebM, so probeVideo throws and useVideoUpload
+  falls back. The BoxParser errors in the console list below are that failure
+  happening, and they are counted as an assertion rather than merely filtered.
+
+  WEBCODECS path (mp4box demux + VideoDecoder), on a VP9 MP4 muxed here with
+  mp4box's own ISOFile write API. H.264 was not available to us at all: this
+  Chromium refuses to decode avc1, MediaRecorder.isTypeSupported('video/mp4;
+  codecs=avc1') is false, Playwright's bundled ffmpeg is built --disable-everything
+  (VP8/WebM only), and there is no system ffmpeg. VP9 was the only route to an MP4
+  mp4box would read, and it worked.
+
+  WHAT THE VP9 FIXTURE DOES NOT COVER, so nobody over-reads it: mp4box's addSample
+  API emits a FRAGMENTED mp4 (ftyp + moov(mvex) + a moof/mdat pair per sample).
+  Real phone uploads are progressive (ftyp + moov with populated stbl + one mdat),
+  and those are different demux paths. Measured: on this fixture createFile(false)
+  still returns all 300 samples with bytes intact, so it would NOT have caught the
+  inverted-keepMdatData bug of ddbc59f. scripts/test-mp4box-contract.mjs remains
+  the only cover for that, and the real-device checklist in MANUAL-VERIFY.md
+  remains the only cover for H.264 and for progressive files.
+
+PATH B (synthetic VP9-in-MP4):
+  fixture: 567542 B, 300 vp09 samples, 10s @ 30fps, vp09.00.10.08
+
+DEFECT FOUND AND FIXED BY THIS DRIVE:
+  useVideoUpload.upload() marked the manifest `uploaded` and stopped, where the
+  live sibling (useRecorder.upload, and its comment saying why) also calls
+  store.discard(). So every frame of every successfully uploaded video stayed in
+  OPFS forever: up to 400 JPEGs a video, with a fresh set stranded beside them on
+  the next upload, collected only if the contributor happened to click 'Upload
+  another video'. Caught by 'OPFS is swept after a successful upload' (1 left).
+
+PRE-EXISTING, NOT THIS UNIT'S:
+  9 React hydration mismatch(es) on the <html> font classNames.
+  Reproduced on /en, /en/map and /es/collect with none of this unit's code on
+  screen, so it is filtered here and reported rather than owned or fixed.
+
+WHY THE FAILURE STATES ARE MOCKED AND NOT PROVOKED:
+  The capture API is NO LONGER a 501 stub in this build. /api/capture/sessions is
+  implemented and .env.local carries real Supabase credentials, so getCaptureDb()
+  returns a live database: an un-mocked upload from this script would create real
+  rows and push real frames at real storage. It is not reachable anyway, because
+  capture_create_session (0013) enforces its own 3/hour ceiling IN POSTGRES and
+  answers 429 regardless of server restarts. So 501 and 503 are both driven from a
+  mocked status: deterministic, side-effect free, and still exercising the real
+  classifyUploadError mapping. 'backend_not_live' is now a branch that the live
+  backend cannot actually produce; it is pinned as copy, not as a live state.
+
+PASS  a decodable video was synthesized in-browser  (1211593 B webm/vp8)
+PASS  the chooser renders both ways in
+PASS  choose-upload reaches the video start screen
+PASS  picking a video reaches the extract screen
+PASS  the seek fallback ran, not WebCodecs  (["DECODER Video element"])
+PASS  the route screen is reached
+PASS  OPFS holds exactly one session  (["video-mrofd2uk-zzqcyv"])
+PASS  the manifest carries the video member with its plan  ({"targetFrames":11,"intervalMs":1000,"framesExtracted":11,"routeSource":null,"clockOffsetMs":0})
+PASS  the plan sampled at one frame a second  (interval 1000 ms)
+PASS  the plan targets one frame per second of video  (11 planned for a ~12s video)
+PASS  every planned frame was extracted  (11 extracted / 11 planned)
+PASS  every manifest frame has bytes on disk  (11 files / 11 meta)
+PASS  the resume cursor kept up with the frames  (cursor 11 / 11 frames)
+PASS  a timed GPX is read and its point count reported
+PASS  a timed GPX is recognised as carrying its own times
+PASS  the GPX is stated as the chosen route
+PASS  route-confirm reaches the review screen
+PASS  the review screen reports the extracted frame count  (ui 11 / manifest 11)
+PASS  the route is recorded on the manifest as a gpx route  (source gpx)
+PASS  video-upload completes to the done screen
+PASS  createSession carried mode:video  ({"mode":"video","honeypot":""})
+PASS  finalize carried the route source  (source gpx)
+PASS  finalize carried a clockOffsetMs  (clockOffsetMs 0)
+PASS  finalize carried a track as long as the GPX  (12 points)
+PASS  every extracted frame was registered for upload  (11 registered / 11 extracted)
+PASS  OPFS is swept after a successful upload  (0 left)
+PASS  a 501 surfaces as the honest backend-not-live state
+PASS  the retry affordance is offered after a failed upload
+PASS  frames stay in OPFS after a failed upload  (1 session(s), 11 frames)
+PASS  a video session is still in OPFS for the regression to bite on
+PASS  the live recorder still reaches its normal start screen
+PASS  the live recorder does not offer a video session as an unfinished walk
+PASS  a 503 surfaces as an honest failure with a retry
+PASS  frames survive a 503 on the device  (1 session(s), 11 frames)
+PASS  a VP9-in-MP4 fixture was muxed with mp4box  (567542 B, 300 samples, vp09.00.10.08)
+PASS  VP9 carries no decoder description, as expected for this codec
+PASS  the WebCodecs path ran on the VP9 MP4, not the seek fallback  (["DECODER WebCodecs"])
+PASS  the WebCodecs path reaches the route screen
+PASS  the WebCodecs path extracted the planned frames  (10 extracted / 10 planned)
+PASS  the WebCodecs plan matches the MP4's demuxed duration  (10 planned for a 10s mp4)
+PASS  every WebCodecs frame has bytes on disk  (10 files / 10 meta)
+PASS  the WebCodecs path uploads to the done screen
+PASS  the WebCodecs path finalizes with mode:video and the gpx source  ({"create":{"mode":"video","honeypot":""},"source":"gpx"})
+PASS  en chooser renders at 390
+PASS  en video start screen renders at 390
+PASS  en review screen renders at 390
+PASS  en chooser renders at 1280
+PASS  en video start screen renders at 1280
+PASS  en review screen renders at 1280
+PASS  es chooser renders at 390
+PASS  es video start screen renders at 390
+PASS  es review screen renders at 390
+PASS  es chooser renders at 1280
+PASS  es video start screen renders at 1280
+PASS  es review screen renders at 1280
+PASS  no unexpected console errors in the driven flows
+PASS  mp4box did refuse the WebM, which is what sends it down the seek path  (7 BoxParser errors)
+
+console errors seen: 21 (21 filtered, 0 ours)
+  of which mp4box refusing the WebM (expected, this is the fallback firing): 7
+  of which pre-existing app-wide hydration mismatches (not this unit's): 9
+
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - [0:00:00.499] [BoxParser] Invalid box type: 'B'
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - [0:00:00.357] [BoxParser] Invalid box type: 'B'
+  - Failed to load resource: the server responded with a status of 501 (Not Implemented)
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - [0:00:00.357] [BoxParser] Invalid box type: 'B'
+  - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
+  - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
+  - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
+  - Failed to load resource: the server responded with a status of 503 (Service Unavailable)
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - [0:00:00.458] [BoxParser] Invalid box type: 'B'
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - [0:00:00.433] [BoxParser] Invalid box type: 'B'
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - [0:00:00.340] [BoxParser] Invalid box type: 'B'
+  - A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used: - A server/client branch `if (typeof window
+  - [0:00:00.418] [BoxParser] Invalid box type: 'B'
+
+RESULT: PASS
