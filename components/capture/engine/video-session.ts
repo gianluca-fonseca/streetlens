@@ -105,10 +105,30 @@ export type VideoSourceFile = {
   lastModified: number;
 };
 
-/** A route drawn on the map or read out of a GPX, before it is timed. */
+/**
+ * A route drawn on the map or read out of a GPX.
+ *
+ * `timedTrack` is the whole reason this type is not just a path. A GPX exported
+ * by a watch or a phone usually carries a real `<time>` on every trkpt, and
+ * those are measured GPS fixes: actual times, at actual places, with the pauses
+ * and the slow uphill stretch already in them. Throwing them away and spreading
+ * the video's duration evenly along the line instead would replace real evidence
+ * with an assumption of constant pace, which is exactly the assumption the timed
+ * file is telling us is false.
+ *
+ * So a timed GPX keeps its own clock and the frames move against it. Everything
+ * else (a drawn trace, a GPX with no times) has no clock of its own and gets one
+ * distributed along its length. `timedTrack` being present is precisely the
+ * condition under which the clock nudge does anything at all: see `setVideoStart`.
+ */
 export type VideoRoute = {
   source: VideoRouteSource;
   path: LatLng[];
+  /**
+   * Real fixes from a timed GPX, already absolute. When set this IS the track,
+   * untouched by the video's clock. Absent for a drawn trace or an untimed GPX.
+   */
+  timedTrack?: TrackPoint[];
 };
 
 /** The video-specific half of the manifest. The live half is `SessionManifest`. */
@@ -295,12 +315,21 @@ export function appendVideoFrame(
  * we happened to keep. The contributor walked the whole line, including the
  * seconds either side of the first and last sample, and pinning the ends to
  * frame times would quietly shorten the route by up to an interval at each end.
+ *
+ * A timed GPX is the exception and takes none of this. Its fixes are already
+ * absolute and already true, so they pass straight through: distributing the
+ * video's duration along them instead would overwrite measured times with an
+ * assumption of constant pace. On that path the track is fixed and the FRAMES
+ * move against it, which is the only configuration in which the clock nudge
+ * changes anything.
  */
 function retimeTrack(manifest: VideoSessionManifest): VideoSessionManifest {
   const { videoStartMs, plan, route } = manifest.video;
-  const track: TrackPoint[] = route
-    ? distributeTimesAlongPath(route.path, videoStartMs, videoStartMs + plan.durationMs)
-    : [];
+  if (!route) return { ...manifest, track: [] };
+
+  const track: TrackPoint[] = route.timedTrack
+    ? route.timedTrack.map((p) => ({ ...p }))
+    : distributeTimesAlongPath(route.path, videoStartMs, videoStartMs + plan.durationMs);
   return { ...manifest, track };
 }
 
@@ -311,6 +340,15 @@ function retimeTrack(manifest: VideoSessionManifest): VideoSessionManifest {
  * previous nudge, so dragging the slider around does not accumulate: the offset
  * always reads as the total correction from what the file claimed, which is the
  * number the server stores and the number a reviewer would want to see.
+ *
+ * Worth knowing before building a slider on top of this: **the nudge only moves
+ * anything when the route carries its own clock**, i.e. a timed GPX. On a drawn
+ * trace (and an untimed GPX) the track's times are derived FROM `videoStartMs`,
+ * so moving the start shifts the frames and the track by the same amount and
+ * every frame interpolates to exactly where it did before. That is not a bug to
+ * fix, it is what "no independent clock to disagree with" means. A UI that
+ * offered the slider there would be showing a control that visibly changes a
+ * number and provably changes nothing about the data.
  */
 export function setVideoStart(
   manifest: VideoSessionManifest,
@@ -345,7 +383,11 @@ export function setVideoRoute(
   route: VideoRoute | null,
 ): VideoSessionManifest {
   const copied: VideoRoute | null = route
-    ? { source: route.source, path: route.path.map((p) => ({ lat: p.lat, lng: p.lng })) }
+    ? {
+        source: route.source,
+        path: route.path.map((p) => ({ lat: p.lat, lng: p.lng })),
+        ...(route.timedTrack ? { timedTrack: route.timedTrack.map((p) => ({ ...p })) } : {}),
+      }
     : null;
   return retimeTrack({ ...manifest, video: { ...manifest.video, route: copied } });
 }
