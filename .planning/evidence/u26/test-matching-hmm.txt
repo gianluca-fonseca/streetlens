@@ -15,7 +15,7 @@
   [ok ] an L-shaped walk yields two traversals — got ["esc-sa-0090","esc-sa-0291"]
   [ok ] ...in the order they were walked — got ["esc-sa-0090","esc-sa-0291"]
   [ok ] traversals are chronological
-  [ok ] frames at the shared junction are flagged nearJunction — got 19 / 28
+  [ok ] frames at the shared junction are flagged nearJunction — got 22 / 25
   [ok ] nearJunctionSeqs is always a subset of frameSeqs
   [ok ] every flagged frame is genuinely near a junction of its own segment (<=35 m incl. GPS noise) — worst flagged frame is 31.1 m from its nearest junction
   [ok ] mid-block frames are NOT flagged (the flag means something)
@@ -37,7 +37,14 @@
   [ok ] no mid-block frame is attributed to the wrong arm — 0 wrong
   [ok ] every frame has an entry, and frames on the route are non-null — 215/215 attributed
 
-7. contract edge cases
+7. out-and-back on one street
+  [ok ] an out-and-back on one street is TWO traversals, not one merged span — got 2
+  [ok ] ...both on the street walked — got ["esc-sa-0170","esc-sa-0170"]
+  [ok ] ...split at the turnaround, not at an arbitrary point — first pass ends 1s from the real turnaround
+  [ok ] each leg measures roughly the 170 m walked (+/-20%) — got 173 / 176 m
+  [ok ] ...while a one-way walk with MORE noise stays a single traversal — got 1
+
+8. contract edge cases
   [ok ] an empty track returns an empty result rather than throwing
   [ok ] no candidate segments -> everything unmatched, no throw
   [ok ] fixes sharing one timestamp do not hang or throw — 1 traversals
