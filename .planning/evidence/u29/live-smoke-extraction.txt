@@ -1,0 +1,56 @@
+u29 live extraction smoke — RESULT: BLOCKED (not passed)
+Run: 2026-07-16, RUN_LIVE_SMOKE=1, gpt-5-nano, fixture street-san-antonio-escazu.jpg (164 KB, 960x666)
+
+The smoke was run twice against the real API. It has NOT passed. It found two
+real defects, then hit an account blocker that no code change can clear.
+
+---- Attempt 1 ----
+FAIL: openai 400 — "Unsupported parameter: 'temperature' is not supported with
+this model."
+
+A REAL BUG, and one no mocked test could have found: every extraction call in
+production would have 400'd. gpt-5 reasoning models reject `temperature`
+outright. Fixed by removing it from buildRequestBody (lib/extraction/client.ts);
+locked by a check in test-extraction-worker.mjs.
+
+---- Attempt 2 (after the fix) ----
+FAIL: openai 429 after 3 attempts — "You exceeded your current quota, please
+check your plan and billing details." (type: insufficient_quota)
+
+The request shape is now accepted; the account behind OPENAI_API_KEY in
+.env.local has no quota. This is an account/billing state, not a code defect.
+
+That failure also exposed a second real bug: `insufficient_quota` arrives as a
+429 and my retry policy treated it as an ordinary rate limit, backing off and
+retrying 3 times. A quota error can never succeed on retry — it burned the
+pump's wall clock to reach the same answer three times and buried "check your
+billing" under a generic "unavailable" message. Fixed in isRetryable()
+(lib/extraction/client.ts); locked by two checks in test-extraction-worker.mjs.
+
+---- What is therefore NOT evidenced ----
+These were the whole point of the live pass and remain UNVERIFIED:
+  - the billed input_tokens for a real detail:low call (the 2600 ceiling is
+    asserted in code and in mocked tests, but never against a real bill)
+  - that prompt caching actually engages on the ~2711-token static prefix
+  - that a real gpt-5-nano response parses against the strict schema + our zod
+  - real per-frame and per-400-frame cost math
+
+The script is ready and reproducible. It needs only a funded key:
+  RUN_LIVE_SMOKE=1 node --env-file=.env.local scripts/live-smoke-extraction.mjs
+It prints the token counts, the cost math, and the model's 15 answers, and it
+fails loudly if the cost breaker fires.
+
+---- Raw output, attempt 2 ----
+live smoke: gpt-5-nano on street-san-antonio-escazu.jpg (164 KB)
+  static prefix ~2711 tokens
+
+  [FAIL] a real call returns a usable answer (got: transport: openai unavailable after 3 attempts: {
+  "error": {
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.",
+    "type": "insufficient_quota",
+    "param": null,
+    "code": "insufficient_quota"
+  }
+})
+FAIL — 1 check(s) failed:
+  - a real call returns a usable answer

@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Throwaway CJS emitted by the scripts/test-*.mjs harnesses. Already
+    // gitignored; ignored here too because a test that fails leaves its build
+    // dir behind, and linting generated CJS would then fail the lint gate for a
+    // reason that has nothing to do with the source.
+    ".test-build-*/**",
   ]),
 ]);
 
