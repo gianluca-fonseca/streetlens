@@ -38,6 +38,10 @@ Design consequences, intentional:
 
 Next.js 15 + TypeScript · Tailwind + shadcn/ui · MapLibre GL (open tiles) · Supabase (Postgres + PostGIS, Auth, Storage) · Vercel.
 
+## The CV data-collection funnel
+
+Alongside the manual audit flow, a contributor can film a street (live on the phone or by uploading a video) and have a vision model score the frames against the same rubric v0.1 a human auditor uses. Frames are placed on the street network by map matching, scored one call per frame, and rolled up into per-segment lens scores. The result is a **proposal, not data**: it enters the same review queue a manual contribution does, and nothing reaches the published map without a human approving it. See [`docs/cv-funnel.md`](docs/cv-funnel.md) for the full architecture, cost model, edge-case catalog, and ops runbook.
+
 ## Roadmap
 
 - **Phase A (July 2026):** public map over real OSM geometry for the San Antonio pilot corridor, synthetic demo data, persistent demo banner.
