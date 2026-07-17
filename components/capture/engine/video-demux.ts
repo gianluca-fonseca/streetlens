@@ -16,10 +16,21 @@
  *
  * mp4box's own retention is the other half of the problem. It is a parser that
  * would happily hold every buffer you ever gave it, which would rebuild the
- * exact whole-file allocation we just went to the trouble of avoiding. Two
- * things stop that: `createFile(false)` tells it not to keep mdat payloads, and
- * `releaseUsedSamples` tells it the samples we have already decoded can go.
- * Without those the slicing is theatre.
+ * exact whole-file allocation we just went to the trouble of avoiding.
+ * `releaseUsedSamples` is what stops that: it tells mp4box the samples we have
+ * already decoded can go, and the stream then reclaims the buffers behind them.
+ * Without it the slicing is theatre.
+ *
+ * `createFile(true)` is NOT the memory knob it looks like, and the reading that
+ * says otherwise is backwards in the worst way. The signature is
+ * `createFile(keepMdatData = false)` and it builds `new ISOFile(stream,
+ * !keepMdatData)`, so the intuitive-looking `createFile(false)` sets
+ * `discardMdatData = true`, and mp4box then throws away the very bytes the
+ * samples are made of. It does not fail. It logs "samples will not be
+ * extracted" at warn level and hands back a perfectly well-formed stream of
+ * nothing, and every count downstream is honestly reporting zero. The flag has
+ * to be true or there is no video here at all. `scripts/test-mp4box-contract.mjs`
+ * pins it.
  *
  * This module demuxes and nothing else. It does not decode, does not sample and
  * does not know what a frame is for. `video-extract.ts` owns those decisions.
@@ -188,7 +199,9 @@ function trackInfo(iso: ISOFile, movie: Movie, track: Track): VideoTrackInfo {
 export async function demuxVideo(file: Blob, handlers: DemuxHandlers): Promise<void> {
   const { onTrack, onSamples, onProgress, signal } = handlers;
 
-  const iso = createFile(false);
+  // `keepMdatData: true`. Counter-intuitive and mandatory: false discards the
+  // sample payloads and extraction silently yields nothing. See the file header.
+  const iso = createFile(true);
   let info: VideoTrackInfo | null = null;
   let stopped = false;
   let parseError: string | null = null;
