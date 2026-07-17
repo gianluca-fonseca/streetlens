@@ -1,0 +1,65 @@
+u2 browser drive — the whole flow, local mode (no database)
+============================================================
+
+Reproduce
+---------
+  node scripts/seed-u2-fixture.mjs --force
+  ADMIN_PASSWORD=streetlens-u2 NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= \
+    ADMIN_RPC_SECRET= next dev -p 3732            # fixture mode (no Supabase)
+  # then log in at /en/admin/login and open the review page:
+  /en/admin/capture/9c2e6a71-4f38-4a1b-b7d0-2e5a1c9f3b84
+
+Seeded walk: 7 frames on two real demo segments (esc-sa-0001, esc-sa-0002), one
+blurred/not-usable frame, one unmatched frame, one escalated frame, a GPS track.
+
+Steps verified (screenshot)
+---------------------------
+1. Review page renders: session header, the map ("The walk"), two segment cards
+   with per-lens scores derived from the live recompute, filmstrips, unmatched
+   frame section, editable score fields, inspector hint.        [u2-01]
+   esc-sa-0001 overall = 17 (a confident bad reading, frame 1, drags it down).
+
+2. Inspector: clicking frame 1 opens all 15 rubric readings with value +
+   confidence (90%), the model rationale, and per-item override dropdowns; a null
+   would read "Not assessable".                                  [u2-02]
+
+3. EXCLUDE -> score moves: excluding frame 1 lifts esc-sa-0001 overall 17 -> 72
+   ("was 17" shown), drops coverage 75% -> 67%, adds the "Human-corrected" badge
+   and "Reset segment", and strikes frame 1 ("excl").            [u2-03]
+
+4. ITEM OVERRIDE: on frame 0, surface_condition 3/4 -> 0/4 shows the struck model
+   value + the override chip, moves overall to 66 / accessibility to 50, and the
+   header shows "2 corrections".                                 [u2-04]
+
+5. DELETE -> tombstone: the inline confirm names the consequence ("This
+   permanently removes the frame's image."); confirming DELETEs the frame
+   (POST returns 200, local tombstone overlay records seq 0), and the thumbnail
+   becomes a seq-only tombstone.                                 [u2-05, u2-06]
+
+6. SEGMENT DROP: excluding esc-sa-0002's frame 3 moves it (82 -> 61, one frame
+   left), then excluding its last frame (frame 4) DROPS the segment: checkbox
+   disabled, "Dropped" badge, "Every supporting frame was excluded or deleted,
+   so this segment cannot be approved", and "Approving 1 of 2 segments".  [u2-07]
+
+7. MAP: MapLibre canvas (948x256) with zoom controls renders the GPS track,
+   numbered frame dots, and matched segment geometry over the token-free
+   OpenFreeMap style.                                            [u2-08]
+
+8. MANUAL SCORE EDIT wins: typing 55 into esc-sa-0001's Overall overrides the
+   recomputed value ("was 17" baseline retained).               [u2-09]
+
+9. APPROVE (authoritative server recompute): POST /api/admin/capture/review 200.
+   Exactly ONE observation lands (esc-sa-0001); the dropped esc-sa-0002 is NOT
+   applied. Persisted row:
+     human_corrected = true
+     overall = 55                      (manual edit won)
+     frame_refs = 2                    (deleted seq 0 + excluded seq 1 excluded)
+     overrides = {"items":{"0":{"surface_condition":0}},"excludedSeqs":[1],
+                  "deletedSeqs":[0],"scores":{"overall":55}}
+   The compact overrides record captures every action a reviewer took.  [u2-10]
+
+10. i18n: the whole workbench in Spanish (es-CR).                [u2-11]
+11. Mobile (390px): the review workbench stacks and stays usable. [u2-12]
+
+Console: one pre-existing Next.js dev-mode hydration artifact (internal error
+boundary), unrelated to u2 components; the same class the u30 drive documented.
