@@ -20,6 +20,50 @@ data.** It enters the same review queue a manual contribution does, and nothing
 it produces reaches the published map without a human approving it. Every
 decision below that looks conservative is downstream of that.
 
+## The funnel in plain language
+
+**What the CV is scanning for.** Each frame from a street walk is sent to a
+vision model (gpt-5-nano, escalating to gpt-5.4-mini on low-confidence frames)
+in a single structured call that evaluates the street against the same rubric
+v0.1 a human auditor uses: 15 items across the four lenses. Concretely it reads
+things like sidewalk presence and effective width, curb ramps, surface
+condition, drainage grates and standing water, tree canopy and shade cover, and
+bike infrastructure (lanes, separation, surface). The response is forced
+through a strict JSON schema, so every frame comes back as structured rubric
+readings, not free text.
+
+**Does it assign a score? Yes, in two stages.** Per frame it produces the 15
+rubric item readings plus a confidence. Then, per street segment, all frames
+matched to that segment are rolled up with confidence-weighted medians into
+lens scores from 0 to 100: accessibility, drainage, shade, bike, and an overall
+composite (0.45 x accessibility + 0.30 x drainage + 0.25 x shade, with bike
+kept separate). A lens no frame could support stays null (unknown), never zero.
+
+**Upload flow.** Two paths, both frames-only; raw video never leaves the phone:
+
+1. **Live recording**: the browser opens the camera, samples roughly one frame
+   per second gated by GPS movement, filters blurry and duplicate frames, and
+   uploads frames directly to Supabase storage as you walk.
+2. **Video upload**: you pick a POV video, the browser decodes it locally
+   (WebCodecs fast path or a fallback decoder), samples frames, and pairs them
+   with a GPX track or a route you trace on the map, since phone videos carry
+   no GPS track.
+
+Either way the lifecycle is the same: a session is created, frames are
+registered (which arms the storage upload policy), bytes upload, finalize runs
+HMM map matching to pin each frame to an exact street segment, a job queue
+extracts each frame through the vision model, rollups are computed, and the
+session lands in the review queue.
+
+**Approval: never automatic.** This is a hard design rule. A finished session
+files itself into the same admin review queue as manual submissions (as a
+`cv_capture` type). An admin opens the review page, sees per-segment scores
+with the frame filmstrip and token and cost stats, and approves or rejects per
+segment with a required reason. Only approved segments land in
+`community_cv_observations` and appear on the map, marked with a provenance
+chip as CV-derived; re-reviewing and unticking a segment removes it. Nothing
+reaches the published map without a human ticking it.
+
 ## Three ways in, one way out
 
 There are three ways a street's condition enters StreetLens, and they converge
