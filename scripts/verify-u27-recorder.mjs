@@ -223,7 +223,7 @@ async function main() {
     try {
       const captures = await root.getDirectoryHandle("captures");
       let n = 0;
-      for await (const _ of captures.values()) n += 1;
+      for await (const entry of captures.values()) if (entry.kind === "directory") n += 1;
       return n;
     } catch {
       return 0;
@@ -258,7 +258,7 @@ async function main() {
     const root = await navigator.storage.getDirectory();
     const captures = await root.getDirectoryHandle("captures");
     let n = 0;
-    for await (const _ of captures.values()) n += 1;
+    for await (const entry of captures.values()) if (entry.kind === "directory") n += 1;
     return n;
   });
   check("frames stay in OPFS after a failed upload", survived === 1, `${survived} session(s)`);

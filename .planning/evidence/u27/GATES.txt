@@ -1,0 +1,61 @@
+u27 live recorder — verification gates — 2026-07-17T02:33:03Z
+worktree: unit-live-recorder-a296 · branch bgsd-0002-cv-data-collection-funne/unit-live-recorder-a296
+
+npx tsc --noEmit            : PASS (clean)
+npm run lint                : PASS (0 errors, 0 warnings; ZERO eslint-disable added anywhere)
+npm run build               : PASS
+  /[locale]/collect             -> ● SSG, prerendered per locale (en, es)
+  /[locale]/collect/status/[id] -> ƒ Dynamic (correct: the id is request-time only)
+  all 5 pre-existing capture API routes still registered dynamic (untouched)
+
+New tests (this unit):
+  test-capture-gating.mjs         PASS  60 checks — haversine vs an independent
+                                        reference, the both-gates rule, the lazy-gray
+                                        perf contract, dedupe, blur, session caps,
+                                        drop tallies, segments, manifest guards.
+  verify-u27-recorder.mjs         PASS  21 checks — real Chromium, real fake camera
+                                        device (--use-fake-device-for-media-stream),
+                                        scripted GPS walk through Escazú at 390px.
+
+Pre-existing repo tests (regression — manual flow and contracts untouched):
+  test-upload-client.mjs          PASS  27 checks (26 pre-existing + 1 added, below)
+  test-capture-schemas.mjs        PASS
+  test-matching-baseline.mjs      PASS
+  test-apply-submissions.mjs      PASS
+  test-submission-counts.mjs      PASS
+  test-parse-feature-props.mjs    PASS
+  test-rate-limit-namespaces.mjs  PASS
+  test-honeypot-type.mjs          PASS
+  test-capture-migrations.mjs     PASS
+  test-import-dryrun.mjs          PASS
+
+Playwright drive (next start :3145), all 21 green:
+  start -> record -> stop -> review -> upload -> done -> status, EN + ES, light + dark.
+  7 frames captured from a real decoded MediaStream over a ~60 m scripted walk.
+  OPFS probed via page.evaluate mid-walk: 7 manifest frames / 7 .jpg files / 7 fixes.
+  501 stub path surfaces "Uploads are not switched on yet"; frames stay in OPFS; retry offered.
+  Reload after a failed upload offers the unfinished walk back.
+  OPFS swept to 0 sessions after a successful (mocked) upload.
+  0 console errors (tile/network noise filtered as environmental and listed in the report).
+
+DEFECT FOUND AND FIXED (cross-unit, in u25's lib/capture/upload-client.ts):
+  uploadCapture could NEVER have uploaded from a browser. All 4 call sites did
+  `opts.fetchImpl ?? globalThis.fetch`, passing fetch detached from its receiver;
+  browsers require this===Window and throw "Illegal invocation". It threw on
+  createSession, the first call of the funnel. Every u25 node test passed because
+  undici ignores the receiver — the only runtime that tolerates it is the one the
+  tests run in. Fixed via a bound defaultFetch() (commit f22b47d); no signature
+  changed. Regression test added that fakes the browser rule; verified honest
+  (FAILS with the fix reverted, PASSES with it applied). Escalated to the Conductor.
+
+NOT verified (honest gaps — see MANUAL-VERIFY.md):
+  - Real iOS Safari: camera facingMode, wake lock, OPFS createWritable support,
+    and backgrounding. All four are physics a desk browser cannot answer, and OPFS
+    on Safari is the single largest unknown in this unit.
+  - The two vision thresholds (duplicateDelta 2, blurVariance 40) are UNCALIBRATED
+    estimates. Synthetic frames bracket them; real Escazú footage has not.
+  - uploadFrameBytes against a live streetlens-frames bucket: it does not exist
+    until 0013 is applied, so the Supabase storage endpoint is stubbed at the
+    network layer. Request shape exercised; the bucket's RLS policy is not.
+  - Live end-to-end against real /api/capture routes: they are 501 stubs owned by
+    the ingest unit, landing this same wave. Proven at the wave boundary, not here.
