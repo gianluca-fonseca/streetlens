@@ -28,11 +28,14 @@
  * ssr:false. The only difference is that something is rendered before it.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { FileVideo, Video } from "lucide-react";
 import { Eyebrow, Screen } from "@/components/capture/ui";
+import { openCaptureStore } from "@/components/capture/engine/opfs";
+import { isRecoverable } from "@/components/capture/engine/session";
+import { looksLikeVideoSession } from "@/components/capture/engine/video-session";
 import { cn } from "@/components/ui/cn";
 import styles from "@/components/ui/zen.module.css";
 
@@ -134,8 +137,61 @@ function ModeChooser({ onChoose }: Readonly<{ onChoose: (mode: Mode) => void }>)
 
 export default function CollectClient() {
   const [mode, setMode] = useState<Mode | null>(null);
+  // Null while we are still looking. The chooser must not paint before we know
+  // whether there is a walk waiting, or it paints and is then yanked away.
+  const [unfinishedWalk, setUnfinishedWalk] = useState<boolean | null>(null);
+
+  /**
+   * A walk that was never uploaded outranks the chooser.
+   *
+   * Before this page had a chooser, /collect went straight to the recorder, and
+   * the recorder's own boot scan put "you have a walk that was never uploaded"
+   * in front of anyone who came back. Putting a gate in front of that quietly
+   * broke it: the walker whose upload failed on the bus lands on a tidy little
+   * menu that says nothing about their twenty minutes of frames, and the only
+   * way to find them is to guess that "record live" is where a finished walk
+   * lives. The frames were never lost, but a recovery prompt nobody is shown is
+   * not a recovery prompt.
+   *
+   * So we look first, and hand straight to the recorder when there is something
+   * to recover. That is exactly what /collect did before, for exactly the person
+   * it did it for.
+   *
+   * The video path deliberately does NOT get the same treatment: a half-extracted
+   * video resumes when the contributor re-picks the file (there is no copy of a
+   * multi-gigabyte source in OPFS to resume from on its own), so there is nothing
+   * to put in front of them here that they could act on.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const store = await openCaptureStore();
+        const manifests = await store.listManifests();
+        if (cancelled) return;
+        // Same filter as the recorder's own scan, and for the same reason: a
+        // video session is a structural superset of a walk and would otherwise
+        // answer to `isRecoverable` here too.
+        setUnfinishedWalk(
+          manifests.some((m) => !looksLikeVideoSession(m) && isRecoverable(m)),
+        );
+      } catch {
+        // A store we cannot read is not a reason to hide the chooser.
+        if (!cancelled) setUnfinishedWalk(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (mode === "live") return <LiveRecorder />;
   if (mode === "upload") return <VideoUploader onBack={() => setMode(null)} />;
+
+  // Matches the recorder's own loading placeholder, so the scan does not shift
+  // the page on its way to whichever screen wins.
+  if (unfinishedWalk === null) return <div className="min-h-0 flex-1" aria-hidden="true" />;
+  if (unfinishedWalk) return <LiveRecorder />;
+
   return <ModeChooser onChoose={setMode} />;
 }
