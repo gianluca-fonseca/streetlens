@@ -1,0 +1,19 @@
+  [ok ] GeoJSON parsed 4 features (4)
+  -> summary {"total":4,"valid":2,"invalid":1,"duplicate":1,"outOfBounds":1}
+  [ok ] summary.total = 4
+  [ok ] summary.valid = 2 (2)
+  [ok ] summary.invalid = 1 (1)
+  [ok ] summary.duplicate = 1 (1)
+  [ok ] summary.outOfBounds = 1 (1)
+  [ok ] row 0 valid, no issues
+  [ok ] row 1 valid + bbox issue
+  [ok ] row 2 invalid + schema issue
+  [ok ] row 3 duplicate + duplicate issue
+  [ok ] commit-eligible features = valid rows only (2)
+  [ok ] CSV parsed 2 rows (2)
+  [ok ] CSV row 0 valid
+  [ok ] CSV row 1 invalid (bad highway)
+  [ok ] garbage file → parseFile null
+  [ok ] ZERO side effects (no community file written)
+
+DRYRUN-TEST PASS

@@ -1,0 +1,31 @@
+u28 gates — 2026-07-17T04:27:28Z
+Re-run against the final tree (70ba466) after the history split.
+
+$ npx tsc --noEmit
+exit=0
+
+$ npm run lint
+> eslint
+
+exit=0 (no errors, no warnings)
+
+$ npm run build
+   * /Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0002-cv-data-collection-funne/worktrees/unit-video-upload-intake-a48e/package-lock.json
+✓ Compiled successfully in 4.1s
+  Generating static pages using 9 workers (0/26) ...
+  Generating static pages using 9 workers (6/26) 
+  Generating static pages using 9 workers (12/26) 
+  Generating static pages using 9 workers (19/26) 
+exit=0
+
+$ node scripts/test-capture-route.mjs
+PASS — GPX parse and route distribution locked
+$ node scripts/test-video-plan.mjs
+PASS — the plan never exceeds the cap, never truncates a walk, and knows which way is up
+$ node scripts/test-mp4box-contract.mjs
+PASS — mp4box still behaves the way video-demux.ts assumes
+
+$ node scripts/verify-u27-recorder.mjs   (the live recorder, through the new chooser)
+  23/23 PASS — see .planning/evidence/u27/playwright-drive.txt
+$ node scripts/verify-u28-video.mjs      (both decode paths)
+  57/57 PASS — see .planning/evidence/u28/playwright-drive.txt

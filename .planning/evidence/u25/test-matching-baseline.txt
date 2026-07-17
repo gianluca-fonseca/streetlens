@@ -1,0 +1,36 @@
+  [ok ] a clean pass yields exactly one traversal of the right street got ["north-st"]
+  [ok ] traversal spans the full track time 1784000000000..1784000009000
+  [ok ] traversal length is the real ground distance (~219 m, +/-5%) got 219.1 m
+  [ok ] a fully matched track has no unmatched spans
+  [ok ] routeLine is a LineString with one position per fix
+  [ok ] a track beyond the gate matches nothing
+  [ok ] an unmatched track reports one unmatched span, not an error [{"tStart":1784000000000,"tEnd":1784000009000}]
+  [ok ] routeLine falls back to raw fixes when nothing snaps
+  [ok ] a ~22 m offset fix matches under the default 30 m gate
+  [ok ] the same fix is unmatched under a 10 m gate
+  [ok ] a single-fix flicker does not become its own traversal got ["north-st"]
+  [ok ] the pass re-merges across the flicker instead of splitting in two
+  [ok ] minRunFixes:1 disables smoothing and the flicker DOES split the pass got 3 traversals
+  [ok ] two passes yield two traversals in chronological order got ["north-st","south-st"]
+  [ok ] an out-and-back on one street stays two traversals got 1 (baseline has no direction model; documented weakness)
+  [ok ] out-of-order fixes are sorted, not trusted (one clean traversal) 1 traversals, 1784000000000..1784000009000
+  [ok ] an empty track returns an empty result rather than throwing
+  [ok ] fixes sharing one timestamp do not hang or throw 1 traversals
+  [ok ] no candidate segments -> everything unmatched, no throw
+  [ok ] frames captured during a pass land on that traversal got [0,1,2]
+  [ok ] frames at the street's ends are flagged nearJunction got [0,2]
+  [ok ] a mid-block frame is NOT nearJunction
+  [ok ] nearJunctionSeqs is a subset of frameSeqs
+  [ok ] attributeFrames returns an entry for EVERY frame
+  [ok ] a matched mid-block frame maps to its segment, nearJunction false {"segmentId":"north-st","nearJunction":false}
+  [ok ] a junction frame maps to its segment, nearJunction true {"segmentId":"north-st","nearJunction":true}
+  [ok ] a frame outside every traversal is present with segmentId null (never dropped) {"segmentId":null,"nearJunction":false}
+  [ok ] junctionRadiusM:200 pulls even the mid-block frame into nearJunction
+  [ok ] the nearJunction test measures from the frame's interpolated position
+  [ok ] matching without frames leaves frameSeqs empty, not undefined
+  [ok ] attributeFrames on a frameless match still lists the frames
+  [ok ] data/segments.geojson metadata.bbox is still LAT-first (Overpass order) [9.898,-84.162,9.922,-84.135]
+  [ok ] the baseline never reads metadata.bbox (it computes bboxes from geometry)
+  [ok ] the default segment source loads and matches a real segment matched esc-sa-0001 (expected around esc-sa-0001)
+
+PASS — matching contract holds

@@ -1,0 +1,18 @@
+  [ok ] baseline official count is 535 (535)
+  [ok ] approve add ok
+  [ok ] approve update ok
+  [ok ] community segment appears in adapter output
+  [ok ] flagged source=community
+  [ok ] flagged verified=false
+  [ok ] NO fabricated scores (all score_* === 0)
+  [ok ] carries a community_report from the note
+  [ok ] geometry is a LineString
+  [ok ] update_segment attached a community report to the target
+  [ok ] report note is qualitative (not a score), carries the reason
+  [ok ] target segment keeps its rubric scores (no mutation)
+  -> stats {"segments":535,"km":76.84,"coveragePct":80.3,"heroPct":29,"communitySegments":1,"cvSessionsReviewed":0,"cvSegments":0}
+  [ok ] official segments still 535 (535)
+  [ok ] communitySegments counted separately (1) (1)
+  [ok ] community add excluded from official collection count (536)
+
+APPLY-TEST PASS

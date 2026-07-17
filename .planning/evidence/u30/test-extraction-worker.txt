@@ -1,0 +1,128 @@
+
+happy path
+  [ok ] 3 frames claimed, 3 done, 0 failed, 0 remaining {"claimed":3,"done":3,"failed":0,"remaining":0}
+  [ok ] one model call per frame got 3
+  [ok ] three observations written
+  [ok ] observation records the model and token usage
+  [ok ] session rolled up and marked review_ready status=review_ready rollups=1
+  [ok ] rollup carries lens scores {"overall":75.94,"accessibility":81.25,"drainage":83.33,"shade":57.5,"bike":83.33}
+  [ok ] session filed into the review queue exactly once (u30) ["0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e"]
+  [ok ] filed BEFORE the review_ready latch (u30) ["emit:0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e","status:review_ready"]
+
+queue emit failure leaves the session retryable
+[capture] rollup failed for 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e: queue unavailable
+  [ok ] a failed emit does NOT flip the session to review_ready status=extracting
+  [ok ] the emit was attempted attempts=1
+  [ok ] no review_ready was ever written []
+  [ok ] the next pump re-files it and lands review_ready status=review_ready emits=2 claimed=0
+
+cost breaker
+[capture] session 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e cost_paused: frame billed 30000 input tokens, over a ceiling of 5828 = ~4628 static request (prompt + schema) + 1200 image budget
+  [ok ] no observation is written for an over-budget frame
+  [ok ] the tripping job is failed_overbudget failed_overbudget
+  [ok ] the session is cost_paused cost_paused
+  [ok ] every frame is reported failed {"claimed":3,"done":0,"failed":3,"remaining":2}
+  [ok ] the breaker stops the session after the first frame, it does not keep paying 1 model calls
+  [ok ] the untouched frames go back to pending, not failed
+  [ok ] the breaker message shows what the ceiling is made of, not a bare number input_tokens=30000 exceeds the per-frame ceiling of 5828 = ~4628 static request (prompt + schema) + 1200 image budget
+
+cost breaker precedence
+[capture] session 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e cost_paused: frame billed 5829 input tokens, over a ceiling of 5828 = ~4628 static request (prompt + schema) + 1200 image budget
+  [ok ] a perfectly valid answer one token over the ceiling is still rejected
+  [ok ] a frame exactly at the ceiling is accepted — the guard is >, not >=
+
+prompt-aware ceiling
+  [ok ] the ceiling is derived from the measured request, not hardcoded 5828 vs ~4628 + 1200
+  [ok ] it clears the whole static request, which a correct call always pays
+  [ok ] the strict schema is counted, not just the prompt — it is ~1900 billed tokens static ~4628 vs prompt ~2711
+  [ok ] an image billed an order of magnitude over its ~470 tokens still trips it static + 4700 = 9328 vs 5828
+  [ok ] the composition is spelled out for whoever finds the paused session 5828 = ~4628 static request (prompt + schema) + 1200 image budget
+  [ok ] CV_INPUT_TOKEN_CEILING overrides it, and says so 999 (CV_INPUT_TOKEN_CEILING override)
+  [ok ] an empty override falls back to the derived ceiling
+  [ok ] a junk override does not disable the breaker
+
+frame downscale
+  [ok ] the model is sent inline JPEG bytes, not the storage URL data:image/jpeg;base64,/9j/2wBDAAoHBwgHB
+  [ok ] the storage URL is never what reaches the model
+  [ok ] the image is downscaled to 512 px on the longest side 512x355 (fixture is 960x666)
+  [ok ] aspect ratio is preserved — the model sees the street, not a squash 1.442
+  [ok ] the bounded image cannot cost more than the image budget, hint or no hint 192 patches ~= 473 tokens vs a 1200 budget
+  [ok ] an escalated frame is fetched and shrunk once, not twice 2 model calls, 1 fetch(es)
+  [ok ] both models are asked about the same downscaled bytes
+  [ok ] a frame that cannot be fetched fails the attempt without paying a model image_prepare: 404 gone
+  [ok ] a data: URL is decoded directly and downscaled the same way 512x355
+  [ok ] the downscaled frame is a fraction of the original's bytes 52 KB vs 218 KB
+
+escalation
+  [ok ] a low-confidence frame escalates to the stronger model 1 escalated
+  [ok ] escalation is capped at 10% of session frames 1 escalated of 10 frames
+  [ok ] past the cap the cheap model's answer is kept rather than dropped 10 observations
+  [ok ] a confident frame does not escalate
+  [ok ] an unusable frame does not escalate — the truck is really in the way 3 calls
+
+refusal and incomplete
+  [ok ] a refusal is a failed attempt, requeued below the attempts cap pending: refusal: I can't help with that.
+  [ok ] a refusal writes no observation
+  [ok ] a truncated response is a failed attempt with the reason recorded incomplete: max_output_tokens
+  [ok ] unparsable output fails the attempt rather than throwing json_parse: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+  [ok ] an out-of-range value is rejected even though strict json_schema 'guaranteed' it schema: [{"origin":"number","code":"too_big","maximum":4,"inclusive":true,"path":["items","sidewalk_width","value"],"message":"Too big: expected number to be <=4"}]
+
+attempts cap
+  [ok ] the third failed attempt is terminal, not requeued forever failed
+  [ok ] a job past the attempts cap is failed without paying a model 0 calls
+
+concurrent pump safety
+  [ok ] two concurrent pumps never process the same frame twice 8 calls over 8 distinct frames
+  [ok ] between them they claim every job exactly once 8 + 0
+  [ok ] all 8 frames end done
+  [ok ] the session is rolled up exactly once ["review_ready"]
+
+kill switch
+  [ok ] the switch off means no claim and no spend, with work left waiting {"claimed":0,"done":0,"failed":0,"remaining":3}
+  [ok ] an unset switch fails closed
+
+per-session budget
+  [ok ] CV_SESSION_TOKENS_PER_FRAME sets the per-frame allowance 3000
+  [ok ] unset, the allowance is derived from the ceiling plus the escalation cap
+[capture] session 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e cost_paused: session budget exhausted (5000/3000 input tokens)
+  [ok ] a session under the per-frame ceiling still gets caught by its own budget status=cost_paused spent=5000/3000
+  [ok ] the overrun is caught on the LAST frame too, not silently passed as review_ready ["cost_paused"]
+  [ok ] frames already paid for keep their data — the spend is sunk either way 2 observations
+  [ok ] a normal session finishes without tripping the budget status=review_ready
+
+request shape and prompt caching
+  [ok ] detail:low still rides along as belt-and-braces, even though it is ignored
+  [ok ] the image the caller prepared goes through verbatim
+  [ok ] the cacheable prefix rides in instructions, not the per-frame turn
+  [ok ] structured output is strict
+  [ok ] the schema demands exactly the 15 rubric items
+  [ok ] the prefix is byte-identical across frames, or caching never engages
+  [ok ] the prefix clears the 1024-token floor prompt caching needs ~2711 tokens
+
+response sorting
+  [ok ] a refusal is recognised as a refusal, not a parse failure
+  [ok ] a refusal still reports its usage — it was billed
+  [ok ] truncation is distinguished from refusal
+  [ok ] a good answer yields its text and cached-token count
+
+frameQuality reason (wire null vs schema optional)
+  [ok ] a usable frame reporting reason:null validates
+  [ok ] an unusable frame keeps its reason and is recorded, not dropped
+
+escalation predicate
+  [ok ] a hedged item on a usable frame escalates
+  [ok ] a confident frame does not
+  [ok ] a low-confidence NULL does not escalate — that is an honest 'cannot see it'
+
+retry policy
+  [ok ] an ordinary 429 is retried and can succeed 3 attempts
+  [ok ] insufficient_quota fails fast instead of backing off three times 1 attempt(s)
+  [ok ] a 400 is our bug and is not retried 1 attempt(s)
+
+request parameters
+  [ok ] no temperature — gpt-5 reasoning models 400 the whole request on it ["model","instructions","input","text","store"]
+
+transport failure
+  [ok ] a transport failure is a failed attempt reporting no spend transport: ECONNRESET
+
+PASS — extraction worker

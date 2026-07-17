@@ -23,13 +23,21 @@ import { getSupabaseClient } from "./supabase";
 import {
   appendCommunityReports,
   appendCommunitySegments,
+  appendCvObservations,
+  pruneCvObservations,
 } from "./community-store";
 import type {
   AddSegmentPayload,
   ImportFeature,
   UpdateSegmentPayload,
 } from "./schemas";
-import type { CommunityReport, CommunitySegment } from "./types";
+import type {
+  CommunityReport,
+  CommunitySegment,
+  CvItemMedian,
+  CvObservation,
+  ScoreLayer,
+} from "./types";
 
 /** Community contributions have no field-surveyed district; the pilot is Escazú. */
 const COMMUNITY_DISTRICT = "Escazú";
@@ -187,6 +195,112 @@ export async function applyApprovedSubmission(
     segment_id: report.segment_id,
     id: report.id,
   };
+}
+
+/* ------------------------------------------------------------------ *
+ * Approved capture sessions (u30)
+ *
+ * The third kind. An approved capture session becomes CvObservation rows — never
+ * a segment, never a score on an audited segment. The same honesty spine as
+ * above: the camera's opinion enters as its own record, merged at read time,
+ * rendered as provisional, counted separately.
+ * ------------------------------------------------------------------ */
+
+/** One segment's worth of approved camera evidence, as the review page has it. */
+export type CvApplyObservation = {
+  segment_id: string;
+  scores: Record<ScoreLayer, number | null>;
+  item_medians: Record<string, CvItemMedian>;
+  coverage: number;
+  confidence: number | null;
+  frame_refs: string[];
+};
+
+/** Input to the capture apply path: a session and the segments an admin approved. */
+export type CvApplyInput = {
+  session_id: string;
+  /** The cv_capture submission that carried it through review; null if none. */
+  submission_id: string | null;
+  /** When the walk happened, not when it was approved. */
+  captured_on: string;
+  observations: CvApplyObservation[];
+  createdAt?: string;
+};
+
+export type CvApplyResult = {
+  mode: "supabase" | "local";
+  kind: "cv_observation";
+  session_id: string;
+  ids: string[];
+};
+
+/** Build the CvObservation rows an approval becomes. Pure; ids are derived. */
+export function buildCvObservations(input: CvApplyInput): CvObservation[] {
+  const createdAt = input.createdAt ?? new Date().toISOString();
+  return input.observations.map((o) => ({
+    id: `cv-${input.session_id}-${o.segment_id}`,
+    segment_id: o.segment_id,
+    session_id: input.session_id,
+    scores: o.scores,
+    item_medians: o.item_medians,
+    confidence: o.confidence,
+    coverage: o.coverage,
+    frame_refs: o.frame_refs,
+    captured_on: input.captured_on,
+    source: "cv",
+    submission_id: input.submission_id,
+    created_at: createdAt,
+  }));
+}
+
+/**
+ * Apply an approved capture session.
+ *
+ * Deliberately NOT routed through `admin_apply_submission`. That RPC is
+ * per-submission and ends in `raise exception 'unsupported submission type'`
+ * (0012:144), which the catch below would swallow into a local write — an
+ * approval that reports success while the live DB never heard about it. Capture
+ * approval is per-segment anyway and gets its own definer RPC (0017).
+ *
+ * `prune` before `append` because approval is re-reviewable: an admin who unticks
+ * a segment and re-approves must see it leave the map, which an upsert alone
+ * would never do.
+ *
+ * Note the local store is not a fallback in the degraded sense — lib/segments.ts
+ * reads community data from these files unconditionally, so this IS the path the
+ * map sees today. The RPC keeps the live DB in step for when it becomes the
+ * read path too.
+ */
+export async function applyApprovedCaptureSession(
+  input: CvApplyInput,
+): Promise<CvApplyResult> {
+  const rows = buildCvObservations(input);
+  const ids = rows.map((r) => r.id);
+
+  const secret = dbSecret();
+  if (secret) {
+    const client = getSupabaseClient();
+    try {
+      const { error } = await client!.rpc("admin_apply_capture_session", {
+        p_secret: secret,
+        p_session_id: input.session_id,
+        p_submission_id: input.submission_id,
+        p_observations: rows,
+      });
+      if (!error) {
+        await pruneCvObservations(input.session_id, ids);
+        await appendCvObservations(rows);
+        return { mode: "supabase", kind: "cv_observation", session_id: input.session_id, ids };
+      }
+      // fall through to local-only on RPC failure (0017 not yet applied)
+    } catch {
+      // fall through
+    }
+  }
+
+  await pruneCvObservations(input.session_id, ids);
+  await appendCvObservations(rows);
+  return { mode: "local", kind: "cv_observation", session_id: input.session_id, ids };
 }
 
 export type ImportApplyResult = {
