@@ -446,9 +446,11 @@ export async function getStats(): Promise<StreetStats> {
   const demo = await readDemoCollection();
   const networkKm = demo.metadata?.network_km;
   // Community/import segments are counted separately; never folded into the
-  // official audited figure (contract v3, ruling 1). Same for CV (u30). The
-  // unaudited canton overlay is on the same footing: neutral, never audited.
-  const communitySegments = (await readAllContributedSegments()).length;
+  // official audited figure (contract v3, ruling 1). Same for CV (u30). This is
+  // the CONTRIBUTION counter (the apply pipeline's community adds); the committed
+  // canton network overlay is baseline context, not a contribution, so it is not
+  // tallied here (and, like community adds, never touches the audited figure).
+  const communitySegments = (await readCommunitySegments()).length;
   const cv = await readCvObservations();
   const cvSessionsReviewed = new Set(cv.map((o) => o.session_id)).size;
   const cvSegments = new Set(cv.map((o) => o.segment_id)).size;

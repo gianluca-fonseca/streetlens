@@ -167,10 +167,12 @@ async function main() {
     "stats.communitySegments is numeric (contract v3)",
     typeof stats.communitySegments === "number",
   );
+  // communitySegments is the CONTRIBUTION counter (community adds), not the
+  // committed canton overlay — so it stays 0 with no community store.
   check(
-    "stats.communitySegments = canton import overlay with no community store",
-    stats.communitySegments === importCount,
-    `(${stats.communitySegments} of ${importCount})`,
+    "stats.communitySegments is 0 with no community store (overlay is not a contribution)",
+    stats.communitySegments === 0,
+    `(${stats.communitySegments})`,
   );
 
   console.log("getSegmentDetail():");
@@ -233,8 +235,8 @@ async function main() {
     );
     check("official stats.segments STILL 535 (community/import excluded)", mergedStats.segments === AUDITED, `(${mergedStats.segments})`);
     check(
-      "stats.communitySegments = canton overlay + 2 community adds",
-      mergedStats.communitySegments === importCount + 2,
+      "stats.communitySegments counts the 2 community adds (not the baseline overlay)",
+      mergedStats.communitySegments === 2,
       `(${mergedStats.communitySegments})`,
     );
     const c1 = merged.features.find((f) => f.properties.id === "com-smoke-1");
