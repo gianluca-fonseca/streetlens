@@ -1,0 +1,59 @@
+u2 — review inspector + overrides + map + curation — GATE RESULTS
+==================================================================
+
+npx tsc --noEmit ................ PASS (exit 0)
+npm run lint (eslint) .......... PASS (exit 0, no warnings)
+npm run build (next build) ..... PASS (exit 0; /api/admin/capture/frame + review route registered)
+
+All scripts/test-*.mjs (22/22) . PASS
+  test-apply-submissions ........ PASS
+  test-canton-identity .......... PASS
+  test-capture-gating ........... PASS
+  test-capture-migrations ....... PASS (0001..0021 on throwaway PostGIS; provenance
+                                   round-trip, backward-compat, capture_delete_frame
+                                   with cascade + tombstone, escalated-usable,
+                                   capture_session_review_detail; needs Docker)
+  test-capture-rollup ........... PASS
+  test-capture-route ............ PASS
+  test-capture-schemas .......... PASS
+  test-cv-apply ................. PASS (untouched stays pure CV; corrected persists
+                                   human_corrected + overrides; flag reaches map
+                                   feature; audit invariant holds under correction)
+  test-extraction-worker ........ PASS
+  test-honeypot-type ............ PASS
+  test-import-dryrun ............ PASS
+  test-matching-baseline ........ PASS
+  test-matching-canton .......... PASS
+  test-matching-hmm ............. PASS
+  test-mp4box-contract .......... PASS
+  test-parse-feature-props ...... PASS
+  test-rate-limit-namespaces .... PASS
+  test-reprocess-core ........... PASS
+  test-review-overrides ......... PASS (NEW — recompute == real rollup math; exclude,
+                                   delete, null override, junction routing, segment
+                                   drop, manual-score-wins; 30 checks)
+  test-submission-counts ........ PASS
+  test-upload-client ............ PASS
+  test-video-plan ............... PASS
+
+i18n EN/ES parity .............. PASS (832 == 832 leaf keys, identical sets)
+                                 see i18n-parity.txt
+
+Browser drive (local mode) ..... PASS — see playwright-drive.txt + screenshots/
+  Driven against `next dev -p 3732` with the seeded fixture (no database).
+  Console: one pre-existing Next.js dev-mode hydration artifact in the internal
+  error boundary (documented by the u30 drive), unrelated to u2 components.
+
+Honest gaps
+-----------
+- The public-map "human-corrected" popover chip renders on
+  cv_observations[].human_corrected. That the flag reaches the map feature is
+  asserted by test-cv-apply; a pixel-accurate click on one Escazu segment on the
+  live public map was not scripted (targeting a specific segment on the canvas is
+  brittle), so no popover screenshot. The review-page marker IS screenshotted
+  (u2-03/04/09 show the "Human-corrected" badge).
+- The map click handler (dot -> inspector) is wired and unit-shaped; the reverse
+  direction (selecting a frame highlights its dot/segment) runs on every selection.
+  A synthetic canvas-pixel click on a specific dot was not scripted for the same
+  targeting reason; the map render (track + numbered dots + controls) is
+  screenshotted (u2-08) and canvas presence asserted via evaluate.

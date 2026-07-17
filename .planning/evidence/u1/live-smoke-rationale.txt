@@ -1,0 +1,43 @@
+
+live smoke: gpt-5-nano on street-san-antonio-escazu.jpg (164 KB)
+  static prefix  ~2973 tokens (cacheable)
+  static request ~5016 tokens (prompt + schema)
+  sent as        52 KB, downscaled to 512 px
+  ceiling        6216 = ~5016 static request (prompt + schema) + 1200 image budget
+
+  [ok ] input_tokens 4958 <= 6216 — the bill is bounded (1258 tokens of headroom)
+  [ok ] the 512 px image is not billed like a full-resolution one billed 4958 vs ~5016 static + 1200 image budget
+  [ok ] a real response parses against the strict schema and our zod 15 items
+  [ok ] every rubric item came back
+  [ok ] every item's value respects its response type
+  [ok ] confidences are in 0..1
+  [ok ] a per-frame rationale field came back as a string 129 chars
+
+  ---- what it actually cost ----
+  input_tokens   : 4958
+  cached_tokens  : 4736
+  output_tokens  : 1382
+  latency        : 10287 ms
+  cost this frame: $0.000801  (@ $0.05/1M in, $0.4/1M out)
+  400-frame run  : $0.3203
+  usable         : false (no_street_visible)
+  rationale      : A vendor stall interior with hanging goods and a person; no street, curb, or sidewalk visible. Frame unusable for street scoring.
+
+  ---- what it saw ----
+  sidewalk_present      null  conf 0.1
+  sidewalk_width        null  conf 0.1
+  surface_condition     null  conf 0.1
+  curb_ramp             null  conf 0.1
+  obstruction_free      null  conf 0.1
+  drain_present         null  conf 0.1
+  standing_water        null  conf 0.1
+  curb_gutter           null  conf 0.1
+  canopy_cover          null  conf 0.1
+  midday_shade          null  conf 0.1
+  lighting              null  conf 0.1
+  crossing_safety       null  conf 0.1
+  bike_lane_present     null  conf 0.1
+  bike_separation       null  conf 0.1
+  bike_surface          null  conf 0.1
+
+PASS — live extraction smoke

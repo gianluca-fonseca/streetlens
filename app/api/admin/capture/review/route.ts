@@ -23,8 +23,29 @@ import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
 import { getSessionReview } from "@/lib/capture/review-store";
 import { applyApprovedCaptureSession } from "@/lib/apply-submissions";
 import { finalizeCaptureReview } from "@/lib/capture/review-actions";
+import {
+  recomputeReview,
+  EMPTY_CORRECTIONS,
+  type ReviewCorrections,
+} from "@/lib/capture/review-overrides";
 
 export const runtime = "nodejs";
+
+// A reviewer's corrections. Loosely typed on the wire (rubric/lens keys are checked
+// by the recompute, which simply ignores anything it does not recognize) but bounded
+// so a forged request cannot smuggle in a huge payload.
+const itemMapSchema = z.record(
+  z.string().max(64),
+  z.record(z.string().max(64), z.number().nullable()),
+);
+const correctionsSchema = z.object({
+  itemOverrides: itemMapSchema.default({}),
+  excluded: z.array(z.number().int().nonnegative().max(100000)).max(2000).default([]),
+  deleted: z.array(z.number().int().nonnegative().max(100000)).max(2000).default([]),
+  manualScores: z
+    .record(z.string().max(64), z.record(z.string().max(32), z.number().nullable()))
+    .default({}),
+});
 
 const bodySchema = z.object({
   session_id: z.string().uuid(),
@@ -36,7 +57,29 @@ const bodySchema = z.object({
    * and retracts anything previously approved.
    */
   segment_ids: z.array(z.string().min(1).max(64)).optional(),
+  /**
+   * The reviewer's corrections. Optional — omitted means "the model's readings,
+   * unchanged". The server RE-RUNS the recompute from the session's own frames, so
+   * the numbers that land are the server's, not the client's; the client cannot
+   * inject arbitrary scores.
+   */
+  corrections: correctionsSchema.optional(),
 });
+
+/** Normalize the wire shape (string seq keys) into the recompute's typed corrections. */
+function toCorrections(input: z.infer<typeof correctionsSchema> | undefined): ReviewCorrections {
+  if (!input) return EMPTY_CORRECTIONS;
+  const itemOverrides: ReviewCorrections["itemOverrides"] = {};
+  for (const [seq, over] of Object.entries(input.itemOverrides)) {
+    itemOverrides[Number(seq)] = over as ReviewCorrections["itemOverrides"][number];
+  }
+  return {
+    itemOverrides,
+    excluded: input.excluded,
+    deleted: input.deleted,
+    manualScores: input.manualScores as ReviewCorrections["manualScores"],
+  };
+}
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
@@ -72,18 +115,43 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const approvedIds = action === "approve" ? (segment_ids ?? review.segments.map((s) => s.segmentId)) : [];
+  // The authoritative recompute. Run from the session's OWN frames with the
+  // reviewer's corrections applied, reusing the same rollup math as the server —
+  // so what lands is what the reviewer saw, and the client cannot inject scores.
+  const corrections = toCorrections(parsed.data.corrections);
+  const recompute = recomputeReview(review.frames, corrections);
 
-  // Every id must be one this session actually observed. Otherwise an admin (or a
-  // forged request) could attach camera scores to an arbitrary segment id that no
-  // frame ever saw.
-  const known = new Set(review.segments.map((s) => s.segmentId));
-  const unknown = approvedIds.filter((id) => !known.has(id));
+  const surviving = new Map(recompute.segments.map((s) => [s.segmentId, s]));
+  const dropped = new Set(recompute.droppedSegmentIds);
+
+  // Implicit approve-all takes exactly the segments that still have supporting
+  // frames; dropped ones simply do not land. An EXPLICIT list is validated harder.
+  const approvedIds =
+    action === "approve" ? (segment_ids ?? [...surviving.keys()]) : [];
+
+  // Every explicitly-approved id must be a segment this session actually observed
+  // (surviving or dropped). Otherwise a forged request could attach camera scores
+  // to a segment id no frame ever saw.
+  const observed = new Set([...surviving.keys(), ...dropped]);
+  const unknown = approvedIds.filter((id) => !observed.has(id));
   if (unknown.length > 0) {
     return NextResponse.json({ error: "unknown_segments", unknown }, { status: 422 });
   }
 
-  const chosen = review.segments.filter((s) => approvedIds.includes(s.segmentId));
+  // A segment whose every supporting frame was excluded or deleted cannot be
+  // approved: there is nothing behind it. (Implicit approve-all never hits this;
+  // it only offers surviving segments.)
+  const droppedApproved = approvedIds.filter((id) => dropped.has(id));
+  if (droppedApproved.length > 0) {
+    return NextResponse.json(
+      { error: "dropped_segments", dropped: droppedApproved },
+      { status: 422 },
+    );
+  }
+
+  const chosen = approvedIds
+    .map((id) => surviving.get(id))
+    .filter((s): s is NonNullable<typeof s> => Boolean(s));
 
   try {
     // Land the data FIRST, then close the session — the same ordering rule
@@ -105,7 +173,9 @@ export async function POST(request: NextRequest) {
         item_medians: s.itemMedians,
         coverage: s.coverage ?? 0,
         confidence: s.confidence,
-        frame_refs: s.frames.map((f) => f.storagePath),
+        frame_refs: s.frameRefs,
+        human_corrected: s.humanCorrected,
+        overrides: s.humanCorrected ? s.overrides : undefined,
       })),
     });
 
@@ -119,6 +189,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       status: action === "approve" ? "approved" : "rejected",
       applied: chosen.length,
+      corrected: chosen.filter((s) => s.humanCorrected).length,
       mode: closed.mode,
     });
   } catch {

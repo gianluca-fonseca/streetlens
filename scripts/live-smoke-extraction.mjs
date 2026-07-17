@@ -198,6 +198,17 @@ async function main() {
         return typeof c === "number" && c >= 0 && c <= 1;
       }),
     );
+    check(
+      // The contract is "rationale is a present string"; empty is tolerated on
+      // purpose (a terse note must never fail a paid frame). So this asserts the
+      // wire shape and REPORTS whether the model actually wrote anything, rather
+      // than failing the whole smoke on an empty note.
+      "a per-frame rationale field came back as a string",
+      typeof observation.rationale === "string",
+      observation.rationale.trim().length > 0
+        ? `${observation.rationale.length} chars`
+        : "EMPTY — the model returned no rationale text on this frame",
+    );
 
     const cost =
       (usage.inputTokens / 1e6) * PRICE_IN + (usage.outputTokens / 1e6) * PRICE_OUT;
@@ -210,6 +221,7 @@ async function main() {
     console.log(`  cost this frame: $${cost.toFixed(6)}  (@ $${PRICE_IN}/1M in, $${PRICE_OUT}/1M out)`);
     console.log(`  400-frame run  : $${(cost * 400).toFixed(4)}`);
     console.log(`  usable         : ${observation.frameQuality.usable}${observation.frameQuality.reason ? ` (${observation.frameQuality.reason})` : ""}`);
+    console.log(`  rationale      : ${observation.rationale}`);
     console.log("\n  ---- what it saw ----");
     for (const k of T.RUBRIC_ITEM_KEYS) {
       const it = observation.items[k];

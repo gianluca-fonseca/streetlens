@@ -80,3 +80,7 @@ data/pending-submissions.local.json
 /data/capture-review-overlay.local.json
 /data/community-cv-observations.local.json
 /public/u30-fixture-frame.jpg
+# u2 review overrides: the fixture frame is copied from scripts/fixtures at seed
+# time (scripts/seed-u2-fixture.mjs); the local review JSON is shared with u30.
+/public/u2-fixture-frame.jpg
+/data/capture-frame-tombstones.local.json

@@ -139,12 +139,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0019", files.some((f) => f.startsWith("0019")), files.join(" "));
+    check("found the full migration chain through 0021", files.some((f) => f.startsWith("0021")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -160,9 +160,16 @@ function main() {
       psql(readFileSync(path.join(MIGRATIONS, "0014_submission_types.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0017_capture_review.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0019_capture_reprocess.sql"), "utf8"));
-      check("0013 + 0014 + 0017 + 0019 are re-runnable (idempotent)", true);
+      // 0020 after 0013's re-run, on purpose: re-running 0013 recreates the old 9-arg
+      // capture_complete_job and reverts capture_session_review to its pre-rationale
+      // body. 0020 re-applied afterward drops that stale overload and re-establishes
+      // the review read WITH per-frame observations, which the assertions below rely on.
+      // 0021 last so its provenance columns and detail RPC survive every re-run.
+      psql(readFileSync(path.join(MIGRATIONS, "0020_observation_rationale.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0021_review_overrides.sql"), "utf8"));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 are re-runnable (idempotent)", true);
     } catch (err) {
-      check("0013 + 0014 + 0017 + 0019 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
     }
 
     /* ---------------- Schema shape ---------------- */
@@ -379,20 +386,33 @@ function main() {
 
     const frameId = psql(`select id from capture_frames where session_id='${sid}' and seq=0;`).trim();
     psql(`select capture_complete_job('${frameId}'::uuid, 'gpt-5-mini',
-            '{"sidewalk_present":{"value":1,"confidence":0.9}}'::jsonb, true, 0.87, 1200, 300, false, 'test-secret');`);
+            '{"sidewalk_present":{"value":1,"confidence":0.9}}'::jsonb, true, 0.87, 1200, 300, false,
+            'Narrow paved street, no sidewalk either side; open gutter at the right edge.', 'test-secret');`);
     check(
       "capture_complete_job stores the observation and closes the job",
       psql(`select count(*) from capture_observations where frame_id='${frameId}';`).trim() === "1" &&
         psql(`select status from capture_frame_jobs where frame_id='${frameId}';`).trim() === "done",
     );
+    check(
+      "capture_complete_job persists the per-frame rationale (0020)",
+      psql(`select rationale from capture_observations where frame_id='${frameId}' and model='gpt-5-mini';`).trim() ===
+        "Narrow paved street, no sidewalk either side; open gutter at the right edge.",
+    );
     psql(`select capture_complete_job('${frameId}'::uuid, 'gpt-5-mini',
-            '{"sidewalk_present":{"value":0,"confidence":0.4}}'::jsonb, true, 0.4, 1200, 300, false, 'test-secret');`);
+            '{"sidewalk_present":{"value":0,"confidence":0.4}}'::jsonb, true, 0.4, 1200, 300, false,
+            'On second look the gutter is silted but present.', 'test-secret');`);
     check(
       "re-running one model REPLACES its answer rather than double-counting",
       psql(`select count(*) from capture_observations where frame_id='${frameId}';`).trim() === "1",
     );
+    check(
+      "the re-run overwrites the rationale too, not just the items",
+      psql(`select rationale from capture_observations where frame_id='${frameId}' and model='gpt-5-mini';`).trim() ===
+        "On second look the gutter is silted but present.",
+    );
     psql(`select capture_complete_job('${frameId}'::uuid, 'gpt-5',
-            '{"sidewalk_present":{"value":1,"confidence":0.99}}'::jsonb, true, 0.99, 2000, 400, true, 'test-secret');`);
+            '{"sidewalk_present":{"value":1,"confidence":0.99}}'::jsonb, true, 0.99, 2000, 400, true,
+            'Escalated read: clearly a two-lane street with intact gutters.', 'test-secret');`);
     check(
       "a DIFFERENT model on the same frame is kept alongside (A/B, escalation)",
       psql(`select count(*) from capture_observations where frame_id='${frameId}';`).trim() === "2",
@@ -408,6 +428,39 @@ function main() {
       "an invalid job status is rejected",
       psqlExpectError(`select capture_fail_job('${frame2}'::uuid, 'vibing', 'x', 'test-secret');`) !== null,
     );
+
+    /* ---------------- 0020: per-frame observation on the review read ---------------- */
+    // sid now has seq 0 scored twice (gpt-5-mini, then escalated gpt-5) and seq 1
+    // never scored (failed_overbudget). The FROZEN CONTRACT hangs an `observation`
+    // off every frame: the winning row for a scored frame, null for an unscored one.
+    {
+      const rv = JSON.parse(psql(`select capture_session_review('${sid}'::uuid, 'test-secret');`).trim());
+      const bySeq = Object.fromEntries((rv.frames ?? []).map((f) => [f.seq, f]));
+      const scored = bySeq[0];
+      const unscored = bySeq[1];
+      check(
+        "a scored frame carries observation { items, rationale, escalated, model }",
+        scored && scored.observation &&
+          typeof scored.observation.items === "object" &&
+          typeof scored.observation.rationale === "string" &&
+          typeof scored.observation.escalated === "boolean" &&
+          typeof scored.observation.model === "string",
+        JSON.stringify(scored && scored.observation),
+      );
+      check(
+        "the escalated row wins the frame's observation, with its rationale",
+        scored && scored.observation &&
+          scored.observation.escalated === true &&
+          scored.observation.model === "gpt-5" &&
+          scored.observation.rationale === "Escalated read: clearly a two-lane street with intact gutters.",
+        JSON.stringify(scored && scored.observation),
+      );
+      check(
+        "an unscored/failed frame reports observation: null (not an empty object)",
+        unscored !== undefined && unscored.observation === null,
+        JSON.stringify(unscored),
+      );
+    }
 
     psql(`select capture_upsert_rollup('${sid}'::uuid, 'esc-sa-0001',
             '{"overall":72.5,"accessibility":60,"drainage":80,"shade":45,"bike":30}'::jsonb,
@@ -577,6 +630,50 @@ function main() {
     check(
       "approving a capture NEVER writes an audit (the prime invariant)",
       psql(`select (select count(*) from audits)::text || '|' || (select count(*) from observations)::text;`).trim() === "0|0",
+    );
+
+    /* ---------------- 0021: reviewer-override provenance ---------------- */
+
+    // Re-approve seg-a as a human-corrected row: the compact overrides record and
+    // the human_corrected flag must land verbatim, and the map reads them back.
+    const corrected = JSON.stringify([
+      {
+        id: `cv-${cvSid}-seg-a`,
+        segment_id: "seg-a",
+        scores: { overall: 50, accessibility: 40, drainage: null, shade: 55, bike: null },
+        item_medians: { ramp_present: { value: 0.5, confidence: 0.8, frames: 2 } },
+        coverage: 0.5,
+        confidence: 0.6,
+        frame_refs: [`captures/${cvSid}/frame-0000.jpg`],
+        captured_on: "2026-07-16T10:00:00Z",
+        human_corrected: true,
+        overrides: {
+          items: { 0: { surface_condition: 0 } },
+          excludedSeqs: [2],
+          deletedSeqs: [],
+          scores: { overall: 50 },
+        },
+      },
+    ]).replace(/'/g, "''");
+    psql(`select admin_apply_capture_session('test-secret', '${cvSid}'::uuid, '${cvSub}'::uuid, '${corrected}'::jsonb);`);
+    check(
+      "a human-corrected approval persists human_corrected = true",
+      psql(`select human_corrected::text from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "true",
+    );
+    check(
+      "the compact overrides record round-trips verbatim",
+      psql(`select ((overrides->'excludedSeqs' = '[2]'::jsonb)
+              and (overrides->'items'->'0'->>'surface_condition' = '0')
+              and (overrides->'scores'->>'overall' = '50'))::text
+              from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "true",
+    );
+    // Backward compatibility: a payload with neither field resets to the untouched
+    // defaults, so an un-upgraded caller (or a re-approval of a fixed row) still works.
+    psql(`select admin_apply_capture_session('test-secret', '${cvSid}'::uuid, '${cvSub}'::uuid, '${obs(["seg-a"])}'::jsonb);`);
+    check(
+      "a payload with no provenance fields defaults to human_corrected = false, overrides = {}",
+      psql(`select human_corrected::text || '|' || (overrides = '{}'::jsonb)::text
+              from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "false|true",
     );
 
     // Closing the review: session and queue row move together or not at all.
@@ -813,10 +910,115 @@ function main() {
       );
     }
 
+    /* ---------------- 0021: frame delete + review detail ---------------- */
+
+    // A hand-built walk: two matched frames (one at a junction, one usable, one
+    // not), one unmatched frame with no location. seq 0 carries two observations —
+    // it escalated — so the detail read must report the STRONGER model's usable.
+    const dSid = psql(`select capture_create_session('live', 'iphash-del');`).trim();
+    psql(`
+      insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id, near_junction, location) values
+        ('${dSid}'::uuid, 0, 'captures/${dSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-x', false,
+           st_geogfromtext('SRID=4326;POINT(-84.150 9.9070)')),
+        ('${dSid}'::uuid, 1, 'captures/${dSid}/frame-0001.jpg', 1784000002000, 640, 480, 1000, 'seg-x', true,
+           st_geogfromtext('SRID=4326;POINT(-84.149 9.9071)')),
+        ('${dSid}'::uuid, 2, 'captures/${dSid}/frame-0002.jpg', 1784000004000, 640, 480, 1000, null, false, null);
+
+      insert into capture_observations (frame_id, segment_id, model, items, usable, escalated)
+        select id, 'seg-x', 'gpt-5-nano', '{}'::jsonb, true, false from capture_frames where session_id='${dSid}'::uuid and seq=0;
+      insert into capture_observations (frame_id, segment_id, model, items, usable, escalated)
+        select id, 'seg-x', 'gpt-5', '{}'::jsonb, false, true from capture_frames where session_id='${dSid}'::uuid and seq=0;
+      insert into capture_observations (frame_id, segment_id, model, items, usable, escalated)
+        select id, 'seg-x', 'gpt-5-nano', '{}'::jsonb, false, false from capture_frames where session_id='${dSid}'::uuid and seq=1;
+
+      insert into storage.objects (bucket_id, name) values ('streetlens-frames', 'captures/${dSid}/frame-0000.jpg');
+    `);
+
+    check(
+      "capture_session_review_detail is secret-gated",
+      (psqlExpectError(`select capture_session_review_detail('${dSid}'::uuid, 'nope');`) || "").includes("unauthorized"),
+    );
+    const detail = JSON.parse(psql(`select capture_session_review_detail('${dSid}'::uuid, 'test-secret');`).trim());
+    check(
+      "detail returns a frame per capture frame, in seq order, with geography + quality",
+      Array.isArray(detail.frames) && detail.frames.length === 3 &&
+        detail.frames[0].seq === 0 && detail.frames[1].seq === 1 && detail.frames[2].seq === 2,
+      JSON.stringify(detail.frames),
+    );
+    check(
+      "a matched frame carries its ground position; an unmatched one carries null",
+      detail.frames[0].position && Math.abs(detail.frames[0].position.lng - -84.15) < 1e-6 &&
+        detail.frames[2].position === null,
+      JSON.stringify(detail.frames.map((f) => f.position)),
+    );
+    check(
+      "near_junction rides through per frame",
+      detail.frames[0].nearJunction === false && detail.frames[1].nearJunction === true,
+    );
+    check(
+      "usable comes from the winning (escalated) observation, matching the rollup",
+      detail.frames[0].usable === false && detail.frames[1].usable === false,
+      JSON.stringify(detail.frames.map((f) => f.usable)),
+    );
+    check(
+      "a session with no finalized track returns an empty track and no tombstones",
+      Array.isArray(detail.track) && detail.track.length === 0 &&
+        Array.isArray(detail.tombstones) && detail.tombstones.length === 0,
+    );
+
+    check(
+      "capture_delete_frame is secret-gated",
+      (psqlExpectError(`select capture_delete_frame('nope', '${dSid}'::uuid, 0);`) || "").includes("unauthorized"),
+    );
+    const delRes = JSON.parse(psql(`select capture_delete_frame('test-secret', '${dSid}'::uuid, 0);`).trim());
+    check(
+      "deleting a frame reports the bytes were removed",
+      delRes.deleted === true && delRes.seq === 0 && delRes.bytesRemoved === true,
+      JSON.stringify(delRes),
+    );
+    check(
+      "the frame row is gone, and its observations cascaded with it",
+      psql(`select count(*) from capture_frames where session_id='${dSid}'::uuid and seq=0;`).trim() === "0" &&
+        psql(`select count(*) from capture_observations o join capture_frames f on f.id=o.frame_id
+                where f.session_id='${dSid}'::uuid;`).trim() === "1",
+    );
+    check(
+      "the storage object is deleted, revoking all access to the bytes",
+      psql(`select count(*) from storage.objects where name='captures/${dSid}/frame-0000.jpg';`).trim() === "0",
+    );
+    check(
+      "a tombstone records the deleted seq so the frame count never silently lies",
+      psql(`select count(*) from capture_frame_tombstones where session_id='${dSid}'::uuid and seq=0;`).trim() === "1",
+    );
+    const detail2 = JSON.parse(psql(`select capture_session_review_detail('${dSid}'::uuid, 'test-secret');`).trim());
+    check(
+      "after delete, the detail read drops the frame and surfaces the tombstone",
+      detail2.frames.length === 2 && detail2.frames.every((f) => f.seq !== 0) &&
+        detail2.tombstones.length === 1 && detail2.tombstones[0].seq === 0,
+      JSON.stringify({ frames: detail2.frames.map((f) => f.seq), tombstones: detail2.tombstones }),
+    );
+    const delAgain = JSON.parse(psql(`select capture_delete_frame('test-secret', '${dSid}'::uuid, 0);`).trim());
+    check(
+      "re-deleting an already-gone frame is idempotent (deleted, but no bytes to remove)",
+      delAgain.deleted === true && delAgain.bytesRemoved === false,
+      JSON.stringify(delAgain),
+    );
+    const delNever = JSON.parse(psql(`select capture_delete_frame('test-secret', '${dSid}'::uuid, 99);`).trim());
+    check(
+      "deleting a seq that never existed still tombstones it, without error",
+      delNever.deleted === true && delNever.bytesRemoved === false &&
+        psql(`select count(*) from capture_frame_tombstones where session_id='${dSid}'::uuid and seq=99;`).trim() === "1",
+    );
+
     psql(`delete from capture_sessions where id='${cvSid}';`);
     check(
       "deleting a session cascades to its CV observations",
       psql(`select count(*) from community_cv_observations where session_id='${cvSid}';`).trim() === "0",
+    );
+    psql(`delete from capture_sessions where id='${dSid}';`);
+    check(
+      "deleting a session cascades to its frame tombstones",
+      psql(`select count(*) from capture_frame_tombstones where session_id='${dSid}';`).trim() === "0",
     );
 
     /* ---------------- Cascades ---------------- */
