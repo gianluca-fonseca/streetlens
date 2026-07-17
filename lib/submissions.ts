@@ -24,6 +24,7 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import type { z } from "zod";
 import { getSupabaseClient } from "./supabase";
 import {
   addSegmentPayloadSchema,
@@ -32,7 +33,7 @@ import {
   type UpdateSegmentPayload,
 } from "./schemas";
 import { applyApprovedSubmission, type ApplyInput } from "./apply-submissions";
-import type { SubmissionStatus, SubmissionType } from "./types";
+import { isSubmissionType, type SubmissionStatus, type SubmissionType } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const SAMPLE_PATH = path.join(DATA_DIR, "pending-submissions.sample.json");
@@ -159,13 +160,35 @@ async function baseRawList(): Promise<{
   return { raw: extractRecords(sample), source: "sample" };
 }
 
+/**
+ * Payload schema per submission type, or `null` where no payload is
+ * renderable yet.
+ *
+ * `cv_capture` and `unknown` map to null on purpose (u25). Both are COUNTED —
+ * see reconcileRecord — but neither is renderable, so the admin queue looks
+ * exactly as it did. unit-capture-review gives cv_capture a schema and a card
+ * when there is something to show; `unknown` is a bot artifact and never gets
+ * one.
+ */
+const PAYLOAD_SCHEMAS: Record<SubmissionType, z.ZodType | null> = {
+  add_segment: addSegmentPayloadSchema,
+  update_segment: updateSegmentPayloadSchema,
+  cv_capture: null,
+  unknown: null,
+};
+
 /** Reconcile one raw record to a single effective status. */
 function reconcileRecord(
   raw: RawRecord,
   overlay: ReviewOverlay,
 ): ReconciledSubmission | null {
   if (typeof raw.id !== "string") return null;
-  if (raw.type !== "add_segment" && raw.type !== "update_segment") return null;
+  // Every KNOWN type is kept, not just the two renderable ones (u25). The
+  // honeypot path now files a bot's unrecognized type as `unknown` rather than
+  // mislabelling it `add_segment`; hard-filtering to the renderable types here
+  // would make those rejected rows vanish from the counters, which is exactly
+  // the count-everything doctrine below being violated by a fix elsewhere.
+  if (!isSubmissionType(raw.type)) return null;
 
   const baseStatus: SubmissionStatus =
     raw.status === "approved" || raw.status === "rejected"
@@ -174,11 +197,8 @@ function reconcileRecord(
   const review = overlay[raw.id];
   const status = review ? review.status : baseStatus;
 
-  const schema =
-    raw.type === "add_segment"
-      ? addSegmentPayloadSchema
-      : updateSegmentPayloadSchema;
-  const parsed = schema.safeParse(raw.payload);
+  const schema = PAYLOAD_SCHEMAS[raw.type];
+  const parsed = schema?.safeParse(raw.payload);
 
   return {
     id: raw.id,
@@ -189,8 +209,8 @@ function reconcileRecord(
         ? raw.created_at
         : new Date(0).toISOString(),
     contact: typeof raw.contact === "string" ? raw.contact : null,
-    payload: parsed.success ? parsed.data : raw.payload,
-    payloadValid: parsed.success,
+    payload: parsed?.success ? parsed.data : raw.payload,
+    payloadValid: parsed?.success ?? false,
   };
 }
 
@@ -274,21 +294,35 @@ export type ReviewResult =
   | { ok: true; status: SubmissionStatus; source: SubmissionSource }
   | { ok: false; error: "not_found" | "invalid_reason" | "invalid_action" };
 
-/** A renderable submission → the apply pipeline's typed input. */
-function toApplyInput(target: QueueSubmission): ApplyInput {
-  return target.type === "add_segment"
-    ? {
-        id: target.id,
-        created_at: target.created_at,
-        type: "add_segment",
-        payload: target.payload as AddSegmentPayload,
-      }
-    : {
-        id: target.id,
-        created_at: target.created_at,
-        type: "update_segment",
-        payload: target.payload as UpdateSegmentPayload,
-      };
+/**
+ * A renderable submission → the apply pipeline's typed input, or `null` when
+ * the type does not belong in that pipeline.
+ *
+ * The null case matters (u25): the apply pipeline turns proposals into
+ * community segments and reports, and a cv_capture is neither. This used to be
+ * a two-branch ternary whose else-branch swept every non-add type into
+ * `update_segment` — harmless while exactly two types existed, a silent
+ * data-corruption bug the moment a third appeared.
+ */
+function toApplyInput(target: QueueSubmission): ApplyInput | null {
+  if (target.type === "add_segment") {
+    return {
+      id: target.id,
+      created_at: target.created_at,
+      type: "add_segment",
+      payload: target.payload as AddSegmentPayload,
+    };
+  }
+  if (target.type === "update_segment") {
+    return {
+      id: target.id,
+      created_at: target.created_at,
+      type: "update_segment",
+      payload: target.payload as UpdateSegmentPayload,
+    };
+  }
+  // cv_capture: unit-capture-review owns what approving a capture does.
+  return null;
 }
 
 /**
@@ -331,7 +365,8 @@ export async function reviewSubmission(
       });
       if (!error) {
         if (action === "approve" && target) {
-          await applyApprovedSubmission(toApplyInput(target));
+          const input = toApplyInput(target);
+          if (input) await applyApprovedSubmission(input);
         }
         return { ok: true, status: newStatus, source: "supabase" };
       }
@@ -349,7 +384,8 @@ export async function reviewSubmission(
   // Land the data FIRST so a write failure never leaves an "approved" marker
   // without the segment/report actually applied.
   if (action === "approve") {
-    await applyApprovedSubmission(toApplyInput(target));
+    const input = toApplyInput(target);
+    if (input) await applyApprovedSubmission(input);
   }
 
   const reviewedAt = new Date().toISOString();
