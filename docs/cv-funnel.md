@@ -798,6 +798,39 @@ usually the kill switch being off or the pump not being called: verify
 retry up to 3 attempts before going `failed`; `capture_fail_unattributed_jobs`
 closes jobs whose frame never matched a segment.
 
+### Reprocessing a session
+
+Use this when a session drained with every frame `failed` on `no_segment_match`
+because the walk was outside the audited network at the time, and the network
+has since grown (for example a district expansion added streets under that
+walk). The track is unchanged; only `data/segments.geojson` moved. Reprocessing
+re-runs the real matcher on the stored track against the current network,
+re-queues the frames that now land on a segment, and hands the session back to
+the pump. It does not re-extract frames that already succeeded, does not touch
+`failed_overbudget` jobs (that is the budget breaker's call), and does not retry
+frames that failed for a model reason rather than a matching one.
+
+Always dry-run first. The dry-run re-matches and prints the summary but writes
+nothing:
+
+```
+node --env-file=.env.local scripts/reprocess-capture-session.mjs <session-id> --dry-run
+```
+
+If the summary shows frames now landing on real segments, run it for real (drop
+`--dry-run`). It re-queues the newly-matched frames, flips the session from
+`review_ready`/`extracting` back to `extracting`, then kicks the pump (set
+`CAPTURE_APP_URL` to have it call the pump for you, otherwise it prints the exact
+`curl` to run once the app is up). It is idempotent and safe to run on any
+session: a decided walk (`approved`/`rejected`) is refused, a session that is not
+`extracting`/`review_ready` is refused, and a session with nothing to fix is a
+clean no-op with a clear message. It runs entirely through the secret-gated
+reprocess RPCs (`capture_session_track`, `capture_reprocess_session`; migration
+`0019`), so it needs `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+and `ADMIN_RPC_SECRET`, and never writes a table directly. Only frames that
+still do not match stay `failed` on `no_segment_match`, exactly as finalize would
+leave them, so the session can still drain afterwards.
+
 ### Pausing extraction
 
 Set `CV_EXTRACTION_ENABLED` to anything other than `"true"` (or unset it). The
@@ -815,7 +848,8 @@ Run these directly with node; none need a live database.
 | `scripts/test-capture-schemas.mjs` | contracts, rubric sync, encodings, path convention |
 | `scripts/test-matching-hmm.mjs` | the HMM against synthetic tracks, and that it beats the baseline on parallel streets |
 | `scripts/test-matching-baseline.mjs` | the matching interface against synthetic tracks |
-| `scripts/test-capture-migrations.mjs` | `0001..0017` applied to a throwaway container, every RPC exercised (needs Docker) |
+| `scripts/test-capture-migrations.mjs` | `0001..0019` applied to a throwaway container, every RPC exercised (needs Docker) |
+| `scripts/test-reprocess-core.mjs` | the reprocess script's track-time reconstruction, match summary, and payload logic |
 | `scripts/test-mp4box-contract.mjs` | the two load-bearing demux settings (`keepMdatData`, `releaseUsedSamples`) |
 | `scripts/test-upload-client.mjs` | retry, resume, concurrency, abort |
 | `scripts/test-rate-limit-namespaces.mjs` | capture ceiling, namespace isolation |
