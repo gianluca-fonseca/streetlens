@@ -93,3 +93,75 @@ export async function localPendingCount(): Promise<number> {
   return queue.filter((r) => r.status === "pending" && !r.honeypot_tripped)
     .length;
 }
+
+/**
+ * Raised when a capture session could not be filed into the review queue.
+ *
+ * Deliberately loud. See `emitCaptureSubmission`.
+ */
+export class CaptureEmitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CaptureEmitError";
+  }
+}
+
+/**
+ * File a finished capture session into the review queue as a `cv_capture` row
+ * (u30). Called by the pump at rollup completion; never by a contributor.
+ *
+ * IDEMPOTENT, because it has to be. The caller emits BEFORE flipping the session
+ * to review_ready, since that write is the drain latch — the drain query only
+ * selects `extracting`, so a session that reaches review_ready is never revisited
+ * and a row lost after that point is lost permanently. Emitting first means a
+ * crash in between simply re-emits on the next pump, which is only safe if a
+ * second emit is a no-op.
+ *
+ * Live mode dedupes inside the RPC rather than here. It has no choice: 0006 gives
+ * anon INSERT on submissions and deliberately NO SELECT policy (the queue holds ip
+ * hashes and reviewer notes), so a check-then-insert from application code cannot
+ * see what it is checking for.
+ *
+ * On a live failure this THROWS rather than falling back to the local queue. A
+ * local write in a Supabase-configured deployment lands in a file the live queue
+ * never reads: the session would go review_ready with no queue row, and no human
+ * would ever see the walk. Throwing leaves the session `extracting`, which the
+ * next pump retries.
+ */
+export async function emitCaptureSubmission(sessionId: string): Promise<void> {
+  const client = getSupabaseClient();
+  const secret = process.env.ADMIN_RPC_SECRET;
+
+  if (client && secret) {
+    try {
+      const { error } = await client.rpc("capture_emit_submission", {
+        p_session_id: sessionId,
+        p_secret: secret,
+      });
+      if (error) throw new CaptureEmitError(error.message);
+      return;
+    } catch (err) {
+      if (err instanceof CaptureEmitError) throw err;
+      throw new CaptureEmitError(
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+  }
+
+  // Local mode: the queue file is readable here, so dedupe directly.
+  const queue = await readLocalQueue();
+  const already = queue.some(
+    (r) =>
+      r.type === "cv_capture" &&
+      (r.payload as { session_id?: unknown } | null)?.session_id === sessionId,
+  );
+  if (already) return;
+
+  await appendLocal({
+    type: "cv_capture",
+    payload: { session_id: sessionId },
+    status: "pending",
+    source_ip_hash: null,
+    honeypot_tripped: false,
+  });
+}

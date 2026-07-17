@@ -57,6 +57,23 @@ export const updateSegmentPayloadSchema = z.object({
 export type UpdateSegmentPayload = z.infer<typeof updateSegmentPayloadSchema>;
 
 /**
+ * Payload for a finished capture session entering the review queue (u30).
+ *
+ * Just the session id, per 0014_submission_types.sql: the capture data itself
+ * lives in the capture_* tables and is deliberately NOT copied here, so the row
+ * cannot drift from the rollups it stands for.
+ *
+ * Note this payload is NOT part of `submissionSchema` below. A cv_capture row is
+ * emitted server-side by the extraction pump, never posted by a contributor, so
+ * accepting it on the public contribution endpoint would only create a way to
+ * forge queue items.
+ */
+export const cvCapturePayloadSchema = z.object({
+  session_id: z.string().uuid(),
+});
+export type CvCapturePayload = z.infer<typeof cvCapturePayloadSchema>;
+
+/**
  * Full submission envelope as posted by an anonymous contributor.
  *
  * `honeypot` must stay empty: a filled value signals a bot and is recorded as

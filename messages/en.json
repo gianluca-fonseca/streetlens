@@ -77,7 +77,15 @@
     "communityPending": "Community: pending field verification",
     "communityNote": "Community-contributed. Not yet field-verified, so it carries no audit scores.",
     "communityReportsHeading": "Community reports",
-    "communityReportLabel": "Community report"
+    "communityReportLabel": "Community report",
+    "cvChip": "Camera: not field-verified",
+    "cvHeading": "Camera observations",
+    "cvNote": "What a camera reading proposed and an admin approved. This is not a field audit, so it carries no audit scores.",
+    "cvObservationLabel": "Camera observation",
+    "cvUnknown": "No frame supported this lens",
+    "cvConfidenceLabel": "Confidence",
+    "cvCoverageLabel": "Coverage",
+    "cvFramesLabel": "Frames"
   },
   "rubric": {
     "overall": {
@@ -169,7 +177,15 @@
       "reasonRequired": "A reason is required.",
       "working": "Saving…",
       "errorGeneric": "Could not save the review. Please try again.",
-      "localNote": "No database configured. Reviews are staged locally for a post-database apply step."
+      "localNote": "No database configured. Reviews are staged locally for a post-database apply step.",
+      "typeCapture": "Camera walk",
+      "captureReviewCta": "Review this walk",
+      "captureUnreadable": "This walk can no longer be read. Its session may have been deleted.",
+      "captureSegments": "Segments",
+      "captureFrames": "Frames",
+      "captureOverbudget": "Budget stopped",
+      "captureFailedFrames": "{count} failed",
+      "captureEscalated": "{count} escalated"
     },
     "import": {
       "title": "Bulk import",
@@ -211,6 +227,51 @@
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected"
+    },
+    "capture": {
+      "title": "Review a camera walk",
+      "sessionHeading": "This walk",
+      "statusLabel": "Status",
+      "framesLabel": "Frames",
+      "capturedLabel": "Walked on",
+      "tokensLabel": "Tokens",
+      "jobsDone": "{count} extracted",
+      "jobsFailed": "{count} failed",
+      "overbudget": "Budget stopped before every frame was read",
+      "escalated": "{count} escalated",
+      "unattributed": "{count} frames matched no street",
+      "cameraObserved": "Camera reading",
+      "confidenceLabel": "Confidence",
+      "coverageLabel": "Coverage",
+      "escalatedLabel": "Escalated",
+      "itemsHeading": "Per item",
+      "itemFrames": "{count} frames",
+      "filmstripHeading": "Frames",
+      "frameAlt": "Frame {seq} from this walk",
+      "noSegments": "This walk produced no usable readings. Nothing here can reach the map, so rejecting it is the honest close.",
+      "unset": "—",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Why are you approving or rejecting this walk?",
+      "reasonRequired": "A reason is required.",
+      "approveSummary": "Approving {count} of {total} segments.",
+      "approve": "Approve selected",
+      "rejectSession": "Reject the walk",
+      "working": "Saving…",
+      "errorGeneric": "That did not save. Please try again.",
+      "alreadyApproved": "This walk has been approved.",
+      "alreadyRejected": "This walk has been rejected.",
+      "fixtureNote": "No database is configured, so this walk is fixture data. Decisions are recorded locally.",
+      "status": {
+        "pending_upload": "Waiting to upload",
+        "uploading": "Uploading",
+        "matching": "Matching to streets",
+        "extracting": "Reading frames",
+        "cost_paused": "Paused: budget",
+        "review_ready": "Ready for review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "failed": "Failed"
+      }
     }
   },
   "contribute": {
@@ -751,8 +812,63 @@
         "description": "The processing status of a walk recorded with StreetLens."
       },
       "eyebrow": "WALK STATUS",
-      "title": "Processing starts shortly",
-      "body": "This walk has been received. Matching and review run in a part of the pipeline that is not live yet, so there is nothing to show here for now.",
+      "title": "Your walk",
+      "body": "This page updates itself while your walk is processed. A person reviews every walk before any of it reaches the map, so none of this is instant.",
+      "loading": "Checking this walk.",
+      "steps": {
+        "received": "Frames received",
+        "matched": "Matched to streets",
+        "read": "Frames read",
+        "review": "Waiting for a reviewer",
+        "decided": "Reviewed"
+      },
+      "state": {
+        "pending_upload": "Waiting for the frames to arrive.",
+        "uploading": "Your frames are still arriving.",
+        "matching": "Matching your frames to the streets you walked.",
+        "extracting": "Reading your frames. This is the slow part, and it moves faster while this page is open.",
+        "cost_paused": "Reading is paused on this walk.",
+        "review_ready": "Your walk is waiting for a reviewer.",
+        "approved": "Approved. What your walk measured is public data now.",
+        "rejected": "A reviewer did not approve this walk, so none of it became public data.",
+        "failed": "This walk could not be processed."
+      },
+      "framesRead": "{done} of {total} frames read",
+      "framesFailed": "Frames that could not be read: {count}. The rest of the walk still counts.",
+      "paused": {
+        "title": "Reading is paused",
+        "body": "This walk reached its processing budget, so nothing more is being spent on it automatically. Somebody has to look at it and decide. Your frames are safe in the meantime."
+      },
+      "failedNotice": {
+        "title": "This walk could not be processed",
+        "body": "Something in matching or reading went wrong, and we would rather say so than show you a number we do not trust. Nothing from this walk became public data."
+      },
+      "segmentsEyebrow": "STREETS MATCHED",
+      "segmentsLead": "Street segments matched so far: {count}. The scores stay provisional until a reviewer approves the walk.",
+      "segmentCoverage": "{percent}% covered",
+      "waitNote": "You can close this page. The walk keeps processing either way, and this link brings you back to it.",
+      "errors": {
+        "not_found": {
+          "title": "No walk at this link",
+          "body": "This link does not point at a walk we hold. Make sure you copied all of it, including the part after the last slash."
+        },
+        "invalid_session": {
+          "title": "This is not a walk link",
+          "body": "The id in this address is not the right shape for a walk. Make sure you copied the whole link."
+        },
+        "unavailable": {
+          "title": "Status is unreachable",
+          "body": "The service that tracks walks is not answering right now. Your walk is unaffected. This page keeps trying."
+        },
+        "server_error": {
+          "title": "Could not read the status",
+          "body": "Something went wrong on our side reading this walk. Your frames are unaffected. This page keeps trying."
+        },
+        "network": {
+          "title": "No connection",
+          "body": "This page cannot reach StreetLens. Your walk keeps processing without it. This page keeps trying."
+        }
+      },
       "sessionLabel": "SESSION",
       "backToMap": "Back to the map"
     }

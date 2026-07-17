@@ -77,7 +77,15 @@
     "communityPending": "Comunidad: pendiente de verificación de campo",
     "communityNote": "Aporte de la comunidad. Aún sin verificación de campo, por lo que no tiene puntajes de auditoría.",
     "communityReportsHeading": "Reportes de la comunidad",
-    "communityReportLabel": "Reporte de la comunidad"
+    "communityReportLabel": "Reporte de la comunidad",
+    "cvChip": "Cámara: sin verificación de campo",
+    "cvHeading": "Observaciones de cámara",
+    "cvNote": "Lo que propuso una lectura de cámara y aprobó una persona administradora. No es una auditoría de campo, por lo que no tiene puntajes de auditoría.",
+    "cvObservationLabel": "Observación de cámara",
+    "cvUnknown": "Ningún cuadro respaldó esta capa",
+    "cvConfidenceLabel": "Confianza",
+    "cvCoverageLabel": "Cobertura",
+    "cvFramesLabel": "Cuadros"
   },
   "rubric": {
     "overall": {
@@ -169,7 +177,15 @@
       "reasonRequired": "Se requiere un motivo.",
       "working": "Guardando…",
       "errorGeneric": "No se pudo guardar la revisión. Inténtelo de nuevo.",
-      "localNote": "Sin base de datos configurada. Las revisiones se guardan localmente para aplicarlas tras la puesta en marcha de la base de datos."
+      "localNote": "Sin base de datos configurada. Las revisiones se guardan localmente para aplicarlas tras la puesta en marcha de la base de datos.",
+      "typeCapture": "Caminata con cámara",
+      "captureReviewCta": "Revisar esta caminata",
+      "captureUnreadable": "Esta caminata ya no se puede leer. Es posible que su sesión se haya eliminado.",
+      "captureSegments": "Tramos",
+      "captureFrames": "Cuadros",
+      "captureOverbudget": "Detenida por presupuesto",
+      "captureFailedFrames": "{count} con fallo",
+      "captureEscalated": "{count} escaladas"
     },
     "import": {
       "title": "Importación masiva",
@@ -211,6 +227,51 @@
       "pending": "Pendiente",
       "approved": "Aprobada",
       "rejected": "Rechazada"
+    },
+    "capture": {
+      "title": "Revisar una caminata con cámara",
+      "sessionHeading": "Esta caminata",
+      "statusLabel": "Estado",
+      "framesLabel": "Cuadros",
+      "capturedLabel": "Caminada el",
+      "tokensLabel": "Tokens",
+      "jobsDone": "{count} extraídos",
+      "jobsFailed": "{count} con fallo",
+      "overbudget": "El presupuesto se detuvo antes de leer todos los cuadros",
+      "escalated": "{count} escaladas",
+      "unattributed": "{count} cuadros no coincidieron con ninguna calle",
+      "cameraObserved": "Lectura de cámara",
+      "confidenceLabel": "Confianza",
+      "coverageLabel": "Cobertura",
+      "escalatedLabel": "Escaladas",
+      "itemsHeading": "Por ítem",
+      "itemFrames": "{count} cuadros",
+      "filmstripHeading": "Cuadros",
+      "frameAlt": "Cuadro {seq} de esta caminata",
+      "noSegments": "Esta caminata no produjo lecturas utilizables. Nada de esto puede llegar al mapa, así que rechazarla es el cierre honesto.",
+      "unset": "—",
+      "reasonLabel": "Razón",
+      "reasonPlaceholder": "¿Por qué aprobás o rechazás esta caminata?",
+      "reasonRequired": "Se requiere una razón.",
+      "approveSummary": "Aprobando {count} de {total} tramos.",
+      "approve": "Aprobar lo seleccionado",
+      "rejectSession": "Rechazar la caminata",
+      "working": "Guardando…",
+      "errorGeneric": "No se guardó. Intentalo de nuevo.",
+      "alreadyApproved": "Esta caminata fue aprobada.",
+      "alreadyRejected": "Esta caminata fue rechazada.",
+      "fixtureNote": "No hay base de datos configurada, así que esta caminata son datos de prueba. Las decisiones se guardan localmente.",
+      "status": {
+        "pending_upload": "Esperando la subida",
+        "uploading": "Subiendo",
+        "matching": "Emparejando con las calles",
+        "extracting": "Leyendo cuadros",
+        "cost_paused": "Pausada: presupuesto",
+        "review_ready": "Lista para revisión",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "failed": "Fallida"
+      }
     }
   },
   "contribute": {
@@ -751,8 +812,63 @@
         "description": "El estado de procesamiento de una caminata grabada con StreetLens."
       },
       "eyebrow": "ESTADO DE LA CAMINATA",
-      "title": "El procesamiento empieza pronto",
-      "body": "Esta caminata se recibió. La unión al mapa y la revisión corren en una parte del sistema que todavía no está encendida, así que por ahora no hay nada que mostrar aquí.",
+      "title": "Tu caminata",
+      "body": "Esta página se actualiza sola mientras se procesa tu caminata. Una persona revisa cada caminata antes de que algo llegue al mapa, así que nada de esto es inmediato.",
+      "loading": "Revisando esta caminata.",
+      "steps": {
+        "received": "Cuadros recibidos",
+        "matched": "Unidos a las calles",
+        "read": "Cuadros leídos",
+        "review": "Esperando a una persona revisora",
+        "decided": "Revisada"
+      },
+      "state": {
+        "pending_upload": "Esperando a que lleguen los cuadros.",
+        "uploading": "Tus cuadros todavía están llegando.",
+        "matching": "Uniendo tus cuadros a las calles que caminaste.",
+        "extracting": "Leyendo tus cuadros. Esta es la parte lenta, y avanza más rápido mientras esta página esté abierta.",
+        "cost_paused": "La lectura está en pausa en esta caminata.",
+        "review_ready": "Tu caminata está esperando a una persona revisora.",
+        "approved": "Aprobada. Lo que midió tu caminata ya es dato público.",
+        "rejected": "Una persona revisora no aprobó esta caminata, así que nada de ella se volvió dato público.",
+        "failed": "Esta caminata no se pudo procesar."
+      },
+      "framesRead": "{done} de {total} cuadros leídos",
+      "framesFailed": "Cuadros que no se pudieron leer: {count}. El resto de la caminata sigue contando.",
+      "paused": {
+        "title": "La lectura está en pausa",
+        "body": "Esta caminata llegó a su límite de procesamiento, así que ya no se gasta nada más en ella de forma automática. Alguien tiene que verla y decidir. Mientras tanto, tus cuadros están a salvo."
+      },
+      "failedNotice": {
+        "title": "Esta caminata no se pudo procesar",
+        "body": "Algo salió mal al unirla o al leerla, y preferimos decirlo antes que mostrarte un número en el que no confiamos. Nada de esta caminata se volvió dato público."
+      },
+      "segmentsEyebrow": "CALLES UNIDAS",
+      "segmentsLead": "Segmentos de calle unidos hasta ahora: {count}. Los puntajes quedan provisionales hasta que una persona revisora apruebe la caminata.",
+      "segmentCoverage": "{percent}% cubierto",
+      "waitNote": "Podés cerrar esta página. La caminata sigue procesándose igual, y este enlace te trae de vuelta.",
+      "errors": {
+        "not_found": {
+          "title": "No hay ninguna caminata en este enlace",
+          "body": "Este enlace no apunta a una caminata que tengamos. Asegurate de copiarlo completo, incluida la parte después de la última barra."
+        },
+        "invalid_session": {
+          "title": "Esto no es un enlace de caminata",
+          "body": "El id de esta dirección no tiene la forma de una caminata. Asegurate de copiar el enlace completo."
+        },
+        "unavailable": {
+          "title": "No se alcanza el estado",
+          "body": "El servicio que sigue las caminatas no está respondiendo ahora. Tu caminata no se ve afectada. Esta página sigue intentando."
+        },
+        "server_error": {
+          "title": "No se pudo leer el estado",
+          "body": "Algo salió mal de nuestro lado al leer esta caminata. Tus cuadros no se ven afectados. Esta página sigue intentando."
+        },
+        "network": {
+          "title": "Sin conexión",
+          "body": "Esta página no puede alcanzar StreetLens. Tu caminata sigue procesándose sin ella. Esta página sigue intentando."
+        }
+      },
       "sessionLabel": "SESIÓN",
       "backToMap": "Volver al mapa"
     }

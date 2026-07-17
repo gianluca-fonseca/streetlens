@@ -139,12 +139,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0014", files.some((f) => f.startsWith("0014")), files.join(" "));
+    check("found the full migration chain through 0017", files.some((f) => f.startsWith("0017")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -158,9 +158,10 @@ function main() {
     try {
       psql(readFileSync(path.join(MIGRATIONS, "0013_capture.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0014_submission_types.sql"), "utf8"));
-      check("0013 + 0014 are re-runnable (idempotent)", true);
+      psql(readFileSync(path.join(MIGRATIONS, "0017_capture_review.sql"), "utf8"));
+      check("0013 + 0014 + 0017 are re-runnable (idempotent)", true);
     } catch (err) {
-      check("0013 + 0014 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
+      check("0013 + 0014 + 0017 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
     }
 
     /* ---------------- Schema shape ---------------- */
@@ -442,6 +443,212 @@ function main() {
     check(
       "status transitions are secret-gated too",
       (psqlExpectError(`select capture_set_session_status('${sid}'::uuid, 'approved', 'nope');`) || "").includes("unauthorized"),
+    );
+
+    /* ---------------- 0017: the review loop (u30) ---------------- */
+
+    // The emit. Idempotency here is not a nicety: the pump files a session BEFORE
+    // flipping it to review_ready (that write is a one-way latch), so a crash in
+    // between re-emits on the next pump. That retry is only safe if a second emit
+    // is a no-op, and TS cannot dedupe it — 0006 gives anon INSERT on submissions
+    // and no SELECT policy, so the check has to live in here.
+    const cvSid = psql(`select capture_create_session('live', 'iphash-cv');`).trim();
+    check(
+      "capture_emit_submission is secret-gated",
+      (psqlExpectError(`select capture_emit_submission('${cvSid}'::uuid, 'nope');`) || "").includes("unauthorized"),
+    );
+    check(
+      "emitting for a session that does not exist raises",
+      psqlExpectError(
+        `select capture_emit_submission('00000000-0000-0000-0000-000000000000'::uuid, 'test-secret');`,
+      ) !== null,
+    );
+    psql(`select capture_emit_submission('${cvSid}'::uuid, 'test-secret');`);
+    check(
+      "the drained session is filed as a pending cv_capture row",
+      psql(`select count(*) from submissions
+             where type='cv_capture' and payload->>'session_id'='${cvSid}' and status='pending';`).trim() === "1",
+    );
+    psql(`select capture_emit_submission('${cvSid}'::uuid, 'test-secret');`);
+    psql(`select capture_emit_submission('${cvSid}'::uuid, 'test-secret');`);
+    check(
+      "re-emitting is a no-op, so the pump's retry cannot double-file the walk",
+      psql(`select count(*) from submissions
+             where type='cv_capture' and payload->>'session_id'='${cvSid}';`).trim() === "1",
+    );
+
+    const cvSub = psql(`select id from submissions
+                         where type='cv_capture' and payload->>'session_id'='${cvSid}';`).trim();
+
+    // The admin review read. It is separate from capture_session_status (0013)
+    // rather than a widening of it, because that one is PUBLIC — the session uuid
+    // is its only capability — and this one returns token spend.
+    check(
+      "capture_session_review is secret-gated",
+      (psqlExpectError(`select capture_session_review('${cvSid}'::uuid, 'nope');`) || "").includes("unauthorized"),
+    );
+    const reviewJson = psql(`select capture_session_review('${cvSid}'::uuid, 'test-secret');`).trim();
+    const review = JSON.parse(reviewJson);
+    check(
+      "the review read returns the session shape the page needs",
+      review.sessionId === cvSid &&
+        typeof review.status === "string" &&
+        review.jobs !== undefined &&
+        review.tokens !== undefined &&
+        Array.isArray(review.rollups) &&
+        Array.isArray(review.frames),
+      reviewJson.slice(0, 160),
+    );
+    check(
+      "overbudget is reported separately from failed (money out != frame bad)",
+      review.jobs.overbudget !== undefined && review.jobs.failed !== undefined,
+      JSON.stringify(review.jobs),
+    );
+    check(
+      "the review read reports token spend (which the PUBLIC status must not)",
+      typeof review.tokens.inputTokens === "number" || review.tokens.inputTokens !== undefined,
+      JSON.stringify(review.tokens),
+    );
+    check(
+      "an unknown session raises rather than returning null",
+      psqlExpectError(
+        `select capture_session_review('00000000-0000-0000-0000-000000000000'::uuid, 'test-secret');`,
+      ) !== null,
+    );
+
+    // The apply. Two segments approved out of a walk.
+    const obs = (ids) =>
+      JSON.stringify(
+        ids.map((s) => ({
+          id: `cv-${cvSid}-${s}`,
+          segment_id: s,
+          scores: { overall: 61.5, accessibility: 40, drainage: null, shade: 55, bike: null },
+          item_medians: { ramp_present: { value: 0.5, confidence: 0.8, frames: 3 } },
+          coverage: 0.75,
+          confidence: 0.62,
+          frame_refs: [`captures/${cvSid}/frame-0000.jpg`],
+          captured_on: "2026-07-16T10:00:00Z",
+        })),
+      ).replace(/'/g, "''");
+
+    check(
+      "admin_apply_capture_session is secret-gated",
+      (psqlExpectError(
+        `select admin_apply_capture_session('nope', '${cvSid}'::uuid, null, '${obs(["seg-a"])}'::jsonb);`,
+      ) || "").includes("unauthorized"),
+    );
+    psql(`select admin_apply_capture_session('test-secret', '${cvSid}'::uuid, '${cvSub}'::uuid, '${obs(["seg-a", "seg-b"])}'::jsonb);`);
+    check(
+      "approving two segments lands exactly two observations",
+      psql(`select count(*) from community_cv_observations where session_id='${cvSid}';`).trim() === "2",
+    );
+    check(
+      "a lens no frame supported stays NULL rather than becoming a zero",
+      psql(`select coalesce(score_drainage::text,'NULL') || '|' || score_accessibility::text
+              from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "NULL|40.00",
+    );
+    check(
+      "the observation keeps its provenance and capture date",
+      psql(`select (submission_id='${cvSub}')::text || '|' || (captured_on is not null)::text
+              from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "true|true",
+    );
+
+    // Re-approving with one segment unticked. Upsert alone would leave seg-b
+    // published forever — an admin who retracts a segment must see it go.
+    psql(`select admin_apply_capture_session('test-secret', '${cvSid}'::uuid, '${cvSub}'::uuid, '${obs(["seg-a"])}'::jsonb);`);
+    check(
+      "re-approving is idempotent for the segments that stayed ticked",
+      psql(`select count(*) from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "1",
+    );
+    check(
+      "an UNTICKED segment is retracted, not left published",
+      psql(`select count(*) from community_cv_observations where id='cv-${cvSid}-seg-b';`).trim() === "0",
+    );
+    check(
+      "retraction is scoped to its own session",
+      psql(`select count(*) from community_cv_observations where session_id='${cvSid}';`).trim() === "1",
+    );
+    check(
+      "an out-of-range CV score is rejected by the CHECK",
+      psqlExpectError(`insert into community_cv_observations (id, segment_id, session_id, score_overall)
+                       values ('cv-bad', 'seg-a', '${cvSid}'::uuid, 140);`) !== null,
+    );
+    check(
+      "approving a capture NEVER writes an audit (the prime invariant)",
+      psql(`select (select count(*) from audits)::text || '|' || (select count(*) from observations)::text;`).trim() === "0|0",
+    );
+
+    // Closing the review: session and queue row move together or not at all.
+    check(
+      "capture_close_review is secret-gated",
+      (psqlExpectError(`select capture_close_review('${cvSid}'::uuid, 'approve', 'looks right', 'nope');`) || "").includes("unauthorized"),
+    );
+    check(
+      "a reason is mandatory, in the database and not just the UI",
+      psqlExpectError(`select capture_close_review('${cvSid}'::uuid, 'approve', '   ', 'test-secret');`) !== null,
+    );
+    check(
+      "an invalid action is rejected",
+      psqlExpectError(`select capture_close_review('${cvSid}'::uuid, 'maybe', 'hmm', 'test-secret');`) !== null,
+    );
+    psql(`select capture_close_review('${cvSid}'::uuid, 'approve', 'two segments look right', 'test-secret');`);
+    check(
+      "closing stamps the session AND closes its queue row in one go",
+      psql(`select
+              (select status from capture_sessions where id='${cvSid}') || '|' ||
+              (select (reviewed_at is not null)::text from capture_sessions where id='${cvSid}') || '|' ||
+              (select status from submissions where id='${cvSub}') || '|' ||
+              (select reviewer_note from submissions where id='${cvSub}');`).trim()
+        === "approved|true|approved|two segments look right",
+    );
+
+    // The session-scoped claim. This is what lets a contributor's status page
+    // pump WITHOUT the admin secret, so its scoping is a security property.
+    const otherSid = psql(`select capture_create_session('live', 'iphash-other-cv');`).trim();
+    psql(`
+      insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
+      values ('${otherSid}'::uuid, 0, 'captures/${otherSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-z');
+      insert into capture_frame_jobs (frame_id)
+        select id from capture_frames where session_id='${otherSid}'::uuid;
+      update capture_sessions set status='extracting' where id='${otherSid}'::uuid;
+    `);
+    check(
+      "capture_claim_jobs_for_session is secret-gated",
+      (psqlExpectError(`select * from capture_claim_jobs_for_session('${otherSid}'::uuid, 5, 'nope');`) || "").includes("unauthorized"),
+    );
+    const mineSid = psql(`select capture_create_session('live', 'iphash-mine-cv');`).trim();
+    psql(`
+      insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
+      values ('${mineSid}'::uuid, 0, 'captures/${mineSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-y');
+      insert into capture_frame_jobs (frame_id)
+        select id from capture_frames where session_id='${mineSid}'::uuid;
+      update capture_sessions set status='extracting' where id='${mineSid}'::uuid;
+    `);
+    const claimedForMine = psql(
+      `select count(*) from capture_claim_jobs_for_session('${mineSid}'::uuid, 5, 'test-secret');`,
+    ).trim();
+    check(
+      "the scoped claim takes MY session's job",
+      claimedForMine === "1",
+      `claimed=${claimedForMine}`,
+    );
+    check(
+      "and it CANNOT reach another session's frames — the whole point of the route",
+      psql(`select status from capture_frame_jobs j
+             join capture_frames f on f.id=j.frame_id
+             where f.session_id='${otherSid}'::uuid;`).trim() === "pending",
+    );
+    check(
+      "a cost_paused session is not claimable, so polling cannot resurrect it",
+      (() => {
+        psql(`update capture_sessions set status='cost_paused' where id='${otherSid}'::uuid;`);
+        return psql(`select count(*) from capture_claim_jobs_for_session('${otherSid}'::uuid, 5, 'test-secret');`).trim() === "0";
+      })(),
+    );
+    psql(`delete from capture_sessions where id='${cvSid}';`);
+    check(
+      "deleting a session cascades to its CV observations",
+      psql(`select count(*) from community_cv_observations where session_id='${cvSid}';`).trim() === "0",
     );
 
     /* ---------------- Cascades ---------------- */

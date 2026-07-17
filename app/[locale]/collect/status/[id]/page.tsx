@@ -1,11 +1,15 @@
 /**
  * Walk status.
  *
- * A deliberate placeholder. The real status view needs matching, extraction and
- * rollups, none of which are live yet, so this page says exactly that instead of
- * rendering a progress bar for work that nothing is doing. The recorder links
- * here on success, and a link that lands on an honest holding page beats a link
- * that 404s.
+ * This page used to be an honest placeholder: matching, extraction and rollups
+ * were not live, so it said so rather than animating a progress bar for work
+ * nothing was doing. They are live now, and the same honesty rule points the
+ * other way: the page reports what the pipeline actually did, including the
+ * parts that are slow, paused or failed.
+ *
+ * The frame is server-rendered and the moving parts are not. Everything below is
+ * one uuid-scoped fetch loop, so it belongs in the client; the header, the id and
+ * the way out do not change and should not wait on a poll.
  *
  * No `generateStaticParams`: the id is only knowable at request time, so the
  * route renders dynamically, which is the correct default here.
@@ -13,6 +17,7 @@
 
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { StatusClient } from "@/components/capture/StatusClient";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -45,6 +50,11 @@ export default async function CollectStatusPage({
           </h1>
           <p className="font-serif text-[17px] leading-[1.6] text-neutral-strong">{t("body")}</p>
         </header>
+
+        {/* The id is not validated here. The route it polls rejects a non-uuid
+            with 400 and an unknown one with 404, and the client says so; a second
+            copy of that rule in this file would be a second thing to get wrong. */}
+        <StatusClient sessionId={id} />
 
         <div className="rounded-[4px] border border-border bg-surface-elevated p-4">
           <p className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-ink-muted">

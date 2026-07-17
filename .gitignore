@@ -73,3 +73,10 @@ data/pending-submissions.local.json
 !.bgsd/config.json
 .bgsd-tmp/
 .vercel
+
+# u30 capture review: fixture + local review state (runtime data, seeded by
+# scripts/seed-u30-fixture.mjs)
+/data/capture-review.local.json
+/data/capture-review-overlay.local.json
+/data/community-cv-observations.local.json
+/public/u30-fixture-frame.jpg

@@ -14,12 +14,18 @@
  * a status page must never spend money. The client pumps by POSTing
  * /api/capture/pump, which is gated.
  *
+ * NO DATABASE: falls back to the review fixture (lib/capture/review-store),
+ * mirroring the map's live-else-static read path, so the status page is drivable
+ * offline. The fallback projects ONLY the public fields, field by field, because
+ * SessionReview also carries admin-only token spend and storage paths.
+ *
  * Next 16: `params` is a Promise and must be awaited.
  */
 
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCaptureDb } from "@/lib/capture/db";
+import { getSessionReview } from "@/lib/capture/review-store";
 
 export const runtime = "nodejs";
 
@@ -35,7 +41,51 @@ export async function GET(
 
   const db = getCaptureDb();
   if (!db) {
-    return NextResponse.json({ ok: false, error: "unavailable" }, { status: 503 });
+    // No database: fall back to the review fixture, exactly as the map's read
+    // path falls back to the demo collection (lib/segments.ts). Without this the
+    // contributor status page is undemoable and undrivable offline, since
+    // recording a session needs a database it cannot have here.
+    //
+    // The projection below is deliberate and NOT `...review`: this route is
+    // public (the uuid is the whole capability), and SessionReview carries
+    // admin-only material — token spend, storage paths, per-item medians. Only
+    // the four documented public fields are copied, one at a time, so a later
+    // addition to SessionReview cannot silently leak out through here.
+    const review = await getSessionReview(id);
+    if (!review) {
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
+    }
+    const rollups = review.segments.map((s) => ({
+      segmentId: s.segmentId,
+      coverage: s.coverage ?? 0,
+      confidence: s.confidence ?? 0,
+      scores: s.scores,
+    }));
+    const body =
+      rollups.length > 0
+        ? {
+            status: review.status,
+            frameCount: review.frameCount,
+            jobs: {
+              pending: review.jobs.pending,
+              done: review.jobs.done,
+              failed: review.jobs.failed,
+            },
+            rollups,
+          }
+        : {
+            status: review.status,
+            frameCount: review.frameCount,
+            jobs: {
+              pending: review.jobs.pending,
+              done: review.jobs.done,
+              failed: review.jobs.failed,
+            },
+          };
+    return NextResponse.json(body, {
+      status: 200,
+      headers: { "cache-control": "no-store" },
+    });
   }
 
   try {

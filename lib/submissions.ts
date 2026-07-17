@@ -28,6 +28,7 @@ import type { z } from "zod";
 import { getSupabaseClient } from "./supabase";
 import {
   addSegmentPayloadSchema,
+  cvCapturePayloadSchema,
   updateSegmentPayloadSchema,
   type AddSegmentPayload,
   type UpdateSegmentPayload,
@@ -164,16 +165,15 @@ async function baseRawList(): Promise<{
  * Payload schema per submission type, or `null` where no payload is
  * renderable yet.
  *
- * `cv_capture` and `unknown` map to null on purpose (u25). Both are COUNTED —
- * see reconcileRecord — but neither is renderable, so the admin queue looks
- * exactly as it did. unit-capture-review gives cv_capture a schema and a card
- * when there is something to show; `unknown` is a bot artifact and never gets
- * one.
+ * `cv_capture` gets its schema here (u30): there is now something to show, so the
+ * row becomes renderable and reaches the queue. `unknown` stays null — it is a bot
+ * artifact, it is COUNTED (see reconcileRecord) but never rendered, and it never
+ * gets a card.
  */
 const PAYLOAD_SCHEMAS: Record<SubmissionType, z.ZodType | null> = {
   add_segment: addSegmentPayloadSchema,
   update_segment: updateSegmentPayloadSchema,
-  cv_capture: null,
+  cv_capture: cvCapturePayloadSchema,
   unknown: null,
 };
 
@@ -292,7 +292,10 @@ export async function getSubmissionCounts(): Promise<SubmissionCounts> {
 
 export type ReviewResult =
   | { ok: true; status: SubmissionStatus; source: SubmissionSource }
-  | { ok: false; error: "not_found" | "invalid_reason" | "invalid_action" };
+  | {
+      ok: false;
+      error: "not_found" | "invalid_reason" | "invalid_action" | "wrong_pipeline";
+    };
 
 /**
  * A renderable submission → the apply pipeline's typed input, or `null` when
@@ -352,6 +355,17 @@ export async function reviewSubmission(
   // The target (with parsed payload) drives the apply step for both paths.
   const { items, source } = await getSubmissions();
   const target = items.find((i) => i.id === id);
+
+  // A cv_capture does not belong to this pipeline, and until u30 it could not
+  // reach here at all (no payload schema => not renderable => never a `target`).
+  // Giving it a schema opened this door, so it is closed explicitly rather than
+  // by the UI's good manners: toApplyInput returns null for cv_capture, so an
+  // approve here would write an "approved" marker and apply NOTHING — the exact
+  // silent-no-op the null branch exists to prevent. Capture review is per-segment
+  // and lives at /api/admin/capture/review.
+  if (target?.type === "cv_capture") {
+    return { ok: false, error: "wrong_pipeline" };
+  }
 
   // Live path: RPC handles auth + DB write; then apply lands the community data.
   const client = getSupabaseClient();

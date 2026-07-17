@@ -12,7 +12,7 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type { CommunityReport, CommunitySegment } from "./types";
+import type { CommunityReport, CommunitySegment, CvObservation } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 export const COMMUNITY_SEGMENTS_PATH = path.join(
@@ -22,6 +22,10 @@ export const COMMUNITY_SEGMENTS_PATH = path.join(
 export const COMMUNITY_REPORTS_PATH = path.join(
   DATA_DIR,
   "community-reports.local.json",
+);
+export const COMMUNITY_CV_OBSERVATIONS_PATH = path.join(
+  DATA_DIR,
+  "community-cv-observations.local.json",
 );
 
 async function readJsonArray<T>(file: string): Promise<T[]> {
@@ -71,4 +75,44 @@ export async function appendCommunityReports(
   if (rows.length === 0) return;
   const merged = upsertById(await readCommunityReports(), rows);
   await writeJson(COMMUNITY_REPORTS_PATH, merged);
+}
+
+/** All approved CV observations (local store). Missing file → empty. */
+export async function readCvObservations(): Promise<CvObservation[]> {
+  return readJsonArray<CvObservation>(COMMUNITY_CV_OBSERVATIONS_PATH);
+}
+
+/**
+ * Upsert CV observations into the local store.
+ *
+ * Ids are `cv-<session>-<segment>`, so an admin who approves a session, changes
+ * their mind about which segments, and approves again lands on the same rows
+ * rather than a second set.
+ */
+export async function appendCvObservations(
+  rows: CvObservation[],
+): Promise<void> {
+  if (rows.length === 0) return;
+  const merged = upsertById(await readCvObservations(), rows);
+  await writeJson(COMMUNITY_CV_OBSERVATIONS_PATH, merged);
+}
+
+/**
+ * Drop CV observations for a session that are no longer approved.
+ *
+ * Needed because approval is per-SEGMENT and re-reviewable: upserting the newly
+ * approved set alone would leave a previously-approved segment on the map after
+ * an admin has just unticked it. Rows for other sessions are untouched.
+ */
+export async function pruneCvObservations(
+  sessionId: string,
+  keepIds: readonly string[],
+): Promise<void> {
+  const existing = await readCvObservations();
+  const keep = new Set(keepIds);
+  const next = existing.filter(
+    (row) => row.session_id !== sessionId || keep.has(row.id),
+  );
+  if (next.length === existing.length) return;
+  await writeJson(COMMUNITY_CV_OBSERVATIONS_PATH, next);
 }

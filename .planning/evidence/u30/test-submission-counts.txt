@@ -1,0 +1,12 @@
+  -> counts {"pending":1,"approved":1,"rejected":1,"total":3}
+  [ok ] pending = 1 (1)
+  [ok ] approved = 1 (1)
+  [ok ] rejected = 1 (invalid-payload file-rejected record COUNTED) (1)
+  [ok ] total = 3 (every record counted) (3)
+  [ok ] buckets sum to total (no drift)
+  [ok ] pending queue has the valid pending item
+  [ok ] pending queue EXCLUDES the rejected/invalid record
+  [ok ] renderable set excludes the invalid-payload record (payload can't render)
+  [ok ] yet counts still tallied it — proving counts != renderable set (renderable 2)
+
+COUNTS-TEST PASS

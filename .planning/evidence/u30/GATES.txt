@@ -1,0 +1,154 @@
+u30 — review loop integration
+gates, run 2026-07-16
+worktree: .bgsd/runs/bgsd-0002-cv-data-collection-funne/worktrees/unit-review-loop-integration-66cf
+branch:   bgsd-0002-cv-data-collection-funne/unit-review-loop-integration-66cf
+
+================================================================
+BUILD GATES
+================================================================
+npx tsc --noEmit : PASS (0 errors)
+npm run lint     : PASS (0 errors, 0 warnings)
+npm run build    : PASS
+
+  New routes, both correctly Dynamic:
+    ƒ /[locale]/admin/capture/[id]
+    ƒ /api/admin/capture/review
+    ƒ /api/capture/sessions/[id]/pump
+  Unchanged and still Dynamic:
+    ƒ /[locale]/collect/status/[id]     (rewritten in place; still ƒ, as u27's gates require)
+    ƒ /[locale]/admin/queue
+
+eslint-disable added by this unit: 1 (NOT zero — see HONEST GAPS below)
+
+================================================================
+NEW TESTS (this unit)
+================================================================
+node scripts/test-cv-apply.mjs                 : PASS  (27 checks)
+  Drives the real applyApprovedCaptureSession + real getSegments/getStats against
+  the real 535-segment demo collection, in local mode. Pins THE INVARIANT by
+  byte-comparing the audited segment's properties before/after, not by eyeballing:
+    before: {"id":"esc-sa-0001",...,"score_overall":73,"score_accessibility":74,
+             "score_drainage":71,"score_shade":72,"score_bike":15,...}
+    after : identical
+  Also: stats.segments stays 535 through approve / re-approve / untick / full
+  retraction; cvSessionsReviewed + cvSegments tally separately; km, coveragePct and
+  heroPct are untouched; the collection gains NO features; a null lens stays null.
+
+node scripts/verify-u30-review-loop.mjs        : PASS  (24 checks)
+  A real Chromium drive of the whole funnel in local mode (fixture, no database):
+    login guard → queue shows the camera walk → review page renders both rollups,
+    the cost readout and a 5-frame lazy filmstrip → approve 2 segments with a
+    reason → the walk leaves the queue → the map's SegmentDetail carries the CV
+    chip on a REAL audited segment → the contributor's status page says approved.
+  Notable assertions:
+    - the audited grid still reads 73/74/71/72/15 while the camera's own reading
+      (62.5 / 41) sits apart and disagrees. The invariant, visible.
+    - the camera's unsupported lens renders "—", not 0.
+    - overbudget and failed render as DIFFERENT things.
+    - the status page never shows token spend.
+  Playwright is deliberately NOT a package.json dependency (u27's precedent):
+    PLAYWRIGHT_MODULE=$(npx --yes playwright@1.56.0 …) node scripts/verify-u30-review-loop.mjs --base http://localhost:3560
+
+node scripts/test-capture-migrations.mjs       : PASS  (extended; +21 checks for 0017)
+  0017 is verified against a THROWAWAY PostGIS container on the real Supabase
+  image, not by inspection. It is NOT applied anywhere (the DB is shared; the
+  Conductor applies migrations). The suite caught two real defects in the SQL as
+  written, both fixed here:
+    1. the migration was not re-runnable (`create policy` has no IF NOT EXISTS)
+    2. (design) it now pins the prime invariant in SQL: approving a capture leaves
+       audits and observations at 0 rows.
+  It also proves: emit is idempotent under repeat (the pump's retry cannot
+  double-file a walk); every new RPC is secret-gated; a reason is mandatory in the
+  DATABASE, not just the UI; an unticked segment is retracted rather than left
+  published; the session-scoped claim takes only its OWN session's job and
+  provably cannot reach another session's frames; a cost_paused session is not
+  claimable, so polling cannot resurrect it.
+
+================================================================
+PRE-EXISTING REPO TESTS (regression, re-run on a clean tree)
+================================================================
+node scripts/test-apply-submissions.mjs        : PASS  (the 535 invariant holds)
+node scripts/test-parse-feature-props.mjs      : PASS  (touched by this unit)
+node scripts/test-submission-counts.mjs        : PASS
+node scripts/test-capture-rollup.mjs           : PASS
+node scripts/test-extraction-worker.mjs        : PASS  (extended: emit ordering + retry)
+
+  test-extraction-worker gained two checks that matter:
+    - the walk is filed into the queue BEFORE the review_ready latch
+    - a failed emit leaves the session `extracting`, and the next pump re-files it
+  Its fake db now injects emitSubmission. Without that, the suite would have been
+  appending to a developer's real data/pending-submissions.local.json on every run.
+
+  NOTE on test-apply-submissions: it refuses to run when local queue files exist
+  ("refusing to clobber a real local queue"). Run `node scripts/seed-u30-fixture.mjs
+  --clean` first. Its guard firing is the guard working, not a failure.
+
+================================================================
+SCREENSHOTS — .planning/evidence/u30/screenshots/ (19)
+================================================================
+Public surfaces, the full matrix (2 locales x 2 widths x 2 themes = 16):
+  u30-status-{en,es}-{390,1440}-{light,dark}.png
+  u30-segmentdetail-{en,es}-{390,1440}-{light,dark}.png
+Admin (EN, 1440, light — admin is not a public surface):
+  u30-01-queue-en-1440-light.png
+  u30-02-review-en-1440-light.png
+  u30-03-review-approved-en-1440-light.png
+
+================================================================
+i18n
+================================================================
+EN 622 keys / ES 622 keys : PARITY OK (key sets identical, asserted programmatically)
+No em dashes in copy      : PASS (the "—" unset data glyph and numeric ranges
+                            like "0–100" are the two deliberate exceptions)
+No ICU plural/select      : PASS (this codebase has none; plurals branch in TS)
+ES frame vocabulary       : unified to "cuadros".
+  My admin/detail keys originally said "fotogramas". The pre-existing collect
+  namespace (u27's recorder) says "cuadros" in 29 places, so MINE were the
+  outlier and were changed to match. One product, one word.
+
+================================================================
+NOT VERIFIED (honest gaps)
+================================================================
+1. MIGRATION 0017 IS NOT APPLIED. This unit wrote it and proved it against a
+   throwaway container; the live shared DB has not seen it. Until the Conductor
+   applies it, on a Supabase-configured deployment:
+     - capture_emit_submission does not exist, so rollupSession's emit THROWS and
+       the session correctly stays `extracting` and retries. No walk is lost, but
+       none reaches the queue either.
+     - the admin approve path's RPC does not exist; the apply falls back to the
+       local store (which is what lib/segments.ts actually reads today anyway).
+   Everything below the DB line is therefore verified in LOCAL MODE ONLY.
+
+2. NO LIVE-DB DRIVE. Deliberate. This worktree carries a .env.local with
+   credentials for the SHARED live database. Driving the funnel against it would
+   have written real rows and called RPCs that do not exist there yet. The env was
+   parked for the drive and restored byte-identically afterwards (verified with
+   cmp). The live path is exercised only against the throwaway container.
+
+3. ONE ESLINT-DISABLE, and prior units advertise "ZERO eslint-disable added
+   anywhere". components/admin/CaptureReview.tsx uses <img> for the filmstrip with
+   `// eslint-disable-next-line @next/next/no-img-element`. next/image would need a
+   per-deployment Supabase host allowlisted in next.config (remotePatterns is
+   static at build time; the URL is not) and would bill image transforms for an
+   internal admin thumbnail. The rule is a warning, so the alternative was leaving
+   lint unclean. Reversible in one line if the Conductor would rather.
+
+4. PRE-EXISTING CONSOLE ERROR, not fixed by this unit. Every page logs one
+   hydration mismatch on <html>'s className (font/theme classes, in LocaleLayout).
+   It reproduces on /[locale]/admin/import, which u30 never touched, so it predates
+   this work. The drive filters it BY PATTERN and reports the count (22) rather
+   than swallowing it. u30 itself introduces zero console errors.
+
+5. FRAMES ARE FIXTURE FRAMES. The filmstrip is verified against a local copy of
+   scripts/fixtures/street-san-antonio-escazu.jpg, not real Supabase bucket URLs
+   (there is no bucket in local mode). The URL-building path (publicFrameUrl) is
+   unchanged from u29 and is not re-proven here.
+
+6. NO MINI MAP on the contributor status page. The seed suggested one; it renders a
+   restrained matched-segment list instead. Pulling maplibre into that client island
+   was not worth the weight for a page whose job is "tell me where my walk is".
+
+7. THE SESSION-SCOPED PUMP IS NOT DRIVEN END-TO-END. Its SQL scoping, secret gate
+   and cost_paused refusal are proven against the container, and the status page's
+   pump-on-poll logic is code-reviewed, but no local-mode drive actually bills a
+   model. Local mode has no capture DB to pump, by design.

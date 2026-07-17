@@ -20,12 +20,14 @@ import { getSupabaseClient } from "./supabase";
 import {
   readCommunityReports,
   readCommunitySegments,
+  readCvObservations,
 } from "./community-store";
 import {
   LEY_7600_MIN_SCORE,
   SCORE_LAYERS,
   type CommunityReport,
   type CommunitySegment,
+  type CvObservation,
   type ScoreLayer,
   type SegmentCollection,
   type SegmentDetail,
@@ -208,14 +210,19 @@ async function liveScoreRows(id?: string): Promise<ScoreRow[] | null> {
  * Community layer (contract v3, u7) — applied contributions merged into the
  * read path. Community/import segments carry NO rubric scores; they render with
  * the neutral community casing and are excluded from the official stats.
+ *
+ * u30 adds a third record kind on identical terms: approved CV observations are
+ * ATTACHED to whatever feature they describe (audited or community) and are never
+ * folded into any score_* field. An audited segment with a camera pass over it
+ * keeps its audited scores exactly; it just also carries what the camera thought.
  * ------------------------------------------------------------------ */
 
-/** Group community reports by their target segment id. */
-function groupReports(
-  reports: CommunityReport[],
-): Map<string, CommunityReport[]> {
-  const byId = new Map<string, CommunityReport[]>();
-  for (const r of reports) {
+/** Group rows carrying a `segment_id` by that id. */
+function groupBySegment<T extends { segment_id: string }>(
+  rows: T[],
+): Map<string, T[]> {
+  const byId = new Map<string, T[]>();
+  for (const r of rows) {
     const list = byId.get(r.segment_id);
     if (list) list.push(r);
     else byId.set(r.segment_id, [r]);
@@ -227,6 +234,7 @@ function groupReports(
 function communitySegmentToFeature(
   cs: CommunitySegment,
   reportsBySegment: Map<string, CommunityReport[]>,
+  cvBySegment: Map<string, CvObservation[]>,
 ): SegmentFeature {
   return {
     type: "Feature",
@@ -245,25 +253,38 @@ function communitySegmentToFeature(
       verified: cs.verified,
       community_report: cs.community_report,
       community_reports: reportsBySegment.get(cs.id) ?? [],
+      cv_observations: cvBySegment.get(cs.id) ?? [],
     },
     geometry: { type: "LineString", coordinates: cs.coordinates },
   };
 }
 
 /**
- * Attach any community reports targeting an official (audited) feature, without
- * mutating the shared cached feature objects.
+ * Attach community reports and CV observations targeting an official (audited)
+ * feature, without mutating the shared cached feature objects.
+ *
+ * Copy-on-write is load-bearing: `features` may be the module-level
+ * demoCollectionCache, and mutating it would leak one request's community data
+ * into every later one.
  */
-function attachReports(
+function attachCommunity(
   features: SegmentFeature[],
   reportsBySegment: Map<string, CommunityReport[]>,
+  cvBySegment: Map<string, CvObservation[]>,
 ): SegmentFeature[] {
   return features.map((f) => {
-    const attached = reportsBySegment.get(f.properties.id);
-    if (!attached || attached.length === 0) return f;
+    const reports = reportsBySegment.get(f.properties.id);
+    const cv = cvBySegment.get(f.properties.id);
+    const hasReports = reports && reports.length > 0;
+    const hasCv = cv && cv.length > 0;
+    if (!hasReports && !hasCv) return f;
     return {
       ...f,
-      properties: { ...f.properties, community_reports: attached },
+      properties: {
+        ...f.properties,
+        ...(hasReports ? { community_reports: reports } : {}),
+        ...(hasCv ? { cv_observations: cv } : {}),
+      },
     };
   });
 }
@@ -278,13 +299,15 @@ function attachReports(
  * scores). Community reports are attached to their target features.
  */
 export async function getSegments(): Promise<SegmentCollection> {
-  const [community, reports] = await Promise.all([
+  const [community, reports, cvObservations] = await Promise.all([
     readCommunitySegments(),
     readCommunityReports(),
+    readCvObservations(),
   ]);
-  const reportsBySegment = groupReports(reports);
+  const reportsBySegment = groupBySegment(reports);
+  const cvBySegment = groupBySegment(cvObservations);
   const communityFeatures = community.map((cs) =>
-    communitySegmentToFeature(cs, reportsBySegment),
+    communitySegmentToFeature(cs, reportsBySegment, cvBySegment),
   );
 
   const live = await liveScoreRows();
@@ -296,7 +319,7 @@ export async function getSegments(): Promise<SegmentCollection> {
   return {
     type: "FeatureCollection",
     features: [
-      ...attachReports(officialFeatures, reportsBySegment),
+      ...attachCommunity(officialFeatures, reportsBySegment, cvBySegment),
       ...communityFeatures,
     ],
   };
@@ -389,8 +412,11 @@ export async function getStats(): Promise<StreetStats> {
   const demo = await readDemoCollection();
   const networkKm = demo.metadata?.network_km;
   // Community/import segments are counted separately; never folded into the
-  // official audited figure (contract v3, ruling 1).
+  // official audited figure (contract v3, ruling 1). Same for CV (u30).
   const communitySegments = (await readCommunitySegments()).length;
+  const cv = await readCvObservations();
+  const cvSessionsReviewed = new Set(cv.map((o) => o.session_id)).size;
+  const cvSegments = new Set(cv.map((o) => o.segment_id)).size;
 
   const live = await liveScoreRows();
   if (live && live.length > 0) {
@@ -407,6 +433,8 @@ export async function getStats(): Promise<StreetStats> {
           : 100,
       heroPct: Math.round((failing / live.length) * 100),
       communitySegments,
+      cvSessionsReviewed,
+      cvSegments,
     };
   }
 
@@ -423,5 +451,7 @@ export async function getStats(): Promise<StreetStats> {
       ? Math.round((failing / features.length) * 100)
       : 0,
     communitySegments,
+    cvSessionsReviewed,
+    cvSegments,
   };
 }
