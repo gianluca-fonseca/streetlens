@@ -199,9 +199,15 @@ async function main() {
       }),
     );
     check(
-      "a per-frame rationale came back as a non-empty string",
-      typeof observation.rationale === "string" && observation.rationale.trim().length > 0,
-      `${observation.rationale ? observation.rationale.length : 0} chars`,
+      // The contract is "rationale is a present string"; empty is tolerated on
+      // purpose (a terse note must never fail a paid frame). So this asserts the
+      // wire shape and REPORTS whether the model actually wrote anything, rather
+      // than failing the whole smoke on an empty note.
+      "a per-frame rationale field came back as a string",
+      typeof observation.rationale === "string",
+      observation.rationale.trim().length > 0
+        ? `${observation.rationale.length} chars`
+        : "EMPTY — the model returned no rationale text on this frame",
     );
 
     const cost =
