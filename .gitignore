@@ -72,3 +72,4 @@ data/pending-submissions.local.json
 !.bgsd/ledger.md
 !.bgsd/config.json
 .bgsd-tmp/
+.vercel
