@@ -34,7 +34,13 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".test-build-live-smoke");
-const FIXTURE = path.join(__dirname, "fixtures", "street-san-antonio-escazu.jpg");
+// The fixture is overridable so the same one real call can be pointed at either
+// the honest street photo (street-real.jpg) or the pulpería control image. A
+// path in SMOKE_FIXTURE (or argv[2]) wins; otherwise the historical default.
+const FIXTURE_OVERRIDE = process.env.SMOKE_FIXTURE || process.argv[2];
+const FIXTURE = FIXTURE_OVERRIDE
+  ? path.resolve(ROOT, FIXTURE_OVERRIDE)
+  : path.join(__dirname, "fixtures", "street-san-antonio-escazu.jpg");
 const require = createRequire(import.meta.url);
 
 const failures = [];
