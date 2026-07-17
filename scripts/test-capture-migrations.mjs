@@ -577,6 +577,74 @@ function main() {
       "approving a capture NEVER writes an audit (the prime invariant)",
       psql(`select (select count(*) from audits)::text || '|' || (select count(*) from observations)::text;`).trim() === "0|0",
     );
+
+    // Closing the review: session and queue row move together or not at all.
+    check(
+      "capture_close_review is secret-gated",
+      (psqlExpectError(`select capture_close_review('${cvSid}'::uuid, 'approve', 'looks right', 'nope');`) || "").includes("unauthorized"),
+    );
+    check(
+      "a reason is mandatory, in the database and not just the UI",
+      psqlExpectError(`select capture_close_review('${cvSid}'::uuid, 'approve', '   ', 'test-secret');`) !== null,
+    );
+    check(
+      "an invalid action is rejected",
+      psqlExpectError(`select capture_close_review('${cvSid}'::uuid, 'maybe', 'hmm', 'test-secret');`) !== null,
+    );
+    psql(`select capture_close_review('${cvSid}'::uuid, 'approve', 'two segments look right', 'test-secret');`);
+    check(
+      "closing stamps the session AND closes its queue row in one go",
+      psql(`select
+              (select status from capture_sessions where id='${cvSid}') || '|' ||
+              (select (reviewed_at is not null)::text from capture_sessions where id='${cvSid}') || '|' ||
+              (select status from submissions where id='${cvSub}') || '|' ||
+              (select reviewer_note from submissions where id='${cvSub}');`).trim()
+        === "approved|true|approved|two segments look right",
+    );
+
+    // The session-scoped claim. This is what lets a contributor's status page
+    // pump WITHOUT the admin secret, so its scoping is a security property.
+    const otherSid = psql(`select capture_create_session('live', 'iphash-other-cv');`).trim();
+    psql(`
+      insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
+      values ('${otherSid}'::uuid, 0, 'captures/${otherSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-z');
+      insert into capture_frame_jobs (frame_id)
+        select id from capture_frames where session_id='${otherSid}'::uuid;
+      update capture_sessions set status='extracting' where id='${otherSid}'::uuid;
+    `);
+    check(
+      "capture_claim_jobs_for_session is secret-gated",
+      (psqlExpectError(`select * from capture_claim_jobs_for_session('${otherSid}'::uuid, 5, 'nope');`) || "").includes("unauthorized"),
+    );
+    const mineSid = psql(`select capture_create_session('live', 'iphash-mine-cv');`).trim();
+    psql(`
+      insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
+      values ('${mineSid}'::uuid, 0, 'captures/${mineSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-y');
+      insert into capture_frame_jobs (frame_id)
+        select id from capture_frames where session_id='${mineSid}'::uuid;
+      update capture_sessions set status='extracting' where id='${mineSid}'::uuid;
+    `);
+    const claimedForMine = psql(
+      `select count(*) from capture_claim_jobs_for_session('${mineSid}'::uuid, 5, 'test-secret');`,
+    ).trim();
+    check(
+      "the scoped claim takes MY session's job",
+      claimedForMine === "1",
+      `claimed=${claimedForMine}`,
+    );
+    check(
+      "and it CANNOT reach another session's frames — the whole point of the route",
+      psql(`select status from capture_frame_jobs j
+             join capture_frames f on f.id=j.frame_id
+             where f.session_id='${otherSid}'::uuid;`).trim() === "pending",
+    );
+    check(
+      "a cost_paused session is not claimable, so polling cannot resurrect it",
+      (() => {
+        psql(`update capture_sessions set status='cost_paused' where id='${otherSid}'::uuid;`);
+        return psql(`select count(*) from capture_claim_jobs_for_session('${otherSid}'::uuid, 5, 'test-secret');`).trim() === "0";
+      })(),
+    );
     psql(`delete from capture_sessions where id='${cvSid}';`);
     check(
       "deleting a session cascades to its CV observations",

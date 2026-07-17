@@ -23,6 +23,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getSupabaseClient } from "@/lib/supabase";
 import { publicFrameUrl } from "./storage";
+import { readCaptureReviewOverlay } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
 
 const FIXTURE_PATH = path.join(
@@ -227,7 +228,18 @@ export async function getSessionReview(
 
   const fixture = await readFixture();
   const found = fixture.find((s) => s.sessionId === sessionId);
-  return found ? toReview(found, "fixture") : null;
+  if (!found) return null;
+
+  // The fixture is immutable base data; decisions live in an overlay, exactly as
+  // lib/submissions.ts does for the local queue. Without this a locally-approved
+  // session would still read `review_ready` and could be approved forever.
+  const overlay = await readCaptureReviewOverlay();
+  const decision = overlay[sessionId];
+  const withDecision: ReviewPayload = decision
+    ? { ...found, status: decision.status, reviewedAt: decision.reviewed_at }
+    : found;
+
+  return toReview(withDecision, "fixture");
 }
 
 /** Session ids present in the fixture. Empty in a live deployment. */

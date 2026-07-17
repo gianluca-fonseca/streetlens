@@ -54,6 +54,11 @@ export type PumpDeps = {
   prepareImage?: ImagePreparer;
   /** Injectable so tests assert the queue emit without writing a real queue file. */
   emitSubmission?: (sessionId: string) => Promise<void>;
+  /**
+   * Claim only this session's jobs (u30). Set by the contributor's session-scoped
+   * pump; unset by the cron and after(), which drain the whole queue.
+   */
+  sessionId?: string;
   limit?: number;
   concurrency?: number;
 };
@@ -95,7 +100,11 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
   const batch = deps?.limit ?? PUMP_BATCH_SIZE;
   const concurrency = deps?.concurrency ?? PUMP_CONCURRENCY;
 
-  const jobs = await db.claimJobs(batch);
+  // Scoped claim for the contributor's pump-on-poll; the global claim for the
+  // cron and after(). A link-holder may only ever move their own walk forward.
+  const jobs = deps?.sessionId
+    ? await db.claimJobsForSession(deps.sessionId, batch)
+    : await db.claimJobs(batch);
   if (jobs.length === 0) {
     await rollupDrainedSessions(db, emitSubmission);
     return emptyResult(await db.pendingJobCount().catch(() => 0));

@@ -16,7 +16,7 @@ Starting public.ecr.aws/supabase/postgres:17.6.1.143...
   [ok ] submissions accepts unknown (the honeypot landing place)
   [ok ] submissions still rejects a garbage type
   [ok ] the two original types still work (manual flow unchanged)
-  [ok ] capture_create_session returns a session uuid fa54fc9a-11ce-4ebd-967d-685257b81b65
+  [ok ] capture_create_session returns a session uuid 861942a1-326a-4ee6-8ac9-203c3f332b29
   [ok ] a new session starts at pending_upload
   [ok ] an invalid mode is rejected
   [ok ] a 4th session from one origin within the hour is rate_limited IN THE DATABASE
@@ -71,6 +71,14 @@ Starting public.ecr.aws/supabase/postgres:17.6.1.143...
   [ok ] retraction is scoped to its own session
   [ok ] an out-of-range CV score is rejected by the CHECK
   [ok ] approving a capture NEVER writes an audit (the prime invariant)
+  [ok ] capture_close_review is secret-gated
+  [ok ] a reason is mandatory, in the database and not just the UI
+  [ok ] an invalid action is rejected
+  [ok ] closing stamps the session AND closes its queue row in one go
+  [ok ] capture_claim_jobs_for_session is secret-gated
+  [ok ] the scoped claim takes MY session's job claimed=1
+  [ok ] and it CANNOT reach another session's frames — the whole point of the route
+  [ok ] a cost_paused session is not claimable, so polling cannot resurrect it
   [ok ] deleting a session cascades to its CV observations
   [ok ] deleting a session cascades to frames, jobs, observations and rollups
   [ok ] the owner CAN see the session (so the next check is not vacuous)

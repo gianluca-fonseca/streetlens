@@ -125,6 +125,77 @@ create policy community_cv_observations_public_read
   for select to anon, authenticated
   using (true);
 
+-- 2b. Session-scoped claim (for the contributor's pump-on-poll) --------------
+--
+-- capture_claim_jobs_with_frames (0015) claims across the WHOLE queue, which is
+-- right for the cron and wrong for a contributor: the note in
+-- app/api/capture/pump/route.ts rules that if client-driven pumping is ever
+-- needed it "wants a separate route scoped and rate limited to one session by its
+-- uuid, never this one opened up". This is the claim that route stands on, so a
+-- link-holder can only ever move their OWN walk forward.
+--
+-- Identical locking to 0015 (FOR UPDATE SKIP LOCKED), so this racing the cron is
+-- ordinary and still never double-bills a frame. Same `s.status = 'extracting'`
+-- and `f.segment_id is not null` guards: a paused or unattributed session is not
+-- claimable here either, so polling cannot resurrect a cost-paused walk.
+
+create or replace function capture_claim_jobs_for_session(
+  p_session_id uuid,
+  p_limit      integer,
+  p_secret     text
+) returns table (
+  job_id        uuid,
+  frame_id      uuid,
+  attempts      integer,
+  session_id    uuid,
+  seq           integer,
+  storage_path  text,
+  segment_id    text,
+  near_junction boolean
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_expected text;
+begin
+  select value into v_expected from app_secrets where key = 'admin_rpc_secret';
+  if v_expected is null or p_secret is null or p_secret <> v_expected then
+    raise exception 'unauthorized';
+  end if;
+
+  return query
+  with claimed as (
+    select j.id
+      from capture_frame_jobs j
+      join capture_frames f   on f.id = j.frame_id
+      join capture_sessions s on s.id = f.session_id
+     where j.status = 'pending'
+       and s.status = 'extracting'
+       and f.segment_id is not null
+       and s.id = p_session_id
+     order by j.created_at
+     limit greatest(coalesce(p_limit, 1), 1)
+     for update of j skip locked
+  ),
+  taken as (
+    update capture_frame_jobs j
+       set status     = 'running',
+           attempts   = j.attempts + 1,
+           claimed_at = now(),
+           updated_at = now()
+      from claimed
+     where j.id = claimed.id
+    returning j.id as job_id, j.frame_id, j.attempts
+  )
+  select t.job_id, t.frame_id, t.attempts,
+         f.session_id, f.seq, f.storage_path, f.segment_id, f.near_junction
+    from taken t
+    join capture_frames f on f.id = t.frame_id;
+end;
+$$;
+
 -- 3. The admin review read --------------------------------------------------
 -- Everything the review page needs, in one gated round trip.
 --
@@ -319,11 +390,73 @@ begin
 end;
 $$;
 
+-- 5. Close the review --------------------------------------------------------
+-- Stamp the session AND close its queue row, in one transaction.
+--
+-- Together, because they are one decision. Two round trips could half-succeed and
+-- leave a session `approved` while its cv_capture row sat pending forever (or the
+-- reverse), and the queue and the session would then disagree about a walk with
+-- no way to tell which was right.
+--
+-- The submission is found by payload->>'session_id' rather than passed in, so the
+-- caller cannot close the wrong row: SECURITY DEFINER can see submissions, but
+-- application code cannot (0006 grants anon INSERT and no SELECT), which is
+-- exactly why this lives here.
+
+create or replace function capture_close_review(
+  p_session_id uuid,
+  p_action     text,
+  p_reason     text,
+  p_secret     text
+) returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_expected text;
+  v_status   text;
+begin
+  select value into v_expected from app_secrets where key = 'admin_rpc_secret';
+  if v_expected is null or p_secret is null or p_secret <> v_expected then
+    raise exception 'unauthorized';
+  end if;
+
+  if p_action not in ('approve', 'reject') then
+    raise exception 'invalid action: %', p_action;
+  end if;
+  if p_reason is null or length(trim(p_reason)) = 0 then
+    raise exception 'a reason is required';
+  end if;
+
+  v_status := case when p_action = 'approve' then 'approved' else 'rejected' end;
+
+  update capture_sessions
+     set status      = v_status,
+         reviewed_at = now()
+   where id = p_session_id;
+  if not found then
+    raise exception 'session not found';
+  end if;
+
+  update submissions
+     set status        = v_status,
+         reviewed_at   = now(),
+         reviewer_note = trim(p_reason)
+   where type = 'cv_capture'
+     and payload ->> 'session_id' = p_session_id::text;
+end;
+$$;
+
 -- Secret-gated, not role-gated: callable by anon/authenticated but each function
 -- enforces the admin secret internally (the deployment has no service role).
 revoke all on function capture_emit_submission(uuid, text) from public;
+revoke all on function capture_claim_jobs_for_session(uuid, integer, text) from public;
 revoke all on function capture_session_review(uuid, text) from public;
+revoke all on function capture_close_review(uuid, text, text, text) from public;
 revoke all on function admin_apply_capture_session(text, uuid, uuid, jsonb) from public;
 grant execute on function capture_emit_submission(uuid, text) to anon, authenticated;
+grant execute on function capture_claim_jobs_for_session(uuid, integer, text) to anon, authenticated;
 grant execute on function capture_session_review(uuid, text) to anon, authenticated;
+grant execute on function capture_close_review(uuid, text, text, text) to anon, authenticated;
 grant execute on function admin_apply_capture_session(text, uuid, uuid, jsonb) to anon, authenticated;

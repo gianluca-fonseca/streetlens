@@ -137,6 +137,11 @@ export interface CaptureDb {
   attributeFrames(sessionId: string, attributions: FrameAttributionWrite[]): Promise<number>;
   failUnattributedJobs(sessionId: string): Promise<number>;
   claimJobs(limit: number): Promise<ClaimedJob[]>;
+  /**
+   * Claim jobs belonging to ONE session (u30). Backs the contributor's
+   * pump-on-poll, which must never be able to drive the whole queue.
+   */
+  claimJobsForSession(sessionId: string, limit: number): Promise<ClaimedJob[]>;
   completeJob(args: CompleteJobArgs): Promise<void>;
   failJob(frameId: string, status: "failed" | "failed_overbudget" | "pending", error: string): Promise<void>;
   sessionTokenUsage(sessionId: string): Promise<TokenUsage>;
@@ -262,6 +267,16 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
     async claimJobs(limit) {
       return (
         (await rpc<ClaimedJob[]>("capture_claim_jobs_with_frames", {
+          p_limit: limit,
+          p_secret: adminSecret(),
+        })) ?? []
+      );
+    },
+
+    async claimJobsForSession(sessionId, limit) {
+      return (
+        (await rpc<ClaimedJob[]>("capture_claim_jobs_for_session", {
+          p_session_id: sessionId,
           p_limit: limit,
           p_secret: adminSecret(),
         })) ?? []

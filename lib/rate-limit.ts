@@ -40,6 +40,15 @@ export const RATE_LIMITS = {
   submissions: RATE_LIMIT,
   /** Capture sessions: 3 per hour per origin. Mirrored by 0013's DB-side check. */
   capture: { capacity: 3, refillWindowMs: 3_600_000 },
+  /**
+   * Session-scoped pump-on-poll (u30): 6 per minute per session.
+   *
+   * Keyed by session uuid rather than IP on purpose — the thing being protected
+   * is one walk's extraction budget, and a contributor on mobile can change IP
+   * mid-poll. The status page polls every ~20s (3/min), so this leaves room for a
+   * reload without ever letting a held-open tab spin the queue.
+   */
+  capturePump: { capacity: 6, refillWindowMs: 60_000 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 export type RateLimitNamespace = keyof typeof RATE_LIMITS;
