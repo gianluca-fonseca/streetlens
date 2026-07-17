@@ -120,7 +120,7 @@ export default function LiveRecorder() {
           durable={durable}
           paused={phase === "paused"}
           onStop={stop}
-          onResume={resume}
+          onResume={() => void resume()}
         />
       ) : null}
 

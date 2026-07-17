@@ -171,7 +171,7 @@ export function useRecorder() {
     phaseRef.current = phase;
   }, [phase]);
 
-  const camera = useCamera();
+  const { state: cameraState, start: startCamera, stop: stopCamera } = useCamera();
   const isRecording = phase === "recording";
   const wakeLock = useWakeLock(isRecording || phase === "paused");
 
@@ -225,14 +225,62 @@ export function useRecorder() {
     });
   }, []);
 
+  /**
+   * The one way a walk ends.
+   *
+   * Every close-out path goes through here (the stop button, the frame cap, the
+   * duration cap, a full disk), because each of them has to do the same four
+   * things and it is the paths that skipped them that went wrong: close the open
+   * segment and stamp the end, snapshot the track for the review map, RELEASE THE
+   * CAMERA, and persist. A cap that ended the walk but left the camera live and
+   * the manifest saying `phase: "recording"` is exactly the bug this collapses.
+   */
+  const finishSession = useCallback(() => {
+    const manifest = manifestRef.current;
+    if (manifest) {
+      const at = Date.now();
+      const closed = closeSegment(manifest, at);
+      closed.endedAt = at;
+      closed.phase = "ready_to_upload";
+      manifestRef.current = closed;
+      setReviewTrack([...closed.track]);
+      void storeRef.current?.putManifest(closed).catch(() => undefined);
+    }
+    stopCamera();
+    publishStats();
+    setPhase("review");
+  }, [publishStats, stopCamera]);
+
   // The elapsed clock and the drop tallies would otherwise only move when a
   // frame is kept, which on a stationary phone is never. A 1 Hz tick keeps the
   // HUD honest without re-rendering per video frame.
+  //
+  // The duration cap is enforced here rather than in the frame pipeline for the
+  // same reason. It exists precisely for the walk where frames are NOT being
+  // kept, so checking it only after a keep means a phone in a pocket drops every
+  // frame, never reaches the check, and records forever with the wake lock held.
   useEffect(() => {
     if (phase !== "recording") return;
-    const id = window.setInterval(publishStats, 1_000);
+
+    const tick = () => {
+      publishStats();
+      const manifest = manifestRef.current;
+      if (!manifest) return;
+      const cap = sessionCapReached({
+        frameCount: manifest.frames.length,
+        startedAt: manifest.startedAt,
+        now: Date.now(),
+        maxFrames: CAPTURE_LIMITS.maxFrames,
+      });
+      if (cap) {
+        setCapReason(cap);
+        finishSession();
+      }
+    };
+
+    const id = window.setInterval(tick, 1_000);
     return () => window.clearInterval(id);
-  }, [phase, publishStats]);
+  }, [phase, publishStats, finishSession]);
 
   /* ---------------------------------------------------------------- *
    * The frame pipeline
@@ -321,10 +369,14 @@ export function useRecorder() {
           // Out of room. Stop cleanly with what we have rather than spinning on
           // failing writes; the walk so far is still uploadable.
           setStorageFull(true);
-          setPhase("review");
+          finishSession();
           return;
         }
-        throw error;
+        // Anything else: lose the frame, say so in the ledger, keep walking. A
+        // single bad write is not a reason to end someone's walk, but it is a
+        // reason the review screen must be able to name.
+        tallyDrop("write_failed");
+        return;
       }
 
       // Only recorded once the bytes are safely down. If the write failed we
@@ -346,10 +398,10 @@ export function useRecorder() {
       });
       if (cap) {
         setCapReason(cap);
-        setPhase("review");
+        finishSession();
       }
     },
-    [encodeFrame, publishStats, tallyDrop],
+    [encodeFrame, finishSession, publishStats, tallyDrop],
   );
 
   const handleFrame = useCallback(
@@ -377,9 +429,14 @@ export function useRecorder() {
       }
 
       encodingRef.current = true;
-      void keepFrame(video, now, fix as TrackPoint, verdict.blurScore).finally(() => {
-        encodingRef.current = false;
-      });
+      // keepFrame owns its own failures, but an unforeseen throw here would be an
+      // unhandled rejection once per frame, which in dev buries the HUD under the
+      // error overlay and in prod is silent. Terminate the chain explicitly.
+      void keepFrame(video, now, fix as TrackPoint, verdict.blurScore)
+        .catch(() => tallyDrop("write_failed"))
+        .finally(() => {
+          encodingRef.current = false;
+        });
     },
     [grayFromVideo, keepFrame, tallyDrop],
   );
@@ -399,6 +456,10 @@ export function useRecorder() {
       // Flush immediately. A tab that is hidden may never get another chance to
       // run our code before iOS discards it.
       void storeRef.current?.putManifest(manifestRef.current);
+      // Actually release the camera, because that is what we tell the walker has
+      // happened. Holding the track while backgrounded leaves the OS recording
+      // indicator lit over another app, which would make the copy a lie.
+      stopCamera();
       setPhase("paused");
     };
 
@@ -415,7 +476,7 @@ export function useRecorder() {
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("pagehide", pause);
     };
-  }, [phase]);
+  }, [phase, stopCamera]);
 
   /* ---------------------------------------------------------------- *
    * Commands
@@ -424,11 +485,13 @@ export function useRecorder() {
     const store = storeRef.current;
     if (!store) return;
 
-    // Failure surfaces through camera.state, which the start screen reads; there
-    // is no stream to assert on here because the component attaches it on the
-    // next render. The frame clock simply yields nothing until the element has
-    // data, so starting the session optimistically costs nothing.
-    await camera.start();
+    // A refused camera must NOT become a session. Entering "recording" anyway
+    // unmounts the start screen, which is the only place the camera error is
+    // rendered, leaving the walker on a black preview with a live REC dot and a
+    // frame counter pinned at zero. So gate on the settled state the call
+    // returns, not on `cameraState`, which is still last render's value here.
+    const result = await startCamera();
+    if (result.status !== "ready") return;
 
     const now = Date.now();
     const manifest = createManifest(crypto.randomUUID(), now);
@@ -442,12 +505,19 @@ export function useRecorder() {
     setUploadFailure(null);
     await store.putManifest(manifest);
     setPhase("recording");
-  }, [camera]);
+  }, [startCamera]);
 
   /** Resume after backgrounding, on a NEW sub-segment. */
-  const resume = useCallback(() => {
+  const resume = useCallback(async () => {
     const manifest = manifestRef.current;
     if (!manifest) return;
+    // The camera was released on pause, so re-acquire it. This runs from the
+    // walker's tap, which is the gesture iOS requires.
+    const result = await startCamera();
+    if (result.status !== "ready") {
+      finishSession();
+      return;
+    }
     manifestRef.current = openSegment(manifest, Date.now());
     // The gate's memory of where we were is stale by however long the phone was
     // in a pocket. Clearing it lets the first frame back through immediately
@@ -455,22 +525,9 @@ export function useRecorder() {
     gateRef.current = { lastKeptT: null, lastKeptPosition: null, prevGray: null };
     void storeRef.current?.putManifest(manifestRef.current);
     setPhase("recording");
-  }, []);
+  }, [finishSession, startCamera]);
 
-  const stop = useCallback(() => {
-    const manifest = manifestRef.current;
-    if (manifest) {
-      const closed = closeSegment(manifest, Date.now());
-      closed.endedAt = Date.now();
-      closed.phase = "ready_to_upload";
-      manifestRef.current = closed;
-      setReviewTrack([...closed.track]);
-      void storeRef.current?.putManifest(closed);
-    }
-    camera.stop();
-    publishStats();
-    setPhase("review");
-  }, [camera, publishStats]);
+  const stop = finishSession;
 
   const discard = useCallback(async () => {
     const manifest = manifestRef.current;
@@ -565,7 +622,7 @@ export function useRecorder() {
     uploadFailure,
     sessionId,
     accuracyWarning,
-    camera: camera.state,
+    camera: cameraState,
     geo: geo.state,
     wakeLock,
     unsupportedReason: unsupportedReason(),

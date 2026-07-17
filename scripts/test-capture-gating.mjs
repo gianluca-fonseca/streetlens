@@ -329,9 +329,23 @@ function main() {
     G.DROP_REASONS.every((r) => counts[r] === 0) &&
       Object.keys(counts).length === G.DROP_REASONS.length,
   );
+  // Both are tallied by the recorder rather than returned by the gate: one is
+  // only knowable after encoding, the other after touching the disk. They still
+  // have to be declared, because the review screen renders every reason and an
+  // undeclared one would surface as a missing i18n key.
   check(
     "oversize is a declared reason even though the gate never returns it",
     G.DROP_REASONS.includes("oversize"),
+  );
+  check(
+    "write_failed is a declared reason even though the gate never returns it",
+    G.DROP_REASONS.includes("write_failed"),
+  );
+  check(
+    "no gate path can return a recorder-only reason",
+    !["oversize", "write_failed"].includes(
+      G.evaluateFrame({ now: 1_000, position: null, gray: sharp, graySize: SIZE }, FRESH).reason,
+    ),
   );
 
   /* ---------------- Session manifest ---------------- */

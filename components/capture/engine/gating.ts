@@ -25,10 +25,11 @@ import { CAPTURE_TUNING, type CaptureTuning } from "@/components/capture/engine/
  * - `duplicate` — visually identical to the previous frame.
  * - `blurry` — too soft to score.
  * - `oversize` — encoded past the storage contract's per-frame byte ceiling.
+ * - `write_failed` — could not be written to storage.
  *
- * `oversize` is the one reason `evaluateFrame` never returns: it is only knowable
- * after JPEG encoding, so the recorder tallies it. Drop reasons are a session
- * ledger, not solely gate output.
+ * The last two are never returned by `evaluateFrame`: they are only knowable
+ * after encoding and after touching the disk, so the recorder tallies them.
+ * Drop reasons are a session ledger, not solely gate output.
  */
 export type DropReason =
   | "no_fix"
@@ -36,7 +37,8 @@ export type DropReason =
   | "displacement"
   | "duplicate"
   | "blurry"
-  | "oversize";
+  | "oversize"
+  | "write_failed";
 
 export const DROP_REASONS: readonly DropReason[] = [
   "no_fix",
@@ -45,12 +47,21 @@ export const DROP_REASONS: readonly DropReason[] = [
   "duplicate",
   "blurry",
   "oversize",
+  "write_failed",
 ] as const;
 
 export type DropCounts = Record<DropReason, number>;
 
 export function emptyDropCounts(): DropCounts {
-  return { no_fix: 0, cadence: 0, displacement: 0, duplicate: 0, blurry: 0, oversize: 0 };
+  return {
+    no_fix: 0,
+    cadence: 0,
+    displacement: 0,
+    duplicate: 0,
+    blurry: 0,
+    oversize: 0,
+    write_failed: 0,
+  };
 }
 
 /**

@@ -9,11 +9,11 @@ npm run build               : PASS
   all 5 pre-existing capture API routes still registered dynamic (untouched)
 
 New tests (this unit):
-  test-capture-gating.mjs         PASS  60 checks — haversine vs an independent
+  test-capture-gating.mjs         PASS  62 checks — haversine vs an independent
                                         reference, the both-gates rule, the lazy-gray
                                         perf contract, dedupe, blur, session caps,
                                         drop tallies, segments, manifest guards.
-  verify-u27-recorder.mjs         PASS  21 checks — real Chromium, real fake camera
+  verify-u27-recorder.mjs         PASS  23 checks — real Chromium, real fake camera
                                         device (--use-fake-device-for-media-stream),
                                         scripted GPS walk through Escazú at 390px.
 
@@ -29,7 +29,7 @@ Pre-existing repo tests (regression — manual flow and contracts untouched):
   test-capture-migrations.mjs     PASS
   test-import-dryrun.mjs          PASS
 
-Playwright drive (next start :3145), all 21 green:
+Playwright drive (next start :3145), all 23 green:
   start -> record -> stop -> review -> upload -> done -> status, EN + ES, light + dark.
   7 frames captured from a real decoded MediaStream over a ~60 m scripted walk.
   OPFS probed via page.evaluate mid-walk: 7 manifest frames / 7 .jpg files / 7 fixes.
@@ -59,3 +59,31 @@ NOT verified (honest gaps — see MANUAL-VERIFY.md):
     network layer. Request shape exercised; the bucket's RLS policy is not.
   - Live end-to-end against real /api/capture routes: they are 501 stubs owned by
     the ingest unit, landing this same wave. Proven at the wave boundary, not here.
+
+POST-REVIEW FIXES (adversarial review of the u27 diff; 7 real bugs found and fixed,
+commit 0a1c2f3 — each was a path the gates could not see):
+  1. A refused camera still entered "recording", unmounting the only screen that
+     renders the camera error. Walker saw a black preview, a live REC dot and a
+     frozen frame count with no explanation. useCamera.start now RETURNS its
+     settled state and start() refuses to open a session without a stream.
+     Regression check added to the drive (path C).
+  2. The camera was never released on either auto-stop path, so hitting the
+     400-frame cap (the normal end of a long walk) left the recording indicator
+     lit through review, upload and done.
+  3. The 30-minute duration cap could never fire: it was only checked after a
+     frame was KEPT, and it exists precisely for the walk where frames are not
+     being kept. A phone in a pocket recorded forever holding the wake lock.
+     Now enforced on the 1 Hz tick.
+  4. Auto-stop never snapshotted the track, so a capped walk reached review with
+     a blank map contradicting its own "N GPS fixes" stat.
+  5. QuotaExceededError was masked: `finally { close() }` on an errored stream
+     rejects with its own TypeError and replaces the pending exception, so the
+     storage-full state was unreachable dead code. Now aborts and rethrows.
+  6. keepFrame produced one unhandled rejection per kept frame on any write
+     error. Now terminates the chain and tallies a new honest "write_failed" drop
+     reason instead of failing silently.
+  7. discard() bypassed the write queue and could race a pending putManifest into
+     resurrecting a manifest whose frame bytes were gone, offering a recovery
+     that recovers nothing. Now queued like every other write.
+  (1)-(4) and (7) collapse into one finishSession() close-out path, since every
+  one of them was a path that skipped a step stop() already did correctly.

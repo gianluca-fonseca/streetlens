@@ -1,4 +1,4 @@
-u27 recorder verification — 2026-07-17T02:32:41.674Z
+u27 recorder verification — 2026-07-17T02:43:31.569Z
 base: http://localhost:3145
 chromium: fake media device + fake media UI; geolocation scripted over Escazú
 
@@ -17,6 +17,8 @@ PASS  a 501 surfaces as the honest backend-not-live state
 PASS  the retry affordance is offered after a failed upload
 PASS  frames stay in OPFS after a failed upload  (1 session(s))
 PASS  an unfinished walk is offered for recovery after a reload
+PASS  a failed camera does not start a session
+PASS  a failed camera stays on the start screen and says why
 PASS  en start screen renders in light
 PASS  en start screen renders in dark
 PASS  es start screen renders in light

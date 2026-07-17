@@ -742,7 +742,8 @@
       "displacement": "El teléfono no se había movido lo suficiente",
       "duplicate": "La misma imagen que el cuadro anterior",
       "blurry": "Muy borroso para calificar",
-      "oversize": "Muy grande para guardar"
+      "oversize": "Muy grande para guardar",
+      "write_failed": "No se pudo guardar"
     },
     "status": {
       "meta": {

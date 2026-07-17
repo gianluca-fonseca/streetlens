@@ -88,8 +88,19 @@ class OpfsStore implements CaptureStore {
     const stream = await handle.createWritable();
     try {
       await stream.write(data);
-    } finally {
       await stream.close();
+    } catch (error) {
+      // NOT a `finally { close() }`. Once a write has errored the stream is
+      // errored too, and closing it rejects with its own TypeError, which would
+      // replace the pending exception and throw away the reason. That reason is
+      // usually QuotaExceededError, i.e. exactly the one the recorder branches
+      // on to stop the walk cleanly. Abort instead, and rethrow the original.
+      try {
+        await stream.abort();
+      } catch {
+        // Already errored or already closing. The original throw is what matters.
+      }
+      throw error;
     }
   }
 
@@ -147,13 +158,21 @@ class OpfsStore implements CaptureStore {
     return frames;
   }
 
-  async discard(localId: string): Promise<void> {
-    const captures = await this.root.getDirectoryHandle(ROOT_DIR, { create: true });
-    try {
-      await captures.removeEntry(localId, { recursive: true });
-    } catch {
-      // Already gone is the desired end state.
-    }
+  /**
+   * Queued like every other write. Deleting out of band would race a pending
+   * `putManifest`, whose `create: true` would resurrect the directory with a
+   * manifest listing frames whose bytes are gone. That resurrected walk would
+   * then be offered back on the next visit and recover into nothing.
+   */
+  discard(localId: string): Promise<void> {
+    return this.enqueue(async () => {
+      const captures = await this.root.getDirectoryHandle(ROOT_DIR, { create: true });
+      try {
+        await captures.removeEntry(localId, { recursive: true });
+      } catch {
+        // Already gone is the desired end state.
+      }
+    });
   }
 }
 

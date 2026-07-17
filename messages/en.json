@@ -742,7 +742,8 @@
       "displacement": "Phone had not moved far enough",
       "duplicate": "Same picture as the frame before",
       "blurry": "Too blurry to score",
-      "oversize": "Too large to store"
+      "oversize": "Too large to store",
+      "write_failed": "Could not be saved"
     },
     "status": {
       "meta": {

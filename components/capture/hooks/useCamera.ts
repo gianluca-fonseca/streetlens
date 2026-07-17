@@ -81,15 +81,23 @@ export function useCamera() {
     setState({ status: "idle" });
   }, []);
 
-  const start = useCallback(async () => {
-    if (!isSecureCameraContext()) {
-      setState({ status: "error", reason: "insecure_context" });
-      return;
-    }
-    if (!isCameraSupported()) {
-      setState({ status: "error", reason: "unsupported" });
-      return;
-    }
+  /**
+   * Returns the state it settled on, as well as storing it.
+   *
+   * The caller needs the answer NOW, not on the next render: `useRecorder.start`
+   * has to decide whether a session may begin at all, and reading `state` there
+   * would read the previous render's value and start recording from a camera
+   * that was just refused.
+   */
+  const start = useCallback(async (): Promise<CameraState> => {
+    const fail = (reason: CameraErrorReason): CameraState => {
+      const next: CameraState = { status: "error", reason };
+      setState(next);
+      return next;
+    };
+
+    if (!isSecureCameraContext()) return fail("insecure_context");
+    if (!isCameraSupported()) return fail("unsupported");
 
     setState({ status: "starting" });
 
@@ -110,12 +118,10 @@ export function useCamera() {
             audio: false,
           });
         } catch (retryError) {
-          setState({ status: "error", reason: classify(retryError) });
-          return;
+          return fail(classify(retryError));
         }
       } else {
-        setState({ status: "error", reason: classify(error) });
-        return;
+        return fail(classify(error));
       }
     }
 
@@ -125,12 +131,14 @@ export function useCamera() {
     // a promise, and every frame's recorded width/height must be what the sensor
     // gave us rather than what we asked for.
     const settings = stream.getVideoTracks()[0]?.getSettings();
-    setState({
+    const next: CameraState = {
       status: "ready",
       stream,
       width: settings?.width ?? 0,
       height: settings?.height ?? 0,
-    });
+    };
+    setState(next);
+    return next;
   }, []);
 
   // Releasing the camera on unmount is not politeness, it is the difference

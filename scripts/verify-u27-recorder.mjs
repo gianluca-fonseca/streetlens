@@ -274,6 +274,45 @@ async function main() {
   await shoot(stubPage, "u27-07-recover-en-390-light");
   await stub.close();
 
+  /* ---------- Path C: a camera we cannot have ---------- */
+
+  // Regression for the worst bug review found: start() used to enter "recording"
+  // regardless of whether the camera opened. That unmounts the start screen,
+  // which is the ONLY place the camera error renders, so a walker who refused the
+  // prompt got a black preview, a live REC dot, a running clock and a frame count
+  // pinned at zero, with nothing telling them why.
+  //
+  // No --use-fake-ui-for-media-stream here and no camera permission, so
+  // getUserMedia genuinely fails. (Headless Chromium reports this as an
+  // unclassified failure rather than NotAllowedError, hence the loose assertion
+  // on the error block rather than on the "denied" copy specifically.)
+  {
+    const denied = await chromium.launch({ args: ["--use-fake-device-for-media-stream"] });
+    const deniedCtx = await denied.newContext({
+      ...devices["iPhone 13"],
+      locale: "en",
+      permissions: ["geolocation"],
+      geolocation: { latitude: START.lat, longitude: START.lng, accuracy: 8 },
+    });
+    const deniedPage = await deniedCtx.newPage();
+    await deniedPage.goto(`${BASE}/en/collect`, { waitUntil: "networkidle" });
+    await deniedPage.getByText("Start recording").click();
+    await deniedPage.waitForTimeout(2_500);
+
+    check(
+      "a failed camera does not start a session",
+      !(await deniedPage.getByText("REC", { exact: true }).isVisible().catch(() => false)) &&
+        !(await deniedPage.getByText("Stop", { exact: true }).isVisible().catch(() => false)),
+    );
+    check(
+      "a failed camera stays on the start screen and says why",
+      (await deniedPage.getByText("Start recording").isVisible()) &&
+        /camera/i.test(await deniedPage.locator("body").innerText()),
+    );
+    await shoot(deniedPage, "u27-09-camera-denied-en-390-light");
+    await denied.close();
+  }
+
   /* ---------- Locale + theme sweep ---------- */
 
   for (const [locale, marker] of [
