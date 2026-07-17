@@ -11,11 +11,11 @@
  * alternative is no frames at all.
  *
  * The sampling decision is NOT re-made here. `planExtraction` and
- * `sampleTargetsMs` are imported from the WebCodecs path so the two produce the
- * same targets from the same duration, and so does the encode: same
- * `fitDimensions`, same JPEG quality, same 32x32 gray blur score. Which path a
- * frame came out of must be invisible downstream, or the extraction model is
- * scoring two populations.
+ * `sampleTargetsMs` are imported from the WebCodecs path, so the two produce the
+ * same targets from the same duration. Encoding goes through the shared
+ * `frame-encode.ts` for the same reason. Which path a frame came out of must be
+ * invisible downstream, or the extraction model is scoring two populations
+ * without anyone being able to tell which is which.
  *
  * Four browser behaviours drive almost every line below, and none of them are
  * guessable from the spec:
@@ -48,13 +48,8 @@
  */
 
 import { CAPTURE_LIMITS } from "@/lib/capture/types";
-import { CAPTURE_TUNING } from "@/components/capture/engine/tuning";
-import {
-  fitDimensions,
-  frameDelta,
-  laplacianVariance,
-  toGray,
-} from "@/components/capture/engine/frame-analysis";
+import { frameDelta } from "@/components/capture/engine/frame-analysis";
+import { createFrameEncoder } from "@/components/capture/engine/frame-encode";
 import {
   planExtraction,
   sampleTargetsMs,
@@ -137,103 +132,6 @@ export type SeekExtractResult = {
   framesKept: number;
 };
 
-/* ------------------------------------------------------------------ *
- * JPEG + blur
- *
- * Duplicated from `video-extract.ts`, knowingly. Its encoder is module-private
- * and another agent owns that file, so exporting from it is not on the table
- * right now. This copy differs in one way: it also returns the gray thumbnail,
- * because the stuck detection below compares it and recomputing it would be a
- * second pass over the same pixels. Both copies should be lifted into a shared
- * `frame-encode.ts` at the first opportunity; two encoders is exactly the drift
- * risk that "an uploaded frame is the same artifact either way" cannot survive.
- * ------------------------------------------------------------------ */
-
-type Canvas2D = {
-  ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
-  toBlob(): Promise<Blob | null>;
-  resize(w: number, h: number): void;
-};
-
-function createCanvas(readFrequently: boolean): Canvas2D | null {
-  const useOffscreen = typeof OffscreenCanvas !== "undefined";
-  const canvas: OffscreenCanvas | HTMLCanvasElement = useOffscreen
-    ? new OffscreenCanvas(1, 1)
-    : document.createElement("canvas");
-
-  const ctx = canvas.getContext("2d", { willReadFrequently: readFrequently }) as
-    | OffscreenCanvasRenderingContext2D
-    | CanvasRenderingContext2D
-    | null;
-  if (!ctx) return null;
-
-  return {
-    ctx,
-    resize(w: number, h: number) {
-      canvas.width = w;
-      canvas.height = h;
-    },
-    toBlob() {
-      if (canvas instanceof OffscreenCanvas) {
-        return canvas.convertToBlob({
-          type: "image/jpeg",
-          quality: CAPTURE_TUNING.jpegQuality,
-        });
-      }
-      return new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", CAPTURE_TUNING.jpegQuality),
-      );
-    },
-  };
-}
-
-type Encoded = {
-  blob: Blob;
-  width: number;
-  height: number;
-  blurScore: number;
-  /** The 32x32 gray the blur score came from, reused for the stuck check. */
-  gray: Uint8Array;
-};
-
-type Encoder = {
-  encode(source: CanvasImageSource, srcW: number, srcH: number): Promise<Encoded | null>;
-};
-
-function createEncoder(): Encoder | null {
-  const jpeg = createCanvas(false);
-  const gray = createCanvas(true);
-  if (!jpeg || !gray) return null;
-
-  const size = CAPTURE_TUNING.graySize;
-
-  return {
-    async encode(source, srcW, srcH) {
-      const { width, height } = fitDimensions(srcW, srcH, CAPTURE_TUNING.maxLongestSide);
-      if (width === 0 || height === 0) return null;
-
-      jpeg.resize(width, height);
-      jpeg.ctx.drawImage(source, 0, 0, width, height);
-      const blob = await jpeg.toBlob();
-      if (!blob) return null;
-
-      // Squashed, aspect not preserved. Blur is scale-free, and this matches
-      // what the recorder measures.
-      gray.resize(size, size);
-      gray.ctx.drawImage(source, 0, 0, size, size);
-      const pixels = gray.ctx.getImageData(0, 0, size, size).data;
-      const grayBytes = toGray(pixels);
-
-      return {
-        blob,
-        width,
-        height,
-        blurScore: laplacianVariance(grayBytes, size),
-        gray: grayBytes,
-      };
-    },
-  };
-}
 
 /* ------------------------------------------------------------------ *
  * Waiting, abortably and with a deadline
@@ -356,7 +254,7 @@ export async function extractFramesWithSeek(
 ): Promise<SeekExtractResult> {
   const { onFrame, onProgress, signal, resumeFromSeq = 0 } = opts;
 
-  const encoder = createEncoder();
+  const encoder = createFrameEncoder();
   if (!encoder) throw new VideoExtractError("no_canvas");
   if (typeof document === "undefined") throw new VideoExtractError("no_video_element");
 

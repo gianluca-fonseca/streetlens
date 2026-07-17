@@ -39,12 +39,7 @@
  */
 
 import { CAPTURE_LIMITS } from "@/lib/capture/types";
-import { CAPTURE_TUNING } from "@/components/capture/engine/tuning";
-import {
-  fitDimensions,
-  laplacianVariance,
-  toGray,
-} from "@/components/capture/engine/frame-analysis";
+import { createFrameEncoder } from "@/components/capture/engine/frame-encode";
 import { demuxVideo, type VideoTrackInfo } from "@/components/capture/engine/video-demux";
 import {
   planExtraction,
@@ -103,98 +98,6 @@ export class VideoExtractError extends Error {
     this.name = "VideoExtractError";
     this.reason = reason;
   }
-}
-
-/* ------------------------------------------------------------------ *
- * JPEG + blur, identical in treatment to the live recorder
- * ------------------------------------------------------------------ */
-
-type Encoder = {
-  encode(source: CanvasImageSource, srcW: number, srcH: number): Promise<{
-    blob: Blob;
-    width: number;
-    height: number;
-    blurScore: number;
-  } | null>;
-};
-
-type Canvas2D = {
-  canvas: OffscreenCanvas | HTMLCanvasElement;
-  ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
-  toBlob(): Promise<Blob | null>;
-  resize(w: number, h: number): void;
-};
-
-function createCanvas(readFrequently: boolean): Canvas2D | null {
-  const useOffscreen = typeof OffscreenCanvas !== "undefined";
-  const canvas: OffscreenCanvas | HTMLCanvasElement = useOffscreen
-    ? new OffscreenCanvas(1, 1)
-    : document.createElement("canvas");
-
-  const ctx = canvas.getContext("2d", { willReadFrequently: readFrequently }) as
-    | OffscreenCanvasRenderingContext2D
-    | CanvasRenderingContext2D
-    | null;
-  if (!ctx) return null;
-
-  return {
-    canvas,
-    ctx,
-    resize(w: number, h: number) {
-      canvas.width = w;
-      canvas.height = h;
-    },
-    toBlob() {
-      if (canvas instanceof OffscreenCanvas) {
-        return canvas.convertToBlob({
-          type: "image/jpeg",
-          quality: CAPTURE_TUNING.jpegQuality,
-        });
-      }
-      return new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", CAPTURE_TUNING.jpegQuality),
-      );
-    },
-  };
-}
-
-/**
- * The same encode the live recorder performs, against a VideoFrame instead of a
- * camera preview.
- *
- * Deliberately reuses `fitDimensions` + `CAPTURE_TUNING.maxLongestSide` +
- * `jpegQuality` and the squashed 32x32 gray thumbnail rather than reimplementing
- * any of it. If the recorder's tuning changes, this changes with it, which is
- * the entire point: an uploaded frame and a walked frame must be the same
- * artifact.
- */
-function createEncoder(): Encoder | null {
-  const jpeg = createCanvas(false);
-  const gray = createCanvas(true);
-  if (!jpeg || !gray) return null;
-
-  const size = CAPTURE_TUNING.graySize;
-
-  return {
-    async encode(source, srcW, srcH) {
-      const { width, height } = fitDimensions(srcW, srcH, CAPTURE_TUNING.maxLongestSide);
-      if (width === 0 || height === 0) return null;
-
-      jpeg.resize(width, height);
-      jpeg.ctx.drawImage(source, 0, 0, width, height);
-      const blob = await jpeg.toBlob();
-      if (!blob) return null;
-
-      // Squashed, aspect not preserved. Blur is scale-free, and this matches
-      // what the recorder measures.
-      gray.resize(size, size);
-      gray.ctx.drawImage(source, 0, 0, size, size);
-      const pixels = gray.ctx.getImageData(0, 0, size, size).data;
-      const blurScore = laplacianVariance(toGray(pixels), size);
-
-      return { blob, width, height, blurScore };
-    },
-  };
 }
 
 /* ------------------------------------------------------------------ *
@@ -258,7 +161,7 @@ export async function extractFramesWithWebCodecs(
 ): Promise<ExtractResult> {
   const { onFrame, onProgress, signal, resumeFromSeq = 0 } = opts;
 
-  const encoder = createEncoder();
+  const encoder = createFrameEncoder();
   if (!encoder) throw new VideoExtractError("no_canvas");
 
   let info: VideoTrackInfo | null = null;
