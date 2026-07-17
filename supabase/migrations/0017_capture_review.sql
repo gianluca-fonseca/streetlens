@@ -125,7 +125,115 @@ create policy community_cv_observations_public_read
   for select to anon, authenticated
   using (true);
 
--- 3. Apply an approved capture session ---------------------------------------
+-- 3. The admin review read --------------------------------------------------
+-- Everything the review page needs, in one gated round trip.
+--
+-- It exists because capture_session_status (0013) deliberately cannot serve this:
+-- that one is PUBLIC (the session uuid is its capability), so it exposes no ip
+-- hash, no contact, no token spend, and its rollup projection carries no
+-- item_medians. An admin needs all of that, so it is a separate, secret-gated
+-- function rather than a widening of the public one — widening it would have
+-- leaked cost and contact data to anyone holding a session link.
+--
+-- Frames come back with their segment attribution so the page can hang a
+-- filmstrip off each segment. Storage paths only: the bucket is public and the
+-- app builds URLs (lib/capture/storage.ts), so the database stays ignorant of
+-- deployment URLs.
+
+create or replace function capture_session_review(
+  p_session_id uuid,
+  p_secret     text
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_expected text;
+  v_session  capture_sessions;
+  v_result   jsonb;
+begin
+  select value into v_expected from app_secrets where key = 'admin_rpc_secret';
+  if v_expected is null or p_secret is null or p_secret <> v_expected then
+    raise exception 'unauthorized';
+  end if;
+
+  select * into v_session from capture_sessions where id = p_session_id;
+  if v_session.id is null then
+    raise exception 'session not found';
+  end if;
+
+  select jsonb_build_object(
+    'sessionId',   v_session.id,
+    'status',      v_session.status,
+    'mode',        v_session.mode,
+    'frameCount',  v_session.frame_count,
+    'capturedOn',  coalesce(v_session.extracted_at, v_session.uploaded_at, v_session.created_at),
+    'reviewedAt',  v_session.reviewed_at,
+    'jobs', (
+      select jsonb_build_object(
+        'pending', count(*) filter (where j.status in ('pending', 'running')),
+        'done',    count(*) filter (where j.status = 'done'),
+        'failed',  count(*) filter (where j.status in ('failed', 'failed_overbudget')),
+        -- Surfaced separately from `failed`: overbudget means the money ran out,
+        -- not that the frame was bad, and the page must not conflate the two.
+        'overbudget', count(*) filter (where j.status = 'failed_overbudget')
+      )
+      from capture_frame_jobs j
+      join capture_frames f on f.id = j.frame_id
+      where f.session_id = p_session_id
+    ),
+    'tokens', (
+      select jsonb_build_object(
+        'inputTokens',  coalesce(sum(o.input_tokens), 0),
+        'outputTokens', coalesce(sum(o.output_tokens), 0),
+        'observations', count(*),
+        'escalated',    count(*) filter (where o.escalated)
+      )
+      from capture_observations o
+      join capture_frames f on f.id = o.frame_id
+      where f.session_id = p_session_id
+    ),
+    'rollups', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'segmentId', r.segment_id,
+        'scores', jsonb_build_object(
+          'overall',       r.score_overall,
+          'accessibility', r.score_accessibility,
+          'drainage',      r.score_drainage,
+          'shade',         r.score_shade,
+          'bike',          r.score_bike
+        ),
+        'itemMedians', r.item_medians,
+        'coverage',    r.coverage,
+        'confidence',  r.confidence,
+        'escalated', (
+          select count(*) from capture_observations o2
+           join capture_frames f2 on f2.id = o2.frame_id
+           where f2.session_id = p_session_id
+             and f2.segment_id = r.segment_id
+             and o2.escalated
+        )
+      ) order by r.segment_id)
+      from capture_segment_rollups r
+      where r.session_id = p_session_id
+    ), '[]'::jsonb),
+    'frames', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'seq',         f.seq,
+        'storagePath', f.storage_path,
+        'segmentId',   f.segment_id
+      ) order by f.seq)
+      from capture_frames f
+      where f.session_id = p_session_id
+    ), '[]'::jsonb)
+  ) into v_result;
+
+  return v_result;
+end;
+$$;
+
+-- 4. Apply an approved capture session ---------------------------------------
 -- The whole approval in one transaction: land the observations the admin ticked,
 -- drop the ones they did not, close the submission, and stamp the session.
 --
@@ -214,6 +322,8 @@ $$;
 -- Secret-gated, not role-gated: callable by anon/authenticated but each function
 -- enforces the admin secret internally (the deployment has no service role).
 revoke all on function capture_emit_submission(uuid, text) from public;
+revoke all on function capture_session_review(uuid, text) from public;
 revoke all on function admin_apply_capture_session(text, uuid, uuid, jsonb) from public;
 grant execute on function capture_emit_submission(uuid, text) to anon, authenticated;
+grant execute on function capture_session_review(uuid, text) to anon, authenticated;
 grant execute on function admin_apply_capture_session(text, uuid, uuid, jsonb) to anon, authenticated;

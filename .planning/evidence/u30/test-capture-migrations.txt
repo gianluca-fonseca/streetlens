@@ -16,7 +16,7 @@ Starting public.ecr.aws/supabase/postgres:17.6.1.143...
   [ok ] submissions accepts unknown (the honeypot landing place)
   [ok ] submissions still rejects a garbage type
   [ok ] the two original types still work (manual flow unchanged)
-  [ok ] capture_create_session returns a session uuid efab6033-c501-4947-8c42-ecd0a695fb98
+  [ok ] capture_create_session returns a session uuid fa54fc9a-11ce-4ebd-967d-685257b81b65
   [ok ] a new session starts at pending_upload
   [ok ] an invalid mode is rejected
   [ok ] a 4th session from one origin within the hour is rate_limited IN THE DATABASE
@@ -57,6 +57,11 @@ Starting public.ecr.aws/supabase/postgres:17.6.1.143...
   [ok ] emitting for a session that does not exist raises
   [ok ] the drained session is filed as a pending cv_capture row
   [ok ] re-emitting is a no-op, so the pump's retry cannot double-file the walk
+  [ok ] capture_session_review is secret-gated
+  [ok ] the review read returns the session shape the page needs {"jobs": {"done": 0, "failed": 0, "pending": 0, "overbudget": 0}, "mode": "live", "frames": [], "status": "pending_upload", "tokens": {"escalated": 0, "inputTok
+  [ok ] overbudget is reported separately from failed (money out != frame bad) {"done":0,"failed":0,"pending":0,"overbudget":0}
+  [ok ] the review read reports token spend (which the PUBLIC status must not) {"escalated":0,"inputTokens":0,"observations":0,"outputTokens":0}
+  [ok ] an unknown session raises rather than returning null
   [ok ] admin_apply_capture_session is secret-gated
   [ok ] approving two segments lands exactly two observations
   [ok ] a lens no frame supported stays NULL rather than becoming a zero

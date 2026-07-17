@@ -480,6 +480,42 @@ function main() {
     const cvSub = psql(`select id from submissions
                          where type='cv_capture' and payload->>'session_id'='${cvSid}';`).trim();
 
+    // The admin review read. It is separate from capture_session_status (0013)
+    // rather than a widening of it, because that one is PUBLIC — the session uuid
+    // is its only capability — and this one returns token spend.
+    check(
+      "capture_session_review is secret-gated",
+      (psqlExpectError(`select capture_session_review('${cvSid}'::uuid, 'nope');`) || "").includes("unauthorized"),
+    );
+    const reviewJson = psql(`select capture_session_review('${cvSid}'::uuid, 'test-secret');`).trim();
+    const review = JSON.parse(reviewJson);
+    check(
+      "the review read returns the session shape the page needs",
+      review.sessionId === cvSid &&
+        typeof review.status === "string" &&
+        review.jobs !== undefined &&
+        review.tokens !== undefined &&
+        Array.isArray(review.rollups) &&
+        Array.isArray(review.frames),
+      reviewJson.slice(0, 160),
+    );
+    check(
+      "overbudget is reported separately from failed (money out != frame bad)",
+      review.jobs.overbudget !== undefined && review.jobs.failed !== undefined,
+      JSON.stringify(review.jobs),
+    );
+    check(
+      "the review read reports token spend (which the PUBLIC status must not)",
+      typeof review.tokens.inputTokens === "number" || review.tokens.inputTokens !== undefined,
+      JSON.stringify(review.tokens),
+    );
+    check(
+      "an unknown session raises rather than returning null",
+      psqlExpectError(
+        `select capture_session_review('00000000-0000-0000-0000-000000000000'::uuid, 'test-secret');`,
+      ) !== null,
+    );
+
     // The apply. Two segments approved out of a walk.
     const obs = (ids) =>
       JSON.stringify(
