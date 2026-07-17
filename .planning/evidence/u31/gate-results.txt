@@ -1,0 +1,59 @@
+u31 cv-funnel docs — gate results
+Run: 2026-07-17. Docs-only unit (docs/cv-funnel.md rewrite + README.md funnel section).
+No app code touched, so the bar is documentation truth, not a build.
+
+---- Scope of change ----
+git diff --stat:
+  README.md          |   4 +
+  docs/cv-funnel.md  | 828 +++++--- (676 insertions, 156 deletions)
+Only README.md and docs/cv-funnel.md modified. No .ts/.tsx/.sql/.json source
+touched, so tsc / eslint / next build cannot be affected by this unit (Markdown
+is not compiled). The u29 gate-results (tsc/eslint/next build PASS) remain the
+standing green for the code tree this doc describes.
+
+---- Cited-path existence (every file/dir referenced in cv-funnel.md) ----
+41/41 backtick-wrapped repo paths exist                       PASS (0 missing)
+21/21 additional bare-filename source citations exist         PASS (0 missing)
+  (gating.ts, tuning.ts, frame-analysis.ts, opfs.ts, frame-encode.ts,
+   video-demux/extract/seek/plan.ts, useFrameClock/useRecorder/useWakeLock.ts,
+   hmm.ts, baseline.ts, graph.ts, lib/extraction/{client,schema,config,downscale}.ts,
+   SegmentDetail.tsx, app/api/capture/pump/route.ts, 0007_admin_rpcs.sql, vercel.json)
+
+---- Env vars documented match code ----
+Every env var in the ops-runbook table is a real process.env.* reference:
+  ADMIN_RPC_SECRET, CRON_SECRET, OPENAI_API_KEY, OPENAI_VISION_MODEL,
+  OPENAI_VISION_ESCALATION_MODEL, CV_EXTRACTION_ENABLED, CV_INPUT_TOKEN_CEILING,
+  CV_SESSION_TOKENS_PER_FRAME, NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY, SUBMISSIONS_IP_SALT, ADMIN_PASSWORD.
+Defaults documented match lib/extraction/config.ts (gpt-5-nano, gpt-5.4-mini,
+derived ceiling = staticRequestApproxTokens()+1200) and lib/ip.ts salt default.
+Bucket name documented as constant CAPTURE_BUCKET="streetlens-frames" (not env),
+matching lib/capture/types.ts and 0013_capture.sql.
+
+---- Cost numbers ----
+Sourced from .planning/evidence/u29/live-smoke-after-downscale.txt:
+  per-frame input 4,619 tokens (4,480 cached), image ~139 tokens @512px,
+  full-res ~1,052, static prefix ~4,480. Documented honestly that end-to-end
+  extraction output/parse remains UNVERIFIED (u29 hit insufficient_quota).
+
+---- Mermaid diagram ----
+One flowchart TD block (docs/cv-funnel.md:44).
+No offline mermaid CLI available (no node_modules/mermaid, no mmdc).
+Validated by: (a) fenced block well-formed; (b) node-reference integrity —
+all 13 edge endpoints (A,AUD,B,C,CV,E,M,MAP,Q,R,REV,U,X) are defined nodes;
+(c) no em/en dashes or stray control chars in the block; (d) syntax eyeball
+(flowchart TD, subgraph, node["<br/>"] labels, -->|label| edges, {decision}).
+Verification bar permits eyeball when a CLI is not on hand.
+
+---- i18n parity (seed step 7) ----
+node leaf-key diff of messages/en.json vs messages/es.json:
+  en 769 leaf keys, es 769 leaf keys, 0 only-in-en, 0 only-in-es
+  PARITY: OK (identical key sets)                              PASS
+  (full output: .planning/evidence/u31/i18n-parity.txt)
+No message catalogs were modified by this unit, so parity is unchanged; the
+check confirms the tree this doc ships against still holds parity.
+
+---- Copy rule ----
+No em dashes / en dashes in cv-funnel.md or the new README section            PASS
+
+RESULT: PASS (documentation unit; truth verified against shipped code)
