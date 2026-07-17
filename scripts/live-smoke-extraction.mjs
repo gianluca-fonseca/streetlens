@@ -198,6 +198,11 @@ async function main() {
         return typeof c === "number" && c >= 0 && c <= 1;
       }),
     );
+    check(
+      "a per-frame rationale came back as a non-empty string",
+      typeof observation.rationale === "string" && observation.rationale.trim().length > 0,
+      `${observation.rationale ? observation.rationale.length : 0} chars`,
+    );
 
     const cost =
       (usage.inputTokens / 1e6) * PRICE_IN + (usage.outputTokens / 1e6) * PRICE_OUT;
@@ -210,6 +215,7 @@ async function main() {
     console.log(`  cost this frame: $${cost.toFixed(6)}  (@ $${PRICE_IN}/1M in, $${PRICE_OUT}/1M out)`);
     console.log(`  400-frame run  : $${(cost * 400).toFixed(4)}`);
     console.log(`  usable         : ${observation.frameQuality.usable}${observation.frameQuality.reason ? ` (${observation.frameQuality.reason})` : ""}`);
+    console.log(`  rationale      : ${observation.rationale}`);
     console.log("\n  ---- what it saw ----");
     for (const k of T.RUBRIC_ITEM_KEYS) {
       const it = observation.items[k];
