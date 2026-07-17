@@ -41,17 +41,31 @@ export function emptyDropCounts(): DropCounts {
   return { no_fix: 0, cadence: 0, displacement: 0, duplicate: 0, blurry: 0 };
 }
 
+/**
+ * `gray` is handed back so the caller can store it as the next `prevGray`
+ * without recomputing it. It is `null` exactly when a cheap gate rejected the
+ * frame before any pixels were touched, which is also why `prevGray` tracks the
+ * previous frame that REACHED the vision gates rather than every frame the
+ * camera delivered.
+ */
 export type FrameVerdict =
-  | { keep: true; blurScore: number }
-  | { keep: false; reason: DropReason; blurScore: number | null };
+  | { keep: true; blurScore: number; gray: Uint8Array }
+  | { keep: false; reason: DropReason; blurScore: number | null; gray: Uint8Array | null };
 
 export type LatLng = Readonly<{ lat: number; lng: number }>;
 
-/** The candidate frame, already reduced to a gray thumbnail. */
+/** The candidate frame. */
 export type FrameCandidate = Readonly<{
   now: number;
   position: LatLng | null;
-  gray: Uint8Array;
+  /**
+   * Reduces the frame to a `graySize` square thumbnail. A THUNK, not a value:
+   * producing it costs a `drawImage` plus a `getImageData` readback, which
+   * stalls on the GPU. This is called ~30 times a second and the cadence gate
+   * rejects roughly 29 of those, so the pixels are only paid for on a frame
+   * that has already earned them.
+   */
+  gray: () => Uint8Array;
   graySize: number;
 }>;
 
@@ -59,7 +73,7 @@ export type FrameCandidate = Readonly<{
 export type GateMemory = Readonly<{
   lastKeptT: number | null;
   lastKeptPosition: LatLng | null;
-  /** Gray thumbnail of the previous CANDIDATE, kept or not. */
+  /** Gray thumbnail of the previous frame that reached the vision gates. */
   prevGray: Uint8Array | null;
 }>;
 
@@ -67,10 +81,13 @@ export type GateMemory = Readonly<{
  * Decide the fate of one candidate frame.
  *
  * The first frame of a session has no `lastKeptT`, so the motion gates cannot
- * apply and are skipped: it still has to clear dedupe and blur. Dedupe compares
- * against the previous CANDIDATE rather than the previous KEPT frame, because
- * the thing it defends against (a hidden video redelivering one frame forever)
- * shows up between candidates.
+ * apply and are skipped: it still has to clear dedupe and blur.
+ *
+ * Dedupe compares against the previous frame that reached the vision gates, not
+ * the previous KEPT frame. The difference matters: comparing against the last
+ * kept frame would mean a phone that moved 6 m to a near-identical stretch of
+ * wall keeps banking duplicates, whereas comparing consecutive candidates
+ * catches both that and the iOS habit of redelivering one frame forever.
  */
 export function evaluateFrame(
   candidate: FrameCandidate,
@@ -78,31 +95,33 @@ export function evaluateFrame(
   tuning: CaptureTuning = CAPTURE_TUNING,
 ): FrameVerdict {
   if (candidate.position === null) {
-    return { keep: false, reason: "no_fix", blurScore: null };
+    return { keep: false, reason: "no_fix", blurScore: null, gray: null };
   }
 
   const isFirst = memory.lastKeptT === null || memory.lastKeptPosition === null;
 
   if (!isFirst) {
     if (candidate.now - (memory.lastKeptT as number) < tuning.minIntervalMs) {
-      return { keep: false, reason: "cadence", blurScore: null };
+      return { keep: false, reason: "cadence", blurScore: null, gray: null };
     }
     const moved = haversineMeters(candidate.position, memory.lastKeptPosition as LatLng);
     if (moved < tuning.minDisplacementM) {
-      return { keep: false, reason: "displacement", blurScore: null };
+      return { keep: false, reason: "displacement", blurScore: null, gray: null };
     }
   }
 
-  if (frameDelta(candidate.gray, memory.prevGray) < tuning.duplicateDelta) {
-    return { keep: false, reason: "duplicate", blurScore: null };
+  const gray = candidate.gray();
+
+  if (frameDelta(gray, memory.prevGray) < tuning.duplicateDelta) {
+    return { keep: false, reason: "duplicate", blurScore: null, gray };
   }
 
-  const blurScore = laplacianVariance(candidate.gray, candidate.graySize);
+  const blurScore = laplacianVariance(gray, candidate.graySize);
   if (blurScore < tuning.blurVariance) {
-    return { keep: false, reason: "blurry", blurScore };
+    return { keep: false, reason: "blurry", blurScore, gray };
   }
 
-  return { keep: true, blurScore };
+  return { keep: true, blurScore, gray };
 }
 
 /** Why a session stopped on its own. */
