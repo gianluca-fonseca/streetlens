@@ -169,6 +169,45 @@ type ReviewPayload = {
   tombstones?: { seq: number }[] | null;
 };
 
+/** The `capture_session_review_detail` payload (u2 migration 0021). */
+type SessionDetail = {
+  track?: FramePosition[] | null;
+  frames?: {
+    seq: number;
+    nearJunction?: boolean;
+    usable?: boolean;
+    position?: FramePosition | null;
+  }[] | null;
+  tombstones?: { seq: number }[] | null;
+};
+
+/**
+ * Fold the geography/quality/track detail onto the review payload, matching frames
+ * by seq. The review RPC owns the frame's identity and observation; the detail RPC
+ * owns where it sits and whether it was usable. Frames the detail read does not
+ * mention keep their defaults, so a partial detail never drops a frame.
+ */
+function mergeDetail(payload: ReviewPayload, detail: SessionDetail | null): ReviewPayload {
+  if (!detail) return payload;
+  const bySeq = new Map<number, NonNullable<SessionDetail["frames"]>[number]>();
+  for (const d of detail.frames ?? []) bySeq.set(d.seq, d);
+  return {
+    ...payload,
+    frames: (payload.frames ?? []).map((f) => {
+      const d = bySeq.get(f.seq);
+      if (!d) return f;
+      return {
+        ...f,
+        nearJunction: d.nearJunction ?? f.nearJunction,
+        usable: d.usable ?? f.usable,
+        position: d.position ?? f.position ?? null,
+      };
+    }),
+    track: detail.track ?? payload.track ?? [],
+    tombstones: detail.tombstones ?? payload.tombstones ?? [],
+  };
+}
+
 /** Build a public frame URL, tolerating an unconfigured deployment. */
 function frameUrl(storagePath: string): string | null {
   try {
@@ -296,7 +335,15 @@ export async function getSessionReview(
         p_secret: secret,
       });
       if (!error && data) {
-        return toReview(data as ReviewPayload, "live");
+        // The map panel and the override recompute need per-frame geography and
+        // quality plus the track, which the review RPC does not carry (u2 migration
+        // 0021). Fetch it and merge by seq. Best-effort: a review without it still
+        // renders (inspector + overrides degrade, the map simply has no dots).
+        const { data: detail } = await client.rpc("capture_session_review_detail", {
+          p_session_id: sessionId,
+          p_secret: secret,
+        });
+        return toReview(mergeDetail(data as ReviewPayload, detail as SessionDetail | null), "live");
       }
     } catch {
       // fall through to the fixture
