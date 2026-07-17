@@ -2,16 +2,30 @@
 /**
  * import-osm-corridor.mjs
  *
- * Pulls the real street network for San Antonio de Escazú, Costa Rica from the
- * OpenStreetMap Overpass API, splits each way into ~150 m block-face segments
+ * Pulls the real street network for the whole canton of Escazú, Costa Rica from
+ * the OpenStreetMap Overpass API, splits each way into ~150 m block-face segments
  * with stable ids, and writes `data/segments.geojson` (geometry + metadata).
  *
- * The raw Overpass response is cached to `data/raw/overpass-san-antonio.json`;
- * re-runs use the cache unless `--refresh` is passed (be a good Overpass
- * citizen — one request per refresh).
+ * The canton has three districts, imported in a fixed order so the pilot stays
+ * byte-identical:
+ *   1. San Antonio de Escazú — the audited pilot corridor. Fetched by the ORIGINAL
+ *      bounding box and cached to `data/raw/overpass-san-antonio.json`; its
+ *      `esc-sa-NNNN` features are frozen (see scripts/test-canton-identity.mjs).
+ *   2. Escazú centro (`esc-ce-NNNN`, district `esc-escazu`).
+ *   3. San Rafael de Escazú (`esc-sr-NNNN`, district `esc-san-rafael`).
  *
- *   node scripts/import-osm-corridor.mjs           # use cache if present
- *   node scripts/import-osm-corridor.mjs --refresh # force a fresh fetch
+ * The two new districts are fetched by their OSM administrative boundary (Overpass
+ * `area`) so district membership is exact rather than a rough bbox. A way already
+ * emitted by an earlier district is skipped, so a way straddling a district line
+ * is never split into two competing segments (San Antonio, imported first, keeps
+ * every way in its bbox — that is what freezes the pilot).
+ *
+ * Each district's raw Overpass response is cached under `data/raw/`; re-runs use
+ * the cache and are fully offline unless `--refresh` is passed (be a good Overpass
+ * citizen — one request per district per refresh).
+ *
+ *   node scripts/import-osm-corridor.mjs           # use caches if present
+ *   node scripts/import-osm-corridor.mjs --refresh # force a fresh fetch per district
  */
 
 import { promises as fs } from "node:fs";
@@ -20,15 +34,54 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const RAW_PATH = path.join(ROOT, "data", "raw", "overpass-san-antonio.json");
+const RAW_DIR = path.join(ROOT, "data", "raw");
 const OUT_PATH = path.join(ROOT, "data", "segments.geojson");
 
 const CANTON_ID = "esc";
-const DISTRICT_ID = "esc-san-antonio";
-const CORRIDOR_ID = "esc-sa-corridor";
+const CANTON_NAME = "Escazú";
 
-// Bounding box for San Antonio de Escazú: [south, west, north, east].
-const BBOX = [9.898, -84.162, 9.922, -84.135];
+// Pilot bounding box for San Antonio de Escazú: [south, west, north, east].
+// FROZEN — changing this would shift every esc-sa-* id.
+const PILOT_BBOX = [9.898, -84.162, 9.922, -84.135];
+
+/**
+ * District import order. San Antonio MUST be first and MUST keep its original
+ * bbox query + cache file so the pilot output is byte-identical to the v1 import.
+ * The two new districts fetch by OSM admin-boundary relation (Overpass area id =
+ * 3600000000 + relation id).
+ */
+const DISTRICTS = [
+  {
+    key: "san-antonio",
+    idPrefix: "esc-sa",
+    districtId: "esc-san-antonio",
+    corridorId: "esc-sa-corridor",
+    name: "San Antonio de Escazú",
+    cache: "overpass-san-antonio.json",
+    query: "bbox",
+    bbox: PILOT_BBOX,
+  },
+  {
+    key: "escazu-centro",
+    idPrefix: "esc-ce",
+    districtId: "esc-escazu",
+    corridorId: null,
+    name: "Escazú centro",
+    cache: "overpass-escazu-centro.json",
+    query: "area",
+    relation: 4071271,
+  },
+  {
+    key: "san-rafael",
+    idPrefix: "esc-sr",
+    districtId: "esc-san-rafael",
+    corridorId: null,
+    name: "San Rafael de Escazú",
+    cache: "overpass-san-rafael.json",
+    query: "area",
+    relation: 4070148,
+  },
+];
 
 // Highway classes we turn into auditable segments. `cycleway` ways are dedicated
 // bike infrastructure and auditable in their own right (they carry the strongest
@@ -60,13 +113,63 @@ const STREET_NETWORK = new Set([
 const TARGET_SEGMENT_M = 150; // aim for ~100-200 m block faces
 const MIN_SEGMENT_M = 40; // shorter tails get merged back
 
-const OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter";
+// Overpass mirrors, tried in order with backoff. The public instances routinely
+// return a transient 504 ("server is probably too busy"); a couple of retries
+// across mirrors makes a --refresh reliable without hammering any one host.
+const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+];
 
-function buildQuery() {
-  const [s, w, n, e] = BBOX;
-  return `[out:json][timeout:90];
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** POST a query to Overpass, retrying across mirrors on a transient failure. */
+async function overpassFetch(query, label) {
+  const attempts = 5;
+  let lastErr;
+  for (let i = 0; i < attempts; i += 1) {
+    const endpoint = OVERPASS_ENDPOINTS[i % OVERPASS_ENDPOINTS.length];
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent":
+            "StreetLens/0.1 (open street audit, Escazu CR; +https://github.com/gianluca-fonseca)",
+        },
+        body: `data=${encodeURIComponent(query)}`,
+      });
+      if (res.ok) return res.json();
+      const body = (await res.text()).slice(0, 160);
+      lastErr = new Error(`Overpass HTTP ${res.status}: ${body}`);
+    } catch (err) {
+      lastErr = err;
+    }
+    const waitMs = 2000 * (i + 1);
+    console.log(
+      `[import] ${label}: ${endpoint} failed (attempt ${i + 1}/${attempts}); retrying in ${waitMs / 1000}s...`,
+    );
+    await sleep(waitMs);
+  }
+  throw lastErr;
+}
+
+function buildQuery(district) {
+  if (district.query === "bbox") {
+    const [s, w, n, e] = district.bbox;
+    return `[out:json][timeout:90];
 (
   way["highway"](${s},${w},${n},${e});
+);
+out geom;`;
+  }
+  // Admin-boundary area query. Overpass area id = 3600000000 + relation id.
+  const areaId = 3600000000 + district.relation;
+  return `[out:json][timeout:90];
+area(${areaId})->.d;
+(
+  way["highway"](area.d);
 );
 out geom;`;
 }
@@ -163,42 +266,34 @@ function segmentName(tags, highway, index) {
   return `Calle sin nombre ${index}`;
 }
 
-async function loadRaw({ refresh }) {
+async function loadRaw(district, { refresh }) {
+  const rawPath = path.join(RAW_DIR, district.cache);
   if (!refresh) {
     try {
-      const cached = await fs.readFile(RAW_PATH, "utf8");
-      console.log(`[import] using cached Overpass response: ${RAW_PATH}`);
+      const cached = await fs.readFile(rawPath, "utf8");
+      console.log(`[import] ${district.key}: using cached Overpass response`);
       return JSON.parse(cached);
     } catch {
       // fall through to fetch
     }
   }
 
-  const query = buildQuery();
-  console.log(`[import] querying Overpass (${OVERPASS_ENDPOINT})...`);
-  const res = await fetch(OVERPASS_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "User-Agent":
-        "StreetLens/0.1 (open street audit, Escazu CR; +https://github.com/gianluca-fonseca)",
-    },
-    body: `data=${encodeURIComponent(query)}`,
-  });
-  if (!res.ok) {
-    throw new Error(`Overpass HTTP ${res.status}: ${await res.text()}`);
-  }
-  const json = await res.json();
-  await fs.mkdir(path.dirname(RAW_PATH), { recursive: true });
-  await fs.writeFile(RAW_PATH, JSON.stringify(json, null, 2));
-  console.log(`[import] cached raw response -> ${RAW_PATH}`);
+  const query = buildQuery(district);
+  console.log(`[import] ${district.key}: querying Overpass...`);
+  const json = await overpassFetch(query, district.key);
+  await fs.mkdir(RAW_DIR, { recursive: true });
+  await fs.writeFile(rawPath, JSON.stringify(json, null, 2));
+  console.log(`[import] ${district.key}: cached raw response -> ${rawPath}`);
   return json;
 }
 
-async function main() {
-  const refresh = process.argv.includes("--refresh");
-  const raw = await loadRaw({ refresh });
-
+/**
+ * Turn one district's raw Overpass response into auditable segment features.
+ * `claimed` is the set of osm_way_ids already emitted by an earlier district;
+ * ways in it are skipped so a boundary-straddling way is never double-counted.
+ * Mutates `claimed` with every way this district emits.
+ */
+function districtFeatures(district, raw, claimed) {
   const ways = (raw.elements || [])
     .filter(
       (el) =>
@@ -216,28 +311,39 @@ async function main() {
 
   for (const way of ways) {
     const highway = way.tags.highway;
-    const bikeInfra = bikeInfraHint(way.tags, highway);
     const coords = way.geometry.map((g) => roundCoord([g.lon, g.lat]));
+
+    if (!AUDITABLE.has(highway)) {
+      // Non-auditable classes still count toward the coverage denominator, but
+      // only the first district to see the way claims its length.
+      if (STREET_NETWORK.has(highway) && !claimed.has(way.id)) {
+        networkMeters += lineLength(coords);
+      }
+      continue;
+    }
+    // An auditable way already emitted by an earlier district belongs to it.
+    if (claimed.has(way.id)) continue;
+    claimed.add(way.id);
 
     if (STREET_NETWORK.has(highway)) {
       networkMeters += lineLength(coords);
     }
-    if (!AUDITABLE.has(highway)) continue;
 
+    const bikeInfra = bikeInfraHint(way.tags, highway);
     const runs = splitPolyline(coords);
     for (const run of runs) {
       const length_m = lineLength(run);
       if (length_m < MIN_SEGMENT_M) continue;
       seq += 1;
-      const id = `esc-sa-${String(seq).padStart(4, "0")}`;
+      const id = `${district.idPrefix}-${String(seq).padStart(4, "0")}`;
       features.push({
         type: "Feature",
         properties: {
           id,
           name: segmentName(way.tags, highway, seq),
           canton_id: CANTON_ID,
-          district_id: DISTRICT_ID,
-          corridor_id: CORRIDOR_ID,
+          district_id: district.districtId,
+          corridor_id: district.corridorId,
           highway,
           bike_infra: bikeInfra,
           length_m: Number(length_m.toFixed(1)),
@@ -253,17 +359,15 @@ async function main() {
     0,
   );
 
-  const collection = {
-    type: "FeatureCollection",
-    metadata: {
-      source: "OpenStreetMap via Overpass API",
-      license: "ODbL 1.0",
-      district: "San Antonio de Escazú",
-      canton_id: CANTON_ID,
-      district_id: DISTRICT_ID,
-      corridor_id: CORRIDOR_ID,
-      bbox: BBOX,
-      generated_at: new Date().toISOString(),
+  return {
+    features,
+    stats: {
+      district_id: district.districtId,
+      name: district.name,
+      corridor_id: district.corridorId,
+      query: district.query,
+      relation: district.relation ?? null,
+      bbox: district.bbox ?? null,
       segment_count: features.length,
       audited_km: Number((auditedMeters / 1000).toFixed(2)),
       network_km: Number((networkMeters / 1000).toFixed(2)),
@@ -272,19 +376,62 @@ async function main() {
           ? Number(((auditedMeters / networkMeters) * 100).toFixed(1))
           : 100,
     },
-    features,
+  };
+}
+
+async function main() {
+  const refresh = process.argv.includes("--refresh");
+
+  const claimed = new Set();
+  const allFeatures = [];
+  const districtStats = {};
+  let cantonAudited = 0;
+  let cantonNetwork = 0;
+
+  for (const district of DISTRICTS) {
+    const raw = await loadRaw(district, { refresh });
+    const { features, stats } = districtFeatures(district, raw, claimed);
+    allFeatures.push(...features);
+    districtStats[district.districtId] = stats;
+    cantonAudited += stats.audited_km;
+    cantonNetwork += stats.network_km;
+    console.log(
+      `[import] ${district.key}: ${stats.segment_count} segments ` +
+        `(${stats.audited_km} km audited / ${stats.network_km} km network, ${stats.coverage_pct}% coverage)`,
+    );
+  }
+
+  const collection = {
+    type: "FeatureCollection",
+    metadata: {
+      source: "OpenStreetMap via Overpass API",
+      license: "ODbL 1.0",
+      canton: CANTON_NAME,
+      canton_id: CANTON_ID,
+      generated_at: new Date().toISOString(),
+      segment_count: allFeatures.length,
+      audited_km: Number(cantonAudited.toFixed(2)),
+      network_km: Number(cantonNetwork.toFixed(2)),
+      coverage_pct:
+        cantonNetwork > 0
+          ? Number(((cantonAudited / cantonNetwork) * 100).toFixed(1))
+          : 100,
+      districts: districtStats,
+    },
+    features: allFeatures,
   };
 
   await fs.mkdir(path.dirname(OUT_PATH), { recursive: true });
   await fs.writeFile(OUT_PATH, JSON.stringify(collection, null, 2));
 
   console.log(
-    `[import] wrote ${features.length} segments (${collection.metadata.audited_km} km audited / ${collection.metadata.network_km} km network, ${collection.metadata.coverage_pct}% coverage) -> ${OUT_PATH}`,
+    `[import] wrote ${allFeatures.length} segments across ${DISTRICTS.length} districts ` +
+      `(${collection.metadata.audited_km} km audited / ${collection.metadata.network_km} km network) -> ${OUT_PATH}`,
   );
 
-  if (features.length < 40) {
+  if (allFeatures.length < 40) {
     console.error(
-      `[import] WARNING: only ${features.length} segments (<40). Widen the bbox or check the Overpass response.`,
+      `[import] WARNING: only ${allFeatures.length} segments (<40). Check the Overpass responses.`,
     );
     process.exitCode = 2;
   }
