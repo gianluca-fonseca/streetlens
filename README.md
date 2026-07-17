@@ -54,6 +54,10 @@ StreetLens es una plataforma abierta y bilingüe que mide la calidad de las call
 
 Every segment is scored on **four independent lenses**, the same way in any city, plus one composite. Each score runs 0 to 100 where higher is better, each ramp is colorblind-safe, and each is paired with a redundant line-width channel so a problem stays legible even in grayscale. Two of the four lenses are a climate-resilience story on their own: shade tracks heat exposure, and drainage tracks flood risk.
 
+<div align="center">
+<img src="docs/assets/landing-lenses-1440-light.jpeg" alt="The four-lens instrument section: accessibility (Cividis) and drainage (Viridis) figures over the Escazú network" width="94%">
+</div>
+
 | Lens | What it reads | Score ramp (sealed) | Low → High |
 |---|---|---|---|
 | **Accessibility** | Curb ramps, tactile paving, safe crossings, effective width (Ley 7600) | Cividis, pale yellow → deep blue | Fails minimums → Fully accessible |

@@ -37,9 +37,9 @@ Messages live in `messages/en.json` and `messages/es.json` under namespaces `met
 
 `lib/segments.ts` is the single surface the UI reads segment data through. It exposes:
 
-- `getSegments()` — the scored network as GeoJSON.
-- `getSegmentDetail(id)` — one segment with its rubric breakdown.
-- `getStats()` — headline figures (segment count, coverage, fail rate).
+- `getSegments()`: the scored network as GeoJSON.
+- `getSegmentDetail(id)`: one segment with its rubric breakdown.
+- `getStats()`: headline figures (segment count, coverage, fail rate).
 
 Each reader is **Supabase-first with a static fallback**: it tries `getSupabaseClient()` (the `v_segment_scores` view and RPCs) and, on a null client or an error, falls back to the committed files in `data/`. Because the database is env-gated off, the static path serves everything today. This is the seam that lets the whole app run with no backend.
 
