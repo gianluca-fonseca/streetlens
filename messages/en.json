@@ -635,7 +635,7 @@
       "rec": "REC",
       "paused": "PAUSED",
       "elapsed": "Elapsed",
-      "frames": "Frames kept",
+      "frames": "Frames",
       "distance": "Distance",
       "gps": "GPS",
       "gpsWaiting": "Waiting for a fix",
