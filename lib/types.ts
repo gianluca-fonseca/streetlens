@@ -62,6 +62,56 @@ export type CommunityReport = {
 };
 
 /**
+ * One rubric item's median across the frames that saw it.
+ *
+ * Structurally identical to `ItemMedian` in lib/capture/rollup.ts, and duplicated
+ * on purpose. The map's data layer (segments.ts → community-store.ts → here) must
+ * not import the capture/extraction stack, for the same reason community-store is
+ * deliberately zod-free. The apply path converts between the two.
+ */
+export type CvItemMedian = {
+  value: number | null;
+  confidence: number | null;
+  /** Frames that contributed a non-null value for this item. */
+  frames: number;
+};
+
+/**
+ * A camera observation of one segment from one approved capture session: the
+ * THIRD community record kind, after segments and reports.
+ *
+ * It is NOT an audit and never becomes one. Rubric scores on an audited segment
+ * are produced by a human against the Ley 7600 rubric; these are produced by a
+ * vision model and approved by an admin as "the camera saw this". They are merged
+ * at read time (lib/segments.ts), rendered as visibly provisional, counted
+ * separately in StreetStats, and never averaged into any `score_*` field.
+ *
+ * `id` is derived (`cv-<session_id>-<segment_id>`), so re-approving the same
+ * session upserts rather than duplicates.
+ */
+export type CvObservation = {
+  id: string;
+  segment_id: string;
+  session_id: string;
+  /** Lens scores as observed by camera. Null where no frame supported that lens. */
+  scores: Record<ScoreLayer, number | null>;
+  /** Per-rubric-item medians, keyed by rubric item key. */
+  item_medians: Record<string, CvItemMedian>;
+  /** Mean of the per-item confidences that produced a median, 0-1. Null if none did. */
+  confidence: number | null;
+  /** Usable contributing frames / frames attributed to this segment, 0-1. */
+  coverage: number;
+  /** Storage paths of the frames behind this observation (bucket-relative). */
+  frame_refs: string[];
+  /** When the walk happened (session extracted_at), not when it was approved. */
+  captured_on: string;
+  source: "cv";
+  /** Provenance back to the cv_capture submission that carried it through review. */
+  submission_id: string | null;
+  created_at: string;
+};
+
+/**
  * Properties carried on every segment GeoJSON feature. Consumed by AuditMap.
  * Flat shape (contract v2, advisor rev 1 u6): the four original 0-100 `score_*`
  * fields plus `score_bike`, `district`, and `audited_at`.
@@ -69,6 +119,10 @@ export type CommunityReport = {
  * Contract v3 (u7, adjudicated): additive OPTIONAL provenance fields. Existing
  * audited features leave them unset (or `source:"audit", verified:true`);
  * community/import features set them. Nothing that read v2 breaks.
+ *
+ * Contract v3 extends again (u30) with `cv_observations`, on the same additive
+ * -optional terms. Like the report fields it is non-primitive, so it MUST be run
+ * through lib/parse-feature-props.ts before use (maplibre JSON-stringifies it).
  */
 export type SegmentProperties = {
   id: string;
@@ -89,6 +143,8 @@ export type SegmentProperties = {
   community_report?: CommunityReport | null;
   /** Reports contributed against this segment (community update_segment approvals). */
   community_reports?: CommunityReport[];
+  /** Approved camera observations of this segment (u30). Never fold into score_*. */
+  cv_observations?: CvObservation[];
 };
 
 export type SegmentFeature = Feature<LineString, SegmentProperties>;
