@@ -7,14 +7,16 @@
  * topology the client trace tool needs to FOLLOW THE STREET NETWORK between
  * dots instead of cutting straight lines through blocks.
  *
- * From the cached raw Overpass ways (data/raw/overpass-san-antonio.json) it
- * writes data/routing-network.geojson: every walkable/drivable way in the pilot
- * bbox as a LineString, coordinates rounded to 6 decimals (~0.11 m). Because two
- * OSM ways that meet at an intersection share the exact same node coordinate,
- * emitting them verbatim preserves shared topology — geojson-path-finder joins
- * lines that touch at a coordinate, so a router can turn at the intersection.
+ * From the cached raw Overpass ways for every Escazú district
+ * (data/raw/overpass-*.json) it writes data/routing-network.geojson: every
+ * walkable/drivable way in the canton as a LineString, coordinates rounded to 6
+ * decimals (~0.11 m). Because two OSM ways that meet at an intersection share the
+ * exact same node coordinate, emitting them verbatim preserves shared topology —
+ * geojson-path-finder joins lines that touch at a coordinate, so a router can
+ * turn at the intersection. Ways shared across two district caches are emitted
+ * once (dedup by osm_way_id).
  *
- *   node scripts/build-routing-graph.mjs           # use cached Overpass response
+ *   node scripts/build-routing-graph.mjs           # use cached Overpass responses
  *   node scripts/build-routing-graph.mjs --refresh # re-run the importer's fetch first
  *
  * Keep it lean: only geometry + a highway tag + osm_way_id ride along. No names,
@@ -27,11 +29,17 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const RAW_PATH = path.join(ROOT, "data", "raw", "overpass-san-antonio.json");
+const RAW_DIR = path.join(ROOT, "data", "raw");
 const OUT_PATH = path.join(ROOT, "data", "routing-network.geojson");
 
-// Same pilot bbox as the importer: [south, west, north, east].
-const BBOX = [9.898, -84.162, 9.922, -84.135];
+// Every district cache the importer maintains, in the same order. The routing
+// graph is the union across the whole canton so client traces can follow the
+// street network anywhere a capture walk happens.
+const RAW_CACHES = [
+  "overpass-san-antonio.json",
+  "overpass-escazu-centro.json",
+  "overpass-san-rafael.json",
+];
 
 /**
  * Highway classes that are walkable and/or drivable, hence routable for a
@@ -116,19 +124,34 @@ async function main() {
     }
   }
 
-  const raw = JSON.parse(await fs.readFile(RAW_PATH, "utf8"));
-  console.log(`[routing] using Overpass cache: ${RAW_PATH}`);
-
-  const ways = (raw.elements || [])
-    .filter(
-      (el) =>
+  // Union every district cache, deduped by osm_way_id (a way that straddles two
+  // districts appears in both caches; keep it once).
+  const wayById = new Map();
+  for (const cache of RAW_CACHES) {
+    const cachePath = path.join(RAW_DIR, cache);
+    let raw;
+    try {
+      raw = JSON.parse(await fs.readFile(cachePath, "utf8"));
+    } catch {
+      console.warn(`[routing] missing cache ${cache}; skipping`);
+      continue;
+    }
+    console.log(`[routing] using Overpass cache: ${cache}`);
+    for (const el of raw.elements || []) {
+      if (
         el.type === "way" &&
         Array.isArray(el.geometry) &&
         el.geometry.length >= 2 &&
         el.tags?.highway &&
-        ROUTABLE.has(el.tags.highway),
-    )
-    .sort((a, b) => a.id - b.id); // deterministic output across runs
+        ROUTABLE.has(el.tags.highway) &&
+        !wayById.has(el.id)
+      ) {
+        wayById.set(el.id, el);
+      }
+    }
+  }
+
+  const ways = [...wayById.values()].sort((a, b) => a.id - b.id); // deterministic
 
   const byClass = {};
   let networkMeters = 0;
@@ -169,8 +192,8 @@ async function main() {
       source: "OpenStreetMap via Overpass API",
       license: "ODbL 1.0",
       purpose: "client trace routing (street-following graph)",
-      district: "San Antonio de Escazú",
-      bbox: BBOX,
+      canton: "Escazú",
+      districts: ["esc-san-antonio", "esc-escazu", "esc-san-rafael"],
       generated_at: new Date().toISOString(),
       way_count: features.length,
       vertex_count: vertexKeys.size,

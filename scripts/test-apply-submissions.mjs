@@ -17,7 +17,7 @@
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { promises as fs } from "node:fs";
-import { rmSync, existsSync } from "node:fs";
+import { rmSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -83,11 +83,24 @@ async function main() {
   const submissions = require(path.join(BUILD_DIR, "submissions.js"));
   const segments = require(path.join(BUILD_DIR, "segments.js"));
 
+  // The committed canton overlay (esc-ce/esc-sr) merges into getSegments as
+  // source:"import" neutral features; count it so the audited pilot (535) and
+  // the always-on overlay are asserted apart.
+  const importFile = path.join(ROOT, "data", "canton-import-segments.json");
+  const importCount = existsSync(importFile)
+    ? JSON.parse(readFileSync(importFile, "utf8")).length
+    : 0;
+
   // Pick a real existing demo segment as the update target.
   const before = await segments.getSegments();
-  const officialBefore = before.features.length;
+  const officialBefore = before.features.filter((f) => !f.properties.source).length;
   const targetId = before.features[0].properties.id;
-  check("baseline official count is 535", officialBefore === 535, `(${officialBefore})`);
+  check("baseline official (audited) count is 535", officialBefore === 535, `(${officialBefore})`);
+  check(
+    "baseline collection = 535 audited + canton overlay",
+    before.features.length === 535 + importCount,
+    `(${before.features.length})`,
+  );
 
   // Seed a pending queue: one add, one update.
   const now = new Date().toISOString();
@@ -170,8 +183,13 @@ async function main() {
   check("official segments still 535", stats.segments === 535, `(${stats.segments})`);
   check("communitySegments counted separately (1)", stats.communitySegments === 1, `(${stats.communitySegments})`);
   check(
-    "community add excluded from official collection count",
-    after.features.length === 535 + 1,
+    "community add excluded from the audited count (still 535 with no source)",
+    after.features.filter((f) => !f.properties.source).length === 535,
+    `(${after.features.filter((f) => !f.properties.source).length})`,
+  );
+  check(
+    "collection = 535 audited + canton overlay + 1 community add",
+    after.features.length === 535 + importCount + 1,
     `(${after.features.length})`,
   );
 

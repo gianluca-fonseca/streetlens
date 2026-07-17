@@ -172,6 +172,7 @@ Three drawing sheets, drawn in the project's zen instrument style, with real dim
 - **Demo data is always labeled.** Everything on the public map today is demo data generated over real OpenStreetMap geometry, so the map behaves exactly as it will with field data. Real measurements replace it corridor by corridor once fieldwork begins in August 2026. No number shown on a demo surface is a real reading.
 - **Scores publish with their formula.** Each lens is scored from a rubric of observed items, higher is better, and the legend always shows the value bins.
 - **Community contributions stay unverified until audited.** Resident-added segments carry no score and render in a neutral casing until a field audit confirms them.
+- **The map covers the whole canton; the pilot corridor is the audited part.** The street network spans all three Escazú districts (San Antonio, Escazú centro, San Rafael), so a capture walk anywhere in the canton matches to real segments. Only the San Antonio pilot carries audit scores today; the rest of the canton renders in the same neutral casing as community adds until fieldwork reaches it.
 - **Machine learning is on the roadmap, not in today's numbers.** There is no model scoring streets, and there is no "AI-powered" claim. When a model is built, a human still verifies every reading.
 - **Open by default.** Open code, open rubric, open method, GeoJSON and CSV exports, and sidewalk geometry contributed back to OpenStreetMap.
 

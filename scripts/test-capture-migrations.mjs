@@ -139,12 +139,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0017", files.some((f) => f.startsWith("0017")), files.join(" "));
+    check("found the full migration chain through 0019", files.some((f) => f.startsWith("0019")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -159,9 +159,10 @@ function main() {
       psql(readFileSync(path.join(MIGRATIONS, "0013_capture.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0014_submission_types.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0017_capture_review.sql"), "utf8"));
-      check("0013 + 0014 + 0017 are re-runnable (idempotent)", true);
+      psql(readFileSync(path.join(MIGRATIONS, "0019_capture_reprocess.sql"), "utf8"));
+      check("0013 + 0014 + 0017 + 0019 are re-runnable (idempotent)", true);
     } catch (err) {
-      check("0013 + 0014 + 0017 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
+      check("0013 + 0014 + 0017 + 0019 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
     }
 
     /* ---------------- Schema shape ---------------- */
@@ -645,6 +646,173 @@ function main() {
         return psql(`select count(*) from capture_claim_jobs_for_session('${otherSid}'::uuid, 5, 'test-secret');`).trim() === "0";
       })(),
     );
+
+    /* ---------------- 0019: the reprocess loop (canton expansion) ---------------- */
+
+    // The motivating case: a walk finished OFF the network, so every frame failed
+    // no_segment_match and the session drained to review_ready with nothing scored.
+    // An expansion later puts streets under it; reprocess re-matches the stored
+    // track and re-queues only the frames that now land. This block builds that
+    // session by hand — six frames in the states reprocess must tell apart.
+    const rpSid = psql(`select capture_create_session('live', 'iphash-reproc');`).trim();
+    psql(`
+      update capture_sessions
+         set track = st_geogfromtext('SRID=4326;LINESTRING(-84.152 9.907, -84.150 9.907, -84.148 9.907)'),
+             frame_count = 6,
+             status = 'review_ready'
+       where id = '${rpSid}'::uuid;
+
+      insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id) values
+        ('${rpSid}'::uuid, 0, 'captures/${rpSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, null),
+        ('${rpSid}'::uuid, 1, 'captures/${rpSid}/frame-0001.jpg', 1784000002000, 640, 480, 1000, null),
+        ('${rpSid}'::uuid, 2, 'captures/${rpSid}/frame-0002.jpg', 1784000004000, 640, 480, 1000, null),
+        ('${rpSid}'::uuid, 3, 'captures/${rpSid}/frame-0003.jpg', 1784000006000, 640, 480, 1000, 'seg-done'),
+        ('${rpSid}'::uuid, 4, 'captures/${rpSid}/frame-0004.jpg', 1784000008000, 640, 480, 1000, null),
+        ('${rpSid}'::uuid, 5, 'captures/${rpSid}/frame-0005.jpg', 1784000010000, 640, 480, 1000, null);
+
+      insert into capture_frame_jobs (frame_id) select id from capture_frames where session_id='${rpSid}'::uuid;
+
+      -- seq 0,1,2: the off-network casualties (failed no_segment_match).
+      update capture_frame_jobs j set status='failed', error='no_segment_match'
+        from capture_frames f where f.id=j.frame_id and f.session_id='${rpSid}'::uuid and f.seq in (0,1,2);
+      -- seq 3: already extracted (done) — its provenance must survive untouched.
+      update capture_frame_jobs j set status='done', error=null
+        from capture_frames f where f.id=j.frame_id and f.session_id='${rpSid}'::uuid and f.seq=3;
+      -- seq 4: budget breaker's business, not a matching failure.
+      update capture_frame_jobs j set status='failed_overbudget', error='budget exhausted'
+        from capture_frames f where f.id=j.frame_id and f.session_id='${rpSid}'::uuid and f.seq=4;
+      -- seq 5: a model failure, not a matching one.
+      update capture_frame_jobs j set status='failed', error='model boom'
+        from capture_frames f where f.id=j.frame_id and f.session_id='${rpSid}'::uuid and f.seq=5;
+    `);
+
+    // capture_session_track: the read the script re-matches from.
+    check(
+      "capture_session_track is secret-gated",
+      (psqlExpectError(`select capture_session_track('${rpSid}'::uuid, 'nope');`) || "").includes("unauthorized"),
+    );
+    const trackJson = psql(`select capture_session_track('${rpSid}'::uuid, 'test-secret');`).trim();
+    const trackRead = JSON.parse(trackJson);
+    check(
+      "capture_session_track returns status + the ordered track vertices",
+      trackRead.status === "review_ready" &&
+        Array.isArray(trackRead.track) &&
+        trackRead.track.length === 3 &&
+        Math.abs(trackRead.track[0].lng - -84.152) < 1e-6 &&
+        Math.abs(trackRead.track[0].lat - 9.907) < 1e-6,
+      trackJson.slice(0, 160),
+    );
+    check(
+      "capture_session_track raises on an unknown session",
+      psqlExpectError(`select capture_session_track('00000000-0000-0000-0000-000000000000'::uuid, 'test-secret');`) !== null,
+    );
+
+    // The reprocess payload the script would hand over: the whole frame set,
+    // with seq 0,1 now landing on a newly-present street and seq 2 still off it.
+    const rpPayload = JSON.stringify([
+      { seq: 0, segmentId: "seg-new", nearJunction: false },
+      { seq: 1, segmentId: "seg-new", nearJunction: true },
+      { seq: 2, segmentId: null, nearJunction: false },
+      { seq: 3, segmentId: "seg-done", nearJunction: false },
+      { seq: 4, segmentId: null, nearJunction: false },
+      { seq: 5, segmentId: null, nearJunction: false },
+    ]).replace(/'/g, "''");
+
+    check(
+      "capture_reprocess_session is secret-gated",
+      (psqlExpectError(`select capture_reprocess_session('${rpSid}'::uuid, '${rpPayload}'::jsonb, 'nope');`) || "").includes("unauthorized"),
+    );
+
+    const rpResult = JSON.parse(psql(`select capture_reprocess_session('${rpSid}'::uuid, '${rpPayload}'::jsonb, 'test-secret');`).trim());
+    check(
+      "reprocess touches only the three no_segment_match frames",
+      rpResult.reprocessed === 3,
+      JSON.stringify(rpResult),
+    );
+    check(
+      "it re-queues the two that now match and reports the one still off-network",
+      rpResult.requeued === 2 && rpResult.matchedNow === 2 && rpResult.stillUnmatched === 1 && rpResult.noop === false,
+      JSON.stringify(rpResult),
+    );
+    check(
+      "a review_ready session with fresh work flips back to extracting",
+      rpResult.status === "extracting" &&
+        psql(`select status from capture_sessions where id='${rpSid}'::uuid;`).trim() === "extracting",
+    );
+    check(
+      "the now-matched frames are pending again with the error cleared",
+      psql(`select string_agg(j.status || ':' || coalesce(j.error,'-'), ',' order by f.seq)
+               from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+              where f.session_id='${rpSid}'::uuid and f.seq in (0,1);`).trim() === "pending:-,pending:-",
+    );
+    check(
+      "and they carry the new segment attribution",
+      psql(`select string_agg(segment_id, ',' order by seq) from capture_frames
+              where session_id='${rpSid}'::uuid and seq in (0,1);`).trim() === "seg-new,seg-new" &&
+        psql(`select near_junction::text from capture_frames where session_id='${rpSid}'::uuid and seq=1;`).trim() === "true",
+    );
+    check(
+      "a frame still off-network stays failed no_segment_match, so the session can still drain",
+      psql(`select j.status || ':' || j.error from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+              where f.session_id='${rpSid}'::uuid and f.seq=2;`).trim() === "failed:no_segment_match",
+    );
+    check(
+      "an already-extracted (done) frame keeps its job AND its segment provenance",
+      psql(`select j.status from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+              where f.session_id='${rpSid}'::uuid and f.seq=3;`).trim() === "done" &&
+        psql(`select segment_id from capture_frames where session_id='${rpSid}'::uuid and seq=3;`).trim() === "seg-done",
+    );
+    check(
+      "a failed_overbudget job is NOT silently retried",
+      psql(`select j.status from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+              where f.session_id='${rpSid}'::uuid and f.seq=4;`).trim() === "failed_overbudget",
+    );
+    check(
+      "a model-error failed job (not a matching failure) is left alone",
+      psql(`select j.status || ':' || j.error from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+              where f.session_id='${rpSid}'::uuid and f.seq=5;`).trim() === "failed:model boom",
+    );
+
+    // Idempotency: the same payload again. seq 0,1 are pending now (no longer
+    // no_segment_match), so only seq 2 is a target, it still does not match, and
+    // nothing changes — the second run is a clean no-op.
+    const rpAgain = JSON.parse(psql(`select capture_reprocess_session('${rpSid}'::uuid, '${rpPayload}'::jsonb, 'test-secret');`).trim());
+    check(
+      "a re-run only reconsiders the still-unmatched frame and changes nothing",
+      rpAgain.reprocessed === 1 && rpAgain.requeued === 0 && rpAgain.noop === true && rpAgain.status === "extracting",
+      JSON.stringify(rpAgain),
+    );
+    check(
+      "the re-queued frames are untouched by the idempotent re-run (still pending)",
+      psql(`select count(*) from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+              where f.session_id='${rpSid}'::uuid and f.seq in (0,1) and j.status='pending';`).trim() === "2",
+    );
+
+    // Guard rails.
+    check(
+      "reprocess refuses a payload that names a frame not in the session",
+      psqlExpectError(`select capture_reprocess_session('${rpSid}'::uuid,
+        '[{"seq":99,"segmentId":"seg-x"}]'::jsonb, 'test-secret');`) !== null,
+    );
+    {
+      const decided = psql(`select capture_create_session('live', 'iphash-decided');`).trim();
+      psql(`update capture_sessions set status='approved' where id='${decided}'::uuid;`);
+      check(
+        "reprocess refuses a decided (approved) session — history, not a retry target",
+        (psqlExpectError(`select capture_reprocess_session('${decided}'::uuid, '[]'::jsonb, 'test-secret');`) || "").includes("already decided"),
+      );
+      psql(`update capture_sessions set status='rejected' where id='${decided}'::uuid;`);
+      check(
+        "reprocess refuses a rejected session too",
+        (psqlExpectError(`select capture_reprocess_session('${decided}'::uuid, '[]'::jsonb, 'test-secret');`) || "").includes("already decided"),
+      );
+      psql(`update capture_sessions set status='cost_paused' where id='${decided}'::uuid;`);
+      check(
+        "reprocess refuses a session that is not extracting/review_ready (e.g. cost_paused)",
+        (psqlExpectError(`select capture_reprocess_session('${decided}'::uuid, '[]'::jsonb, 'test-secret');`) || "").includes("not reprocessable"),
+      );
+    }
+
     psql(`delete from capture_sessions where id='${cvSid}';`);
     check(
       "deleting a session cascades to its CV observations",

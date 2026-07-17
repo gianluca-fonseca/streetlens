@@ -20,6 +20,50 @@ data.** It enters the same review queue a manual contribution does, and nothing
 it produces reaches the published map without a human approving it. Every
 decision below that looks conservative is downstream of that.
 
+## The funnel in plain language
+
+**What the CV is scanning for.** Each frame from a street walk is sent to a
+vision model (gpt-5-nano, escalating to gpt-5.4-mini on low-confidence frames)
+in a single structured call that evaluates the street against the same rubric
+v0.1 a human auditor uses: 15 items across the four lenses. Concretely it reads
+things like sidewalk presence and effective width, curb ramps, surface
+condition, drainage grates and standing water, tree canopy and shade cover, and
+bike infrastructure (lanes, separation, surface). The response is forced
+through a strict JSON schema, so every frame comes back as structured rubric
+readings, not free text.
+
+**Does it assign a score? Yes, in two stages.** Per frame it produces the 15
+rubric item readings plus a confidence. Then, per street segment, all frames
+matched to that segment are rolled up with confidence-weighted medians into
+lens scores from 0 to 100: accessibility, drainage, shade, bike, and an overall
+composite (0.45 x accessibility + 0.30 x drainage + 0.25 x shade, with bike
+kept separate). A lens no frame could support stays null (unknown), never zero.
+
+**Upload flow.** Two paths, both frames-only; raw video never leaves the phone:
+
+1. **Live recording**: the browser opens the camera, samples roughly one frame
+   per second gated by GPS movement, filters blurry and duplicate frames, and
+   uploads frames directly to Supabase storage as you walk.
+2. **Video upload**: you pick a POV video, the browser decodes it locally
+   (WebCodecs fast path or a fallback decoder), samples frames, and pairs them
+   with a GPX track or a route you trace on the map, since phone videos carry
+   no GPS track.
+
+Either way the lifecycle is the same: a session is created, frames are
+registered (which arms the storage upload policy), bytes upload, finalize runs
+HMM map matching to pin each frame to an exact street segment, a job queue
+extracts each frame through the vision model, rollups are computed, and the
+session lands in the review queue.
+
+**Approval: never automatic.** This is a hard design rule. A finished session
+files itself into the same admin review queue as manual submissions (as a
+`cv_capture` type). An admin opens the review page, sees per-segment scores
+with the frame filmstrip and token and cost stats, and approves or rejects per
+segment with a required reason. Only approved segments land in
+`community_cv_observations` and appear on the map, marked with a provenance
+chip as CV-derived; re-reviewing and unticking a segment removes it. Nothing
+reaches the published map without a human ticking it.
+
 ## Three ways in, one way out
 
 There are three ways a street's condition enters StreetLens, and they converge
@@ -327,6 +371,34 @@ frame seq to `{ segmentId, nearJunction }`, with unmatched frames mapping to
 > **lat-first** order, which is not the GeoJSON convention. Reading it as-is
 > transposes every gate check into the ocean. Compute bboxes from geometry. A
 > test keeps this warning from going stale.
+
+### Network coverage: the whole canton, one audited corridor
+
+The matcher works over the entire street network of the cantón of Escazú, so a
+capture walk anywhere in the canton pins to real segments. `segments.geojson`
+now spans all three districts:
+
+| District | id prefix | `district_id` | segments |
+| --- | --- | --- | --- |
+| San Antonio de Escazú (pilot) | `esc-sa-` | `esc-san-antonio` | 535 |
+| Escazú centro | `esc-ce-` | `esc-escazu` | 93 |
+| San Rafael de Escazú | `esc-sr-` | `esc-san-rafael` | 829 |
+
+`scripts/import-osm-corridor.mjs` imports San Antonio first, on its original
+bounding box and cache, so the pilot's 535 features stay byte-for-byte identical
+across a canton re-import; `scripts/test-canton-identity.mjs` freezes that
+against a content hash. The two new districts are fetched by OSM administrative
+boundary (Overpass `area`), each raw response cached under `data/raw/` for
+offline re-runs. `scripts/build-routing-graph.mjs` unions the same caches into a
+canton-wide street-following graph for the client trace tool.
+
+The pilot corridor remains the audited ground truth: only `esc-sa-*` segments
+carry rubric scores, and the official stats (`getStats`) count only them. The
+rest of the canton is imported unscored (`data/canton-import-segments.json`,
+`source: "import"`) and rendered with the neutral community casing, never a score
+color, until fieldwork reaches it. `scripts/test-matching-canton.mjs` proves the
+production HMM matches a synthetic walk on a real Escazú centro street to its
+`esc-ce` segment without flipping districts.
 
 ### Extraction
 
@@ -726,6 +798,39 @@ usually the kill switch being off or the pump not being called: verify
 retry up to 3 attempts before going `failed`; `capture_fail_unattributed_jobs`
 closes jobs whose frame never matched a segment.
 
+### Reprocessing a session
+
+Use this when a session drained with every frame `failed` on `no_segment_match`
+because the walk was outside the audited network at the time, and the network
+has since grown (for example a district expansion added streets under that
+walk). The track is unchanged; only `data/segments.geojson` moved. Reprocessing
+re-runs the real matcher on the stored track against the current network,
+re-queues the frames that now land on a segment, and hands the session back to
+the pump. It does not re-extract frames that already succeeded, does not touch
+`failed_overbudget` jobs (that is the budget breaker's call), and does not retry
+frames that failed for a model reason rather than a matching one.
+
+Always dry-run first. The dry-run re-matches and prints the summary but writes
+nothing:
+
+```
+node --env-file=.env.local scripts/reprocess-capture-session.mjs <session-id> --dry-run
+```
+
+If the summary shows frames now landing on real segments, run it for real (drop
+`--dry-run`). It re-queues the newly-matched frames, flips the session from
+`review_ready`/`extracting` back to `extracting`, then kicks the pump (set
+`CAPTURE_APP_URL` to have it call the pump for you, otherwise it prints the exact
+`curl` to run once the app is up). It is idempotent and safe to run on any
+session: a decided walk (`approved`/`rejected`) is refused, a session that is not
+`extracting`/`review_ready` is refused, and a session with nothing to fix is a
+clean no-op with a clear message. It runs entirely through the secret-gated
+reprocess RPCs (`capture_session_track`, `capture_reprocess_session`; migration
+`0019`), so it needs `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+and `ADMIN_RPC_SECRET`, and never writes a table directly. Only frames that
+still do not match stay `failed` on `no_segment_match`, exactly as finalize would
+leave them, so the session can still drain afterwards.
+
 ### Pausing extraction
 
 Set `CV_EXTRACTION_ENABLED` to anything other than `"true"` (or unset it). The
@@ -743,7 +848,8 @@ Run these directly with node; none need a live database.
 | `scripts/test-capture-schemas.mjs` | contracts, rubric sync, encodings, path convention |
 | `scripts/test-matching-hmm.mjs` | the HMM against synthetic tracks, and that it beats the baseline on parallel streets |
 | `scripts/test-matching-baseline.mjs` | the matching interface against synthetic tracks |
-| `scripts/test-capture-migrations.mjs` | `0001..0017` applied to a throwaway container, every RPC exercised (needs Docker) |
+| `scripts/test-capture-migrations.mjs` | `0001..0019` applied to a throwaway container, every RPC exercised (needs Docker) |
+| `scripts/test-reprocess-core.mjs` | the reprocess script's track-time reconstruction, match summary, and payload logic |
 | `scripts/test-mp4box-contract.mjs` | the two load-bearing demux settings (`keepMdatData`, `releaseUsedSamples`) |
 | `scripts/test-upload-client.mjs` | retry, resume, concurrency, abort |
 | `scripts/test-rate-limit-namespaces.mjs` | capture ceiling, namespace isolation |

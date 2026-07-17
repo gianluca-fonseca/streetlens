@@ -103,15 +103,32 @@ async function main() {
       JSON.stringify(["overall", "accessibility", "drainage", "shade", "bike"]),
   );
 
+  // The unaudited canton overlay (esc-ce/esc-sr) merges into getSegments as
+  // source:"import" neutral features. Count it so the audited pilot (535) and
+  // the neutral overlay are asserted separately.
+  const importFile = path.join(ROOT, "data", "canton-import-segments.json");
+  const importCount = existsSync(importFile)
+    ? JSON.parse(await fs.readFile(importFile, "utf8")).length
+    : 0;
+  const AUDITED = 535;
+
   console.log("getSegments():");
   const col = await seg.getSegments();
   check("FeatureCollection", col.type === "FeatureCollection");
   check(">= 40 features", col.features.length >= 40, `(${col.features.length})`);
-  check("exactly 535 features", col.features.length === 535, `(${col.features.length})`);
+  // Audited pilot features carry no `source`; the canton overlay carries "import".
+  const audited = col.features.filter((f) => !f.properties.source);
+  const neutral = col.features.filter((f) => f.properties.source);
+  check("exactly 535 audited features", audited.length === AUDITED, `(${audited.length})`);
+  check(
+    "collection = 535 audited + canton import overlay",
+    col.features.length === AUDITED + importCount,
+    `(${col.features.length} = 535 + ${importCount})`,
+  );
 
   const SCORE_KEYS = ["score_overall", "score_accessibility", "score_drainage", "score_shade", "score_bike"];
   let badDistrict = 0, badAuditedAt = 0, badScores = 0, badDemo = 0, badGeom = 0;
-  for (const f of col.features) {
+  for (const f of audited) {
     const p = f.properties;
     if (typeof p.district !== "string" || p.district.length === 0) badDistrict += 1;
     if (typeof p.audited_at !== "string" || p.audited_at.length === 0) badAuditedAt += 1;
@@ -119,11 +136,24 @@ async function main() {
     if (p.demo !== true) badDemo += 1;
     if (f.geometry?.type !== "LineString" || f.geometry.coordinates.length < 2) badGeom += 1;
   }
-  check("every feature has district", badDistrict === 0, badDistrict ? `(${badDistrict} missing)` : "");
-  check("every feature has audited_at", badAuditedAt === 0, badAuditedAt ? `(${badAuditedAt} missing)` : "");
-  check("every feature has all five score_* in 0..100 (incl. score_bike)", badScores === 0, badScores ? `(${badScores} bad)` : "");
-  check("every feature demo=true", badDemo === 0);
-  check("every geometry is a real LineString", badGeom === 0);
+  check("every audited feature has district", badDistrict === 0, badDistrict ? `(${badDistrict} missing)` : "");
+  check("every audited feature has audited_at", badAuditedAt === 0, badAuditedAt ? `(${badAuditedAt} missing)` : "");
+  check("every audited feature has all five score_* in 0..100 (incl. score_bike)", badScores === 0, badScores ? `(${badScores} bad)` : "");
+  check("every audited feature demo=true", badDemo === 0);
+  check("every audited geometry is a real LineString", badGeom === 0);
+
+  // The canton overlay must render neutral: import source, no scores, real geometry.
+  let badNeutralSource = 0, badNeutralScore = 0, badNeutralGeom = 0;
+  for (const f of neutral) {
+    const p = f.properties;
+    if (p.source !== "import" && p.source !== "community") badNeutralSource += 1;
+    if (!SCORE_KEYS.every((k) => p[k] === 0)) badNeutralScore += 1;
+    if (f.geometry?.type !== "LineString" || f.geometry.coordinates.length < 2) badNeutralGeom += 1;
+  }
+  check("canton overlay present", neutral.length === importCount, `(${neutral.length} of ${importCount})`);
+  check("every overlay feature is source import/community", badNeutralSource === 0);
+  check("every overlay feature carries NO score (all 0, never a ramp color)", badNeutralScore === 0);
+  check("every overlay geometry is a real LineString", badNeutralGeom === 0);
 
   console.log("getStats():");
   const stats = await seg.getStats();
@@ -132,13 +162,15 @@ async function main() {
     "shape {segments,km,coveragePct,heroPct} all numeric",
     ["segments", "km", "coveragePct", "heroPct"].every((k) => typeof stats[k] === "number"),
   );
-  check("stats.segments matches collection", stats.segments === col.features.length);
+  check("stats.segments is the audited pilot only (535)", stats.segments === AUDITED, `(${stats.segments})`);
   check(
     "stats.communitySegments is numeric (contract v3)",
     typeof stats.communitySegments === "number",
   );
+  // communitySegments is the CONTRIBUTION counter (community adds), not the
+  // committed canton overlay — so it stays 0 with no community store.
   check(
-    "stats.communitySegments is 0 with no community store",
+    "stats.communitySegments is 0 with no community store (overlay is not a contribution)",
     stats.communitySegments === 0,
     `(${stats.communitySegments})`,
   );
@@ -196,9 +228,17 @@ async function main() {
     await fs.writeFile(COMMUNITY_SEGMENTS_PATH, JSON.stringify(fixture, null, 2), "utf8");
     const merged = await seg.getSegments();
     const mergedStats = await seg.getStats();
-    check("merged collection = 535 + 2 community", merged.features.length === 537, `(${merged.features.length})`);
-    check("official stats.segments STILL 535 (community excluded)", mergedStats.segments === 535, `(${mergedStats.segments})`);
-    check("stats.communitySegments = 2", mergedStats.communitySegments === 2, `(${mergedStats.communitySegments})`);
+    check(
+      "merged collection = 535 audited + canton overlay + 2 community",
+      merged.features.length === AUDITED + importCount + 2,
+      `(${merged.features.length})`,
+    );
+    check("official stats.segments STILL 535 (community/import excluded)", mergedStats.segments === AUDITED, `(${mergedStats.segments})`);
+    check(
+      "stats.communitySegments counts the 2 community adds (not the baseline overlay)",
+      mergedStats.communitySegments === 2,
+      `(${mergedStats.communitySegments})`,
+    );
     const c1 = merged.features.find((f) => f.properties.id === "com-smoke-1");
     check("community feature flagged source/verified", Boolean(c1) && c1.properties.source === "community" && c1.properties.verified === false);
     check(
@@ -207,8 +247,8 @@ async function main() {
         [c1.properties.score_overall, c1.properties.score_accessibility, c1.properties.score_drainage, c1.properties.score_shade, c1.properties.score_bike].every((s) => s === 0),
     );
     check(
-      "official features carry no community source flag",
-      merged.features.filter((f) => !f.properties.source).length === 535,
+      "audited features carry no source flag (pilot stays 535)",
+      merged.features.filter((f) => !f.properties.source).length === AUDITED,
     );
   } finally {
     await fs.rm(COMMUNITY_SEGMENTS_PATH, { force: true });

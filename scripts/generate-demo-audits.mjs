@@ -12,10 +12,16 @@
  * Every feature is marked `demo: true`. Output is deterministic (fixed PRNG
  * seed) so re-runs are byte-identical.
  *
+ * Only the San Antonio pilot (esc-sa-*) is scored: it is the audited ground
+ * truth. The rest of the canton (esc-ce-*, esc-ce / esc-sr-*) has no fieldwork,
+ * so those segments are emitted UNSCORED as `source: "import"` records that the
+ * map renders with the neutral community casing (never a score color).
+ *
  * Writes:
- *   data/demo-segments.geojson  scored collection consumed by the fallback adapter + map
- *   data/demo-audits.json       per-segment audit + observation detail (getSegmentDetail)
- *   supabase/seed.sql           rubric v0.1 + geography + segments + demo audits/observations
+ *   data/demo-segments.geojson       scored PILOT collection (fallback adapter + map)
+ *   data/demo-audits.json            per-segment audit + observation detail (getSegmentDetail)
+ *   data/canton-import-segments.json unscored canton segments (neutral map casing)
+ *   supabase/seed.sql                rubric v0.1 + pilot geography + demo audits/observations
  */
 
 import { promises as fs } from "node:fs";
@@ -28,6 +34,7 @@ const ROOT = path.resolve(__dirname, "..");
 const SEGMENTS_PATH = path.join(ROOT, "data", "segments.geojson");
 const DEMO_GEOJSON_PATH = path.join(ROOT, "data", "demo-segments.geojson");
 const DEMO_AUDITS_PATH = path.join(ROOT, "data", "demo-audits.json");
+const IMPORT_PATH = path.join(ROOT, "data", "canton-import-segments.json");
 const SEED_PATH = path.join(ROOT, "supabase", "seed.sql");
 
 const RUBRIC_VERSION_ID = "v0.1";
@@ -35,6 +42,18 @@ const DISTRICT_NAME = "San Antonio";
 const AUDIT_DATE = "2026-07-10";
 const AUDITOR = "demo-generator";
 const SEED = 0x51_7e_ec_a5;
+
+// The audited pilot: only these ids get demo scores.
+const PILOT_PREFIX = "esc-sa-";
+
+// Display names for the unaudited canton districts (source: "import").
+const DISTRICT_DISPLAY = {
+  "esc-escazu": "Escazú",
+  "esc-san-rafael": "San Rafael",
+};
+
+// Fixed import timestamp so canton-import-segments.json is byte-stable per run.
+const IMPORT_AT = "2026-07-17T00:00:00.000Z";
 
 // Approximate quebrada (stream) reference points inside the San Antonio bbox.
 // Drainage scores dip near these.
@@ -251,10 +270,22 @@ function sqlStr(value) {
  * -------------------------------------------------------------- */
 async function main() {
   const raw = JSON.parse(await fs.readFile(SEGMENTS_PATH, "utf8"));
-  const features = raw.features || [];
-  if (features.length === 0) {
+  const allFeatures = raw.features || [];
+  if (allFeatures.length === 0) {
     throw new Error(
       "No segments in data/segments.geojson — run import-osm-corridor.mjs first.",
+    );
+  }
+  // Only the audited pilot is scored; the rest of the canton is imported unscored.
+  const features = allFeatures.filter((f) =>
+    f.properties.id.startsWith(PILOT_PREFIX),
+  );
+  const cantonFeatures = allFeatures.filter(
+    (f) => !f.properties.id.startsWith(PILOT_PREFIX),
+  );
+  if (features.length === 0) {
+    throw new Error(
+      `No ${PILOT_PREFIX}* segments in data/segments.geojson — the pilot import is missing.`,
     );
   }
   const rand = mulberry32(SEED);
@@ -334,11 +365,26 @@ async function main() {
     );
   }
 
-  // ---- write demo-segments.geojson ----
+  // ---- write demo-segments.geojson (pilot only) ----
+  // Reconstruct the pilot-scoped metadata so getStats() keeps reporting the
+  // audited pilot (segment_count / audited_km / network_km / coverage_pct),
+  // not canton-wide totals — the pilot corridor is the audited ground truth.
+  const pilotMeta = raw.metadata?.districts?.["esc-san-antonio"] ?? {};
   const demoCollection = {
     type: "FeatureCollection",
     metadata: {
-      ...raw.metadata,
+      source: raw.metadata?.source,
+      license: raw.metadata?.license,
+      district: pilotMeta.name ?? "San Antonio de Escazú",
+      canton_id: raw.metadata?.canton_id ?? "esc",
+      district_id: pilotMeta.district_id ?? "esc-san-antonio",
+      corridor_id: pilotMeta.corridor_id ?? "esc-sa-corridor",
+      bbox: pilotMeta.bbox ?? null,
+      generated_at: raw.metadata?.generated_at,
+      segment_count: demoFeatures.length,
+      audited_km: pilotMeta.audited_km,
+      network_km: pilotMeta.network_km,
+      coverage_pct: pilotMeta.coverage_pct,
       demo: true,
       note: "Synthetic demo scores over real OSM geometry. Not real measurements.",
       rubric_version_id: RUBRIC_VERSION_ID,
@@ -347,6 +393,26 @@ async function main() {
     features: demoFeatures,
   };
   await fs.writeFile(DEMO_GEOJSON_PATH, JSON.stringify(demoCollection, null, 2));
+
+  // ---- write canton-import-segments.json (unscored, neutral map casing) ----
+  // Every non-pilot canton segment as a CommunitySegment with source "import":
+  // real geometry, no rubric scores. lib/segments merges these into the read
+  // path exactly like community adds, so the map draws them with the neutral
+  // dashed casing and the official audited stats never move.
+  const importSegments = cantonFeatures.map((f) => ({
+    id: f.properties.id,
+    name: f.properties.name,
+    highway: f.properties.highway,
+    district: DISTRICT_DISPLAY[f.properties.district_id] ?? f.properties.district_id,
+    source: "import",
+    verified: false,
+    auditor: null,
+    submission_id: null,
+    coordinates: f.geometry.coordinates,
+    community_report: null,
+    created_at: IMPORT_AT,
+  }));
+  await fs.writeFile(IMPORT_PATH, JSON.stringify(importSegments, null, 2));
 
   // ---- write demo-audits.json ----
   await fs.writeFile(
@@ -417,7 +483,10 @@ commit;
     (f) => f.properties.score_accessibility < 50,
   ).length;
   console.log(
-    `[demo] scored ${demoFeatures.length} segments; ${failing} fail Ley 7600 (accessibility < 50).`,
+    `[demo] scored ${demoFeatures.length} pilot segments; ${failing} fail Ley 7600 (accessibility < 50).`,
+  );
+  console.log(
+    `[demo] imported ${importSegments.length} unscored canton segments -> ${IMPORT_PATH}`,
   );
   console.log(`[demo] wrote ${DEMO_GEOJSON_PATH}`);
   console.log(`[demo] wrote ${DEMO_AUDITS_PATH}`);
