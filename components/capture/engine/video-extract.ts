@@ -46,6 +46,16 @@ import {
   toGray,
 } from "@/components/capture/engine/frame-analysis";
 import { demuxVideo, type VideoTrackInfo } from "@/components/capture/engine/video-demux";
+import {
+  planExtraction,
+  sampleTargetsMs,
+  type ExtractionPlan,
+} from "@/components/capture/engine/video-plan";
+
+// Re-exported so a caller needs one import for the extraction vocabulary. The
+// definitions live in `video-plan.ts` because this file imports mp4box, which is
+// ESM-only, and the CommonJS test harness cannot `require()` through it.
+export { planExtraction, sampleTargetsMs, type ExtractionPlan };
 
 /**
  * How many decoded frames may sit in the reorder buffer.
@@ -67,9 +77,6 @@ const REORDER_WINDOW = 16;
  */
 const MAX_DECODE_QUEUE = 24;
 
-/** Ideal sampling interval: one frame a second, same cadence as a live walk. */
-const IDEAL_INTERVAL_MS = 1_000;
-
 export type ExtractedFrame = {
   seq: number;
   /** Milliseconds from the start of the video, NOT epoch. The caller adds the clock. */
@@ -78,24 +85,6 @@ export type ExtractedFrame = {
   width: number;
   height: number;
   blurScore: number;
-};
-
-/**
- * The sampling decision, made up front from the duration alone so the UI can be
- * honest about it before any work starts.
- */
-export type ExtractionPlan = {
-  durationMs: number;
-  intervalMs: number;
-  targetFrames: number;
-  /**
-   * True when the video is long enough that a frame a second would blow the
-   * session cap, so the interval was stretched to fit. The UI must say this out
-   * loud: the walker gets sparser coverage than they might expect, and silently
-   * truncating at 400 instead would be worse (it would cover the first seven
-   * minutes and abandon the rest of the street).
-   */
-  sparser: boolean;
 };
 
 export type ExtractionProgress = {
@@ -114,56 +103,6 @@ export class VideoExtractError extends Error {
     this.name = "VideoExtractError";
     this.reason = reason;
   }
-}
-
-/**
- * Decide the sampling cadence.
- *
- * A 20 minute video at 1 fps is 1200 frames against a 400 frame cap, so the
- * interval stretches to 3 seconds and the whole street still gets covered. The
- * alternative (keep 1 fps, stop at 400) would silently cover a third of the walk
- * and drop the rest on the floor, which is a lie by omission.
- */
-export function planExtraction(
-  durationMs: number,
-  maxFrames: number = CAPTURE_LIMITS.maxFrames,
-): ExtractionPlan {
-  const duration = Math.max(0, durationMs);
-  const idealCount = Math.floor(duration / IDEAL_INTERVAL_MS);
-
-  if (idealCount <= maxFrames) {
-    return {
-      durationMs: duration,
-      intervalMs: IDEAL_INTERVAL_MS,
-      targetFrames: Math.max(idealCount, duration > 0 ? 1 : 0),
-      sparser: false,
-    };
-  }
-
-  const intervalMs = Math.ceil(duration / maxFrames);
-  return {
-    durationMs: duration,
-    intervalMs,
-    targetFrames: Math.min(maxFrames, Math.floor(duration / intervalMs)),
-    sparser: true,
-  };
-}
-
-/**
- * The times we want a frame at, in ms from the start of the video.
- *
- * Offset by half an interval rather than starting at zero. Frame zero of a phone
- * video is the worst frame in it: the exposure and focus are still settling and
- * it is often the inside of a pocket. Half-interval offsets also stop the
- * sampling grid aligning with the GOP boundary, which would otherwise bias every
- * sample toward keyframes.
- */
-export function sampleTargetsMs(plan: ExtractionPlan): number[] {
-  const targets: number[] = [];
-  for (let i = 0; i < plan.targetFrames; i += 1) {
-    targets.push(Math.round(i * plan.intervalMs + plan.intervalMs / 2));
-  }
-  return targets;
 }
 
 /* ------------------------------------------------------------------ *
