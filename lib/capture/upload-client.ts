@@ -211,10 +211,24 @@ async function getJson<T>(
   return (await response.json()) as T;
 }
 
+/**
+ * The default fetch, bound to its receiver.
+ *
+ * `globalThis.fetch` on its own is NOT callable once detached from the global:
+ * browsers require `this` to be the Window (or WorkerGlobalScope) and throw
+ * `TypeError: Failed to execute 'fetch' on 'Window': Illegal invocation`
+ * otherwise. Node's undici does not care, which is why passing the bare
+ * reference around survives every node test and then fails on the first real
+ * upload from a phone.
+ */
+function defaultFetch(): typeof fetch {
+  return globalThis.fetch.bind(globalThis);
+}
+
 export async function createSession(
   opts: Pick<UploadCaptureOptions, "mode" | "contact" | "fetchImpl" | "baseUrl" | "signal" | "maxRetries">,
 ): Promise<CreateSessionResponse> {
-  const fetchImpl = opts.fetchImpl ?? globalThis.fetch;
+  const fetchImpl = opts.fetchImpl ?? defaultFetch();
   const url = `${opts.baseUrl ?? ""}/api/capture/sessions`;
   return withRetry(
     () =>
@@ -235,7 +249,7 @@ export async function registerFrames(
   frames: CaptureFrameMeta[],
   opts: Pick<UploadCaptureOptions, "fetchImpl" | "baseUrl" | "signal" | "maxRetries">,
 ): Promise<RegisterFramesResponse> {
-  const fetchImpl = opts.fetchImpl ?? globalThis.fetch;
+  const fetchImpl = opts.fetchImpl ?? defaultFetch();
   const url = `${opts.baseUrl ?? ""}/api/capture/sessions/${sessionId}/frames`;
   return withRetry(
     () => postJson<RegisterFramesResponse>(url, { frames }, { fetchImpl, signal: opts.signal }),
@@ -248,7 +262,7 @@ export async function getSessionStatus(
   sessionId: string,
   opts: Pick<UploadCaptureOptions, "fetchImpl" | "baseUrl" | "signal" | "maxRetries">,
 ): Promise<SessionStatusResponse> {
-  const fetchImpl = opts.fetchImpl ?? globalThis.fetch;
+  const fetchImpl = opts.fetchImpl ?? defaultFetch();
   const url = `${opts.baseUrl ?? ""}/api/capture/sessions/${sessionId}`;
   return withRetry(
     () => getJson<SessionStatusResponse>(url, { fetchImpl, signal: opts.signal }),
@@ -262,7 +276,7 @@ export async function finalizeSession(
   body: { track: TrackPoint[]; source: TrackSource; clockOffsetMs?: number },
   opts: Pick<UploadCaptureOptions, "fetchImpl" | "baseUrl" | "signal" | "maxRetries">,
 ): Promise<{ status: CaptureSessionStatus }> {
-  const fetchImpl = opts.fetchImpl ?? globalThis.fetch;
+  const fetchImpl = opts.fetchImpl ?? defaultFetch();
   const url = `${opts.baseUrl ?? ""}/api/capture/sessions/${sessionId}/finalize`;
   return withRetry(
     () => postJson<{ status: CaptureSessionStatus }>(url, body, { fetchImpl, signal: opts.signal }),

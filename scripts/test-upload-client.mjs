@@ -374,6 +374,47 @@ function main() {
       check("getSessionStatus reads the progress shape", status.status === "uploading" && status.jobs.pending === 2, JSON.stringify(status));
     }
 
+    /* ---------------- Default fetch binding (u27 regression) ---------------- */
+
+    // Regression for a real defect: every call site did `opts.fetchImpl ??
+    // globalThis.fetch`, handing the bare reference on. Browsers require fetch's
+    // `this` to be the Window and throw "Illegal invocation" otherwise, so
+    // uploadCapture failed on its FIRST call from a real phone while every test
+    // here passed. It passed because node's undici does not care about the
+    // receiver, which is precisely why this case has to fake the browser's rule
+    // rather than trust the runtime's leniency.
+    //
+    // The emitted CJS is strict, so a detached `f(url)` sees `this === undefined`
+    // exactly as it would in a browser.
+    {
+      const server = makeServer();
+      const realFetch = globalThis.fetch;
+      let sawDetachedCall = false;
+      globalThis.fetch = function boundOnlyFetch(...args) {
+        if (this !== globalThis) {
+          sawDetachedCall = true;
+          throw new TypeError(
+            "Failed to execute 'fetch' on 'Window': Illegal invocation",
+          );
+        }
+        return server.fetchImpl(...args);
+      };
+      let error = null;
+      try {
+        // No fetchImpl: this is the production path a phone actually takes.
+        await U.createSession({ mode: "live" });
+      } catch (err) {
+        error = err;
+      } finally {
+        globalThis.fetch = realFetch;
+      }
+      check(
+        "the default fetch is bound, so a browser would not reject it",
+        error === null && !sawDetachedCall,
+        error ? `threw ${error.message}` : "",
+      );
+    }
+
     rmSync(BUILD_DIR, { recursive: true, force: true });
 
     console.log(
