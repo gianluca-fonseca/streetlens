@@ -25,8 +25,11 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { publicFrameUrl } from "./storage";
 import { readCaptureReviewOverlay, readCaptureTombstones } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
-import type { FrameObservation, SegmentAssessments } from "./review-overrides";
-import type { SegmentAssessment } from "./schemas";
+import type {
+  FrameObservation,
+  SegmentAssessment,
+  SegmentAssessments,
+} from "./review-overrides";
 
 export type { FrameObservation, SegmentAssessment, SegmentAssessments };
 
