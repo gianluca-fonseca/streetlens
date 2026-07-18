@@ -258,7 +258,11 @@ async function main() {
       /62\.5/.test(panelText) && /41/.test(panelText),
     );
     check("the camera's unknown lens is unset, not 0", /Drainage\n—/.test(panelText) || /Drainage\s*\n?\s*—/.test(panelText));
-    check("confidence and coverage are shown", /Confidence 64%/.test(panelText) && /Coverage 75%/.test(panelText));
+    // \s+ rather than a literal space: u33 turned these into gauges, so the
+    // label and its figure are now separate blockified spans and innerText puts
+    // a newline between them. The assertion is about the label and the value
+    // being SHOWN together, which is still exactly what is checked.
+    check("confidence and coverage are shown", /Confidence\s+64%/.test(panelText) && /Coverage\s+75%/.test(panelText));
 
     /* ---------------- The contributor ---------------- */
     console.log("\nthe contributor's status page");
