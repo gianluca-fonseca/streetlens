@@ -17,6 +17,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getSupabaseClient } from "./supabase";
+import { showDemoData } from "./demo-flag";
 import {
   readCommunityReports,
   readCommunitySegments,
@@ -144,6 +145,33 @@ async function readDemoCollection(): Promise<DemoCollection> {
     demoCollectionCache = parsed;
   }
   return demoCollectionCache;
+}
+
+/**
+ * Demo era off (NEXT_PUBLIC_SHOW_DEMO_DATA unset): strip the generated pilot
+ * scores and re-cast the 535 esc-sa features as the neutral, unaudited canton
+ * network. `source: "import"` routes them through the exact community casing the
+ * canton overlay already uses (RAMP_LAYER_FILTER excludes source:community/import,
+ * COMMUNITY_LAYER_FILTER draws them), so they render neutral with no map or
+ * detail-panel change: SegmentDetail keys its score breakdown and demo footnote
+ * on `isCommunity`, and getStats excludes source:import from the audited figure.
+ * Copy-on-write, so the module-level demoCollectionCache is never mutated.
+ */
+function hideDemoScores(features: SegmentFeature[]): SegmentFeature[] {
+  return features.map((f) => ({
+    ...f,
+    properties: {
+      ...f.properties,
+      score_overall: 0,
+      score_accessibility: 0,
+      score_drainage: 0,
+      score_shade: 0,
+      score_bike: 0,
+      audited_at: "",
+      demo: false,
+      source: "import",
+    },
+  }));
 }
 
 async function readDemoAudits(): Promise<DemoAuditsFile> {
@@ -438,10 +466,13 @@ export async function getSegments(): Promise<SegmentCollection> {
   );
 
   const live = await liveScoreRows();
+  const demoFeatures = live && live.length > 0 ? null : (await readDemoCollection()).features;
   const officialFeatures =
-    live && live.length > 0
-      ? live.map(rowToFeature)
-      : (await readDemoCollection()).features;
+    demoFeatures === null
+      ? live!.map(rowToFeature)
+      : showDemoData()
+        ? demoFeatures
+        : hideDemoScores(demoFeatures);
 
   return {
     type: "FeatureCollection",
@@ -562,6 +593,21 @@ export async function getStats(): Promise<StreetStats> {
           ? Number(((km / networkKm) * 100).toFixed(1))
           : 100,
       heroPct: Math.round((failing / live.length) * 100),
+      communitySegments,
+      cvSessionsReviewed,
+      cvSegments,
+    };
+  }
+
+  // Demo era off: no audited scores are published, so the headline audited
+  // figures degrade honestly to zero. The real community/CV counters (computed
+  // above) are unaffected and stay the only live signal.
+  if (!showDemoData()) {
+    return {
+      segments: 0,
+      km: 0,
+      coveragePct: 0,
+      heroPct: 0,
       communitySegments,
       cvSessionsReviewed,
       cvSegments,
