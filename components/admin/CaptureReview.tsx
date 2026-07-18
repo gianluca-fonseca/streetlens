@@ -29,6 +29,7 @@ import {
   type RecomputedSegment,
 } from "@/lib/capture/review-overrides";
 import { LENS_KEYS, type LensKey } from "@/lib/capture/scoring";
+import { formatProvenanceDate, sanitizeContact } from "@/lib/cv-provenance";
 import type { RubricItemKey } from "@/lib/capture/types";
 import FrameInspector from "./FrameInspector";
 import FrameLightbox from "./FrameLightbox";
@@ -330,14 +331,23 @@ export default function CaptureReview({
           </div>
           <div>
             <dt className="text-neutral-strong">{t("capturedLabel")}</dt>
-            <dd className="font-mono font-medium text-ink">
-              {review.capturedOn ? review.capturedOn.slice(0, 10) : t("unset")}
+            <dd className="font-medium text-ink">
+              {formatProvenanceDate(review.capturedOn, locale) ?? t("unset")}
             </dd>
           </div>
           <div>
             <dt className="text-neutral-strong">{t("tokensLabel")}</dt>
             <dd className="font-mono font-medium text-ink">
               {numFmt.format(review.tokens.inputTokens + review.tokens.outputTokens)}
+            </dd>
+          </div>
+          {/* The SAME "submitted by" fact the public popover shows, so reviewer and
+              public read one truth. Contact only reaches here via the secret-gated
+              detail RPC (0024); anonymous / fixture sessions fall back. Never a hash. */}
+          <div className="col-span-2 sm:col-span-2">
+            <dt className="text-neutral-strong">{t("submittedByLabel")}</dt>
+            <dd className="break-words font-medium text-ink">
+              {sanitizeContact(review.contact) ?? t("submittedAnonymous")}
             </dd>
           </div>
         </dl>

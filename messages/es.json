@@ -241,6 +241,8 @@
       "statusLabel": "Estado",
       "framesLabel": "Cuadros",
       "capturedLabel": "Caminada el",
+      "submittedByLabel": "Enviado por",
+      "submittedAnonymous": "Colaborador anónimo",
       "tokensLabel": "Tokens",
       "jobsDone": "{count} extraídos",
       "jobsFailed": "{count} con fallo",

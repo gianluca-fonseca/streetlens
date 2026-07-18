@@ -241,6 +241,8 @@
       "statusLabel": "Status",
       "framesLabel": "Frames",
       "capturedLabel": "Walked on",
+      "submittedByLabel": "Submitted by",
+      "submittedAnonymous": "Anonymous contributor",
       "tokensLabel": "Tokens",
       "jobsDone": "{count} extracted",
       "jobsFailed": "{count} failed",

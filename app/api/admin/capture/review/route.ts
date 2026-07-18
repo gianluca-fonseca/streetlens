@@ -167,6 +167,10 @@ export async function POST(request: NextRequest) {
       session_id,
       submission_id: null,
       captured_on: review.capturedOn ?? new Date().toISOString(),
+      // The DB apply re-sources contact server-side (0024); this carries it for the
+      // local mirror, which has no capture_sessions table to read. Null when the
+      // walk was anonymous or when only the anon review RPC populated the review.
+      contact: review.contact ?? null,
       observations: chosen.map((s) => ({
         segment_id: s.segmentId,
         scores: {

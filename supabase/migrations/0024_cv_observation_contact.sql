@@ -129,4 +129,86 @@ begin
 end;
 $$;
 
+-- 3. capture_session_review_detail, extended ---------------------------------
+-- The admin review workbench must show the SAME "submitted by" fact the public
+-- popover shows, so reviewer and public read one truth. This detail RPC is the
+-- secret-gated (admin-only) companion to the anon-callable capture_session_review,
+-- which deliberately withholds contact/ip hash from anyone holding a session link.
+-- Adding contact HERE (and not to the anon RPC) keeps that boundary: only an
+-- authenticated admin sees it. Identical to 0021 except `contact` joins the return.
+
+create or replace function capture_session_review_detail(
+  p_session_id uuid,
+  p_secret     text
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_expected text;
+  v_session  capture_sessions;
+  v_track    jsonb;
+  v_frames   jsonb;
+  v_tombs    jsonb;
+begin
+  select value into v_expected from app_secrets where key = 'admin_rpc_secret';
+  if v_expected is null or p_secret is null or p_secret <> v_expected then
+    raise exception 'unauthorized';
+  end if;
+
+  select * into v_session from capture_sessions where id = p_session_id;
+  if v_session.id is null then
+    raise exception 'session not found';
+  end if;
+
+  select coalesce(
+           jsonb_agg(
+             jsonb_build_object('lng', st_x(dp.geom), 'lat', st_y(dp.geom))
+             order by dp.path
+           ),
+           '[]'::jsonb
+         )
+    into v_track
+    from st_dumppoints(v_session.track::geometry) as dp;
+
+  select coalesce(jsonb_agg(fr order by (fr ->> 'seq')::int), '[]'::jsonb)
+    into v_frames
+    from (
+      select jsonb_build_object(
+        'seq',          f.seq,
+        'nearJunction', f.near_junction,
+        'usable',       coalesce((
+          select o.usable
+            from capture_observations o
+           where o.frame_id = f.id
+           order by o.escalated desc
+           limit 1
+        ), true),
+        'position', case
+          when f.location is null then null
+          else jsonb_build_object(
+            'lng', st_x(f.location::geometry),
+            'lat', st_y(f.location::geometry)
+          )
+        end
+      ) as fr
+      from capture_frames f
+      where f.session_id = p_session_id
+    ) frames;
+
+  select coalesce(jsonb_agg(jsonb_build_object('seq', t.seq) order by t.seq), '[]'::jsonb)
+    into v_tombs
+    from capture_frame_tombstones t
+   where t.session_id = p_session_id;
+
+  return jsonb_build_object(
+    'track',      coalesce(v_track, '[]'::jsonb),
+    'frames',     coalesce(v_frames, '[]'::jsonb),
+    'tombstones', coalesce(v_tombs, '[]'::jsonb),
+    'contact',    v_session.contact
+  );
+end;
+$$;
+
 commit;
