@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { StreetStats } from "@/lib/segments";
+import { formatCvCoveragePct } from "@/lib/cv-provenance";
 import { cn } from "@/components/ui/cn";
 
 /**
@@ -14,6 +15,13 @@ import { cn } from "@/components/ui/cn";
  * saw nothing move and read it as breakage. This renders those counters as what
  * they are: observed, not verified. It never touches `segments`, `km`,
  * `coveragePct`, or `heroPct`.
+ *
+ * The CV line also carries `cvCoveragePct`, the share of the canton network a
+ * camera has actually been down. That is the one figure that MOVES the moment an
+ * approval lands, so it is the answer to the owner's "approved, still 0%". It is
+ * rendered as a clearly separate percentage on the unaudited line, never beside
+ * or merged into the audited `coveragePct`, and it floors at "<0.1%" so a single
+ * street reads as visibly non-zero (see `formatCvCoveragePct`).
  *
  * Each line appears only when its counter is above zero, so a deployment with
  * neither signal renders nothing at all.
@@ -32,15 +40,27 @@ export default function ProvenanceNote({
   tone?: "page" | "panel";
 }>) {
   const t = useTranslations("provenance");
+  const locale = useLocale();
 
   const lines: { key: string; text: string }[] = [];
   if (stats.cvSegments > 0) {
+    // The percentage fragment appears only when there is a real percentage to
+    // show. With no network length behind the covered segments this falls back
+    // to the count-only line rather than printing a hollow "0%" beside the
+    // audited zero, which is the confusion this note exists to end.
+    const pct = formatCvCoveragePct(stats.cvCoveragePct, locale);
     lines.push({
       key: "cv",
-      text: t("cv", {
-        segments: stats.cvSegments,
-        sessions: stats.cvSessionsReviewed,
-      }),
+      text: pct
+        ? t("cvWithCoverage", {
+            segments: stats.cvSegments,
+            sessions: stats.cvSessionsReviewed,
+            pct,
+          })
+        : t("cv", {
+            segments: stats.cvSegments,
+            sessions: stats.cvSessionsReviewed,
+          }),
     });
   }
   if (stats.communitySegments > 0) {

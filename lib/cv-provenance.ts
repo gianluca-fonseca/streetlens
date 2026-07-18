@@ -52,3 +52,36 @@ export function sanitizeContact(contact: unknown): string | null {
   if (!s) return null;
   return s.length > 80 ? `${s.slice(0, 79)}…` : s;
 }
+
+/** Below this, a real percentage is shown as a floor rather than rounded away. */
+const COVERAGE_FLOOR_PCT = 0.1;
+
+/**
+ * `StreetStats.cvCoveragePct` as a display string, or null when there is nothing
+ * to show (zero, negative, or not a number — the caller then renders no
+ * percentage fragment at all rather than an honest-looking "0%").
+ *
+ * THE RULE THIS EXISTS FOR: never print "0.0%" for a value that is genuinely
+ * above zero. A single approved street is ~0.09% of the canton network, so naive
+ * one-decimal rounding would render "0.0%" — indistinguishable from the "nothing
+ * happened" the owner reported as breakage, on the very number that is supposed
+ * to move when an approval lands. Anything under 0.1% floors to "<0.1%" instead,
+ * which is both truthful and visibly non-zero.
+ *
+ * Locale-aware: Spanish takes a comma decimal separator ("2,3%", "<0,1%"), so the
+ * threshold is formatted through Intl too rather than hardcoded into the string.
+ */
+export function formatCvCoveragePct(
+  pct: unknown,
+  locale: string,
+): string | null {
+  if (typeof pct !== "number" || !Number.isFinite(pct) || pct <= 0) return null;
+  const format = (n: number) =>
+    new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(n);
+  return pct < COVERAGE_FLOOR_PCT
+    ? `<${format(COVERAGE_FLOOR_PCT)}%`
+    : `${format(pct)}%`;
+}

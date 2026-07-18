@@ -76,6 +76,7 @@
   },
   "provenance": {
     "cv": "{segments, plural, one {# calle observada} other {# calles observadas}} por cámara ({sessions, plural, one {# sesión revisada} other {# sesiones revisadas}}) · pendiente de verificación en campo",
+    "cvWithCoverage": "{segments, plural, one {# calle observada} other {# calles observadas}} por cámara ({sessions, plural, one {# sesión revisada} other {# sesiones revisadas}}) · {pct} de la red · pendiente de verificación en campo",
     "community": "{count, plural, one {# aporte comunitario} other {# aportes comunitarios}} · sin verificar"
   },
   "detail": {

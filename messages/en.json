@@ -76,6 +76,7 @@
   },
   "provenance": {
     "cv": "{segments, plural, one {# street} other {# streets}} camera-observed ({sessions, plural, one {# session} other {# sessions}} reviewed) · pending field verification",
+    "cvWithCoverage": "{segments, plural, one {# street} other {# streets}} camera-observed ({sessions, plural, one {# session} other {# sessions}} reviewed) · {pct} of network · pending field verification",
     "community": "{count, plural, one {# community contribution} other {# community contributions}} · unverified"
   },
   "detail": {
