@@ -35,6 +35,7 @@ type CvObservationRow = {
   human_corrected: boolean | null;
   overrides: Record<string, unknown> | null;
   assessment: CvObservation["assessment"] | null;
+  assessment_es: CvObservation["assessment_es"] | null;
 };
 
 function toNum(v: number | string | null | undefined): number | null {
@@ -66,6 +67,7 @@ function rowToCvObservation(row: CvObservationRow): CvObservation {
     human_corrected: row.human_corrected ?? false,
     overrides: row.overrides ?? {},
     assessment: row.assessment ?? null,
+    assessment_es: row.assessment_es ?? null,
   };
 }
 
@@ -81,7 +83,7 @@ async function liveCvObservationsForSegment(
         const { data, error } = await client
           .from("community_cv_observations")
           .select(
-            "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
+            "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment,assessment_es",
           )
           .eq("segment_id", segmentId)
           .order("created_at", { ascending: false })

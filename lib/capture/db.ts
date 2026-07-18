@@ -27,7 +27,7 @@ import type {
   CaptureObservationItem,
 } from "./types";
 import type { TrackPoint } from "./types";
-import type { SegmentAssessment } from "./schemas";
+import type { SegmentAssessment, SegmentAssessmentEs } from "./schemas";
 
 /* ------------------------------------------------------------------ *
  * Row shapes returned by the RPCs (0013 + 0015)
@@ -114,6 +114,8 @@ export type SegmentAssessmentWrite = {
   sessionId: string;
   segmentId: string;
   assessment: SegmentAssessment;
+  /** Spanish prose companion (0028). Null when synthesis omitted usable ES. */
+  assessmentEs?: SegmentAssessmentEs | null;
   /** The synthesis call's spend, recorded on the rollup for the session ledger. */
   inputTokens: number;
   outputTokens: number;
@@ -397,6 +399,7 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
         p_session_id: args.sessionId,
         p_segment_id: args.segmentId,
         p_assessment: args.assessment,
+        p_assessment_es: args.assessmentEs ?? null,
         p_input_tokens: args.inputTokens,
         p_output_tokens: args.outputTokens,
         p_secret: adminSecret(),

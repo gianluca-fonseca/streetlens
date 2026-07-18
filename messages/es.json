@@ -99,6 +99,8 @@
     "breakdownHeading": "Desglose de la rúbrica",
     "photosHeading": "Fotos",
     "photoPlaceholder": "Foto pendiente del trabajo de campo",
+    "photoHeld": "Fotogramas de cámara en revisión",
+    "photoUnavailable": "Evidencia fotográfica no disponible",
     "demoNote": "Auditoría de demostración. Los datos de campo reales reemplazan este corredor, tramo por tramo, desde agosto de 2026.",
     "close": "Cerrar el panel de detalle",
     "communityPending": "Aporte de la comunidad · pendiente de verificación de campo",
@@ -122,7 +124,7 @@
     "cvCoverageLabel": "Cobertura",
     "cvFramesLabel": "Cuadros",
     "cvAssessmentLabel": "Evaluación",
-    "cvAssessmentNote": "Escrito por el modelo de cámara, en inglés. No es una auditoría de campo."
+    "cvAssessmentNote": "Escrito por el modelo de cámara. Se muestra en inglés si falta el español. No es una auditoría de campo."
   },
   "rubric": {
     "overall": {

@@ -171,6 +171,17 @@ export function synthesisMaxAdjust(): number {
   return 20;
 }
 
+/**
+ * Hard ceiling on synthesis output tokens. Bilingual prose (EN+ES) roughly
+ * doubles the write budget; this keeps a runaway model from burning the
+ * session on one segment. `CV_SYNTHESIS_MAX_OUTPUT_TOKENS` overrides.
+ */
+export function synthesisMaxOutputTokens(): number {
+  const override = Number(process.env.CV_SYNTHESIS_MAX_OUTPUT_TOKENS);
+  if (Number.isFinite(override) && override > 0) return Math.floor(override);
+  return 1800;
+}
+
 /* ------------------------------------------------------------------ *
  * Queue + retries
  * ------------------------------------------------------------------ */

@@ -99,6 +99,8 @@
     "breakdownHeading": "Rubric breakdown",
     "photosHeading": "Photos",
     "photoPlaceholder": "Photo pending fieldwork",
+    "photoHeld": "Camera frames held for review",
+    "photoUnavailable": "Evidence frames unavailable",
     "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
     "close": "Close detail panel",
     "communityPending": "Community-contributed · pending field verification",
@@ -122,7 +124,7 @@
     "cvCoverageLabel": "Coverage",
     "cvFramesLabel": "Frames",
     "cvAssessmentLabel": "Assessment",
-    "cvAssessmentNote": "Written by the camera model, in English. Not a field audit."
+    "cvAssessmentNote": "Written by the camera model. Falls back to English when Spanish is missing. Not a field audit."
   },
   "rubric": {
     "overall": {

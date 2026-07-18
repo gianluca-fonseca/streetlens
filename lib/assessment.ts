@@ -7,8 +7,13 @@
  */
 export {
   segmentAssessmentSchema,
+  segmentAssessmentEsSchema,
+  assessmentOverallForLocale,
   type SegmentAssessment,
+  type SegmentAssessmentEs,
   parseSegmentAssessment,
+  parseSegmentAssessmentEs,
 } from "./capture/schemas";
 
 export type { SegmentAssessment as CvAssessment } from "./capture/schemas";
+export type { SegmentAssessmentEs as CvAssessmentEs } from "./capture/schemas";

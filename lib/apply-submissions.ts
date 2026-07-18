@@ -35,6 +35,7 @@ import type {
   CommunityReport,
   CommunitySegment,
   CvAssessment,
+  CvAssessmentEs,
   CvItemMedian,
   CvObservation,
   ScoreLayer,
@@ -256,6 +257,8 @@ export type CvApplyObservation = {
   overrides?: Record<string, unknown>;
   /** The segment synthesis approved alongside the numbers (u2). Null when none. */
   assessment?: CvAssessment | null;
+  /** Spanish prose companion (0028). Null when synthesis omitted ES. */
+  assessment_es?: CvAssessmentEs | null;
 };
 
 /** Input to the capture apply path: a session and the segments an admin approved. */
@@ -295,6 +298,7 @@ export function buildCvObservations(input: CvApplyInput): CvObservation[] {
     human_corrected: o.human_corrected ?? false,
     overrides: o.overrides ?? {},
     assessment: o.assessment ?? null,
+    assessment_es: o.assessment_es ?? null,
   }));
 }
 

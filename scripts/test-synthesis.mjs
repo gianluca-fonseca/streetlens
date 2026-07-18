@@ -123,6 +123,13 @@ function draft(adjust = {}) {
       shade: adjust.shade ?? base(),
       bike: adjust.bike ?? base(),
     },
+    overall_es: "Un veredicto matizado sobre todo el segmento.",
+    lenses_es: {
+      accessibility: "prosa de accesibilidad",
+      drainage: "prosa de drenaje",
+      shade: "prosa de sombra",
+      bike: "prosa de bicicleta",
+    },
   };
 }
 
@@ -387,9 +394,15 @@ async function main() {
     check("the bounded adjustment is applied end to end", out.kind === "ok" && out.assessment.adjustedScores.accessibility === 78);
     check("usage is reported for the ledger", out.kind === "ok" && out.usage.inputTokens === 400);
     check(
+      "Spanish prose companion is extracted from the same call",
+      out.kind === "ok" && out.assessmentEs?.overall === "Un veredicto matizado sobre todo el segmento.",
+    );
+    check(
       "the request is text-only, carrying the evidence and the strict format",
       client.calls[0].user.includes("SEGMENT s") && client.calls[0].format.strict === true,
     );
+    const body = SYN.buildSynthesisRequestBody(client.calls[0]);
+    check("synthesis request bounds max_output_tokens", typeof body.max_output_tokens === "number" && body.max_output_tokens > 0);
   }
 
   {
@@ -421,7 +434,7 @@ async function main() {
   {
     const fmt = SYN.synthesisResponseFormat(20);
     check("structured output is strict", fmt.strict === true);
-    check("it demands overall, lenses, and adjustments", ["overall", "lenses", "adjustments"].every((k) => fmt.schema.required.includes(k)));
+    check("it demands overall, lenses, adjustments, and ES companions", ["overall", "lenses", "adjustments", "overall_es", "lenses_es"].every((k) => fmt.schema.required.includes(k)));
     check(
       "adjustments requires all four adjustable lenses",
       ["accessibility", "drainage", "shade", "bike"].every((k) => fmt.schema.properties.adjustments.required.includes(k)),

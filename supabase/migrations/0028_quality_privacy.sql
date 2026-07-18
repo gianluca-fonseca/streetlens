@@ -35,6 +35,11 @@ comment on column community_cv_observations.assessment_es is
 
 -- Persist both locales from the pump. p_assessment_es is optional (null keeps
 -- the EN-only path for older callers / failed ES generation).
+--
+-- Postgres: adding a DEFAULT arg creates a new overload. Drop the 6-arg form
+-- so callers always hit the 7-arg signature (p_assessment_es nullable).
+drop function if exists capture_set_segment_assessment(uuid, text, jsonb, integer, integer, text);
+
 create or replace function capture_set_segment_assessment(
   p_session_id    uuid,
   p_segment_id    text,
@@ -65,19 +70,20 @@ revoke all on function capture_set_segment_assessment(uuid, text, jsonb, integer
 grant execute on function capture_set_segment_assessment(uuid, text, jsonb, integer, integer, text, jsonb) to anon, authenticated;
 
 -- Apply path: carry assessment_es onto published CV observations.
-create or replace function admin_apply_cv_observations(
+-- Preserves 0026 body; only assessment_es is additive.
+create or replace function admin_apply_capture_session(
+  p_secret        text,
   p_session_id    uuid,
   p_submission_id uuid,
-  p_observations  jsonb,
-  p_secret        text
+  p_observations  jsonb
 ) returns integer
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_keep  text[];
-  v_count integer;
+  v_count    integer;
+  v_keep     text[];
 begin
   perform assert_admin_secret(p_secret);
 
@@ -144,7 +150,7 @@ begin
 end;
 $$;
 
--- Review read: surface assessment_es beside assessment (admin workbench).
+-- Review read: 0027 body + assessmentEs on each rollup.
 create or replace function capture_session_review(
   p_session_id uuid,
   p_secret     text
@@ -169,10 +175,7 @@ begin
     'status',      v_session.status,
     'mode',        v_session.mode,
     'frameCount',  v_session.frame_count,
-    'contact',     v_session.contact,
-    'createdAt',   v_session.created_at,
-    'matchedAt',   v_session.matched_at,
-    'extractedAt', v_session.extracted_at,
+    'capturedOn',  coalesce(v_session.extracted_at, v_session.uploaded_at, v_session.created_at),
     'reviewedAt',  v_session.reviewed_at,
     'pauseReason', v_session.pause_reason,
     'resumeActor', v_session.resume_actor,
@@ -296,14 +299,9 @@ set search_path = public
 as $$
   select exists (
     select 1
-      from community_cv_observations o
-     where o.frame_refs ? p_name
-        or o.frame_refs @> to_jsonb(p_name)
-        or exists (
-             select 1
-               from jsonb_array_elements_text(o.frame_refs) as ref(path)
-              where ref.path = p_name
-           )
+      from community_cv_observations o,
+           jsonb_array_elements_text(coalesce(o.frame_refs, '[]'::jsonb)) as ref(path)
+     where ref.path = p_name
   );
 $$;
 
