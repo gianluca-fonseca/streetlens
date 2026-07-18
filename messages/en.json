@@ -6,6 +6,14 @@
   "demoBanner": {
     "message": "Demo data over real street geometry. Field pilot begins August 2026: no number shown is a real measurement."
   },
+  "theme": {
+    "label": "Theme",
+    "options": {
+      "light": "Light",
+      "system": "System",
+      "dark": "Dark"
+    }
+  },
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
     "demoTag": "DEMO",
