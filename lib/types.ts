@@ -184,6 +184,12 @@ export type SegmentProperties = {
    * on this primitive instead. Always mirrors `cv_observations.length`.
    */
   cv_count?: number;
+  /** Paint-only canonical CV lens scores (public map wire). */
+  cv_overall?: number | null;
+  cv_accessibility?: number | null;
+  cv_drainage?: number | null;
+  cv_shade?: number | null;
+  cv_bike?: number | null;
 };
 
 export type SegmentFeature = Feature<LineString, SegmentProperties>;

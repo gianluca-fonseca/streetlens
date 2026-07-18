@@ -76,6 +76,7 @@ async function main() {
       "tsc",
       "lib/submissions.ts",
       "lib/segments.ts",
+      "lib/segment-map-detail.ts",
       "--outDir", BUILD_DIR,
       "--module", "commonjs",
       "--moduleResolution", "node",
@@ -87,6 +88,7 @@ async function main() {
 
   const submissions = require(path.join(BUILD_DIR, "submissions.js"));
   const segments = require(path.join(BUILD_DIR, "segments.js"));
+  const mapDetail = require(path.join(BUILD_DIR, "segment-map-detail.js"));
 
   // The committed canton overlay (esc-ce/esc-sr) merges into getSegments as
   // source:"import" neutral features; count it so the audited pilot (535) and
@@ -164,14 +166,27 @@ async function main() {
         (s) => s === 0,
       ),
     );
-    check("carries a community_report from the note", Boolean(p.community_report && p.community_report.note));
+    check(
+      "paint wire omits community_report blob",
+      p.community_report === undefined,
+    );
     check("geometry is a LineString", community.geometry?.type === "LineString");
   }
 
+  const addDetail = await mapDetail.getSegmentMapDetail("com-t-add-1");
+  check(
+    "detail fetch carries community_report from the note",
+    Boolean(addDetail.community_report && addDetail.community_report.note),
+  );
+
   // Update → report attached to the TARGET segment (not the community add).
   const targetFeature = after.features.find((f) => f.properties.id === targetId);
-  const reports = targetFeature?.properties?.community_reports ?? [];
-  const upReport = reports.find((r) => r.id === "rep-t-upd-1");
+  check(
+    "paint wire omits community_reports on target",
+    targetFeature?.properties?.community_reports === undefined,
+  );
+  const targetDetail = await mapDetail.getSegmentMapDetail(targetId);
+  const upReport = targetDetail.community_reports.find((r) => r.id === "rep-t-upd-1");
   check("update_segment attached a community report to the target", Boolean(upReport));
   check(
     "report note is qualitative (not a score), carries the reason",

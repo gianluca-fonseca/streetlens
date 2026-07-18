@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
@@ -8,13 +9,14 @@ import type { SegmentCollection, StreetStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
-import AuditMap from "@/components/AuditMap";
 import Logo from "@/components/ui/Logo";
 import ProvenanceNote from "@/components/ProvenanceNote";
 import StatFigure from "@/components/ui/StatFigure";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { cn } from "@/components/ui/cn";
 import { AUTHOR_LINKEDIN, CITY_REQUEST_URL, CUSP_URL, GITHUB_URL } from "@/lib/links";
+
+const AuditMap = dynamic(() => import("@/components/AuditMap"), { ssr: false });
 
 /**
  * The platform hero (rev 6, u21 — the mcbroken restructure). A slim top banner

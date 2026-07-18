@@ -23,6 +23,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { getSessionReview } from "@/lib/capture/review-store";
 import { applyApprovedCaptureSession } from "@/lib/apply-submissions";
 import { finalizeCaptureReview } from "@/lib/capture/review-actions";
+import { revalidatePublicMapPages } from "@/lib/revalidate-map";
 import {
   recomputeReview,
   EMPTY_CORRECTIONS,
@@ -191,6 +192,10 @@ export async function POST(request: NextRequest) {
       action,
       reason,
     });
+
+    if (action === "approve") {
+      revalidatePublicMapPages();
+    }
 
     return NextResponse.json({
       ok: true,

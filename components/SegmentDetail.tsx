@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown, ImageOff, Pencil, ScanLine, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
@@ -160,7 +160,12 @@ function CvObservationCard({
   const tl = useTranslations("layers");
   const locale = useLocale();
 
-  const frames = Array.isArray(o.frame_refs) ? o.frame_refs.length : 0;
+  const frames =
+    "frame_count" in o && typeof (o as { frame_count?: unknown }).frame_count === "number"
+      ? (o as { frame_count: number }).frame_count
+      : Array.isArray(o.frame_refs)
+        ? o.frame_refs.length
+        : 0;
   const confidence = asPercent(o.confidence);
   const coverage = asPercent(o.coverage);
   const confidenceRatio = asRatio(o.confidence);
@@ -315,7 +320,8 @@ function CvObservationCard({
 /**
  * Elevated detail panel shown when a segment is selected (popover elevation).
  * Per-layer scores, a per-item rubric breakdown for the active layer, and a
- * photo placeholder grid. Built from the clicked feature's props — no fetch.
+ * photo placeholder grid. Paint props come from the clicked feature; community
+ * reports and CV observations load on click via /api/segments/[id]/detail.
  */
 export default function SegmentDetail({
   segment,
@@ -329,6 +335,43 @@ export default function SegmentDetail({
   const t = useTranslations("detail");
   const tl = useTranslations("layers");
   const tr = useTranslations("rubric");
+
+  const [detailLoading, setDetailLoading] = useState(true);
+  const [detailCv, setDetailCv] = useState<CvObservation[] | null>(null);
+  const [detailReports, setDetailReports] = useState<
+    ReturnType<typeof parseCommunityReports> | null
+  >(null);
+  const [detailEmbedded, setDetailEmbedded] = useState<
+    ReturnType<typeof parseCommunityReport> | null
+  >(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const res = await fetch(`/api/segments/${encodeURIComponent(segment.id)}/detail`);
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          community_report?: unknown;
+          community_reports?: unknown;
+          cv_observations?: unknown;
+        };
+        if (cancelled) return;
+        setDetailEmbedded(parseCommunityReport(data.community_report));
+        setDetailReports(parseCommunityReports(data.community_reports));
+        setDetailCv(parseCvObservations(data.cv_observations) as CvObservation[]);
+      } catch {
+        /* degrade to paint-only props */
+      } finally {
+        if (!cancelled) setDetailLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [segment.id]);
 
   // Mobile bottom-sheet drag-to-dismiss. Attached only to the drag handle (which
   // is `md:hidden`), so the desktop popover is never draggable. A downward drag
@@ -374,10 +417,10 @@ export default function SegmentDetail({
   // Coerce defensively regardless of upstream: maplibre may deliver these as
   // JSON strings, and malformed report data must NEVER throw here (the panel has
   // no error boundary below the page). parse* tolerate string/object/null/junk.
-  const embedded = parseCommunityReport(segment.community_report);
+  const embedded = detailEmbedded ?? parseCommunityReport(segment.community_report);
   const allReports = [
     ...(embedded ? [embedded] : []),
-    ...parseCommunityReports(segment.community_reports),
+    ...(detailReports ?? parseCommunityReports(segment.community_reports)),
   ];
   const reportMap = new Map<string, (typeof allReports)[number]>();
   for (const r of allReports) reportMap.set(r.id, r);
@@ -386,13 +429,15 @@ export default function SegmentDetail({
   // Approved camera observations. A proposal an admin accepted, NOT an audit:
   // rendered in the provisional idiom, never mixed into `scores` above
   // (docs/cv-funnel.md — "CV output is a proposal, not data").
-  const cvObservations = parseCvObservations(segment.cv_observations);
+  const cvObservations =
+    detailCv ?? parseCvObservations(segment.cv_observations);
   // ONE observation is the segment's present-day state: the most recently walked
   // one (u32, issue #19). Everything it supersedes moves to the archive
   // disclosure below. The ordering lives in lib/cv-provenance so this panel and
   // any future surface cannot drift into disagreeing about what the street is.
   const { canonical, archived } = splitCvObservations(cvObservations);
-  const hasCv = canonical !== null;
+  const hasCv =
+    canonical !== null || (segment.cv_count ?? 0) > 0 || cvObservations.length > 0;
   // A reviewer corrected the CURRENT reading before approving it (u2). Shown as a
   // small, honest marker beside the CV chip — not loud, but not hidden. Scoped to
   // the canonical observation on purpose: the chips describe the street as it
@@ -641,9 +686,15 @@ export default function SegmentDetail({
             <p className="mb-2 text-[12px] leading-snug text-neutral-strong">
               {t("cvNote")}
             </p>
+            {detailLoading && !canonical ? (
+              <p className="rounded-[8px] border border-border bg-surface-sunken px-3 py-4 text-center text-[12px] text-neutral-strong">
+                …
+              </p>
+            ) : canonical ? (
             <ul className="flex flex-col divide-y divide-border rounded-[8px] border border-border">
               <CvObservationCard observation={canonical} superseded={false} />
             </ul>
+            ) : null}
 
             {/* Archive. Only rendered when something was actually superseded:
                 with zero or one observation there is no history to disclose, and
