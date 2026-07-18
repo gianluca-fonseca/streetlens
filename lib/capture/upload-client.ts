@@ -320,19 +320,51 @@ export async function uploadFrameBytes(
   }
 
   const path = captureFrameStoragePath(sessionId, seq);
-  const { error } = await client.storage.from(CAPTURE_BUCKET).upload(path, blob, {
-    contentType: "image/jpeg",
-    // Never overwrite: frames are write-once, and a conflict is how resume
-    // discovers this frame already landed.
-    upsert: false,
-  });
 
-  if (!error) return "uploaded";
+  // Raw-body POST, deliberately NOT client.storage.upload(): supabase-js wraps
+  // Blobs in multipart FormData with an unnamed part, and at least one mobile
+  // WebKit serialization of that shape is rejected by the storage API with an
+  // opaque 400 (observed live 2026-07-18: every phone frame upload 400'd while
+  // raw-body uploads of the same bytes succeeded). A raw body with an explicit
+  // Content-Type has no multipart parsing to disagree about.
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "");
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!base || !anon) {
+    throw new CaptureUploadError(
+      "Supabase is not configured; cannot upload frames",
+      0,
+      "storage",
+    );
+  }
 
-  const status = Number((error as { statusCode?: string | number }).statusCode ?? 0);
-  if (status === 409 || /exists/i.test(error.message)) return "already_present";
+  const res = await fetch(
+    `${base}/storage/v1/object/${CAPTURE_BUCKET}/${path}`,
+    {
+      method: "POST",
+      headers: {
+        apikey: anon,
+        Authorization: `Bearer ${anon}`,
+        "Content-Type": "image/jpeg",
+        // Never overwrite: frames are write-once, and a conflict is how resume
+        // discovers this frame already landed.
+        "x-upsert": "false",
+      },
+      body: blob,
+    },
+  );
 
-  throw new CaptureUploadError(`frame ${seq}: ${error.message}`, status, "storage");
+  if (res.ok) return "uploaded";
+
+  let message = `HTTP ${res.status}`;
+  try {
+    const body = (await res.json()) as { message?: string; error?: string };
+    message = body.message ?? body.error ?? message;
+  } catch {
+    /* body was not json; keep the status text */
+  }
+  if (res.status === 409 || /exists/i.test(message)) return "already_present";
+
+  throw new CaptureUploadError(`frame ${seq}: ${message}`, res.status, "storage");
 }
 
 /* ------------------------------------------------------------------ *
