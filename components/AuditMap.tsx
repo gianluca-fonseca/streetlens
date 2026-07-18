@@ -314,6 +314,7 @@ function setupTerrain(map: maplibregl.Map, dark: boolean) {
         id: HILLSHADE_LAYER_ID,
         type: "hillshade",
         source: TERRAIN.sourceId,
+        layout: { visibility: "none" },
         paint: { ...(dark ? HILLSHADE_PAINT.dark : HILLSHADE_PAINT.light) },
       },
       firstRoadLayerId(map),
@@ -381,13 +382,17 @@ function clampCenterToTerrain(map: maplibregl.Map) {
 }
 
 /** Toggle presentational 3D: terrain + eased pitch + building extrusions. */
-function applyThreeD(map: maplibregl.Map, on: boolean) {
+function applyThreeD(map: maplibregl.Map, on: boolean, dark: boolean) {
   const bid = buildingLayerId(map);
   if (on) {
+    setupTerrain(map, dark);
     map.setTerrain({
       source: TERRAIN.sourceId,
       exaggeration: TERRAIN.exaggeration,
     });
+    if (map.getLayer(HILLSHADE_LAYER_ID)) {
+      map.setLayoutProperty(HILLSHADE_LAYER_ID, "visibility", "visible");
+    }
     if (bid) map.setLayoutProperty(bid, "visibility", "visible");
     map.easeTo({ pitch: 60, duration: 900, essential: true });
     // The DEM tile for the center may still be loading; clamp the center onto
@@ -396,6 +401,9 @@ function applyThreeD(map: maplibregl.Map, on: boolean) {
     clampCenterToTerrain(map);
   } else {
     map.setTerrain(null);
+    if (map.getLayer(HILLSHADE_LAYER_ID)) {
+      map.setLayoutProperty(HILLSHADE_LAYER_ID, "visibility", "none");
+    }
     if (bid) map.setLayoutProperty(bid, "visibility", "none");
     map.easeTo({ pitch: 0, bearing: 0, duration: 700, essential: true });
   }
@@ -555,8 +563,7 @@ export default function AuditMap({
       const dark = prefersDark();
       muteBasemap(map, dark);
       addDataLayers(map, segmentsRef.current);
-      // DEM source + always-on hillshade + primed (hidden) building extrusions.
-      setupTerrain(map, dark);
+      // DEM + hillshade load lazily when 3D is toggled on (applyThreeD).
 
       // Apply the current active layer + dark-mode glow.
       applyLayer(map, activeLayerRef.current, dark);
@@ -730,7 +737,7 @@ export default function AuditMap({
   const handleToggleThreeD = (next: boolean) => {
     setThreeD(next);
     const map = mapRef.current;
-    if (map && readyRef.current) applyThreeD(map, next);
+    if (map && readyRef.current) applyThreeD(map, next, prefersDark());
   };
 
   const handleClose = () => {
@@ -833,6 +840,7 @@ export default function AuditMap({
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center md:inset-x-auto md:bottom-auto md:right-4 md:top-4 md:block">
             <SegmentDetail
+              key={selected.id}
               segment={selected}
               activeLayer={activeLayer}
               onClose={handleClose}
