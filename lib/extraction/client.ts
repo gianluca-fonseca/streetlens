@@ -79,7 +79,7 @@ export class VisionTransportError extends Error {
  * wall clock to arrive at the same answer three times, and buries the real cause
  * ("check your billing") under a generic unavailable message.
  */
-function isRetryable(status: number, body: string): boolean {
+export function isRetryable(status: number, body: string): boolean {
   if (status === 429) return !/insufficient_quota/i.test(body);
   return status >= 500 && status <= 599;
 }
@@ -91,13 +91,13 @@ function isRetryable(status: number, body: string): boolean {
  * un-jittered retries would resynchronize into the same burst that caused the
  * 429 in the first place.
  */
-function backoffMs(attempt: number, rand: () => number): number {
+export function backoffMs(attempt: number, rand: () => number): number {
   const base = 500;
   const capped = Math.min(base * 2 ** attempt, 8_000);
   return Math.floor(rand() * capped);
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /* ------------------------------------------------------------------ *
  * Response parsing

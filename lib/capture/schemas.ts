@@ -286,10 +286,106 @@ export const pumpResponseSchema = z.object({
 export type PumpResponse = z.infer<typeof pumpResponseSchema>;
 
 /* ------------------------------------------------------------------ *
+ * Segment synthesis (the FROZEN assessment contract)
+ *
+ * After the deterministic rollup, one text-only model call per segment reads the
+ * whole traversal in order and produces a nuanced assessment: a prose verdict,
+ * a per-lens explanation, and BOUNDED, REASONED score adjustments on top of the
+ * baseline. This file is the contract in one place — the synthesis engine
+ * (lib/extraction/synthesis.ts) fills it, the persist path stores it as jsonb,
+ * and the review UI reads it back verbatim. Nothing downstream re-derives its
+ * shape by hand.
+ *
+ * The four ADJUSTABLE lenses are accessibility, drainage, shade and bike — the
+ * lenses a rollup measures directly. `overall` is never adjusted or invented by
+ * the model: it is recomputed from the adjusted lens values with the SAME
+ * renormalized 0.45/0.30/0.25 formula scoring.ts uses (see renormalizedOverall).
+ * ------------------------------------------------------------------ */
+
+/** The lenses synthesis may adjust. `overall` is derived, never adjusted. */
+export const SYNTHESIS_LENS_KEYS = ["accessibility", "drainage", "shade", "bike"] as const;
+export type SynthesisLensKey = (typeof SYNTHESIS_LENS_KEYS)[number];
+
+/**
+ * One lens adjustment. `delta` is points added to the baseline (negative lowers
+ * it); the engine clamps it to ±CV_SYNTHESIS_MAX_ADJUST. `reason` is the written
+ * justification the contract requires for every non-zero move — an adjustment
+ * with no reason is dropped to zero rather than applied, so no unexplained number
+ * ever reaches a reviewer.
+ */
+export const lensAdjustmentSchema = z.object({
+  delta: z.number(),
+  reason: z.string(),
+});
+export type LensAdjustment = z.infer<typeof lensAdjustmentSchema>;
+
+const perLensProse = z.object({
+  accessibility: z.string(),
+  drainage: z.string(),
+  shade: z.string(),
+  bike: z.string(),
+});
+
+/**
+ * What the MODEL returns, before the engine applies the bounds and recomputes
+ * `overall`. Strict-schema-shaped: every adjustable lens carries an adjustment
+ * object (delta 0, empty reason when unchanged), because a strict json_schema
+ * cannot express optional keys. The engine turns this into the stored assessment.
+ */
+export const segmentAssessmentDraftSchema = z.object({
+  overall: z.string(),
+  lenses: perLensProse,
+  adjustments: z.object({
+    accessibility: lensAdjustmentSchema,
+    drainage: lensAdjustmentSchema,
+    shade: lensAdjustmentSchema,
+    bike: lensAdjustmentSchema,
+  }),
+});
+export type SegmentAssessmentDraft = z.infer<typeof segmentAssessmentDraftSchema>;
+
+const nullableScore = z.number().nullable();
+
+/**
+ * The stored assessment — the frozen shape the review UI consumes.
+ *
+ * `adjustments` here carries ONLY the lenses actually moved (a partial map), so a
+ * reviewer sees the moves that happened and nothing else. `adjustedScores` is the
+ * engine's output, never the model's: each lens is clamp(baseline + bounded delta,
+ * 0, 100), a lens with a null baseline stays null (synthesis cannot invent a score
+ * for a lens no frame could assess), and `overall` is recomputed from the adjusted
+ * lenses.
+ */
+export const segmentAssessmentSchema = z.object({
+  overall: z.string(),
+  lenses: perLensProse,
+  adjustments: z.object({
+    accessibility: lensAdjustmentSchema.optional(),
+    drainage: lensAdjustmentSchema.optional(),
+    shade: lensAdjustmentSchema.optional(),
+    bike: lensAdjustmentSchema.optional(),
+  }),
+  adjustedScores: z.object({
+    overall: nullableScore,
+    accessibility: nullableScore,
+    drainage: nullableScore,
+    shade: nullableScore,
+    bike: nullableScore,
+  }),
+  model: z.string(),
+});
+export type SegmentAssessment = z.infer<typeof segmentAssessmentSchema>;
+
+/* ------------------------------------------------------------------ *
  * Parse helpers
  * ------------------------------------------------------------------ */
 
 /** Parse+validate an unknown value as a capture observation. Throws on invalid input. */
 export function parseCaptureObservation(input: unknown): CaptureObservationParsed {
   return captureObservationSchema.parse(input);
+}
+
+/** Parse+validate a stored segment assessment. Throws on invalid input. */
+export function parseSegmentAssessment(input: unknown): SegmentAssessment {
+  return segmentAssessmentSchema.parse(input);
 }
