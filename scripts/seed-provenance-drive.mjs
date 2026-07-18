@@ -33,6 +33,20 @@ const SEGMENT = "esc-sa-0001";
 const SESSION_A = "3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b";
 const SESSION_B = "8c1e4d05-2a9f-4b73-8e16-7d4f0a2b9c31";
 
+/**
+ * A CvAssessment (lib/types.ts) carrying just the field the public panel reads.
+ * The shape matters: the panel takes `assessment.overall`, so a bare string here
+ * would silently render nothing at all and the drive would "pass" while proving
+ * less than it claims.
+ */
+function cvAssessment(overall) {
+  return {
+    overall,
+    lenses: { accessibility: "", drainage: "", shade: "", bike: "" },
+    adjustments: {},
+  };
+}
+
 function observation(sessionId, capturedOn, frames, scores, assessment) {
   return {
     id: `cv-${sessionId}-${SEGMENT}`,
@@ -89,14 +103,18 @@ function main() {
           "2026-03-04T02:00:00.000Z",
           3,
           { overall: 54, accessibility: 41, drainage: 60, shade: 58, bike: 33 },
-          "Broken sidewalk on the north side with a missing curb ramp at the corner.",
+          cvAssessment(
+            "Broken sidewalk on the north side with a missing curb ramp at the corner.",
+          ),
         ),
         observation(
           SESSION_B,
           "2026-07-16T02:00:00.000Z",
           2,
           { overall: 71, accessibility: 68, drainage: 74, shade: 58, bike: 45 },
-          "Sidewalk has been repaved since the earlier pass and the corner now has a curb ramp.",
+          cvAssessment(
+            "Sidewalk has been repaved since the earlier pass and the corner now has a curb ramp.",
+          ),
         ),
       ],
       null,
