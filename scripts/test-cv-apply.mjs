@@ -231,7 +231,7 @@ async function main() {
     // The synthesis the reviewer approved rides along with SEG_A. The chosen NUMBER
     // (overall 50) is the reviewer's; the assessment is context for the popover.
     const assessment = {
-      overall: "Walkable but the corner ramp is missing — the one real gap on this block.",
+      overall: "Walkable, but the corner ramp is missing: the one real gap on this block.",
       lenses: {
         accessibility: "Continuous walk, no ramp at the junction.",
         drainage: "No standing water seen.",

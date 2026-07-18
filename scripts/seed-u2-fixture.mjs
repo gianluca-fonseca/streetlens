@@ -211,7 +211,7 @@ function main() {
               drainage:
                 "Standing water pooled at the gutter in one frame; a drain is present but appears undersized for the grade.",
               shade:
-                "Thin canopy — a few young trees give partial midday shade, no continuous cover.",
+                "A thin canopy: a few young trees give partial midday shade, no continuous cover.",
               bike:
                 "No dedicated provision; riders share a narrow lane with turning traffic near the corner.",
             },
@@ -238,7 +238,7 @@ function main() {
           escalated: 0,
           assessment: {
             overall:
-              "A well-kept block: a wide, even sidewalk with good canopy and a present drain. Nothing here needs correcting — the camera and the rubric agree it reads well.",
+              "A well-kept block: a wide, even sidewalk with good canopy and a present drain. Nothing here needs correcting; the camera and the rubric agree it reads well.",
             lenses: {
               accessibility: "Wide, continuous, level walk with no obstructions in view.",
               drainage: "Drain present and the surface sheds cleanly; no pooling seen.",
