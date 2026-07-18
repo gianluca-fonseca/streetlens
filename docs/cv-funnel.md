@@ -514,6 +514,10 @@ The live engine runs entirely on the phone. It is under
 `components/capture/engine/` and `components/capture/hooks/`. Its job is to keep
 only the frames worth uploading, and to survive iOS killing the tab.
 
+> For a plain-language walkthrough of the capture gates and the video-upload
+> path, see [keyframe-extraction.md](keyframe-extraction.md). The sections below
+> are the code-level reference.
+
 **Frame clock and visibility.** `useFrameClock.ts` drives one callback per
 decoded frame via `requestVideoFrameCallback`, falling back to
 `requestAnimationFrame` with a `currentTime` guard so the same frame is not
@@ -641,6 +645,10 @@ what lets bytes land. See the security model below for how the RLS check
 actually runs.
 
 ### Map matching
+
+> For why the HMM holds where naive nearest-segment snapping flips between
+> parallel streets, see [map-matching.md](map-matching.md). The section below is
+> the code-level reference.
 
 `lib/matching/index.ts` picks the active implementation; import from
 `lib/matching`, never from an implementation file. Today the active matcher is
