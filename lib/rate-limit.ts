@@ -39,7 +39,9 @@ export const RATE_LIMIT: RateLimitConfig = { capacity: 5, refillWindowMs: 60_000
 export const RATE_LIMITS = {
   submissions: RATE_LIMIT,
   /** Capture sessions: 3 per hour per origin. Mirrored by 0013's DB-side check. */
-  capture: { capacity: 3, refillWindowMs: 3_600_000 },
+  // Testing-era relief (owner, 2026-07-18): 30/hour while field testing is
+  // active; the DB ceiling (0031) matches. Restore a tighter bound post-pilot.
+  capture: { capacity: 30, refillWindowMs: 3_600_000 },
   /**
    * Session-scoped pump-on-poll (u30): 6 per minute per session.
    *
