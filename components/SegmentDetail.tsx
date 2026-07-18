@@ -664,47 +664,6 @@ export default function SegmentDetail({
             </li>
           ))}
         </ul>
-
-        <h3
-          style={settleDelay(120)}
-          className={`mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong ${panel.settle}`}
-        >
-          {t("photosHeading")}
-        </h3>
-        <div style={settleDelay(120)} className={`${panel.settle}`}>
-          {evidence && evidence.frames.length > 0 ? (
-            <ul className="grid grid-cols-3 gap-2" aria-label={t("photosHeading")}>
-              {evidence.frames.map((frame) => (
-                <li key={frame.i} className="aspect-square overflow-hidden rounded-[8px] border border-border bg-surface-sunken">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- signed URLs are ephemeral; next/image cannot optimize them */}
-                  <img
-                    src={frame.url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="flex aspect-[3/1] flex-col items-center justify-center gap-1 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 text-center">
-              <ImageOff
-                size={18}
-                strokeWidth={1.75}
-                className="text-neutral"
-                aria-hidden="true"
-              />
-              <span className="text-[9.5px] leading-tight text-neutral-strong">
-                {evidence?.emptyReason === "unavailable"
-                  ? t("photoUnavailable")
-                  : evidence?.emptyReason === "none"
-                    ? t("photoHeld")
-                    : t("photoPlaceholder")}
-              </span>
-            </div>
-          )}
-        </div>
           </>
         ) : null}
 
@@ -730,6 +689,49 @@ export default function SegmentDetail({
               <CvObservationCard observation={canonical} superseded={false} />
             </ul>
             ) : null}
+
+            {/* Privacy-safe evidence strip: signed URLs only, via /evidence.
+                Lives with the CV block so import/community camera streets show
+                it (field-audit score chrome above stays gated on !isCommunity). */}
+            <h3
+              className="mb-2 mt-3 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong"
+            >
+              {t("photosHeading")}
+            </h3>
+            <div>
+              {evidence && evidence.frames.length > 0 ? (
+                <ul className="grid grid-cols-3 gap-2" aria-label={t("photosHeading")}>
+                  {evidence.frames.map((frame) => (
+                    <li key={frame.i} className="aspect-square overflow-hidden rounded-[8px] border border-border bg-surface-sunken">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- signed URLs are ephemeral; next/image cannot optimize them */}
+                      <img
+                        src={frame.url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="flex aspect-[3/1] flex-col items-center justify-center gap-1 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 text-center">
+                  <ImageOff
+                    size={18}
+                    strokeWidth={1.75}
+                    className="text-neutral"
+                    aria-hidden="true"
+                  />
+                  <span className="text-[9.5px] leading-tight text-neutral-strong">
+                    {evidence?.emptyReason === "unavailable"
+                      ? t("photoUnavailable")
+                      : evidence?.emptyReason === "none"
+                        ? t("photoHeld")
+                        : t("photoPlaceholder")}
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Archive. Only rendered when something was actually superseded:
                 with zero or one observation there is no history to disclose, and
