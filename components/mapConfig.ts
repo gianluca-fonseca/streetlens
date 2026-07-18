@@ -171,11 +171,88 @@ export const RAMP_LAYER_FILTER = [
   ["in", ["get", "source"], ["literal", COMMUNITY_SOURCES]],
 ] as unknown as ExpressionSpecification;
 
-/** The community casing layer draws ONLY community/import features. */
+/* ------------------------------------------------------------------ *
+ * Camera-observed segments (u31)
+ *
+ * A street with approved CV observations must be unmistakable on the public
+ * map. With demo data off every segment is `source: "import"`, so an observed
+ * street was previously pixel-identical to the ~1,456 others: same neutral
+ * dashed casing, nothing to see. This adds a third, dedicated treatment.
+ *
+ * Colour is the sealed flash-pink accent (--accent / dark --accent-strong),
+ * the one strong non-ramp chroma in the design register. It cannot collide
+ * with any score ramp (none of the five reach magenta) nor with the warm
+ * neutral grey, so the three casings stay mutually unambiguous.
+ *
+ * SOLID (not dashed) and wider than the neutral casing: dashes read as
+ * provisional, and camera evidence is the opposite of provisional. It still
+ * carries no score semantics — it marks that a street was SEEN, never how it
+ * scored, so it is deliberately not a ramp.
+ * ------------------------------------------------------------------ */
+
+export const CV_CASING = {
+  /** Flash pink, the sealed graphic-signal accent. */
+  color: "#f0268c",
+  /** The lighter dark-theme form (--accent-strong), for contrast on near-black. */
+  colorDark: "#ff77b8",
+  /** Solid, and wider than COMMUNITY_CASING so it reads as the stronger mark. */
+  width: 5,
+  widthSelected: 7,
+  /**
+   * Floor on the rendered width so an observed street stays clearly visible
+   * when zoomed out ("very clear, even if small"). Below this zoom the casing
+   * stops shrinking with the viewport.
+   */
+  minWidth: 3.5,
+  /** Zoom at and below which `minWidth` holds. */
+  minWidthZoom: 12,
+  /** Zoom at and above which the full `width` is used. */
+  fullWidthZoom: 14.5,
+  opacity: 0.95,
+} as const;
+
+/**
+ * The camera-observed layer draws ONLY features carrying at least one approved
+ * CV observation. It filters on the precomputed `cv_count` primitive rather
+ * than `cv_observations` itself: MapLibre stringifies array properties at the
+ * worker boundary, and community features always carry the array key even when
+ * it is empty, so neither `["get"]`-into-array nor `["has"]` would work.
+ */
+export const CV_LAYER_FILTER = [
+  ">",
+  ["coalesce", ["get", "cv_count"], 0],
+  0,
+] as unknown as ExpressionSpecification;
+
+/**
+ * The community casing layer draws community/import features EXCEPT those with
+ * camera observations, which get the CV casing instead — otherwise an observed
+ * import segment would be drawn twice and the neutral dash would fight the
+ * accent.
+ */
 export const COMMUNITY_LAYER_FILTER = [
-  "in",
-  ["get", "source"],
-  ["literal", COMMUNITY_SOURCES],
+  "all",
+  ["in", ["get", "source"], ["literal", COMMUNITY_SOURCES]],
+  ["!", CV_LAYER_FILTER],
+] as unknown as ExpressionSpecification;
+
+/**
+ * CV casing width: zoom-interpolated with a floor, and thicker when selected.
+ * The selected step is flat across zoom so the selection cue never disappears.
+ */
+export const cvWidthExpression = [
+  "case",
+  ["boolean", ["feature-state", "selected"], false],
+  CV_CASING.widthSelected,
+  [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    CV_CASING.minWidthZoom,
+    CV_CASING.minWidth,
+    CV_CASING.fullWidthZoom,
+    CV_CASING.width,
+  ],
 ] as unknown as ExpressionSpecification;
 
 /** Community casing width, thicker when this feature is selected. */
@@ -244,6 +321,15 @@ export const BASEMAP = {
     roadMinor: "#fcfcfc",
     building: "#ececec",
     boundary: "#e4e4e4", // --hairline
+    // Label ink (u31). The basemap keeps its full Liberty label hierarchy —
+    // street names, businesses, POIs, places — recoloured to the zen register
+    // rather than stripped. Primary is near-ink for places/streets; minor is a
+    // step lighter so POI density never shouts over the score ramps. The halo
+    // is the page ground, which is what keeps text legible where it crosses a
+    // casing.
+    label: "#3d3d3d",
+    labelMinor: "#6f6f6f",
+    labelHalo: "#fafafa",
   },
   dark: {
     land: "#0a0a0a", // --paper (the negative)
@@ -254,6 +340,10 @@ export const BASEMAP = {
     roadMinor: "#111111",
     building: "#181818",
     boundary: "#262626", // --hairline
+    // The negative: bright label ink over a near-black halo.
+    label: "#d8d8d8",
+    labelMinor: "#9c9c9c",
+    labelHalo: "#0a0a0a",
   },
 } as const;
 
