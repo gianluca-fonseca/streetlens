@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { LayoutGrid, ListChecks, Map, Upload } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
 import { LogoMark } from "@/components/ui/Logo";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import LogoutButton from "./LogoutButton";
 
 /**
@@ -81,6 +82,7 @@ export default async function AdminHeader({
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <ThemeSwitcher className="text-neutral-strong" />
           <Link
             href={`/${other}/admin${suffix}`}
             className="rounded-[4px] border border-border bg-surface-elevated px-2 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-neutral-strong transition-colors hover:border-border-strong hover:text-ink"
