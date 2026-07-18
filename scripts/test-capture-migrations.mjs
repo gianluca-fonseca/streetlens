@@ -143,12 +143,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0032", files.some((f) => f.startsWith("0032")), files.join(" "));
+    check("found the full migration chain through 0033", files.some((f) => f.startsWith("0033")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025") || file.startsWith("0026") || file.startsWith("0027") || file.startsWith("0028") || file.startsWith("0029") || file.startsWith("0030") || file.startsWith("0032")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025") || file.startsWith("0026") || file.startsWith("0027") || file.startsWith("0028") || file.startsWith("0029") || file.startsWith("0030") || file.startsWith("0032") || file.startsWith("0033")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -202,6 +202,7 @@ function main() {
       psql(readFileSync(path.join(MIGRATIONS, "0030_vehicle_capture.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0031_testing_rate_relief.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0032_glitch_tolerant_track.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0033_frame_mime_relax.sql"), "utf8"));
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", true);
     } catch (err) {
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
