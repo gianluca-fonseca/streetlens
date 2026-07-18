@@ -19,7 +19,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Ban, X } from "lucide-react";
 import type { ReviewFrame } from "@/lib/capture/review-store";
 
 /** Horizontal travel (px) past which a touch drag counts as a swipe, not a tap. */
@@ -32,6 +32,8 @@ export default function FrameLightbox({
   seq,
   excluded,
   deleted,
+  segmentCaption,
+  onToggleExclude,
   onSeqChange,
   onClose,
 }: Readonly<{
@@ -43,6 +45,10 @@ export default function FrameLightbox({
   excluded: ReadonlySet<number>;
   /** Seqs whose bytes were tombstoned (server `deleted` or a local delete). */
   deleted: ReadonlySet<number>;
+  /** Human street name + district for the caption. */
+  segmentCaption?: string;
+  /** Toggle exclude/include for the current frame without closing the lightbox. */
+  onToggleExclude?: () => void;
   onSeqChange: (seq: number) => void;
   onClose: () => void;
 }>) {
@@ -70,9 +76,11 @@ export default function FrameLightbox({
     [ordered, index, onSeqChange],
   );
 
-  // Keyboard: Esc closes, arrows navigate. Bound while open only.
+  // Keyboard: Esc closes, arrows navigate, e toggles exclude. Bound while open only.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      const cur = ordered.find((f) => f.seq === seq);
+      const curDeleted = cur ? cur.deleted || deleted.has(cur.seq) : true;
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
@@ -82,11 +90,14 @@ export default function FrameLightbox({
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
         go(1);
+      } else if (e.key === "e" && onToggleExclude && !curDeleted) {
+        e.preventDefault();
+        onToggleExclude();
       }
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [go, onClose]);
+  }, [go, onClose, onToggleExclude, ordered, seq, deleted]);
 
   // Lock body scroll while open; restore the exact prior value on close.
   useEffect(() => {
@@ -147,7 +158,7 @@ export default function FrameLightbox({
   const isDeleted = frame.deleted || deleted.has(frame.seq);
   const isExcluded = excluded.has(frame.seq);
   const rationale = frame.observation?.rationale ?? null;
-  const segmentLabel = frame.segmentId ?? t("unmatched");
+  const segmentLabel = segmentCaption || frame.segmentId || t("unmatched");
   const canNavigate = ordered.length > 1;
   const longRationale = rationale !== null && rationale.length > RATIONALE_CLAMP;
 
@@ -257,6 +268,16 @@ export default function FrameLightbox({
             {t("inspectorTitle", { seq: frame.seq })}
           </span>
           <span className="font-mono text-[11.5px] text-white/60">{segmentLabel}</span>
+          {onToggleExclude && !isDeleted ? (
+            <button
+              type="button"
+              onClick={onToggleExclude}
+              className="ml-auto inline-flex items-center gap-1 rounded-[4px] border border-white/25 bg-white/10 px-2 py-0.5 text-[10.5px] font-medium text-white/90 hover:bg-white/20"
+            >
+              <Ban size={12} strokeWidth={1.75} aria-hidden="true" />
+              {isExcluded ? t("includeFrame") : t("excludeFrame")}
+            </button>
+          ) : null}
           {isDeleted ? (
             <span className="inline-flex items-center rounded-[4px] border border-clay/50 bg-clay/20 px-1.5 py-0.5 text-[10.5px] font-medium text-clay">
               {t("frameDeleted")}

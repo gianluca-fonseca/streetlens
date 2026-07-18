@@ -16,10 +16,12 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSessionReview } from "@/lib/capture/review-store";
+import { getPendingCaptureSessionIds } from "@/lib/capture/pending-captures";
 import { getSegments } from "@/lib/segments";
 import AdminHeader from "@/components/admin/AdminHeader";
 import CaptureReview from "@/components/admin/CaptureReview";
 import type { MatchedGeometry } from "@/components/admin/ReviewMap";
+import type { SegmentMeta } from "@/lib/capture/segment-label";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +44,7 @@ export default async function AdminCaptureReviewPage({
     review.frames.map((f) => f.segmentId).filter((id): id is string => Boolean(id)),
   );
   let matchedGeometry: MatchedGeometry[] = [];
+  let segmentMeta: SegmentMeta[] = [];
   if (matchedIds.size > 0) {
     try {
       const collection = await getSegments();
@@ -49,15 +52,25 @@ export default async function AdminCaptureReviewPage({
         .filter((f) => matchedIds.has(f.properties.id))
         .map((f) => ({
           id: f.properties.id,
+          name: f.properties.name,
+          district: f.properties.district,
           coordinates: f.geometry.coordinates.map(
             (c) => [c[0], c[1]] as [number, number],
           ),
         }));
+      segmentMeta = matchedGeometry.map(({ id, name, district }) => ({
+        id,
+        name,
+        district,
+      }));
     } catch {
       // The map degrades to track + dots without segment highlights; not fatal.
       matchedGeometry = [];
+      segmentMeta = [];
     }
   }
+
+  const pendingCaptureSessionIds = await getPendingCaptureSessionIds();
 
   return (
     <>
@@ -72,7 +85,12 @@ export default async function AdminCaptureReviewPage({
           </p>
         </div>
 
-        <CaptureReview review={review} matchedGeometry={matchedGeometry} />
+        <CaptureReview
+          review={review}
+          matchedGeometry={matchedGeometry}
+          segmentMeta={segmentMeta}
+          pendingCaptureSessionIds={pendingCaptureSessionIds}
+        />
       </main>
     </>
   );
