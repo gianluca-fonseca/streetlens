@@ -28,7 +28,12 @@ import type { ReviewFrame, FramePosition } from "@/lib/capture/review-store";
 const LIBERTY_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 const FALLBACK_STYLE_URL = "https://demotiles.maplibre.org/style.json";
 
-export type MatchedGeometry = { id: string; coordinates: [number, number][] };
+export type MatchedGeometry = {
+  id: string;
+  coordinates: [number, number][];
+  name?: string;
+  district?: string;
+};
 
 type FrameKind = "matched" | "unmatched" | "excluded" | "deleted";
 

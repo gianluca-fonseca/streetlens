@@ -21,19 +21,24 @@
 
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { existsSync, rmSync, readFileSync } from "node:fs";
+import { rmSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  setupIsolatedDataDir,
+  cleanupIsolatedDataDir,
+  localDataPath,
+} from "./lib/test-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const require = createRequire(import.meta.url);
 const BUILD_DIR = path.join(ROOT, ".test-build-cv-apply");
 
-const LOCAL_FILES = [
-  path.join(ROOT, "data", "community-cv-observations.local.json"),
-  path.join(ROOT, "data", "community-segments.local.json"),
-  path.join(ROOT, "data", "community-reports.local.json"),
+const LOCAL_FILE_NAMES = [
+  "community-cv-observations.local.json",
+  "community-segments.local.json",
+  "community-reports.local.json",
 ];
 
 const failures = [];
@@ -42,8 +47,8 @@ function check(label, ok, detail = "") {
   if (!ok) failures.push(label);
 }
 
-function cleanup() {
-  for (const f of LOCAL_FILES) if (existsSync(f)) rmSync(f);
+function cleanup(localFiles) {
+  for (const f of localFiles) rmSync(f, { force: true });
   rmSync(BUILD_DIR, { recursive: true, force: true });
 }
 
@@ -65,15 +70,10 @@ function observation(segmentId, overrides = {}) {
 }
 
 async function main() {
-  // Refuse to clobber a real local store.
-  const existing = LOCAL_FILES.filter((f) => existsSync(f));
-  if (existing.length > 0) {
-    console.error("Refusing to clobber real local data:");
-    for (const f of existing) console.error(`  ${path.relative(ROOT, f)}`);
-    process.exit(1);
-  }
+  const isolatedDir = setupIsolatedDataDir();
+  const LOCAL_FILES = LOCAL_FILE_NAMES.map((name) => localDataPath(name));
 
-  // Force local mode: no Supabase, no secret.
+  try {
   delete process.env.NEXT_PUBLIC_SUPABASE_URL;
   delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   delete process.env.ADMIN_RPC_SECRET;
@@ -88,6 +88,7 @@ async function main() {
       "tsc",
       "lib/apply-submissions.ts",
       "lib/segments.ts",
+      "lib/segment-map-detail.ts",
       "--outDir", BUILD_DIR,
       "--module", "commonjs",
       "--moduleResolution", "node",
@@ -103,6 +104,19 @@ async function main() {
     path.join(BUILD_DIR, "apply-submissions.js"),
   );
   const { getSegments, getStats } = require(path.join(BUILD_DIR, "segments.js"));
+  const { getSegmentMapDetail } = require(path.join(BUILD_DIR, "segment-map-detail.js"));
+
+  function paintAuditedFields(props) {
+    const p = { ...props };
+    delete p.cv_observations;
+    delete p.cv_count;
+    delete p.cv_overall;
+    delete p.cv_accessibility;
+    delete p.cv_drainage;
+    delete p.cv_shade;
+    delete p.cv_bike;
+    return p;
+  }
 
   // The audited truth, before anything is approved.
   const before = await getSegments();
@@ -145,36 +159,35 @@ async function main() {
 
     const after = await getSegments();
     const segA = after.features.find((f) => f.properties.id === SEG_A);
-    check("the audited segment now carries cv_observations", (segA.properties.cv_observations ?? []).length === 1);
+    const segADetail = await getSegmentMapDetail(SEG_A);
+    check("paint wire omits cv_observations blob", segA.properties.cv_observations === undefined);
+    check("paint wire carries cv_count", segA.properties.cv_count === 1, `(${segA.properties.cv_count})`);
+    check("detail fetch carries cv_observations", segADetail.cv_observations.length === 1);
     check(
       "and its cv_observation keeps the null lens as null",
-      segA.properties.cv_observations[0].scores.drainage === null,
+      segADetail.cv_observations[0].scores.drainage === null,
     );
-
-    // cv_count is CV-derived metadata (the map's filter primitive, u31), not an
-    // audited field — so it is excluded from THE INVARIANT alongside
-    // cv_observations. It is asserted here rather than merely discarded, so the
-    // exclusion cannot hide a drift between the count and the array.
     check(
-      "cv_count mirrors cv_observations.length",
-      segA.properties.cv_count === segA.properties.cv_observations.length,
-      `(${segA.properties.cv_count})`,
+      "detail scrubs session_id from the public wire",
+      !("session_id" in segADetail.cv_observations[0]),
+    );
+    check(
+      "detail exposes frame_count instead of frame_refs",
+      segADetail.cv_observations[0].frame_count === 1 &&
+        !("frame_refs" in segADetail.cv_observations[0]),
     );
 
     // THE INVARIANT.
-    const auditedFieldsAfter = { ...segA.properties };
-    delete auditedFieldsAfter.cv_observations;
-    delete auditedFieldsAfter.cv_count;
     check(
       "THE INVARIANT: the audited segment's own properties are untouched",
-      JSON.stringify(auditedFieldsAfter) === auditedScoresBefore,
-      `\n    before: ${auditedScoresBefore}\n    after:  ${JSON.stringify(auditedFieldsAfter)}`,
+      JSON.stringify(paintAuditedFields(segA.properties)) === auditedScoresBefore,
+      `\n    before: ${auditedScoresBefore}\n    after:  ${JSON.stringify(paintAuditedFields(segA.properties))}`,
     );
 
     const untouched = after.features.find((f) => f.properties.id === "esc-sa-0003");
     check(
-      "a segment the walk never saw carries no cv_observations",
-      (untouched.properties.cv_observations ?? []).length === 0,
+      "a segment the walk never saw carries no cv_count on the paint wire",
+      (untouched.properties.cv_count ?? 0) === 0,
     );
 
     const stats = await getStats();
@@ -225,9 +238,9 @@ async function main() {
 
     const after = await getSegments();
     const segB = after.features.find((f) => f.properties.id === SEG_B);
-    check("and it no longer carries cv_observations on the map", (segB.properties.cv_observations ?? []).length === 0);
+    check("and it no longer carries cv_count on the paint wire", (segB.properties.cv_count ?? 0) === 0);
     const segA = after.features.find((f) => f.properties.id === SEG_A);
-    check("while the still-ticked segment keeps its observation", (segA.properties.cv_observations ?? []).length === 1);
+    check("while the still-ticked segment keeps cv_count", segA.properties.cv_count === 1);
 
     const stats = await getStats();
     check("cvSegments follows the retraction", stats.cvSegments === 1, `(${stats.cvSegments})`);
@@ -280,25 +293,23 @@ async function main() {
 
     const after = await getSegments();
     const segA = after.features.find((f) => f.properties.id === SEG_A);
+    const segADetail = await getSegmentMapDetail(SEG_A);
     check(
-      "human_corrected reaches the map feature for the marker",
-      segA.properties.cv_observations[0].human_corrected === true,
+      "human_corrected reaches the detail fetch for the marker",
+      segADetail.cv_observations[0].human_corrected === true,
     );
     check(
-      "the assessment overall text reaches the map feature for the popover",
-      segA.properties.cv_observations[0].assessment.overall === assessment.overall,
+      "the assessment overall text reaches the detail fetch for the popover",
+      segADetail.cv_observations[0].assessment.overall === assessment.overall,
     );
     check(
-      "the reviewer's chosen number lands on the map, not the synthesis's adjustedScore",
-      segA.properties.cv_observations[0].scores.accessibility === 41,
+      "the reviewer's chosen number lands on the detail fetch, not the synthesis's adjustedScore",
+      segADetail.cv_observations[0].scores.accessibility === 41,
     );
     // The invariant still holds even for a corrected approval.
-    const auditedFieldsAfter = { ...segA.properties };
-    delete auditedFieldsAfter.cv_observations;
-    delete auditedFieldsAfter.cv_count;
     check(
       "THE INVARIANT holds under correction: audited properties untouched",
-      JSON.stringify(auditedFieldsAfter) === auditedScoresBefore,
+      JSON.stringify(paintAuditedFields(segA.properties)) === auditedScoresBefore,
     );
   }
 
@@ -317,6 +328,10 @@ async function main() {
     check("the CV counts go back to zero", stats.cvSessionsReviewed === 0 && stats.cvSegments === 0);
     check("and the audited dataset is exactly where it started", stats.segments === 535 && stats.km === statsBefore.km);
   }
+  } finally {
+    cleanup(LOCAL_FILES);
+    cleanupIsolatedDataDir(isolatedDir);
+  }
 }
 
 main()
@@ -325,7 +340,6 @@ main()
     failures.push(String(err));
   })
   .finally(() => {
-    cleanup();
     console.log(
       failures.length === 0
         ? "\nPASS — CV apply attaches, upserts, retracts, and never touches an audit"

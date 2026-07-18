@@ -8,15 +8,16 @@
  *   - `getSegmentDetail()` -> SegmentDetail | null
  *   - `getStats()`         -> StreetStats { segments, km, coveragePct, heroPct }
  *
- * Each reader tries Supabase first when it is configured, and falls back to the
- * generated static data files on any absence or error. The live database does
- * not exist yet, so in practice the static path serves everything today — and
- * the app never blocks on the DB.
+ * Each reader tries Supabase first when it is configured. When configured and a
+ * live read fails, the failure is logged and `dataRead.degraded` is set — the map
+ * may still render static fallback data, but never silently pretends it is live.
  */
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { getSupabaseClient } from "./supabase";
+import { getSupabaseClient, isSupabaseConfigured } from "./supabase";
+import { fetchAllPages } from "./supabase-bounded";
+import { toPaintFeature } from "./map-payload";
 import { showDemoData } from "./demo-flag";
 import {
   readCommunityReports,
@@ -69,6 +70,39 @@ const IMPORT_SEGMENTS_PATH = path.join(DATA_DIR, "canton-import-segments.json");
 // measured here and nowhere else: an approved observation can land on any of the
 // 1,457, and only this file has a length for all of them.
 const NETWORK_SEGMENTS_PATH = path.join(DATA_DIR, "segments.geojson");
+
+/** Per-request read provenance, reset at the start of each public read. */
+type SegmentDataReadMeta = NonNullable<StreetStats["dataRead"]>;
+
+let segmentDataReadMeta: SegmentDataReadMeta = {
+  scoresSource: "static",
+  cvSource: "local",
+  degraded: false,
+  errors: [],
+};
+
+function resetSegmentDataReadMeta(): void {
+  segmentDataReadMeta = {
+    scoresSource: isSupabaseConfigured() ? "live" : "static",
+    cvSource: isSupabaseConfigured() ? "live" : "local",
+    degraded: false,
+    errors: [],
+  };
+}
+
+/** How the last getSegments/getStats read resolved (0025). */
+export function getSegmentDataReadMeta(): SegmentDataReadMeta {
+  return segmentDataReadMeta;
+}
+
+function markLiveReadFailure(kind: "scores" | "cv", message: string): void {
+  if (!isSupabaseConfigured()) return;
+  segmentDataReadMeta.degraded = true;
+  if (kind === "scores") segmentDataReadMeta.scoresSource = "static";
+  else segmentDataReadMeta.cvSource = "local";
+  segmentDataReadMeta.errors.push(`${kind}: ${message}`);
+  console.error(`[segments] live ${kind} read failed: ${message}`);
+}
 
 /* ------------------------------------------------------------------ *
  * Static file readers (cached per process)
@@ -325,16 +359,49 @@ async function liveScoreRows(id?: string): Promise<ScoreRow[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
   try {
-    let query = client
-      .from("v_segment_scores")
-      .select(
-        "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade,score_bike",
-      );
-    if (id) query = query.eq("id", id);
-    const { data, error } = await query;
-    if (error || !data) return null;
-    return data as ScoreRow[];
-  } catch {
+    if (id) {
+      const { data, error } = await client
+        .from("v_segment_scores")
+        .select(
+          "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade,score_bike",
+        )
+        .eq("id", id)
+        .range(0, 0);
+      if (error) {
+        markLiveReadFailure("scores", error.message);
+        return null;
+      }
+      if (!data) {
+        markLiveReadFailure("scores", "empty response");
+        return null;
+      }
+      segmentDataReadMeta.scoresSource = "live";
+      return data as ScoreRow[];
+    }
+    const rows = await fetchAllPages<ScoreRow>(
+      "v_segment_scores",
+      async (from, to) => {
+        const { data, error } = await client
+          .from("v_segment_scores")
+          .select(
+            "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade,score_bike",
+          )
+          .range(from, to);
+        if (error) {
+          markLiveReadFailure("scores", error.message);
+          return null;
+        }
+        return data ?? null;
+      },
+    );
+    if (rows === null) {
+      markLiveReadFailure("scores", "paged read failed");
+      return null;
+    }
+    segmentDataReadMeta.scoresSource = "live";
+    return rows;
+  } catch (err) {
+    markLiveReadFailure("scores", err instanceof Error ? err.message : String(err));
     return null;
   }
 }
@@ -396,8 +463,8 @@ function rowToCvObservation(row: CvObservationRow): CvObservation {
 
 /**
  * Approved CV observations from Supabase (public-read table community_cv_observations,
- * 0017). Best-effort, exactly like liveScoreRows: any absence or error returns null so
- * the caller falls back to the local store.
+ * 0017). When Supabase is configured, a read failure is logged and surfaces as
+ * degraded — never a silent swap to local data without marking it.
  *
  * This is the read path the public map uses for camera evidence. Approval writes the
  * observation to Postgres through the definer RPC (admin_apply_capture_session); the
@@ -409,14 +476,30 @@ async function liveCvObservations(): Promise<CvObservation[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
   try {
-    const { data, error } = await client
-      .from("community_cv_observations")
-      .select(
-        "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
-      );
-    if (error || !data) return null;
-    return (data as CvObservationRow[]).map(rowToCvObservation);
-  } catch {
+    const rows = await fetchAllPages<CvObservationRow>(
+      "community_cv_observations",
+      async (from, to) => {
+        const { data, error } = await client
+          .from("community_cv_observations")
+          .select(
+            "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
+          )
+          .range(from, to);
+        if (error) {
+          markLiveReadFailure("cv", error.message);
+          return null;
+        }
+        return (data as CvObservationRow[]) ?? null;
+      },
+    );
+    if (!rows) {
+      markLiveReadFailure("cv", "paged read failed");
+      return null;
+    }
+    segmentDataReadMeta.cvSource = "live";
+    return rows.map(rowToCvObservation);
+  } catch (err) {
+    markLiveReadFailure("cv", err instanceof Error ? err.message : String(err));
     return null;
   }
 }
@@ -526,6 +609,7 @@ function attachCommunity(
  * scores). Community reports are attached to their target features.
  */
 export async function getSegments(): Promise<SegmentCollection> {
+  resetSegmentDataReadMeta();
   const [community, reports, cvObservations] = await Promise.all([
     readAllContributedSegments(),
     readCommunityReports(),
@@ -546,12 +630,16 @@ export async function getSegments(): Promise<SegmentCollection> {
         ? demoFeatures
         : hideDemoScores(demoFeatures);
 
+  const fullFeatures = [
+    ...attachCommunity(officialFeatures, reportsBySegment, cvBySegment),
+    ...communityFeatures,
+  ];
+
+  // Paint-only wire: ids, casings, cv_count, canonical score stubs — no
+  // cv_observations blobs, session_id, frame_refs, or report bodies.
   return {
     type: "FeatureCollection",
-    features: [
-      ...attachCommunity(officialFeatures, reportsBySegment, cvBySegment),
-      ...communityFeatures,
-    ],
+    features: fullFeatures.map((f) => toPaintFeature(f, cvBySegment)),
   };
 }
 
@@ -639,6 +727,7 @@ export async function getSegmentDetail(
 
 /** Headline aggregate stats for the hero panel. */
 export async function getStats(): Promise<StreetStats> {
+  resetSegmentDataReadMeta();
   const demo = await readDemoCollection();
   const networkKm = demo.metadata?.network_km;
   // Community/import segments are counted separately; never folded into the
@@ -673,6 +762,7 @@ export async function getStats(): Promise<StreetStats> {
       cvSessionsReviewed,
       cvSegments,
       cvCoveragePct,
+      dataRead: { ...segmentDataReadMeta },
     };
   }
 
@@ -689,6 +779,7 @@ export async function getStats(): Promise<StreetStats> {
       cvSessionsReviewed,
       cvSegments,
       cvCoveragePct,
+      dataRead: { ...segmentDataReadMeta },
     };
   }
 
@@ -708,5 +799,6 @@ export async function getStats(): Promise<StreetStats> {
     cvSessionsReviewed,
     cvSegments,
     cvCoveragePct,
+    dataRead: { ...segmentDataReadMeta },
   };
 }

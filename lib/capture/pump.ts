@@ -342,11 +342,13 @@ async function pauseSession(
 ): Promise<void> {
   session.paused = true;
   try {
-    await db.setSessionStatus(sessionId, "cost_paused");
-  } catch {
-    // Swallowed on purpose: the in-memory pause already stopped this batch, and
-    // throwing here would abandon the remaining jobs mid-flight without closing
-    // them out. The next claim retries the write.
+    await db.setSessionStatus(sessionId, "cost_paused", reason);
+  } catch (err) {
+    // In-memory pause already stopped this batch. Log the write failure — a
+    // transient DB blip must not pretend the breaker latched when it did not.
+    console.error(
+      `[capture] session ${sessionId} cost_paused write failed (in-memory pause active): ${errText(err)}`,
+    );
   }
   console.warn(`[capture] session ${sessionId} cost_paused: ${reason}`);
 }

@@ -79,29 +79,14 @@ export type CvItemMedian = {
 /**
  * The segment synthesis carried on an approved camera observation (u2).
  *
- * Structurally identical to `SegmentAssessment` in lib/capture/review-overrides.ts,
- * and duplicated on purpose for the same reason as {@link CvItemMedian}: the map's
- * data layer must not import the capture/extraction stack. It is model output
- * (English), shown as visibly model-written on the public popover; the NUMBERS on
- * the map are still the reviewer's chosen `scores`, never these.
+ * Alias of {@link SegmentAssessment} from lib/assessment.ts — one Zod-validated
+ * shape shared with the capture review stack. Model output (English), shown as
+ * visibly model-written on the public popover; the NUMBERS on the map are still
+ * the reviewer's chosen `scores`, never these.
  */
-export type CvAssessment = {
-  /** The overall plain-language verdict. Model output; labeled as such on the map. */
-  overall: string;
-  /** Per-lens explanations (the composite `overall` lens has no separate explanation). */
-  lenses: {
-    accessibility: string;
-    drainage: string;
-    shade: string;
-    bike: string;
-  };
-  /** The engine's proposed bounded nudges, by lens. Kept for the record, not re-applied on the map. */
-  adjustments: Partial<Record<ScoreLayer, { delta: number; reason: string }>>;
-  /** The engine's adjusted scores on the original baseline. Reference only. */
-  adjustedScores: Record<ScoreLayer, number | null>;
-  /** The model that produced the synthesis. */
-  model: string;
-};
+import type { CvAssessment } from "./assessment";
+
+export type { CvAssessment } from "./assessment";
 
 /**
  * A camera observation of one segment from one approved capture session: the
@@ -199,6 +184,12 @@ export type SegmentProperties = {
    * on this primitive instead. Always mirrors `cv_observations.length`.
    */
   cv_count?: number;
+  /** Paint-only canonical CV lens scores (public map wire). */
+  cv_overall?: number | null;
+  cv_accessibility?: number | null;
+  cv_drainage?: number | null;
+  cv_shade?: number | null;
+  cv_bike?: number | null;
 };
 
 export type SegmentFeature = Feature<LineString, SegmentProperties>;
@@ -280,6 +271,16 @@ export type StreetStats = {
    * display layer floors it at "<0.1%" instead (see `formatCvCoveragePct`).
    */
   cvCoveragePct: number;
+  /**
+   * How segment/CV data was read for this request (0025). `degraded` is true when
+   * Supabase is configured but a live read failed and static/local data was used.
+   */
+  dataRead?: {
+    scoresSource: "live" | "static";
+    cvSource: "live" | "local";
+    degraded: boolean;
+    errors: string[];
+  };
 };
 
 /**

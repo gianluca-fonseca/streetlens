@@ -175,6 +175,8 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
     events: [],
     /** Assessments written by the synthesis drain stage (0022). */
     assessments: [],
+    /** Pause reasons passed to setSessionStatus (0025). */
+    pauseReasons: [],
   };
 
   const db = {
@@ -229,9 +231,10 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
       job.status = status;
       job.error = error;
     },
-    async setSessionStatus(_sessionId, s) {
+    async setSessionStatus(_sessionId, s, pauseReason) {
       state.sessionStatus = s;
       state.statusWrites.push(s);
+      if (pauseReason) state.pauseReasons = [...(state.pauseReasons ?? []), pauseReason];
       state.events.push(`status:${s}`);
     },
     async pendingJobCount() {
@@ -539,6 +542,11 @@ async function main() {
       "the session is cost_paused",
       db.state.sessionStatus === "cost_paused",
       db.state.sessionStatus,
+    );
+    check(
+      "pause reason is persisted through setSessionStatus",
+      (db.state.pauseReasons ?? []).some((r) => /image budget|static request/i.test(r)),
+      JSON.stringify(db.state.pauseReasons ?? []),
     );
     check("every frame is reported failed", result.done === 0 && result.failed === 3, JSON.stringify(result));
     check(

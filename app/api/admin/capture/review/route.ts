@@ -19,10 +19,15 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { getSessionReview } from "@/lib/capture/review-store";
 import { applyApprovedCaptureSession } from "@/lib/apply-submissions";
 import { finalizeCaptureReview } from "@/lib/capture/review-actions";
+import { revalidatePublicMapPages } from "@/lib/revalidate-map";
+import {
+  getPendingCaptureSessionIds,
+  nextPendingSessionId,
+} from "@/lib/capture/pending-captures";
 import {
   recomputeReview,
   EMPTY_CORRECTIONS,
@@ -88,10 +93,8 @@ function toCorrections(input: z.infer<typeof correctionsSchema> | undefined): Re
 }
 
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  if (!(await verifySessionToken(token))) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
 
   let raw: unknown;
   try {
@@ -194,12 +197,20 @@ export async function POST(request: NextRequest) {
       reason,
     });
 
+    if (action === "approve") {
+      revalidatePublicMapPages();
+    }
+    const pendingIds = await getPendingCaptureSessionIds();
+    const next_session_id = nextPendingSessionId(pendingIds, session_id);
+
     return NextResponse.json({
       ok: true,
       status: action === "approve" ? "approved" : "rejected",
       applied: chosen.length,
       corrected: chosen.filter((s) => s.humanCorrected).length,
       mode: closed.mode,
+      next_session_id,
+      queue_remaining: pendingIds.length,
     });
   } catch (err) {
     // Log before swallowing into an opaque server_error, so a prod failure (e.g. a

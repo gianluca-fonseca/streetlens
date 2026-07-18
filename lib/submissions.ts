@@ -34,13 +34,13 @@ import {
   type UpdateSegmentPayload,
 } from "./schemas";
 import { applyApprovedSubmission, type ApplyInput } from "./apply-submissions";
+import { getDataDir } from "./data-dir";
 import { isSubmissionType, type SubmissionStatus, type SubmissionType } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const SAMPLE_PATH = path.join(DATA_DIR, "pending-submissions.sample.json");
-const LOCAL_PATH = path.join(DATA_DIR, "pending-submissions.local.json");
-const REVIEWS_PATH = path.join(DATA_DIR, "submission-reviews.local.json");
-const APPROVED_PATH = path.join(DATA_DIR, "approved-submissions.local.json");
+const SAMPLE_PATH = path.join(process.cwd(), "data", "pending-submissions.sample.json");
+const LOCAL_PATH = path.join(getDataDir(), "pending-submissions.local.json");
+const REVIEWS_PATH = path.join(getDataDir(), "submission-reviews.local.json");
+const APPROVED_PATH = path.join(getDataDir(), "approved-submissions.local.json");
 
 export type SubmissionSource = "supabase" | "local" | "sample";
 export type ReviewAction = "approve" | "reject";

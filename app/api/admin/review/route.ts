@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { reviewSubmission } from "@/lib/submissions";
+import { revalidatePublicMapPages } from "@/lib/revalidate-map";
 
 // Uses fs (local fallback) + Web Crypto (session verify): Node.js runtime.
 export const runtime = "nodejs";
@@ -13,10 +14,8 @@ export const runtime = "nodejs";
  * required for both actions.
  */
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  if (!(await verifySessionToken(token))) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
 
   let body: { id?: unknown; action?: unknown; reason?: unknown };
   try {
@@ -39,6 +38,10 @@ export async function POST(request: NextRequest) {
   if (!result.ok) {
     const status = result.error === "not_found" ? 404 : 422;
     return NextResponse.json({ error: result.error }, { status });
+  }
+
+  if (action === "approve") {
+    revalidatePublicMapPages();
   }
 
   return NextResponse.json(result);

@@ -21,18 +21,19 @@
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { promises as fs } from "node:fs";
-import { rmSync, existsSync } from "node:fs";
+import { rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  setupIsolatedDataDir,
+  cleanupIsolatedDataDir,
+  localDataPath,
+} from "./lib/test-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".smoke-build");
-const COMMUNITY_SEGMENTS_PATH = path.join(
-  ROOT,
-  "data",
-  "community-segments.local.json",
-);
+const COMMUNITY_SEGMENTS_NAME = "community-segments.local.json";
 const require = createRequire(import.meta.url);
 
 const FROZEN_EXPORTS = [
@@ -56,14 +57,10 @@ function check(label, ok, detail = "") {
 }
 
 async function main() {
-  // The community-exclusion scenario writes a temp community store; refuse to
-  // run over a real one so we never clobber runtime data.
-  if (existsSync(COMMUNITY_SEGMENTS_PATH)) {
-    throw new Error(
-      "refusing to run: data/community-segments.local.json exists (would be clobbered)",
-    );
-  }
+  const isolatedDir = setupIsolatedDataDir();
+  const COMMUNITY_SEGMENTS_PATH = localDataPath(COMMUNITY_SEGMENTS_NAME);
 
+  try {
   // 1. Export-surface check on the TypeScript source (covers type-only exports).
   const source = await fs.readFile(path.join(ROOT, "lib", "segments.ts"), "utf8");
   console.log("Export surface (lib/segments.ts source):");
@@ -305,6 +302,9 @@ async function main() {
     process.exit(1);
   }
   console.log("\nSMOKE PASS");
+  } finally {
+    cleanupIsolatedDataDir(isolatedDir);
+  }
 }
 
 main().catch((err) => {

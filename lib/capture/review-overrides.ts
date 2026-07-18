@@ -25,6 +25,9 @@
 import { computeRollups, type RollupObservation, type ItemMedian } from "./rollup";
 import { LENS_KEYS, renormalizedOverall, type LensKey, type LensScores } from "./scoring";
 import type { RubricItemKey, CaptureObservationItem } from "./types";
+import type { SegmentAssessment } from "@/lib/assessment";
+
+export type { SegmentAssessment };
 
 /**
  * One frame's model reading, the frozen cross-lane contract (u2 seed, seal #1).
@@ -60,30 +63,6 @@ export type FrameObservation = {
  * are shown only for reference; the number that lands is recomputed, not read
  * from this object.
  */
-export type AssessmentAdjustment = {
-  /** Bounded nudge the engine proposes for this lens, in score points (may be negative). */
-  delta: number;
-  /** The engine's free-text justification for the nudge. */
-  reason: string;
-};
-
-export type SegmentAssessment = {
-  /** The overall, plain-language verdict a reviewer reads first. Model output, English. */
-  overall: string;
-  /** Per-lens explanations (the composite `overall` lens has no separate explanation). */
-  lenses: {
-    accessibility: string;
-    drainage: string;
-    shade: string;
-    bike: string;
-  };
-  /** Per-lens bounded adjustments the engine proposes, keyed by lens. */
-  adjustments: Partial<Record<LensKey, AssessmentAdjustment>>;
-  /** The engine's adjusted scores on the ORIGINAL baseline. Reference only; recomputed on the fresh baseline. */
-  adjustedScores: LensScores;
-  /** The model that produced the synthesis. */
-  model: string;
-};
 
 /** Per-segment synthesis, keyed by segment id. A missing/null entry means "no assessment". */
 export type SegmentAssessments = Record<string, SegmentAssessment | null>;
@@ -206,6 +185,7 @@ function computeAdjusted(
   const out: LensScores = { ...baseline };
   if (!assessment) return out;
   for (const lens of LENS_KEYS) {
+    if (lens === "overall") continue;
     const adj = assessment.adjustments?.[lens];
     const base = baseline[lens];
     if (adj && typeof adj.delta === "number" && Number.isFinite(adj.delta) && base !== null) {

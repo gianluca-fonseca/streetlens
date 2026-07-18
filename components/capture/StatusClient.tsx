@@ -48,6 +48,8 @@ type Snapshot = Readonly<{
   status: CaptureSessionStatus;
   frameCount: number;
   jobs: Readonly<{ pending: number; done: number; failed: number }>;
+  /** Present when status is cost_paused (0025). */
+  pauseReason?: string | null;
   /** Present only once there is at least one rollup. Absent is not empty. */
   rollups?: readonly Rollup[];
 }>;
@@ -290,7 +292,12 @@ export function StatusClient({ sessionId }: Readonly<{ sessionId: string }>) {
           reader. These change rarely; the region above changes every poll. */}
       {status === "cost_paused" ? (
         <Notice tone="warn" title={t("status.paused.title")}>
-          {t("status.paused.body")}
+          <span className="block">{t("status.paused.body")}</span>
+          {snapshot?.pauseReason ? (
+            <span className="mt-2 block font-mono text-[11.5px] text-ink-muted">
+              {t("status.paused.reason", { reason: snapshot.pauseReason })}
+            </span>
+          ) : null}
         </Notice>
       ) : null}
 
@@ -300,7 +307,7 @@ export function StatusClient({ sessionId }: Readonly<{ sessionId: string }>) {
         </Notice>
       ) : null}
 
-      {snapshot !== null && snapshot.jobs.failed > 0 && status !== "failed" ? (
+      {snapshot !== null && snapshot.jobs.failed > 0 && status !== "failed" && status !== "cost_paused" ? (
         <Notice tone="warn">{t("status.framesFailed", { count: snapshot.jobs.failed })}</Notice>
       ) : null}
 

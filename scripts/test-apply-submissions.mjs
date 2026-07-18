@@ -20,19 +20,23 @@ import { promises as fs } from "node:fs";
 import { rmSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  setupIsolatedDataDir,
+  cleanupIsolatedDataDir,
+  localDataPath,
+} from "./lib/test-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".test-build-apply");
-const DATA = path.join(ROOT, "data");
 const require = createRequire(import.meta.url);
 
-const LOCAL_FILES = [
-  path.join(DATA, "pending-submissions.local.json"),
-  path.join(DATA, "submission-reviews.local.json"),
-  path.join(DATA, "approved-submissions.local.json"),
-  path.join(DATA, "community-segments.local.json"),
-  path.join(DATA, "community-reports.local.json"),
+const LOCAL_FILE_NAMES = [
+  "pending-submissions.local.json",
+  "submission-reviews.local.json",
+  "approved-submissions.local.json",
+  "community-segments.local.json",
+  "community-reports.local.json",
 ];
 
 const failures = [];
@@ -41,8 +45,8 @@ function check(label, ok, detail = "") {
   if (!ok) failures.push(label);
 }
 
-async function cleanup() {
-  for (const f of LOCAL_FILES) {
+async function cleanup(localFiles) {
+  for (const f of localFiles) {
     try {
       await fs.rm(f, { force: true });
     } catch {
@@ -53,13 +57,10 @@ async function cleanup() {
 }
 
 async function main() {
-  // Refuse to clobber a real local queue if one somehow exists.
-  for (const f of LOCAL_FILES) {
-    if (existsSync(f)) {
-      throw new Error(`refusing to run: ${path.basename(f)} already exists`);
-    }
-  }
+  const isolatedDir = setupIsolatedDataDir();
+  const LOCAL_FILES = LOCAL_FILE_NAMES.map((name) => localDataPath(name));
 
+  try {
   delete process.env.NEXT_PUBLIC_SUPABASE_URL;
   delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   delete process.env.ADMIN_RPC_SECRET;
@@ -75,6 +76,7 @@ async function main() {
       "tsc",
       "lib/submissions.ts",
       "lib/segments.ts",
+      "lib/segment-map-detail.ts",
       "--outDir", BUILD_DIR,
       "--module", "commonjs",
       "--moduleResolution", "node",
@@ -86,6 +88,7 @@ async function main() {
 
   const submissions = require(path.join(BUILD_DIR, "submissions.js"));
   const segments = require(path.join(BUILD_DIR, "segments.js"));
+  const mapDetail = require(path.join(BUILD_DIR, "segment-map-detail.js"));
 
   // The committed canton overlay (esc-ce/esc-sr) merges into getSegments as
   // source:"import" neutral features; count it so the audited pilot (535) and
@@ -138,7 +141,7 @@ async function main() {
     },
   ];
   await fs.writeFile(
-    path.join(DATA, "pending-submissions.local.json"),
+    LOCAL_FILES[0],
     JSON.stringify(queue, null, 2),
     "utf8",
   );
@@ -163,14 +166,27 @@ async function main() {
         (s) => s === 0,
       ),
     );
-    check("carries a community_report from the note", Boolean(p.community_report && p.community_report.note));
+    check(
+      "paint wire omits community_report blob",
+      p.community_report === undefined,
+    );
     check("geometry is a LineString", community.geometry?.type === "LineString");
   }
 
+  const addDetail = await mapDetail.getSegmentMapDetail("com-t-add-1");
+  check(
+    "detail fetch carries community_report from the note",
+    Boolean(addDetail.community_report && addDetail.community_report.note),
+  );
+
   // Update → report attached to the TARGET segment (not the community add).
   const targetFeature = after.features.find((f) => f.properties.id === targetId);
-  const reports = targetFeature?.properties?.community_reports ?? [];
-  const upReport = reports.find((r) => r.id === "rep-t-upd-1");
+  check(
+    "paint wire omits community_reports on target",
+    targetFeature?.properties?.community_reports === undefined,
+  );
+  const targetDetail = await mapDetail.getSegmentMapDetail(targetId);
+  const upReport = targetDetail.community_reports.find((r) => r.id === "rep-t-upd-1");
   check("update_segment attached a community report to the target", Boolean(upReport));
   check(
     "report note is qualitative (not a score), carries the reason",
@@ -203,11 +219,14 @@ async function main() {
   } else {
     console.log("\nAPPLY-TEST PASS");
   }
+  } finally {
+    await cleanup(LOCAL_FILES);
+    cleanupIsolatedDataDir(isolatedDir);
+  }
 }
 
 main()
   .catch((err) => {
     console.error("[test-apply] crashed:", err);
     process.exitCode = 1;
-  })
-  .finally(cleanup);
+  });

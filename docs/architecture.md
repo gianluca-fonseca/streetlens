@@ -2,7 +2,7 @@
 
 A closer look at how StreetLens is built. For the one-diagram version, see the [README](../README.md); for the scoring model, see [method](method.md).
 
-StreetLens is a Next.js 16 App Router application. It renders a public street-audit map for the Escazú pilot, an integrated community-contribution flow, and a secret-gated admin queue. It runs entirely off committed static data today; Supabase is fully schema'd but env-gated off.
+StreetLens is a Next.js 16 App Router application. It renders a public street-audit map for the Escazú pilot, a dedicated camera-walk collection route, an integrated community-contribution flow on the map, and a secret-gated admin queue. The data adapter is **live-first when Supabase is configured** (CV observations, approved scores, submissions) and falls back to committed static files for local development without a database.
 
 ## Routing
 
@@ -12,16 +12,20 @@ Everything is locale-scoped under `app/[locale]/`.
 |---|---|
 | `/[locale]` | Landing. Composes `components/landing/*` sections. The hero holds the one live map; other sections use pre-rendered SVG plates. |
 | `/[locale]/map` | The full-bleed audit map: `DemoBanner` + `components/AuditMap.tsx`. |
+| `/[locale]/collect` | Camera-walk collection UI (`CollectClient.tsx`). Uploads frames and tracks session status. |
+| `/[locale]/collect/status/[id]` | Post-upload status for one capture session. |
 | `/[locale]/admin` | Dashboard (stat tiles + per-district table), `force-dynamic`. |
 | `/[locale]/admin/login` | Password gate. |
 | `/[locale]/admin/queue` | Submissions review. |
 | `/[locale]/admin/import` | Bulk import. |
+| `/[locale]/admin/history` | Submission history (all reconciled records). |
+| `/[locale]/admin/capture/[id]` | Capture session review workbench. |
 
-API routes live under `app/api/*/route.ts` (Node runtime): `admin/login`, `admin/logout`, `admin/review`, `admin/import`, `submissions` (anonymous intake), and `routing-network` (serves the trace graph).
+API routes live under `app/api/*/route.ts` (Node runtime): `admin/login`, `admin/logout`, `admin/review`, `admin/import`, `admin/capture/review`, `admin/capture/frame`, `submissions` (anonymous intake), and `routing-network` (serves the trace graph).
 
-**Middleware** is `proxy.ts` (Next 16 renames `middleware` to `proxy`). It runs two jobs in order: an admin guard that requires a valid signed session cookie on `/(en|es)/admin/**` except `/login`, then next-intl locale prefixing with Accept-Language detection. The matcher excludes `/api`, `_next`, and static assets.
+**Middleware** is `proxy.ts` (Next 16 renames `middleware` to `proxy`). It runs two jobs in order: an admin guard that requires a valid signed session cookie on `/(en|es)/admin/**` except `/login`, then next-intl locale prefixing with Accept-Language detection. The matcher excludes `/api`, `_next`, and static assets. Every `/api/admin/*` route **re-verifies** the session via `requireAdmin()` because the proxy does not guard API paths.
 
-There is no standalone `/collect` route. The "collect" flow is embedded inside the map (`components/contribute/*`).
+The map-embedded contribute flow (`components/contribute/*`) remains on `/map`; `/collect` is the dedicated camera-walk funnel.
 
 ## Internationalization
 
@@ -41,17 +45,19 @@ Messages live in `messages/en.json` and `messages/es.json` under namespaces `met
 - `getSegmentDetail(id)`: one segment with its rubric breakdown.
 - `getStats()`: headline figures (segment count, coverage, fail rate).
 
-Each reader is **Supabase-first with a static fallback**: it tries `getSupabaseClient()` (the `v_segment_scores` view and RPCs) and, on a null client or an error, falls back to the committed files in `data/`. Because the database is env-gated off, the static path serves everything today. This is the seam that lets the whole app run with no backend.
+Each reader is **Supabase-first with a static fallback**: it tries `getSupabaseClient()` (the `v_segment_scores` view, CV observation RPCs, and related tables) and, when the client is unconfigured or the query errors, falls back to committed files in `data/`. With no env vars, the static path serves the app end to end. With `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` set, live CV and approved observations are the primary read path.
 
-Types are the contract, in `lib/types.ts`: `ScoreLayer`, `SCORE_LAYERS`, `SegmentProperties` (flat `score_*` fields plus provenance: `source`, `verified`, `community_report`), `SegmentDetail`, `StreetStats`, and DB row mirrors. `LEY_7600_MIN_SCORE = 50` is the accessibility fail threshold that drives the hero stat.
+Types are the contract, in `lib/types.ts`: `ScoreLayer`, `SCORE_LAYERS`, `SegmentProperties` (flat `score_*` fields plus provenance: `source`, `verified`, `community_report`, `cv_observations`), `SegmentDetail`, `StreetStats`, and DB row mirrors. `CvAssessment` is an alias of the Zod-validated `SegmentAssessment` in `lib/assessment.ts`. `LEY_7600_MIN_SCORE = 50` is the accessibility fail threshold that drives the hero stat.
 
-Data files in `data/`: `demo-segments.geojson` (the audited reference network, read by both the adapter and the render script), `demo-audits.json` (rubric observations tagged `rubric_version_id: "v0.1"`), `routing-network.geojson` (the trace graph), and `raw/overpass-san-antonio.json` (the OSM source). Community contributions persist to a gitignored `data/community-segments.local.json` via `lib/community-store.ts` and merge into `getSegments()` with no scores.
+Data files in `data/`: `demo-segments.geojson` (the audited reference network), `demo-audits.json` (rubric observations tagged `rubric_version_id: "v0.1"`), `routing-network.geojson` (the trace graph), and `raw/overpass-san-antonio.json` (the OSM source). Runtime local stores (`*.local.json`) live under `data/` by default, or under `STREETLENS_DATA_DIR` when set (used by tests for isolation). Community contributions and approved CV observations persist via `lib/community-store.ts` and merge into `getSegments()` with separate provenance.
+
+The demo data switch (`NEXT_PUBLIC_SHOW_DEMO_DATA`) gates whether the 535 generated pilot scores publish on the public map. Off by default; see `lib/demo-flag.ts`.
 
 ## Map layer
 
 `components/AuditMap.tsx` (`"use client"`) is the single MapLibre GL engine, with variants `"hero"` and `"app"`.
 
-- **Basemap**: OpenFreeMap **Liberty** vector tiles, with a demotiles fallback on error. After load, `muteBasemap()` recolors Liberty to the neutral grayscale palette (light and dark) and hides POI labels.
+- **Basemap**: OpenFreeMap **Liberty** vector tiles, with a demotiles fallback on error. After load, `muteBasemap()` recolors Liberty to the neutral grayscale palette (light and dark) and **keeps** the full label hierarchy (place, street, business, POI), tuned for legibility over score casings.
 - **Score layers**: one GeoJSON source (`segments`, `promoteId: "id"`) drives `segments-glow` (dark only), `segments-line` (the score ramp), and `segments-community` (the neutral dashed casing). Hover and selection use feature-state.
 - **3D**: an optional DEM terrain from **AWS Terrarium** tiles (`encoding: "terrarium"`), an always-on hillshade, and OSM building extrusions, with a camera clamp that works around the sea-level sink bug.
 
@@ -75,12 +81,13 @@ The mirror is the one place the "single source of truth" is intentionally duplic
 ## Contribution and submissions
 
 - **Map-integrated flow**: `components/contribute/*` holds a small state machine (`useContribute.ts`) and a street-following trace built on `geojson-path-finder` over `/api/routing-network`.
+- **Camera-walk flow**: `app/[locale]/collect/*` handles frame upload and session status for the CV funnel (see [cv-funnel](cv-funnel.md)).
 - **Intake**: `POST /api/submissions` runs a honeypot, a rate limit (`lib/rate-limit.ts`), zod validation (`lib/schemas.ts`), and then `lib/submissions-sink.ts` (a Supabase insert as `pending`, or an append to a gitignored local queue).
-- **Admin apply**: `lib/apply-submissions.ts` turns an approved `add_segment` into a community segment (no scores), an `update_segment` into a community report, and a bulk import into imported segments. `lib/admin-auth.ts` is a shared-password plus HMAC session cookie via Web Crypto, with no user table.
+- **Admin apply**: `lib/apply-submissions.ts` turns an approved `add_segment` into a community segment (no scores), an `update_segment` into a community report, an approved capture session into CV observations, and a bulk import into imported segments. `lib/admin-auth.ts` is a shared-password plus HMAC session cookie via Web Crypto, with `requireAdmin()` re-checking every admin API route.
 
-## Supabase (planned)
+## Supabase (provisioned, env-gated)
 
-The `supabase/` directory holds a full Postgres + PostGIS schema that is not yet provisioned. Migrations `0001`–`0012` build the geography (`cantons → districts → corridors → segments`), the versioned bilingual rubric (`rubric_versions`, `rubric_items`, `observations`), audits and photos, the submissions queue, row-level security, admin RPCs (secret-gated `SECURITY DEFINER` functions, no service-role key), the `v_segment_scores` read model, and the community tables. Until the env vars are set, the adapter's static fallback serves the app.
+The `supabase/` directory holds a full Postgres + PostGIS schema. Migrations `0001`–`0024` build the geography (`cantons → districts → corridors → segments`), the versioned bilingual rubric, audits and photos, the submissions queue, row-level security, admin RPCs (secret-gated `SECURITY DEFINER` functions, no service-role key), the `v_segment_scores` read model, community tables, the capture funnel (sessions, frames, extraction, synthesis, review), and CV observation contact fields. When `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set, the adapter and capture stack use the live database; without them, static files and local `*.local.json` stores serve development.
 
 ## Stack
 
@@ -92,5 +99,9 @@ The `supabase/` directory holds a full Postgres + PostGIS schema that is not yet
 | Styling | Tailwind CSS v4 · Space Grotesk, Newsreader, IBM Plex Mono |
 | Geometry | Turf, `geojson-path-finder` |
 | Validation | Zod |
-| Backend (planned) | Supabase (Postgres + PostGIS, Auth, Storage) |
+| Backend | Supabase (Postgres + PostGIS), env-gated |
 | Hosting | Vercel |
+
+## Testing
+
+Contract suites live in `scripts/test-*.mjs`. Run them all with `npm test` (see [CONTRIBUTING](../CONTRIBUTING.md)). Tests honor `STREETLENS_DATA_DIR` for isolated temp stores so they never clobber a developer's real `data/*.local.json` files.

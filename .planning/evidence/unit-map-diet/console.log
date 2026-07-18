@@ -1,0 +1,10 @@
+Browser drive evidence — unit-map-diet (port 3573)
+Date: 2026-07-18
+
+[INFO] React DevTools message (dev only)
+[LOG] [HMR] connected
+[WARNING] Expected value to be of type number, but found null instead. (maplibre style expression — pre-existing, 4x on map load)
+
+Map page: http://localhost:3573/en/map — loaded, 0 console errors
+Landing: http://localhost:3573/en — hero map deferred via next/dynamic (ssr:false), loaded after paint
+Detail API: GET /api/segments/esc-sa-0001/detail → 200 {"community_report":null,"community_reports":[],"cv_observations":[]}

@@ -1,0 +1,5 @@
+npx tsc --noEmit: PASS
+npm run lint: PASS
+npm run build: PASS
+scripts/test-*.mjs: PASS (32 scripts)
+node scripts/test-i18n-parity.mjs: PASS

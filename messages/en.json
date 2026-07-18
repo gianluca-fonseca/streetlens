@@ -6,6 +6,9 @@
   "demoBanner": {
     "message": "Demo data over real street geometry. Field pilot begins August 2026: no number shown is a real measurement."
   },
+  "dataDegradedBanner": {
+    "message": "Live database unreachable — showing cached static data. Map numbers may be stale until the connection recovers."
+  },
   "theme": {
     "label": "Theme",
     "options": {
@@ -294,6 +297,14 @@
       "jobsDone": "{count} extracted",
       "jobsFailed": "{count} failed",
       "overbudget": "Budget stopped before every frame was read",
+      "pauseBannerTitle": "Extraction paused — budget limit reached",
+      "pauseBannerBody": "This session hit its processing budget and stopped automatically. Resume only after you have decided to spend more.",
+      "pauseReasonLabel": "Pause reason",
+      "resumeExtraction": "Resume extraction",
+      "resumeReasonLabel": "Resume reason",
+      "resumeReasonPlaceholder": "Why are you resuming this session?",
+      "resumeReasonRequired": "A resume reason is required.",
+      "resumeError": "Could not resume extraction. Please try again.",
       "escalated": "{count} escalated",
       "unattributed": "{count} frames matched no street",
       "cameraObserved": "Camera reading",
@@ -314,6 +325,37 @@
       "rejectSession": "Reject the session",
       "working": "Saving…",
       "errorGeneric": "That did not save. Please try again.",
+      "errorUnauthorized": "Your admin session expired. Sign in again from the queue page, then retry.",
+      "errorNotReviewable": "This walk was already decided (perhaps in another tab). Refresh the page or open history to see the outcome.",
+      "errorDroppedSegments": "One or more ticked segments lost every supporting frame. Untick them or restore excluded frames, then try again.",
+      "errorUnknownSegments": "The approval list included segments this walk never observed. Refresh and try again.",
+      "errorBadRequest": "The server rejected this submission. Check your reason and segment selection, then try again.",
+      "errorNotFound": "This session no longer exists. Return to the queue.",
+      "deleteErrorUnauthorized": "Your admin session expired. Sign in again, then retry the delete.",
+      "deleteErrorBadRequest": "That frame could not be deleted. Refresh and try again.",
+      "reasonPresetLooksGood": "Looks good — approve as proposed",
+      "reasonPresetExcludedBlurry": "Excluded blurry frames",
+      "reasonPresetCorrectedRamps": "Corrected curb ramps",
+      "reasonPresetOverbudgetPartial": "Overbudget — partial approve",
+      "queuePosition": "Walk {position} of {total} · {remaining} left after this",
+      "nextWalk": "Next walk",
+      "backToQueue": "Back to queue",
+      "draftRestored": "Your unsaved corrections were restored from this device.",
+      "selectAll": "Select all",
+      "selectNone": "Select none",
+      "selectInvert": "Invert",
+      "shortcutsToggle": "Shortcuts",
+      "shortcutsTitle": "Keyboard shortcuts",
+      "shortcutsClose": "Close",
+      "shortcutStepFrames": "Step frames",
+      "shortcutExclude": "Exclude / include frame",
+      "shortcutLightbox": "Open full-size view",
+      "shortcutLensFocus": "Focus lens score for selected segment",
+      "shortcutSelectAllNone": "Select all / select none",
+      "shortcutDecision": "Focus reason / reject",
+      "shortcutClose": "Close inspector",
+      "shortcutToggle": "Toggle this cheat sheet",
+      "frameExcludedShort": "excl",
       "alreadyApproved": "This submission has been approved.",
       "alreadyRejected": "This submission has been rejected.",
       "fixtureNote": "No database is configured, so this submission is fixture data. Decisions are recorded locally.",
@@ -1165,7 +1207,7 @@
         "uploading": "Your frames are still arriving.",
         "matching": "Matching your frames to the streets you walked.",
         "extracting": "Reading your frames. This is the slow part, and it moves faster while this page is open.",
-        "cost_paused": "Reading is paused on this submission.",
+        "cost_paused": "Reading is paused — waiting for staff to resume.",
         "review_ready": "Your session is waiting for a reviewer.",
         "approved": "Approved. What your session measured is public data now.",
         "rejected": "A reviewer did not approve this submission, so none of it became public data.",
@@ -1174,12 +1216,13 @@
       "framesRead": "{done} of {total} frames read",
       "framesFailed": "Frames that could not be read: {count}. The rest of the session still counts.",
       "paused": {
-        "title": "Reading is paused",
-        "body": "This submission reached its processing budget, so nothing more is being spent on it automatically. Somebody has to look at it and decide. Your frames are safe in the meantime."
+        "title": "Reading is paused by staff",
+        "body": "This submission reached its processing budget and stopped automatically. It will not resume on its own — a team member must review it and explicitly resume extraction. Your frames are safe.",
+        "reason": "Technical detail: {reason}"
       },
       "failedNotice": {
         "title": "This submission could not be processed",
-        "body": "Something in matching or reading went wrong, and we would rather say so than show you a number we do not trust. Nothing from this submission became public data."
+        "body": "Something in matching or reading went wrong before the walk could finish. This is not a budget pause — the session failed and will not complete without help. Nothing from this submission became public data."
       },
       "segmentsEyebrow": "STREETS MATCHED",
       "segmentsLead": "Street segments matched so far: {count}. The scores stay provisional until a reviewer approves the session.",

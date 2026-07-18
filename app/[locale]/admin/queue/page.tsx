@@ -1,8 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
-import { getSegmentDetail } from "@/lib/segments";
+import { getSegmentDetail, getSegments } from "@/lib/segments";
 import { getPendingSubmissions } from "@/lib/submissions";
 import { getSessionReview } from "@/lib/capture/review-store";
+import { summarizeStreetNames } from "@/lib/capture/segment-label";
 import type {
   AddSegmentPayload,
   CvCapturePayload,
@@ -23,6 +24,19 @@ export default async function AdminQueuePage({
   const t = await getTranslations({ locale, namespace: "admin.queue" });
 
   const { items, source } = await getPendingSubmissions();
+
+  let segmentCatalog = new Map<string, { name: string; district: string }>();
+  try {
+    const collection = await getSegments();
+    for (const f of collection.features) {
+      segmentCatalog.set(f.properties.id, {
+        name: f.properties.name,
+        district: f.properties.district,
+      });
+    }
+  } catch {
+    segmentCatalog = new Map();
+  }
 
   // Enrich each item for display. For updates, join the current segment values
   // so the queue can render a field-by-field diff.
@@ -49,6 +63,15 @@ export default async function AdminQueuePage({
         // the card reads it rather than trusting a snapshot that could drift.
         const payload = item.payload as CvCapturePayload;
         const review = await getSessionReview(payload.session_id);
+        const walkSegmentIds = review
+          ? [...new Set(review.frames.map((f) => f.segmentId).filter((id): id is string => Boolean(id)))]
+          : [];
+        const streetSummary = summarizeStreetNames(
+          walkSegmentIds.map((id) => {
+            const meta = segmentCatalog.get(id);
+            return { id, name: meta?.name, district: meta?.district };
+          }),
+        );
         return {
           id: item.id,
           type: "cv_capture",
@@ -63,6 +86,7 @@ export default async function AdminQueuePage({
                 failedFrames: review.jobs.failed - review.jobs.overbudget,
                 overbudget: review.overbudget,
                 escalated: review.tokens.escalated,
+                streetSummary,
               }
             : {
                 // The queue row outlived its session. Say so plainly rather than

@@ -12,19 +12,19 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { getDataDir } from "./data-dir";
 import type { CommunityReport, CommunitySegment, CvObservation } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
 export const COMMUNITY_SEGMENTS_PATH = path.join(
-  DATA_DIR,
+  getDataDir(),
   "community-segments.local.json",
 );
 export const COMMUNITY_REPORTS_PATH = path.join(
-  DATA_DIR,
+  getDataDir(),
   "community-reports.local.json",
 );
 export const COMMUNITY_CV_OBSERVATIONS_PATH = path.join(
-  DATA_DIR,
+  getDataDir(),
   "community-cv-observations.local.json",
 );
 

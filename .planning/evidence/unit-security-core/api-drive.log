@@ -1,0 +1,17 @@
+unit-security-core browser-drive 2026-07-18T17:51:22Z
+port: 3572
+
+GET /en/collect -> 200
+GET /en/map -> 200
+
+POST /api/capture/sessions (honeypot tripped):
+{"ok":false,"error":"rejected"}
+HTTP 400
+
+POST /api/capture/sessions (valid body, server-side secret path):
+{"ok":false,"error":"server_error"}
+HTTP 500
+
+POST /api/submissions (valid segment proposal):
+{"ok":true,"status":"pending","sink":"local"}
+HTTP 201

@@ -29,6 +29,8 @@ export type QueueCaptureView = {
   overbudget: boolean;
   /** Frames sent to the stronger model because the first pass was unsure. */
   escalated: number;
+  /** Human street names when geometry is known. */
+  streetSummary?: string | null;
   /** The session could not be read (fixture/live mismatch, or deleted). */
   unreadable?: boolean;
 };
@@ -359,6 +361,9 @@ function CaptureCardBody({
 
   return (
     <div className="mt-3">
+      {c.streetSummary ? (
+        <p className="mb-2 text-[13px] font-medium text-ink">{c.streetSummary}</p>
+      ) : null}
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[13px]">
         <dt className="text-neutral-strong">{t("captureSegments")}</dt>
         <dd className="font-mono font-medium text-ink">{c.segments}</dd>
