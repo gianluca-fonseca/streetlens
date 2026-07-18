@@ -1,0 +1,23 @@
+# unit-civic-pack evidence — 2026-07-18T21:37:50Z
+port: 3583
+
+## pages
+/en/brief -> 200
+/es/brief -> 200
+/en/data -> 200
+/es/data -> 200
+/en/press -> 200
+/es/press -> 200
+
+## apis
+/api/open-data/geojson -> 200
+/api/open-data/gejson -> 200
+/api/open-data/csv -> 200
+
+## open-data scrub sample
+feature_count 1
+municipality Escazú
+forbidden_keys_present []
+
+## browser console (playwright)
+Total messages: 0 (Errors: 0, Warnings: 0)
