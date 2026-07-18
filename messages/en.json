@@ -17,6 +17,16 @@
       "dark": "Dark"
     }
   },
+  "localeSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "es": "Español"
+  },
+  "mapChrome": {
+    "home": "StreetLens home",
+    "tagline": "Escazú street instrument",
+    "contribute": "Contribute a street"
+  },
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
     "demoTag": "DEMO",
@@ -596,7 +606,10 @@
       "segments": {
         "title": "Lowest-scoring streets",
         "caveat": "Demo scores over real geometry. Not real measurements.",
-        "activate": "Open {name} in the platform"
+        "activate": "Open {name} in the platform",
+        "cvTitle": "Recently camera-observed",
+        "cvBadge": "CV",
+        "empty": "No camera observations published yet. Record a walk or add a street from the map."
       },
       "stats": {
         "failLabel": "Fail Ley 7600 minimums",
@@ -604,7 +617,12 @@
         "segmentsLabel": "Segments audited",
         "kmLabel": "Street network audited",
         "bikeLabel": "Avg. bike infrastructure",
-        "demoFootnote": "Fail rate and averages are demo figures over real OSM geometry."
+        "demoFootnote": "Fail rate and averages are demo figures over real OSM geometry.",
+        "cvSegmentsLabel": "Streets camera-observed",
+        "cvSessionsLabel": "Walks reviewed",
+        "cvCoverageLabel": "Camera network coverage",
+        "communityLabel": "Community contributions",
+        "auditedPending": "Field audits not published yet. Camera walks and community adds are the live signal until corridor fieldwork begins."
       },
       "map": {
         "live": "Live map",
@@ -700,7 +718,8 @@
       "statKm": "Corridor km",
       "statCoverage": "Pilot coverage",
       "beginning": "This is a pilot, and a beginning.",
-      "demoNote": "Demo audit over real geometry. No score shown is a measurement until fieldwork begins in August 2026."
+      "demoNote": "Demo audit over real geometry. No score shown is a measurement until fieldwork begins in August 2026.",
+      "auditedEmpty": "No field audits published yet. The canton network is live on the map; camera walks and community reports are the signals that move today."
     },
     "method": {
       "eyebrow": "Method",
@@ -743,7 +762,7 @@
       "pipeline": {
         "eyebrow": "The engine ahead",
         "heading": "Every audit trains the next one.",
-        "body": "Field audits are the source of truth, and they stay that way. From the August 2026 pilot on, every corridor an auditor walks is also photographed, and those images become labeled training data. Over time they will train a computer-vision and machine-learning pipeline that reads sidewalk condition and obstructions straight from a photo, so every future audit scores faster than the last. No model scores a street today. When one does, a person still verifies what it reports."
+        "body": "Field audits remain the source of truth, and they stay that way. Camera walks already propose scores on the map: each session is reviewed before anything goes public, and a person still verifies what it reports. Those walks also become labeled training data so future field audits score faster. A camera proposal is not a field audit until one is published."
       },
       "plates": {
         "crossSection": {
@@ -764,7 +783,7 @@
           "label": "Figure 6",
           "claim": "Field audits today. A verified model tomorrow.",
           "support": "Every walked corridor is photographed, and those images become training data for a computer-vision pipeline that a person always checks.",
-          "source": "Roadmap, not built. The machine-learning path drawn dashed does not score any street today.",
+          "source": "Live today: camera proposals on the map, admin-reviewed. Field audits remain the published source of truth.",
           "alt": "Method pipeline diagram: field audits flow to open data today, with a dashed roadmap loop where a computer-vision and machine-learning model scores streets and a human always verifies the result."
         }
       }
@@ -837,7 +856,7 @@
       "items": {
         "real": {
           "q": "Is this real data?",
-          "a": "Not yet. Every score you see today is demo data generated over real OpenStreetMap geometry, so the map behaves exactly as it will with field data. Real measurements replace it corridor by corridor once fieldwork begins in August 2026."
+          "a": "The street network is real OpenStreetMap geometry. Demo audit scores are off by default; what you see colored today is camera-observed or community-reported work, each reviewed before it appears. Field audits will replace demo scores corridor by corridor once published."
         },
         "scores": {
           "q": "How are scores computed?",
@@ -845,7 +864,7 @@
         },
         "ai": {
           "q": "Does StreetLens use machine learning or computer vision?",
-          "a": "Not to score streets today. Every score you see is demo data, and real scores will come from auditors in the field. Their photos become the training data for a computer-vision and machine-learning pipeline that will speed up future audits, and a person will always verify what it produces. Machine learning and computer vision are on the roadmap, not in today's numbers."
+          "a": "Yes, for proposals — not for published field audits. Camera walks already produce proposed scores on the map; a reviewer approves each session before it appears, and those readings stay separate from field audits until one is published. Field auditors remain the source of truth, and a person always verifies what the camera reports."
         },
         "city": {
           "q": "Can my city use this?",
