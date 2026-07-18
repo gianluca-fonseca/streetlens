@@ -14,6 +14,11 @@ import FaqSection from "@/components/landing/FaqSection";
 import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
 
+// ISR, same reason as the map: the landing's pilot stats include CV sessions/segments
+// reviewed (getStats), which move when an admin approves a session after deploy.
+// Revalidate every 5 minutes so those counts refresh without a redeploy.
+export const revalidate = 300;
+
 export async function generateMetadata({
   params,
 }: {

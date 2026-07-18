@@ -27,6 +27,8 @@ import {
   SCORE_LAYERS,
   type CommunityReport,
   type CommunitySegment,
+  type CvAssessment,
+  type CvItemMedian,
   type CvObservation,
   type ScoreLayer,
   type SegmentCollection,
@@ -240,6 +242,97 @@ async function liveScoreRows(id?: string): Promise<ScoreRow[] | null> {
   }
 }
 
+/** Raw row from community_cv_observations (0017/0021/0023). numeric → number|string. */
+type CvObservationRow = {
+  id: string;
+  segment_id: string;
+  session_id: string;
+  score_overall: number | string | null;
+  score_accessibility: number | string | null;
+  score_drainage: number | string | null;
+  score_shade: number | string | null;
+  score_bike: number | string | null;
+  item_medians: Record<string, CvItemMedian> | null;
+  coverage: number | string | null;
+  confidence: number | string | null;
+  frame_refs: string[] | null;
+  captured_on: string | null;
+  submission_id: string | null;
+  created_at: string;
+  human_corrected: boolean | null;
+  overrides: Record<string, unknown> | null;
+  assessment: CvAssessment | null;
+};
+
+/** PostgREST returns numeric as number or string; coerce to a finite number or null. */
+function toNum(v: number | string | null | undefined): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function rowToCvObservation(row: CvObservationRow): CvObservation {
+  return {
+    id: row.id,
+    segment_id: row.segment_id,
+    session_id: row.session_id,
+    scores: {
+      overall: toNum(row.score_overall),
+      accessibility: toNum(row.score_accessibility),
+      drainage: toNum(row.score_drainage),
+      shade: toNum(row.score_shade),
+      bike: toNum(row.score_bike),
+    },
+    item_medians: row.item_medians ?? {},
+    confidence: toNum(row.confidence),
+    coverage: toNum(row.coverage) ?? 0,
+    frame_refs: Array.isArray(row.frame_refs) ? row.frame_refs : [],
+    captured_on: row.captured_on ?? row.created_at,
+    source: "cv",
+    submission_id: row.submission_id,
+    created_at: row.created_at,
+    human_corrected: row.human_corrected ?? false,
+    overrides: row.overrides ?? {},
+    assessment: row.assessment ?? null,
+  };
+}
+
+/**
+ * Approved CV observations from Supabase (public-read table community_cv_observations,
+ * 0017). Best-effort, exactly like liveScoreRows: any absence or error returns null so
+ * the caller falls back to the local store.
+ *
+ * This is the read path the public map uses for camera evidence. Approval writes the
+ * observation to Postgres through the definer RPC (admin_apply_capture_session); the
+ * local mirror is skipped on a read-only serverless FS. Without this reader an
+ * approved session would sit in the DB and never reach the deployed map, no matter
+ * how often the page revalidated — there would be nothing live to become fresh.
+ */
+async function liveCvObservations(): Promise<CvObservation[] | null> {
+  const client = getSupabaseClient();
+  if (!client) return null;
+  try {
+    const { data, error } = await client
+      .from("community_cv_observations")
+      .select(
+        "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
+      );
+    if (error || !data) return null;
+    return (data as CvObservationRow[]).map(rowToCvObservation);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Approved CV observations: the live DB when Supabase is configured, else the local
+ * store. No module-level cache, so an ISR revalidation re-reads the DB fresh (the
+ * committed static files may cache per-process, but this live read must not).
+ */
+async function getCvObservations(): Promise<CvObservation[]> {
+  return (await liveCvObservations()) ?? readCvObservations();
+}
+
 /* ------------------------------------------------------------------ *
  * Community layer (contract v3, u7) — applied contributions merged into the
  * read path. Community/import segments carry NO rubric scores; they render with
@@ -336,7 +429,7 @@ export async function getSegments(): Promise<SegmentCollection> {
   const [community, reports, cvObservations] = await Promise.all([
     readAllContributedSegments(),
     readCommunityReports(),
-    readCvObservations(),
+    getCvObservations(),
   ]);
   const reportsBySegment = groupBySegment(reports);
   const cvBySegment = groupBySegment(cvObservations);
@@ -451,7 +544,7 @@ export async function getStats(): Promise<StreetStats> {
   // canton network overlay is baseline context, not a contribution, so it is not
   // tallied here (and, like community adds, never touches the audited figure).
   const communitySegments = (await readCommunitySegments()).length;
-  const cv = await readCvObservations();
+  const cv = await getCvObservations();
   const cvSessionsReviewed = new Set(cv.map((o) => o.session_id)).size;
   const cvSegments = new Set(cv.map((o) => o.segment_id)).size;
 

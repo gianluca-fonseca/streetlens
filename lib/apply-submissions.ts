@@ -149,6 +149,41 @@ function dbSecret(): string | null {
   return client && secret ? secret : null;
 }
 
+/** Compact description of a caught error (code + message) for a best-effort warning. */
+function errorDetail(err: unknown): string {
+  if (err && typeof err === "object") {
+    const e = err as { code?: string; message?: string };
+    if (e.code || e.message) return `${e.code ?? "ERR"}: ${e.message ?? String(err)}`;
+  }
+  return String(err);
+}
+
+/**
+ * Best-effort local mirror of an approved capture session, for LIVE mode only.
+ *
+ * In live mode the DB (via `admin_apply_capture_session`) is the source of truth
+ * and the community store files are only a convenience mirror for a same-box
+ * drive. Vercel's serverless filesystem is read-only outside /tmp, so this write
+ * throws EROFS/ENOENT there — which must NOT fail an approval whose authoritative
+ * write already committed to Postgres. The failure is logged (path and code ride
+ * the fs error message) and swallowed. Local mode never calls this: there the
+ * files ARE the store and a failure must surface.
+ */
+async function mirrorCvLocally(
+  sessionId: string,
+  keepIds: string[],
+  rows: CvObservation[],
+): Promise<void> {
+  try {
+    await pruneCvObservations(sessionId, keepIds);
+    await appendCvObservations(rows);
+  } catch (err) {
+    console.warn(
+      `[capture apply] local CV mirror skipped for session ${sessionId} (live DB is authoritative): ${errorDetail(err)}`,
+    );
+  }
+}
+
 /**
  * Apply one approved submission. Tries the DB RPC when configured; on any
  * absence or error, applies to the local community store so the flow works with
@@ -298,8 +333,9 @@ export async function applyApprovedCaptureSession(
         p_observations: rows,
       });
       if (!error) {
-        await pruneCvObservations(input.session_id, ids);
-        await appendCvObservations(rows);
+        // The DB write is authoritative; the local mirror is best-effort so a
+        // read-only serverless FS never fails an approval that already landed.
+        await mirrorCvLocally(input.session_id, ids, rows);
         return { mode: "supabase", kind: "cv_observation", session_id: input.session_id, ids };
       }
       // fall through to local-only on RPC failure (0017 not yet applied)
@@ -308,6 +344,8 @@ export async function applyApprovedCaptureSession(
     }
   }
 
+  // Local mode: these files ARE the store, so a write failure must surface rather
+  // than reporting a success the map never saw.
   await pruneCvObservations(input.session_id, ids);
   await appendCvObservations(rows);
   return { mode: "local", kind: "cv_observation", session_id: input.session_id, ids };
