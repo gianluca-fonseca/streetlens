@@ -87,6 +87,7 @@ function compile() {
 
 let T; // types
 let R; // rollup
+let S; // scoring
 
 /** All 15 items at `value` (encoded per response type), with per-key overrides. */
 function items(value, confidence, overrides) {
@@ -162,6 +163,7 @@ function main() {
   compile();
   T = require(path.join(BUILD_DIR, "capture", "types.js"));
   R = require(path.join(BUILD_DIR, "capture", "rollup.js"));
+  S = require(path.join(BUILD_DIR, "capture", "scoring.js"));
   const { recomputeReview, EMPTY_CORRECTIONS } = OV();
 
   const corr = (partial = {}) => ({ ...EMPTY_CORRECTIONS, ...partial });
@@ -352,6 +354,59 @@ function main() {
     check("chosen equals baseline when no synthesis exists", eq(s.scores, s.baselineScores));
     check("assessment is null", s.assessment === null);
     check("assessment is never stale when there is none", s.assessmentStale === false);
+  }
+
+  /* ---------------- 14. Overall is the composite of the FINAL adjusted lenses ---------------- */
+  // The prod defect (session b7c1da08): synthesis adjustments to drainage/shade were
+  // accepted, but score_overall persisted the pre-adjustment baseline composite. With
+  // no manual overall edit, the landed overall MUST be the renormalized composite of
+  // the final accessibility/drainage/shade that actually land.
+  console.log("\noverall composite — accepted synthesis adjustments recompute overall from the FINAL lenses");
+  {
+    const frames = [frame(0, { value: 3 }), frame(1, { value: 4 })];
+    // Move two constituents by hand-in-synthesis deltas, leave overall unproposed.
+    const A = {
+      "north-st": assessment({
+        drainage: { delta: -20, reason: "ponding at the curb" },
+        shade: { delta: 15, reason: "denser canopy than the frames caught" },
+      }),
+    };
+    const result = recomputeReview(frames, corr(), A);
+    const s = result.segments[0];
+    const expected = clampScore(
+      S.renormalizedOverall(s.scores.accessibility, s.scores.drainage, s.scores.shade),
+    );
+    check(
+      "drainage/shade took the synthesis adjustment",
+      s.scores.drainage === s.adjustedScores.drainage && s.scores.shade === s.adjustedScores.shade,
+      JSON.stringify({ drainage: s.scores.drainage, shade: s.scores.shade }),
+    );
+    check(
+      "stored overall equals the composite of the FINAL lenses",
+      s.scores.overall === expected,
+      `got ${s.scores.overall}, composite ${expected}`,
+    );
+    check(
+      "overall actually moved off the baseline (not the stale composite)",
+      s.scores.overall !== s.baselineScores.overall,
+      `overall ${s.scores.overall} vs baseline ${s.baselineScores.overall}`,
+    );
+    check("no manual edit was involved", s.manualEdited === false);
+  }
+
+  /* ---------------- 15. A manual overall edit still wins over the composite ---------------- */
+  console.log("\noverall manual — a hand-set overall beats the recomputed composite");
+  {
+    const frames = [frame(0, { value: 3 }), frame(1, { value: 4 })];
+    const A = { "north-st": assessment({ drainage: { delta: -20, reason: "r" } }) };
+    const result = recomputeReview(
+      frames,
+      corr({ manualScores: { "north-st": { overall: 51.5 } } }),
+      A,
+    );
+    const s = result.segments[0];
+    check("manual overall wins over the composite", s.scores.overall === 51.5);
+    check("the constituent adjustment still landed", s.scores.drainage === s.adjustedScores.drainage);
   }
 
   console.log(`\n${failures.length ? `FAIL (${failures.length})` : "PASS"}`);
