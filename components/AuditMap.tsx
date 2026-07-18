@@ -15,14 +15,11 @@ import {
   BUILDINGS,
   COMMUNITY_CASING,
   COMMUNITY_LAYER_FILTER,
-  CV_CASING,
-  CV_LAYER_FILTER,
   HILLSHADE_LAYER_ID,
   HILLSHADE_PAINT,
   RAMP_LAYER_FILTER,
   TERRAIN,
   communityWidthExpression,
-  cvWidthExpression,
   lineColorExpression,
   lineWidthExpression,
 } from "@/components/mapConfig";
@@ -46,14 +43,8 @@ const SOURCE_ID = "segments";
 const LINE_LAYER_ID = "segments-line";
 const GLOW_LAYER_ID = "segments-glow";
 const COMMUNITY_LAYER_ID = "segments-community";
-const CV_LAYER_ID = "segments-cv";
-/**
- * Layers that respond to hover / click (score ramp + community + camera casing).
- * The CV layer must be here: it draws the features it steals from the community
- * filter, so leaving it out would make a camera-observed import segment
- * unclickable.
- */
-const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID, CV_LAYER_ID];
+/** Layers that respond to hover / click (score ramp + neutral community casing). */
+const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID];
 
 function prefersDark(): boolean {
   return (
@@ -174,9 +165,7 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
 
   // Community / import segments: fixed neutral warm-grey dashed casing, never a
   // score color (contract v3, ruling 1). Verified in applyLayer for dark mode.
-  // Added BEFORE the CV casing and the score line so the draw order runs
-  // glow → neutral → camera-observed → score ramp (the three casing filters are
-  // mutually exclusive, so ordering is about the CV halo, not overlap).
+  // Added BEFORE the score line so the draw order runs glow → neutral → ramp.
   if (!map.getLayer(COMMUNITY_LAYER_ID)) {
     map.addLayer({
       id: COMMUNITY_LAYER_ID,
@@ -194,27 +183,6 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
           1,
           0.85,
         ],
-      },
-    });
-  }
-
-  // Camera-observed segments (u31): the accent casing that makes a street the
-  // cameras have actually seen unmistakable. It sits ABOVE the neutral overlay
-  // and BELOW the score line, so on an audited segment it reads as a pink halo
-  // around the score colour (which stays fully visible), and on an unaudited
-  // import segment — the demo-off case, where everything else is neutral — it
-  // is the mark itself.
-  if (!map.getLayer(CV_LAYER_ID)) {
-    map.addLayer({
-      id: CV_LAYER_ID,
-      type: "line",
-      source: SOURCE_ID,
-      filter: CV_LAYER_FILTER,
-      layout: { "line-cap": "round", "line-join": "round" },
-      paint: {
-        "line-color": CV_CASING.color,
-        "line-width": cvWidthExpression,
-        "line-opacity": CV_CASING.opacity,
       },
     });
   }
@@ -256,12 +224,6 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
       COMMUNITY_LAYER_ID,
       "line-color",
       dark ? COMMUNITY_CASING.colorDark : COMMUNITY_CASING.color,
-    );
-    // Likewise the camera casing: score-independent, only its accent tracks theme.
-    map.setPaintProperty(
-      CV_LAYER_ID,
-      "line-color",
-      dark ? CV_CASING.colorDark : CV_CASING.color,
     );
   } catch {
     /* layers not ready yet */
@@ -446,6 +408,7 @@ export default function AuditMap({
   interactive = false,
   onSegmentActivate,
   onMoveStateChange,
+  openContributeOnMount = false,
 }: Readonly<{
   segments: SegmentCollection;
   stats?: StreetStats;
@@ -461,6 +424,8 @@ export default function AuditMap({
   /** Fires true on movestart / false on moveend so the composing chrome can swap
    * its over-tile glass to a solid while the map moves (research §1 perf note). */
   onMoveStateChange?: (moving: boolean) => void;
+  /** Deep-link from landing CTA: open the contribute chooser once the map is ready. */
+  openContributeOnMount?: boolean;
 }>) {
   const t = useTranslations("map");
   const isHero = variant === "hero";
@@ -485,6 +450,13 @@ export default function AuditMap({
 
   // Map-integrated contribution flow (owns its own draw layers + handlers).
   const contribute = useContribute(mapRef, mapReady);
+  const openedContributeRef = useRef(false);
+
+  useEffect(() => {
+    if (!openContributeOnMount || !mapReady || openedContributeRef.current) return;
+    openedContributeRef.current = true;
+    contribute.open();
+  }, [openContributeOnMount, mapReady, contribute]);
 
   const activeLayerRef = useRef(activeLayer);
   const selectedIdRef = useRef<string | null>(null);
