@@ -9,6 +9,7 @@ import type { SegmentCollection, StreetStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
 import { formatCvCoveragePct } from "@/lib/cv-provenance";
 import { hideAuditedZeros, listRecentlyCvObserved } from "@/lib/real-data-era";
+import { streetPath } from "@/lib/street-links";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import Logo from "@/components/ui/Logo";
@@ -136,22 +137,21 @@ function LegendChip() {
 
 /** One camera-observed street in the LEFT-zone list. */
 function CvSegmentRow({
+  id,
   name,
   district,
   badge,
   activateLabel,
-  onActivate,
 }: Readonly<{
+  id: string;
   name: string;
   district: string;
   badge: string;
   activateLabel: string;
-  onActivate: () => void;
 }>) {
   return (
-    <button
-      type="button"
-      onClick={onActivate}
+    <Link
+      href={streetPath(id)}
       aria-label={activateLabel}
       className="sl-card flex min-h-[44px] w-full items-center gap-3 rounded-[8px] border border-hairline bg-paper-white px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
     >
@@ -169,7 +169,7 @@ function CvSegmentRow({
           {district}
         </span>
       </span>
-    </button>
+    </Link>
   );
 }
 
@@ -588,11 +588,11 @@ export default function Hero({
                   {cvObserved.map((s) => (
                     <li key={s.id}>
                       <CvSegmentRow
+                        id={s.id}
                         name={s.name}
                         district={s.district}
                         badge={t("segments.cvBadge")}
                         activateLabel={t("segments.activate", { name: s.name })}
-                        onActivate={openPlatform}
                       />
                     </li>
                   ))}

@@ -194,3 +194,20 @@ export function splitCvObservations<T extends CvOrderable>(
     .sort(byRecencyDesc);
   return { canonical, archived };
 }
+
+/** The overall assessment sentence from a CV observation, or null when absent. */
+export function cvOverallAssessment(assessment: unknown): string | null {
+  let a: unknown = assessment;
+  if (typeof a === "string") {
+    const s = a.trim();
+    if (!s || s === "null") return null;
+    try {
+      a = JSON.parse(s);
+    } catch {
+      return null;
+    }
+  }
+  if (!a || typeof a !== "object" || Array.isArray(a)) return null;
+  const overall = (a as { overall?: unknown }).overall;
+  return typeof overall === "string" && overall.trim() ? overall : null;
+}
