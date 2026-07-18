@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
 import { reviewSubmission } from "@/lib/submissions";
+import { revalidatePublicMapPages } from "@/lib/revalidate-map";
 
 // Uses fs (local fallback) + Web Crypto (session verify): Node.js runtime.
 export const runtime = "nodejs";
@@ -39,6 +40,10 @@ export async function POST(request: NextRequest) {
   if (!result.ok) {
     const status = result.error === "not_found" ? 404 : 422;
     return NextResponse.json({ error: result.error }, { status });
+  }
+
+  if (action === "approve") {
+    revalidatePublicMapPages();
   }
 
   return NextResponse.json(result);
