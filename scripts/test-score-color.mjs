@@ -50,31 +50,33 @@ function check(label, ok, detail = "") {
  * imported from the module under test: a snapshot that reads from the thing it
  * guards would pass no matter what anyone did to it.
  */
+// Rev 7 (#28). The owner lifted the seal to replace these values; this fixture
+// re-freezes the NEW table so it is the baseline going forward.
 const SEALED_RAMP = {
   overall: [
-    { at: 0, hex: "#C0472B" },
-    { at: 50, hex: "#E8B84B" },
-    { at: 100, hex: "#0E7C66" },
+    { at: 0, hex: "#F45E53" },
+    { at: 50, hex: "#CE4D02" },
+    { at: 100, hex: "#056E48" },
   ],
   accessibility: [
-    { at: 0, hex: "#FFE945" },
-    { at: 50, hex: "#7C7B78" },
-    { at: 100, hex: "#00204D" },
+    { at: 0, hex: "#CE63E9" },
+    { at: 50, hex: "#A844EA" },
+    { at: 100, hex: "#7629F1" },
   ],
   drainage: [
-    { at: 0, hex: "#C7C13B" },
-    { at: 50, hex: "#4CA377" },
-    { at: 100, hex: "#21808C" },
+    { at: 0, hex: "#0E9EAF" },
+    { at: 50, hex: "#077FA8" },
+    { at: 100, hex: "#0263A8" },
   ],
   shade: [
-    { at: 0, hex: "#DDE3CE" },
-    { at: 50, hex: "#6E9463" },
-    { at: 100, hex: "#14532D" },
+    { at: 0, hex: "#729D0D" },
+    { at: 50, hex: "#148918" },
+    { at: 100, hex: "#07703F" },
   ],
   bike: [
-    { at: 0, hex: "#E8D9C4" },
-    { at: 50, hex: "#C88C5E" },
-    { at: 100, hex: "#8A4B2D" },
+    { at: 0, hex: "#EF599A" },
+    { at: 50, hex: "#DF1194" },
+    { at: 100, hex: "#B20795" },
   ],
 };
 
@@ -288,7 +290,14 @@ function main() {
     // 6. A colour that already passes is returned untouched — no gratuitous
     //    drift away from the map for values that were fine to begin with.
     {
-      const already = "#8A4B2D"; // bike@100, 6.4:1 on white
+      // overall@100, 5.58:1 on #f1f1f1. Re-anchored for rev 7: the old constant
+      // here was bike@100 #8A4B2D, which stopped being a ramp colour when the
+      // bike lens moved off copper. It kept passing (any compliant colour does),
+      // but it no longer proved anything about the shipped ramp. Under rev 7 the
+      // score-100 stops are the only ones already compliant as light ink — every
+      // other stop sits in the mid-luminance band the basemap requires and is
+      // lifted by readableInk, which is precisely why this module exists.
+      const already = "#056E48";
       check(
         "readableInk leaves an already-compliant colour alone",
         S.readableInk(already, S.SURFACE_LIGHT) === already,

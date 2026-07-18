@@ -82,11 +82,22 @@ Each lens has its own colorblind-safe ramp, and every ramp is paired with a redu
 
 | Lens | Ramp | Stop 0 (worst) | Stop 50 | Stop 100 (best) |
 |---|---|---|---|---|
-| Overall | teal ← amber ← clay | `#C0472B` | `#E8B84B` | `#0E7C66` |
-| Accessibility | Cividis | `#FFE945` | `#7C7B78` | `#00204D` |
-| Drainage | Viridis | `#C7C13B` | `#4CA377` | `#21808C` |
-| Shade | canopy green | `#DDE3CE` | `#6E9463` | `#14532D` |
-| Bike | sand → copper | `#E8D9C4` | `#C88C5E` | `#8A4B2D` |
+| Overall | traffic light: coral-red → burnt orange → emerald | `#F45E53` | `#CE4D02` | `#056E48` |
+| Accessibility | violet: orchid → electric indigo | `#CE63E9` | `#A844EA` | `#7629F1` |
+| Drainage | cyan → deep azure | `#0E9EAF` | `#077FA8` | `#0263A8` |
+| Shade | lime → deep canopy | `#729D0D` | `#148918` | `#07703F` |
+| Bike | pink → deep magenta | `#EF599A` | `#DF1194` | `#B20795` |
+
+These are rev 7. Every stop is solved to a target relative luminance (0.278 at
+score 0, 0.183 at 50, 0.118 at 100) rather than picked by eye, because the
+basemap is near-white in light and near-black in dark: only a middle luminance
+band clears both. Two properties fall out of that construction. Every stop holds
+at least 3:1 against the light basemap and ~2.9:1 against the dark one, and
+luminance descends monotonically along every ramp, so bad → good still reads
+with all colour removed (a ~1.95:1 grayscale spread) and does not depend on
+telling red from green. `scripts/test-ramp-legibility.mjs` asserts those rules
+directly, so a future retune has to preserve them rather than just re-freeze new
+values.
 
 Width channel: a segment's line is **6.0 px** at score 0 and narrows to **2.5 px** at score 100, so the lowest-scoring segments are the thickest and most visible.
 

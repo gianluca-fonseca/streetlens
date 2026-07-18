@@ -22,10 +22,10 @@ type Lens = {
 };
 
 const LENSES: readonly Lens[] = [
-  { key: "accessibility", fig: "2a", img: "/render/lens-accessibility.svg", stops: ["#FFE945", "#7C7B78", "#00204D"] },
-  { key: "drainage", fig: "2b", img: "/render/lens-drainage.svg", stops: ["#C7C13B", "#4CA377", "#21808C"] },
-  { key: "shade", fig: "2c", img: "/render/lens-shade.svg", stops: ["#DDE3CE", "#6E9463", "#14532D"] },
-  { key: "bike", fig: "2d", img: "/render/lens-bike.svg", stops: ["#E8D9C4", "#C88C5E", "#8A4B2D"] },
+  { key: "accessibility", fig: "2a", img: "/render/lens-accessibility.svg", stops: ["#CE63E9", "#A844EA", "#7629F1"] },
+  { key: "drainage", fig: "2b", img: "/render/lens-drainage.svg", stops: ["#0E9EAF", "#077FA8", "#0263A8"] },
+  { key: "shade", fig: "2c", img: "/render/lens-shade.svg", stops: ["#729D0D", "#148918", "#07703F"] },
+  { key: "bike", fig: "2d", img: "/render/lens-bike.svg", stops: ["#EF599A", "#DF1194", "#B20795"] },
 ];
 
 export default function MeasureSection() {
