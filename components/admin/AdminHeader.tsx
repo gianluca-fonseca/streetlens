@@ -66,7 +66,7 @@ export default async function AdminHeader({
           {t("brand")}
         </span>
 
-        <nav className="flex items-center gap-1" aria-label={t("brand")}>
+        <nav className="flex flex-wrap items-center gap-1" aria-label={t("brand")}>
           {nav.map(({ key, href, label, Icon }) => {
             const isActive = key === active;
             return (
