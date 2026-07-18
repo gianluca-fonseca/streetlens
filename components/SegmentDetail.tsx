@@ -10,7 +10,7 @@ import {
   parseCommunityReports,
   parseCvObservations,
 } from "@/lib/parse-feature-props";
-import { formatProvenanceDate, splitCvObservations } from "@/lib/cv-provenance";
+import { formatProvenanceDate, splitCvObservations, cvOverallAssessment } from "@/lib/cv-provenance";
 import {
   LAYER_ORDER,
   RUBRIC_ITEMS,
@@ -20,6 +20,7 @@ import {
 import { meterWidth, rampInkVars } from "@/components/scoreColor";
 import styles from "@/components/ui/zen.module.css";
 import panel from "@/components/ui/panel.module.css";
+import StreetShareActions from "@/components/street/StreetShareActions";
 
 /**
  * Placeholder for a value the camera never established. Deliberately not "0":
@@ -53,19 +54,7 @@ function asRatio(value: unknown): number | null {
  * assessment", never throw under the popover (which has no error boundary).
  */
 function cvOverall(assessment: unknown): string | null {
-  let a: unknown = assessment;
-  if (typeof a === "string") {
-    const s = a.trim();
-    if (!s || s === "null") return null;
-    try {
-      a = JSON.parse(s);
-    } catch {
-      return null;
-    }
-  }
-  if (!a || typeof a !== "object" || Array.isArray(a)) return null;
-  const overall = (a as { overall?: unknown }).overall;
-  return typeof overall === "string" && overall.trim() ? overall : null;
+  return cvOverallAssessment(assessment);
 }
 
 /**
@@ -535,7 +524,9 @@ export default function SegmentDetail({
             </span>
           ) : null}
         </div>
-        <button
+        <div className="flex shrink-0 items-center gap-1">
+          <StreetShareActions segmentId={segment.id} variant="panel" />
+          <button
           type="button"
           onClick={onClose}
           aria-label={t("close")}
@@ -543,6 +534,7 @@ export default function SegmentDetail({
         >
           <X size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-4">
