@@ -2,8 +2,8 @@
  * Where a validated submission lands.
  *
  * Env-gated, mirroring the data layer's philosophy (see lib/segments.ts): when
- * Supabase is configured we insert a `pending` row (RLS in 0006 lets anon
- * insert only pending proposals); otherwise we append to a gitignored local
+ * Supabase is configured we insert via the secret-gated `submit_proposal` RPC
+ * (0025); otherwise we append to a gitignored local queue file so the whole
  * queue file so the whole flow works TONIGHT with no database. The row shape
  * matches `SubmissionRow` in lib/types.ts and the `submissions` migration.
  */
@@ -64,21 +64,19 @@ export async function persistSubmission(
   record: SubmissionInsert,
 ): Promise<SinkResult> {
   const client = getSupabaseClient();
-  if (client) {
+  const secret = process.env.ADMIN_RPC_SECRET;
+  if (client && secret) {
     try {
-      const { data, error } = await client
-        .from("submissions")
-        .insert({
-          type: record.type,
-          payload: record.payload,
-          status: record.status,
-          source_ip_hash: record.source_ip_hash,
-          honeypot_tripped: record.honeypot_tripped,
-        })
-        .select("id")
-        .single();
+      const { data, error } = await client.rpc("submit_proposal", {
+        p_type: record.type,
+        p_payload: record.payload,
+        p_status: record.status,
+        p_source_ip_hash: record.source_ip_hash,
+        p_honeypot_tripped: record.honeypot_tripped,
+        p_secret: secret,
+      });
       if (!error && data) {
-        return { sink: "supabase", id: (data as { id: string }).id };
+        return { sink: "supabase", id: data as string };
       }
     } catch {
       // fall through to local queue
@@ -117,10 +115,9 @@ export class CaptureEmitError extends Error {
  * crash in between simply re-emits on the next pump, which is only safe if a
  * second emit is a no-op.
  *
- * Live mode dedupes inside the RPC rather than here. It has no choice: 0006 gives
- * anon INSERT on submissions and deliberately NO SELECT policy (the queue holds ip
- * hashes and reviewer notes), so a check-then-insert from application code cannot
- * see what it is checking for.
+ * Live mode dedupes inside the RPC rather than here. It has no choice: 0025
+ * removed anon INSERT on submissions, so a check-then-insert from application
+ * code cannot see the queue (no SELECT policy for anon).
  *
  * On a live failure this THROWS rather than falling back to the local queue. A
  * local write in a Supabase-configured deployment lands in a file the live queue

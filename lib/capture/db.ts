@@ -229,6 +229,7 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
         p_mode: mode,
         p_ip_hash: ipHash,
         p_contact: contact ?? null,
+        p_secret: adminSecret(),
       });
     },
 
@@ -246,14 +247,16 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
       return rpc<number[]>("capture_register_frames", {
         p_session_id: sessionId,
         p_frames: payload,
+        p_secret: adminSecret(),
       });
     },
 
     async finalizeSession(sessionId, track, clockOffsetMs) {
       return rpc<string>("capture_finalize_session", {
         p_session_id: sessionId,
-        p_track: track.map((p) => ({ lng: p.lng, lat: p.lat })),
+        p_track: track.map((p) => ({ lng: p.lng, lat: p.lat, t: p.t, ...(p.accuracy !== undefined ? { accuracy: p.accuracy } : {}) })),
         p_clock_offset_ms: clockOffsetMs,
+        p_secret: adminSecret(),
       });
     },
 
