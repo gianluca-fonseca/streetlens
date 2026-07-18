@@ -150,6 +150,7 @@ restating it.
 | Review, approval, the third community kind | `supabase/migrations/0017_capture_review.sql` |
 | Per-frame rationale + observations on the review read | `supabase/migrations/0020_observation_rationale.sql` |
 | Reviewer overrides, frame delete, review detail | `supabase/migrations/0021_review_overrides.sql`, `lib/capture/review-overrides.ts` |
+| Segment synthesis: apply + persist | `supabase/migrations/0023_assessment_apply.sql`, `lib/capture/review-overrides.ts` |
 | Upload orchestration | `lib/capture/upload-client.ts` |
 
 ### The rubric is not a new vocabulary
@@ -600,6 +601,55 @@ numbered dot at `capture_frames.location` (the position the pipeline recorded at
 match time, not a second interpolation), and the matched segments in their real
 geometry. Unmatched frames are grey, excluded ones dim, deleted ones tombstoned.
 Selection is bidirectional with the inspector and the segment cards.
+
+### Segment synthesis (u2)
+
+Numbers alone are thin. A separate engine (the sibling lane, migration 0022)
+writes a per-segment **synthesis** onto the `capture_session_review` rollup: an
+overall plain-language verdict, a short explanation per lens, and a set of
+bounded score adjustments, each with its own reason. The frozen shape:
+
+```
+assessment = {
+  overall: string,
+  lenses: { accessibility, drainage, shade, bike },   // per-lens explanations
+  adjustments: { <lens>: { delta, reason } },          // bounded nudges
+  adjustedScores: { overall, accessibility, drainage, shade, bike },
+  model: string
+}
+```
+
+**The workbench reads it first.** In `components/admin/CaptureReview.tsx` the
+overall verdict is the first thing a reviewer sees on a segment, then each lens's
+explanation sits beside its score. Where the engine proposed an adjustment, the
+baseline and the adjusted value show side by side with the signed delta and the
+reason. The **adjusted value is the default proposal**. A one-tap "use baseline"
+reverts a single lens, and a segment-level control reverts them all. A hand-typed
+score in the grid still wins over either, unchanged from u2's manual edit.
+
+**The delta rides the fresh baseline, not the stale number.** The synthesis
+adjustment is folded into the one `recomputeReview` (`lib/capture/review-overrides.ts`),
+extending the fixed order to: drop deleted → drop excluded → item overrides →
+`computeRollups` → **synthesis adjustment (the clamped delta on the recomputed
+baseline)** → per-lens baseline opt-out → manual edit wins → drop empty segments.
+So when a reviewer excludes or corrects frames, the baseline moves and the
+adjusted value is that moved baseline plus the same delta, never the engine's
+`adjustedScores`, which were computed on the original frames. When that happens the
+explanation text is flagged "written before your corrections" so the reviewer
+knows the prose predates the evidence, even though the number is honest. A lens the
+frames never measured (null baseline) is not adjusted: unknown is not a number to
+nudge. Locked by `scripts/test-review-overrides.mjs`.
+
+**What lands, and what the public sees.** The reviewer's chosen numbers remain the
+only numbers on the map (the `overrides` record already logs what a human changed,
+and a baseline opt-out joins it). The synthesis rides along as context:
+`community_cv_observations` gains a nullable `assessment jsonb` (migration 0023,
+extending `admin_apply_capture_session` create-or-replace, backward compatible: a
+walk with no synthesis stores `NULL`), and the public `SegmentDetail.tsx` popover
+shows the overall sentence, labeled as model-written and in English, beside the
+existing provenance chips. It never feeds a `score_*`. Locked by
+`scripts/test-cv-apply.mjs` and the 0023 section of
+`scripts/test-capture-migrations.mjs`.
 
 ### The pump processing model
 
