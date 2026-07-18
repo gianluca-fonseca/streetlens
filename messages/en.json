@@ -1272,5 +1272,54 @@
       "sessionLabel": "SESSION",
       "backToMap": "Back to the map"
     }
+  },
+  "street": {
+    "meta": {
+      "title": "{name} · {district}",
+      "description": "Street report card for {name} in {district}. Overall score {score}/100.",
+      "notFoundTitle": "Street not found"
+    },
+    "chrome": {
+      "home": "StreetLens home",
+      "tagline": "Street report card",
+      "map": "Open on map"
+    },
+    "eyebrow": "Street report card",
+    "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
+    "scoresHeading": "Scores by layer",
+    "provenanceHeading": "Provenance",
+    "assessmentHeading": "Assessment",
+    "assessmentNote": "Written by the camera model, in English. Not a field audit.",
+    "mapHeading": "Location",
+    "mapHint": "Open the full map to explore this segment in context.",
+    "layers": {
+      "overall": "Overall",
+      "accessibility": "Accessibility",
+      "drainage": "Drainage",
+      "shade": "Shade",
+      "bike": "Bike"
+    },
+    "provenance": {
+      "audited": "Field audited",
+      "camera": "Camera observed",
+      "community": "Community contributed",
+      "updated": "Last updated"
+    },
+    "share": {
+      "copyLink": "Copy link",
+      "copied": "Copied",
+      "openStreetPage": "Open street page",
+      "openOnMap": "Open on map"
+    },
+    "og": {
+      "eyebrow": "Street report card",
+      "overall": "Overall",
+      "layers": {
+        "accessibility": "Access",
+        "drainage": "Drain",
+        "shade": "Shade",
+        "bike": "Bike"
+      }
+    }
   }
 }

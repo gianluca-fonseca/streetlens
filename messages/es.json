@@ -1272,5 +1272,54 @@
       "sessionLabel": "SESIÓN",
       "backToMap": "Volver al mapa"
     }
+  },
+  "street": {
+    "meta": {
+      "title": "{name} · {district}",
+      "description": "Ficha de calle para {name} en {district}. Puntaje general {score}/100.",
+      "notFoundTitle": "Calle no encontrada"
+    },
+    "chrome": {
+      "home": "Inicio de StreetLens",
+      "tagline": "Ficha de calle",
+      "map": "Abrir en el mapa"
+    },
+    "eyebrow": "Ficha de calle",
+    "demoNote": "Auditoría de demostración. Los datos de campo reales reemplazarán este corredor tramo a tramo desde agosto de 2026.",
+    "scoresHeading": "Puntajes por capa",
+    "provenanceHeading": "Procedencia",
+    "assessmentHeading": "Evaluación",
+    "assessmentNote": "Redactado por el modelo de cámara, en inglés. No es una auditoría de campo.",
+    "mapHeading": "Ubicación",
+    "mapHint": "Abre el mapa completo para explorar este segmento en contexto.",
+    "layers": {
+      "overall": "General",
+      "accessibility": "Accesibilidad",
+      "drainage": "Drenaje",
+      "shade": "Sombra",
+      "bike": "Bici"
+    },
+    "provenance": {
+      "audited": "Auditado en campo",
+      "camera": "Observado por cámara",
+      "community": "Aportado por la comunidad",
+      "updated": "Última actualización"
+    },
+    "share": {
+      "copyLink": "Copiar enlace",
+      "copied": "Copiado",
+      "openStreetPage": "Abrir ficha de calle",
+      "openOnMap": "Abrir en el mapa"
+    },
+    "og": {
+      "eyebrow": "Ficha de calle",
+      "overall": "General",
+      "layers": {
+        "accessibility": "Acceso",
+        "drainage": "Drenaje",
+        "shade": "Sombra",
+        "bike": "Bici"
+      }
+    }
   }
 }
