@@ -2,14 +2,15 @@
 
 import { useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ImageOff, Pencil, ScanLine, Users, X } from "lucide-react";
+import { ChevronDown, ImageOff, Pencil, ScanLine, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
+import type { CvObservation } from "@/lib/types";
 import {
   parseCommunityReport,
   parseCommunityReports,
   parseCvObservations,
 } from "@/lib/parse-feature-props";
-import { formatProvenanceDate } from "@/lib/cv-provenance";
+import { formatProvenanceDate, splitCvObservations } from "@/lib/cv-provenance";
 import {
   LAYER_ORDER,
   RUBRIC_ITEMS,
@@ -56,6 +57,127 @@ function cvOverall(assessment: unknown): string | null {
 }
 
 /**
+ * One approved camera observation, rendered identically whether it is the
+ * canonical reading or an archived one (u32) — same card treatment, so the
+ * archive reads as history rather than a lesser second-class thing.
+ *
+ * `superseded` changes only the framing: the label says which kind it is, and
+ * an archived card carries a "Superseded" tag plus its walk date up in the
+ * label line, since for a past reading WHEN it was walked is the whole point.
+ */
+function CvObservationCard({
+  observation: o,
+  superseded,
+}: Readonly<{ observation: CvObservation; superseded: boolean }>) {
+  const t = useTranslations("detail");
+  const tl = useTranslations("layers");
+  const locale = useLocale();
+
+  const frames = Array.isArray(o.frame_refs) ? o.frame_refs.length : 0;
+  const confidence = asPercent(o.confidence);
+  const coverage = asPercent(o.coverage);
+  // Provenance the segment must answer at a glance (u-provenance): when it was
+  // walked and when the reading last changed (created_at moves on re-approval
+  // upsert, so it reads "last updated"). Both cross the maplibre boundary; the
+  // helper never throws. The contributor's contact is PII and is NEVER shown
+  // publicly (conductor privacy rule) — the public attribution is a generic
+  // "Community contributor"; contact lives only on the admin workbench.
+  const walked = formatProvenanceDate(o.captured_on, locale);
+  const updated = formatProvenanceDate(o.created_at, locale);
+
+  return (
+    <li className="px-3 py-2">
+      <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 font-mono text-[10.5px] text-neutral-strong">
+        <span>{superseded ? t("cvObservationLabel") : t("cvCurrentLabel")}</span>
+        {superseded ? (
+          <>
+            {walked ? (
+              <span className="text-ink">· {walked}</span>
+            ) : null}
+            <span className="rounded-[3px] border border-dashed border-border-strong bg-surface-sunken px-1.5 py-0.5 text-[9.5px] uppercase tracking-[0.08em]">
+              {t("cvSuperseded")}
+            </span>
+          </>
+        ) : null}
+      </p>
+      {/* Compact provenance: dates as friendly localized text (EN/ES),
+          contact shown as given or an "Anonymous contributor" fallback,
+          never the ip hash and never a mailto. */}
+      <dl className="mt-1 flex flex-col gap-0.5 text-[11px] leading-snug text-neutral-strong">
+        {walked ? (
+          <div className="flex flex-wrap gap-x-1.5">
+            <dt>{t("cvWalkedLabel")}</dt>
+            <dd className="text-ink">{walked}</dd>
+          </div>
+        ) : null}
+        {updated ? (
+          <div className="flex flex-wrap gap-x-1.5">
+            <dt>{t("cvUpdatedLabel")}</dt>
+            <dd className="text-ink">{updated}</dd>
+          </div>
+        ) : null}
+        <div className="flex flex-wrap gap-x-1.5">
+          <dt>{t("cvSubmittedByLabel")}</dt>
+          <dd className="text-ink">{t("cvSubmittedCommunity")}</dd>
+        </div>
+      </dl>
+      {/* Observed lens values. Mono numerals, no ramp dots: the ramp is
+          reserved for audited data, and these are not it. */}
+      <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
+        {LAYER_ORDER.map((layer) => {
+          const observed = o.scores[layer];
+          const known = typeof observed === "number";
+          return (
+            <li
+              key={layer}
+              className="flex items-center justify-between gap-2"
+            >
+              <span className="truncate text-[12.5px] leading-snug text-ink">
+                {tl(`${layer}.name`)}
+              </span>
+              <span
+                className="font-mono text-[12.5px] font-medium text-neutral-strong"
+                title={known ? undefined : t("cvUnknown")}
+              >
+                {known ? observed : UNSET}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-1.5 font-mono text-[10.5px] text-neutral-strong">
+        {t("cvConfidenceLabel")} {confidence ?? UNSET}
+        <span className="mx-1.5">·</span>
+        {t("cvCoverageLabel")} {coverage ?? UNSET}
+        <span className="mx-1.5">·</span>
+        {/* Label + count rather than an ICU plural: this codebase has no
+            plural/select syntax anywhere and branches plurals in TS (see
+            admin.queue's subtitleZero/One/Many). A label sidesteps the
+            grammatical number entirely. */}
+        {t("cvFramesLabel")} {frames}
+      </p>
+      {/* The reviewer-approved synthesis (u2). Model output, in English: the
+          localized labels frame it, the sentence itself is the model's. Numbers
+          above are still the reviewer's; this is context. Read defensively — it
+          crosses the maplibre boundary. */}
+      {cvOverall(o.assessment) ? (
+        <div className="mt-1.5 rounded-[6px] border border-dashed border-border-strong bg-surface-sunken px-2.5 py-1.5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-neutral-strong">
+            {t("cvAssessmentLabel")}
+          </p>
+          <p className="mt-0.5 text-[12px] leading-snug text-ink">
+            {cvOverall(o.assessment)}
+          </p>
+          <p className="mt-1 text-[9.5px] leading-snug text-neutral-strong">
+            {t("cvAssessmentNote")}
+          </p>
+        </div>
+      ) : null}
+    </li>
+  );
+}
+
+/**
  * Elevated detail panel shown when a segment is selected (popover elevation).
  * Per-layer scores, a per-item rubric breakdown for the active layer, and a
  * photo placeholder grid. Built from the clicked feature's props — no fetch.
@@ -72,7 +194,6 @@ export default function SegmentDetail({
   const t = useTranslations("detail");
   const tl = useTranslations("layers");
   const tr = useTranslations("rubric");
-  const locale = useLocale();
 
   // Mobile bottom-sheet drag-to-dismiss. Attached only to the drag handle (which
   // is `md:hidden`), so the desktop popover is never draggable. A downward drag
@@ -131,10 +252,18 @@ export default function SegmentDetail({
   // rendered in the provisional idiom, never mixed into `scores` above
   // (docs/cv-funnel.md — "CV output is a proposal, not data").
   const cvObservations = parseCvObservations(segment.cv_observations);
-  const hasCv = cvObservations.length > 0;
-  // A reviewer corrected at least one of these readings before approving (u2). Shown
-  // as a small, honest marker beside the CV chip — not loud, but not hidden.
-  const hasHumanCorrected = cvObservations.some((o) => o.human_corrected);
+  // ONE observation is the segment's present-day state: the most recently walked
+  // one (u32, issue #19). Everything it supersedes moves to the archive
+  // disclosure below. The ordering lives in lib/cv-provenance so this panel and
+  // any future surface cannot drift into disagreeing about what the street is.
+  const { canonical, archived } = splitCvObservations(cvObservations);
+  const hasCv = canonical !== null;
+  // A reviewer corrected the CURRENT reading before approving it (u2). Shown as a
+  // small, honest marker beside the CV chip — not loud, but not hidden. Scoped to
+  // the canonical observation on purpose: the chips describe the street as it
+  // stands now, so a correction on a superseded reading must not still flag it.
+  const hasHumanCorrected = canonical?.human_corrected === true;
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   return (
     <section
@@ -320,103 +449,58 @@ export default function SegmentDetail({
               {t("cvNote")}
             </p>
             <ul className="flex flex-col divide-y divide-border rounded-[8px] border border-border">
-              {cvObservations.map((o) => {
-                const frames = Array.isArray(o.frame_refs)
-                  ? o.frame_refs.length
-                  : 0;
-                const confidence = asPercent(o.confidence);
-                const coverage = asPercent(o.coverage);
-                // Provenance the segment must answer at a glance (u-provenance):
-                // when it was walked and when the reading last changed (created_at
-                // moves on re-approval upsert, so it reads "last updated"). Both
-                // cross the maplibre boundary; the helper never throws. The
-                // contributor's contact is PII and is NEVER shown publicly (conductor
-                // privacy rule) — the public attribution is a generic "Community
-                // contributor"; contact lives only on the admin workbench.
-                const walked = formatProvenanceDate(o.captured_on, locale);
-                const updated = formatProvenanceDate(o.created_at, locale);
-                return (
-                  <li key={o.id} className="px-3 py-2">
-                    <p className="font-mono text-[10.5px] text-neutral-strong">
-                      {t("cvObservationLabel")}
-                    </p>
-                    {/* Compact provenance: dates as friendly localized text (EN/ES),
-                        contact shown as given or an "Anonymous contributor" fallback,
-                        never the ip hash and never a mailto. */}
-                    <dl className="mt-1 flex flex-col gap-0.5 text-[11px] leading-snug text-neutral-strong">
-                      {walked ? (
-                        <div className="flex flex-wrap gap-x-1.5">
-                          <dt>{t("cvWalkedLabel")}</dt>
-                          <dd className="text-ink">{walked}</dd>
-                        </div>
-                      ) : null}
-                      {updated ? (
-                        <div className="flex flex-wrap gap-x-1.5">
-                          <dt>{t("cvUpdatedLabel")}</dt>
-                          <dd className="text-ink">{updated}</dd>
-                        </div>
-                      ) : null}
-                      <div className="flex flex-wrap gap-x-1.5">
-                        <dt>{t("cvSubmittedByLabel")}</dt>
-                        <dd className="text-ink">{t("cvSubmittedCommunity")}</dd>
-                      </div>
-                    </dl>
-                    {/* Observed lens values. Mono numerals, no ramp dots: the
-                        ramp is reserved for audited data, and these are not it. */}
-                    <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
-                      {LAYER_ORDER.map((layer) => {
-                        const observed = o.scores[layer];
-                        const known = typeof observed === "number";
-                        return (
-                          <li
-                            key={layer}
-                            className="flex items-center justify-between gap-2"
-                          >
-                            <span className="truncate text-[12.5px] leading-snug text-ink">
-                              {tl(`${layer}.name`)}
-                            </span>
-                            <span
-                              className="font-mono text-[12.5px] font-medium text-neutral-strong"
-                              title={known ? undefined : t("cvUnknown")}
-                            >
-                              {known ? observed : UNSET}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    <p className="mt-1.5 font-mono text-[10.5px] text-neutral-strong">
-                      {t("cvConfidenceLabel")} {confidence ?? UNSET}
-                      <span className="mx-1.5">·</span>
-                      {t("cvCoverageLabel")} {coverage ?? UNSET}
-                      <span className="mx-1.5">·</span>
-                      {/* Label + count rather than an ICU plural: this codebase
-                          has no plural/select syntax anywhere and branches
-                          plurals in TS (see admin.queue's subtitleZero/One/Many).
-                          A label sidesteps the grammatical number entirely. */}
-                      {t("cvFramesLabel")} {frames}
-                    </p>
-                    {/* The reviewer-approved synthesis (u2). Model output, in English:
-                        the localized labels frame it, the sentence itself is the
-                        model's. Numbers above are still the reviewer's; this is
-                        context. Read defensively — it crosses the maplibre boundary. */}
-                    {cvOverall(o.assessment) ? (
-                      <div className="mt-1.5 rounded-[6px] border border-dashed border-border-strong bg-surface-sunken px-2.5 py-1.5">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-neutral-strong">
-                          {t("cvAssessmentLabel")}
-                        </p>
-                        <p className="mt-0.5 text-[12px] leading-snug text-ink">
-                          {cvOverall(o.assessment)}
-                        </p>
-                        <p className="mt-1 text-[9.5px] leading-snug text-neutral-strong">
-                          {t("cvAssessmentNote")}
-                        </p>
-                      </div>
-                    ) : null}
-                  </li>
-                );
-              })}
+              <CvObservationCard observation={canonical} superseded={false} />
             </ul>
+
+            {/* Archive. Only rendered when something was actually superseded:
+                with zero or one observation there is no history to disclose, and
+                an empty "Archive (0)" toggle would be pure noise. Collapsed by
+                default — the current reading is the answer, the archive is for
+                someone who asks a follow-up question. Nothing is deleted; this
+                is a display split only. */}
+            {archived.length > 0 ? (
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => setArchiveOpen((open) => !open)}
+                  aria-expanded={archiveOpen}
+                  aria-controls="cv-archive"
+                  className="flex w-full items-center justify-between gap-2 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 py-2 text-left text-[11px] font-medium text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                >
+                  <span className="font-mono uppercase tracking-[0.12em]">
+                    {t("cvArchiveToggle")}
+                    {/* Count outside the message: this codebase branches plurals
+                        in TS rather than using ICU plural syntax, and a bare
+                        parenthesized number sidesteps grammatical number in both
+                        locales. */}
+                    <span className="ml-1.5">({archived.length})</span>
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                    className={[
+                      "shrink-0 transition-transform",
+                      archiveOpen ? "rotate-180" : "",
+                    ].join(" ")}
+                  />
+                </button>
+                {archiveOpen ? (
+                  <ul
+                    id="cv-archive"
+                    className="mt-2 flex flex-col divide-y divide-border rounded-[8px] border border-border"
+                  >
+                    {archived.map((o) => (
+                      <CvObservationCard
+                        key={o.id}
+                        observation={o}
+                        superseded={true}
+                      />
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         ) : null}
 
