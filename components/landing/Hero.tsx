@@ -3,10 +3,12 @@
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
+import { formatCvCoveragePct } from "@/lib/cv-provenance";
+import { hideAuditedZeros, listRecentlyCvObserved } from "@/lib/real-data-era";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import Logo from "@/components/ui/Logo";
@@ -132,10 +134,46 @@ function LegendChip() {
   );
 }
 
-/** One street in the LEFT-zone list: a hairline card in the segment's SEALED ramp
- * color (a score dot, data context like the legend), the street name, its
- * district, and the mono score. Tapping opens the full platform (u17 rule: no
- * deep-link infra, the map opens at the district view). */
+/** One camera-observed street in the LEFT-zone list. */
+function CvSegmentRow({
+  name,
+  district,
+  badge,
+  activateLabel,
+  onActivate,
+}: Readonly<{
+  name: string;
+  district: string;
+  badge: string;
+  activateLabel: string;
+  onActivate: () => void;
+}>) {
+  return (
+    <button
+      type="button"
+      onClick={onActivate}
+      aria-label={activateLabel}
+      className="sl-card flex min-h-[44px] w-full items-center gap-3 rounded-[8px] border border-hairline bg-paper-white px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+    >
+      <span
+        aria-hidden="true"
+        className="inline-flex h-5 shrink-0 items-center rounded-full bg-accent/15 px-2 font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-accent-text"
+      >
+        {badge}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13.5px] font-medium leading-tight text-ink">
+          {name}
+        </span>
+        <span className="block truncate text-[11.5px] leading-tight text-ink-muted">
+          {district}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+/** One audited street in the LEFT-zone list (demo era). */
 function SegmentRow({
   name,
   district,
@@ -311,7 +349,9 @@ export default function Hero({
   stats: StreetStats;
 }>) {
   const t = useTranslations("landing.hero");
+  const locale = useLocale();
   const router = useRouter();
+  const auditedHidden = hideAuditedZeros(stats);
   // Drop the over-tile glass chips to solid while the map is moving (research §1
   // perf note): backdrop-blur re-blurs every frame a map pans/zooms.
   const [mapMoving, setMapMoving] = useState(false);
@@ -349,6 +389,13 @@ export default function Hero({
       : 0;
     return { worst: worstStreets, avgBike: bikeMean };
   }, [segments]);
+
+  const cvObserved = useMemo(
+    () => (auditedHidden ? listRecentlyCvObserved(segments) : []),
+    [auditedHidden, segments],
+  );
+
+  const cvCoverage = formatCvCoveragePct(stats.cvCoveragePct, locale);
 
   const openPlatform = () => router.push("/map");
 
@@ -439,36 +486,78 @@ export default function Hero({
                vertical on desktop) + one shared demo footnote ────────── */}
           <div className="flex flex-col gap-3 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:min-h-0 lg:min-w-0">
             <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:min-h-0 lg:flex-col lg:overflow-y-auto lg:px-0 lg:pb-0 lg:[scrollbar-width:thin]">
-              <StatCard
-                value={String(stats.heroPct)}
-                unit="%"
-                label={t("stats.failLabel")}
-                tone="accent"
-                delay={420}
-              />
-              <StatCard
-                value={String(stats.coveragePct)}
-                unit="%"
-                label={t("stats.coverageLabel")}
-                delay={490}
-              />
-              <StatCard
-                value={String(stats.segments)}
-                label={t("stats.segmentsLabel")}
-                delay={560}
-              />
-              <StatCard
-                value={stats.km.toFixed(1)}
-                unit="km"
-                label={t("stats.kmLabel")}
-                delay={630}
-              />
-              <StatCard
-                value={String(avgBike)}
-                unit="/100"
-                label={t("stats.bikeLabel")}
-                delay={700}
-              />
+              {auditedHidden ? (
+                <>
+                  <StatCard
+                    value={String(stats.cvSegments)}
+                    label={t("stats.cvSegmentsLabel")}
+                    tone="accent"
+                    delay={420}
+                  />
+                  <StatCard
+                    value={String(stats.cvSessionsReviewed)}
+                    label={t("stats.cvSessionsLabel")}
+                    delay={490}
+                  />
+                  {cvCoverage ? (
+                    <StatCard
+                      value={cvCoverage}
+                      label={t("stats.cvCoverageLabel")}
+                      delay={560}
+                    />
+                  ) : null}
+                  {stats.communitySegments > 0 ? (
+                    <StatCard
+                      value={String(stats.communitySegments)}
+                      label={t("stats.communityLabel")}
+                      delay={630}
+                    />
+                  ) : null}
+                  {stats.cvSegments === 0 && stats.communitySegments === 0 ? (
+                    <div
+                      className="sl-card sl-hero-el min-w-[11.5rem] shrink-0 snap-start rounded-[4px] border border-hairline bg-paper-white p-3.5 lg:min-w-0 lg:shrink"
+                      style={{ animationDelay: "560ms" }}
+                    >
+                      <p className="font-mono text-[11px] leading-snug text-ink-muted">
+                        {t("stats.auditedPending")}
+                      </p>
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <StatCard
+                    value={String(stats.heroPct)}
+                    unit="%"
+                    label={t("stats.failLabel")}
+                    tone="accent"
+                    delay={420}
+                  />
+                  <StatCard
+                    value={String(stats.coveragePct)}
+                    unit="%"
+                    label={t("stats.coverageLabel")}
+                    delay={490}
+                  />
+                  <StatCard
+                    value={String(stats.segments)}
+                    label={t("stats.segmentsLabel")}
+                    delay={560}
+                  />
+                  <StatCard
+                    value={stats.km.toFixed(1)}
+                    unit="km"
+                    label={t("stats.kmLabel")}
+                    delay={630}
+                  />
+                  <StatCard
+                    value={String(avgBike)}
+                    unit="/100"
+                    label={t("stats.bikeLabel")}
+                    delay={700}
+                  />
+                </>
+              )}
             </div>
             {/* The unaudited signal, beside (never inside) the audited cards:
                 a camera pass and a community add are real work, and with no
@@ -485,27 +574,49 @@ export default function Hero({
           <div className="flex flex-col lg:col-start-1 lg:row-start-2 lg:min-h-0">
             <div className="shrink-0 text-center lg:text-left">
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
-                {t("segments.title")}
+                {auditedHidden ? t("segments.cvTitle") : t("segments.title")}
               </p>
-              {showDemoData() && (
+              {showDemoData() && !auditedHidden && (
                 <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
                   {t("segments.caveat")}
                 </p>
               )}
             </div>
-            <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
-              {worst.map((s) => (
-                <li key={s.name}>
-                  <SegmentRow
-                    name={s.name}
-                    district={s.district}
-                    score={s.score}
-                    activateLabel={t("segments.activate", { name: s.name })}
-                    onActivate={openPlatform}
-                  />
-                </li>
-              ))}
-            </ul>
+            {auditedHidden ? (
+              cvObserved.length > 0 ? (
+                <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
+                  {cvObserved.map((s) => (
+                    <li key={s.id}>
+                      <CvSegmentRow
+                        name={s.name}
+                        district={s.district}
+                        badge={t("segments.cvBadge")}
+                        activateLabel={t("segments.activate", { name: s.name })}
+                        onActivate={openPlatform}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 rounded-[4px] border border-hairline bg-paper-white px-3 py-3 text-center font-mono text-[11px] leading-snug text-ink-muted lg:text-left">
+                  {t("segments.empty")}
+                </p>
+              )
+            ) : (
+              <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
+                {worst.map((s) => (
+                  <li key={s.name}>
+                    <SegmentRow
+                      name={s.name}
+                      district={s.district}
+                      score={s.score}
+                      activateLabel={t("segments.activate", { name: s.name })}
+                      onActivate={openPlatform}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>

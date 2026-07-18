@@ -27,7 +27,16 @@ export default function GapSection({
     // stat3 is the pilot's own fail rate; with demo off it degrades to 0% and its
     // "demo figure" caveat no longer applies, so it drops. The two Costa Rican
     // anchors above are real and always keep their sourced notes.
-    { key: "3", value: `${heroPct}%`, label: t("stat3Label"), note: showDemoData() ? t("stat3Note") : "" },
+    ...(showDemoData()
+      ? [
+          {
+            key: "3",
+            value: `${heroPct}%`,
+            label: t("stat3Label"),
+            note: t("stat3Note"),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -51,7 +60,9 @@ export default function GapSection({
       </Measure>
 
       <Measure width="page" className="clear-both mt-14">
-        <dl className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-3">
+        <dl
+          className={`grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline ${stats.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}
+        >
           {stats.map((s) => (
             <div key={s.key} className="flex flex-col bg-surface p-6 sm:p-7">
               <dd className="font-mono text-[clamp(1.7rem,3.4vw,2.15rem)] font-medium leading-none tracking-tight text-ink-display">
