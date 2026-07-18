@@ -7,6 +7,7 @@ import type { ScoreLayer, StreetStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
 import LayerSwitcher from "@/components/LayerSwitcher";
 import Legend from "@/components/Legend";
+import ProvenanceNote from "@/components/ProvenanceNote";
 import styles from "@/components/ui/zen.module.css";
 
 /**
@@ -113,6 +114,11 @@ export default function MapPanel({
           </div>
         ))}
       </dl>
+
+      {/* Outside the collapsible block on purpose: when the audited figures are
+          zero these counters are the only live data on the map, and burying them
+          behind the phone chevron is how "still 0%" read as breakage. */}
+      <ProvenanceNote stats={stats} tone="panel" className="-mt-1" />
 
       <LayerSwitcher active={activeLayer} onSelect={onSelectLayer} />
 

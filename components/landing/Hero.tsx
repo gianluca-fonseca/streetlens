@@ -10,6 +10,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import AuditMap from "@/components/AuditMap";
 import Logo from "@/components/ui/Logo";
+import ProvenanceNote from "@/components/ProvenanceNote";
 import StatFigure from "@/components/ui/StatFigure";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { cn } from "@/components/ui/cn";
@@ -467,6 +468,10 @@ export default function Hero({
                 delay={700}
               />
             </div>
+            {/* The unaudited signal, beside (never inside) the audited cards:
+                a camera pass and a community add are real work, and with no
+                published audit they are the only live numbers on the page. */}
+            <ProvenanceNote stats={stats} align="center" className="px-1 lg:px-0" />
             {showDemoData() && (
               <p className="px-1 text-center font-mono text-[11px] leading-snug text-ink-muted lg:px-0 lg:text-left">
                 {t("stats.demoFootnote")}
