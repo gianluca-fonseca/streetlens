@@ -23,7 +23,7 @@
  */
 
 import { computeRollups, type RollupObservation, type ItemMedian } from "./rollup";
-import { LENS_KEYS, type LensKey, type LensScores } from "./scoring";
+import { LENS_KEYS, renormalizedOverall, type LensKey, type LensScores } from "./scoring";
 import type { RubricItemKey, CaptureObservationItem } from "./types";
 
 /**
@@ -309,11 +309,37 @@ export function recomputeReview(
       if (useBaseline.has(lens)) scores[lens] = baselineScores[lens];
     }
     let manualEdited = false;
+    let manualOverall = false;
     for (const lens of LENS_KEYS) {
       if (Object.prototype.hasOwnProperty.call(manual, lens)) {
         scores[lens] = manual[lens] ?? null;
         manualEdited = true;
+        if (lens === "overall") manualOverall = true;
       }
+    }
+
+    // `overall` is a DERIVED composite, never a lens the frames measure on its own.
+    // Once a synthesis adjustment, a baseline opt-out, or a manual edit has moved a
+    // constituent (accessibility/drainage/shade), the landed overall must be the
+    // renormalized weighting of those FINAL values — not the pre-adjustment baseline
+    // computeRollups produced before the reviewer touched anything. Without this, an
+    // approval with adjusted drainage/shade stores the stale baseline overall (the
+    // prod defect: drainage 63.67 + shade 33 approved, overall persisted at the 68.13
+    // baseline). When no constituent moved we keep the baseline overall verbatim, so
+    // an untouched recompute stays byte-identical to computeRollups (this module's
+    // contract) rather than drifting a hundredth on a re-round. A manual overall edit
+    // is the reviewer's explicit number and still wins.
+    const constituentMoved =
+      scores.accessibility !== baselineScores.accessibility ||
+      scores.drainage !== baselineScores.drainage ||
+      scores.shade !== baselineScores.shade;
+    if (!manualOverall && constituentMoved) {
+      const composite = renormalizedOverall(
+        scores.accessibility,
+        scores.drainage,
+        scores.shade,
+      );
+      scores.overall = composite === null ? null : clampScore(composite);
     }
 
     const overrides = buildSegmentOverrideRecord(r.segmentId, frames, corrections);

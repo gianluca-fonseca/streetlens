@@ -201,7 +201,11 @@ export async function POST(request: NextRequest) {
       corrected: chosen.filter((s) => s.humanCorrected).length,
       mode: closed.mode,
     });
-  } catch {
+  } catch (err) {
+    // Log before swallowing into an opaque server_error, so a prod failure (e.g. a
+    // read-only FS or an RPC error) is diagnosable from the Vercel logs. Response
+    // body is intentionally unchanged.
+    console.error("[capture review] approve/reject failed:", err);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }
