@@ -38,16 +38,24 @@ import {
 } from "@/lib/extraction/extract";
 import { downscaleFrame } from "@/lib/extraction/downscale";
 import { createOpenAiVisionClient, type VisionClient } from "@/lib/extraction/client";
-import type { CaptureDb, ClaimedJob } from "./db";
+import {
+  createOpenAiSynthesisClient,
+  synthesizeSegment,
+  type SynthesisClient,
+  type SynthesisFrame,
+} from "@/lib/extraction/synthesis";
+import type { CaptureDb, ClaimedJob, ObservationRow } from "./db";
 import { getCaptureDb } from "./db";
 import { publicFrameUrl } from "./storage";
-import { computeRollups, type RollupObservation } from "./rollup";
+import { computeRollups, type RollupObservation, type SegmentRollup } from "./rollup";
 import { emitCaptureSubmission } from "@/lib/submissions-sink";
 import type { PumpResponse } from "./schemas";
 
 export type PumpDeps = {
   db: CaptureDb;
   vision: VisionClient;
+  /** The text model that writes the per-segment synthesis. Injectable for tests. */
+  synthesis?: SynthesisClient;
   /** Injectable so tests can assert URL construction without Supabase env. */
   frameUrl?: (storagePath: string) => string;
   /** Injectable so tests drive the real downscale without fetching anything. */
@@ -94,6 +102,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
   }
 
   const vision = deps?.vision ?? createOpenAiVisionClient();
+  const synthesis = deps?.synthesis ?? createOpenAiSynthesisClient();
   const frameUrl = deps?.frameUrl ?? publicFrameUrl;
   const prepareImage = deps?.prepareImage ?? downscaleFrame;
   const emitSubmission = deps?.emitSubmission ?? emitCaptureSubmission;
@@ -106,7 +115,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
     ? await db.claimJobsForSession(deps.sessionId, batch)
     : await db.claimJobs(batch);
   if (jobs.length === 0) {
-    await rollupDrainedSessions(db, emitSubmission);
+    await rollupDrainedSessions(db, emitSubmission, synthesis);
     return emptyResult(await db.pendingJobCount().catch(() => 0));
   }
 
@@ -149,7 +158,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
     ),
   );
 
-  await rollupDrainedSessions(db, emitSubmission);
+  await rollupDrainedSessions(db, emitSubmission, synthesis);
 
   return {
     claimed: jobs.length,
@@ -352,6 +361,7 @@ async function pauseSession(
 async function rollupDrainedSessions(
   db: CaptureDb,
   emitSubmission: (sessionId: string) => Promise<void>,
+  synthesis: SynthesisClient,
 ): Promise<void> {
   let sessionIds: string[];
   try {
@@ -362,7 +372,7 @@ async function rollupDrainedSessions(
 
   for (const sessionId of sessionIds) {
     try {
-      await rollupSession(db, sessionId, emitSubmission);
+      await rollupSession(db, sessionId, emitSubmission, synthesis);
     } catch (err) {
       console.warn(`[capture] rollup failed for ${sessionId}: ${errText(err)}`);
     }
@@ -374,6 +384,7 @@ export async function rollupSession(
   db: CaptureDb,
   sessionId: string,
   emitSubmission: (sessionId: string) => Promise<void>,
+  synthesis?: SynthesisClient,
 ): Promise<number> {
   const rows = await db.listObservations(sessionId);
 
@@ -400,6 +411,20 @@ export async function rollupSession(
     });
   }
 
+  // Synthesis: the nuanced cross-frame verdict, written onto the rollups above.
+  // AFTER rollup, BEFORE the session is filed for review — and behind the same
+  // kill switch that gates every spend. It NEVER blocks the drain: the whole
+  // phase is wrapped so a bug, a timeout, or a malformed answer leaves the
+  // baseline rollups standing with a null assessment and the session still
+  // reaches review_ready. A reviewer who sees "no assessment" is told the truth.
+  if (synthesis && extractionEnabled()) {
+    try {
+      await synthesizeSession(db, sessionId, rows, rollups, synthesis);
+    } catch (err) {
+      console.warn(`[capture] synthesis phase failed for ${sessionId}: ${errText(err)}`);
+    }
+  }
+
   // File it into the review queue BEFORE flipping the status, because the status
   // write below is a one-way latch: drainedSessions only selects `extracting`, so
   // a session that reaches review_ready is never drained again. Emitting after it
@@ -417,6 +442,100 @@ export async function rollupSession(
   // walk someone should be told about.
   await db.setSessionStatus(sessionId, "review_ready");
   return rollups.length;
+}
+
+/**
+ * Synthesise every segment that rolled up, and attach each assessment to its
+ * rollup row.
+ *
+ * FAILURE IS PER SEGMENT AND NEVER FATAL. Each segment is synthesised inside its
+ * own try, so one segment that throws or comes back malformed does not rob the
+ * others of their assessment, and none of them can stop the session reaching
+ * review_ready — the caller runs this behind a try of its own as well. The token
+ * spend of each call is recorded on the rollup so a per-segment text call is
+ * counted in the session ledger, not free money nobody sees.
+ *
+ * Exported for the worker tests, which drive it with a scripted synthesis client.
+ */
+export async function synthesizeSession(
+  db: CaptureDb,
+  sessionId: string,
+  rows: readonly ObservationRow[],
+  rollups: readonly SegmentRollup[],
+  synthesis: SynthesisClient,
+): Promise<void> {
+  const framesBySegment = groupSynthesisFrames(rows);
+
+  for (const rollup of rollups) {
+    const frames = framesBySegment.get(rollup.segmentId) ?? [];
+    if (frames.length === 0) continue;
+
+    try {
+      const outcome = await synthesizeSegment(synthesis, {
+        segmentId: rollup.segmentId,
+        frames,
+        baselineScores: rollup.scores,
+        itemMedians: rollup.itemMedians,
+      });
+
+      if (outcome.kind !== "ok") {
+        // A failed synthesis leaves the assessment null and says so — the rollup
+        // is untouched, and the reviewer sees the baseline with no verdict.
+        console.warn(
+          `[capture] synthesis failed for ${sessionId}/${rollup.segmentId}: ${outcome.reason}`,
+        );
+        continue;
+      }
+
+      await db.setSegmentAssessment({
+        sessionId,
+        segmentId: rollup.segmentId,
+        assessment: outcome.assessment,
+        inputTokens: outcome.usage.inputTokens,
+        outputTokens: outcome.usage.outputTokens,
+      });
+    } catch (err) {
+      console.warn(
+        `[capture] synthesis errored for ${sessionId}/${rollup.segmentId}: ${errText(err)}`,
+      );
+    }
+  }
+}
+
+/**
+ * Group observation rows into per-segment synthesis frames, in traversal order.
+ *
+ * One observation per frame — the escalated answer wins, exactly as the rollup
+ * dedupes — so an escalated frame does not appear twice in the evidence. Unusable
+ * frames are KEPT (unlike the scoring path, which drops them): a stretch the
+ * camera could not read is itself part of the walk's continuity, and the model is
+ * told plainly which frames those are.
+ */
+function groupSynthesisFrames(rows: readonly ObservationRow[]): Map<string, SynthesisFrame[]> {
+  const byFrame = new Map<string, ObservationRow>();
+  for (const r of rows) {
+    const existing = byFrame.get(r.frame_id);
+    if (!existing || (r.escalated && !existing.escalated)) byFrame.set(r.frame_id, r);
+  }
+
+  const bySegment = new Map<string, SynthesisFrame[]>();
+  for (const r of byFrame.values()) {
+    if (!r.segment_id) continue;
+    const frame: SynthesisFrame = {
+      seq: r.seq,
+      location: r.lng !== null && r.lat !== null ? { lng: r.lng, lat: r.lat } : null,
+      nearJunction: r.near_junction,
+      usable: r.usable,
+      items: r.items,
+      rationale: r.rationale,
+    };
+    const list = bySegment.get(r.segment_id);
+    if (list) list.push(frame);
+    else bySegment.set(r.segment_id, [frame]);
+  }
+
+  for (const list of bySegment.values()) list.sort((a, b) => a.seq - b.seq);
+  return bySegment;
 }
 
 function errText(err: unknown): string {

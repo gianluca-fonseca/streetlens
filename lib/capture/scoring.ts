@@ -88,14 +88,50 @@ export function normalizeItemValue(key: RubricItemKey, value: number | null): nu
 }
 
 /**
+ * The overall composite from three constituent lens values, renormalized over
+ * whichever ones are present.
+ *
+ * Scale-agnostic on purpose: it multiplies each present lens by its weight and
+ * divides by the weight that was actually used, so 0..1 lens values return a
+ * 0..1 overall and 0..100 lens values return a 0..100 overall. That is what lets
+ * `lensScoresFromItems` (which works in 0..1) and the synthesis engine (which
+ * adjusts 0..100 lens scores) share ONE definition of "overall" — the moment
+ * they diverge, a CV rollup and a synthesised assessment stop meaning the same
+ * thing by "72". `overall` needs at least one of its three constituent lenses;
+ * a segment with no drainage evidence still gets an honest overall from
+ * accessibility and shade rather than being dragged down by a lens that was
+ * never measured. `bike` is not part of this composite (it is its own lens).
+ */
+export function renormalizedOverall(
+  accessibility: number | null,
+  drainage: number | null,
+  shade: number | null,
+): number | null {
+  let weightSum = 0;
+  let weighted = 0;
+  const parts: [number | null, number][] = [
+    [accessibility, OVERALL_WEIGHTS.accessibility],
+    [drainage, OVERALL_WEIGHTS.drainage],
+    [shade, OVERALL_WEIGHTS.shade],
+  ];
+  for (const [value, weight] of parts) {
+    if (value === null || !Number.isFinite(value)) continue;
+    weighted += value * weight;
+    weightSum += weight;
+  }
+  return weightSum > 0 ? weighted / weightSum : null;
+}
+
+/**
  * Per-item normalized values → the five lens scores.
  *
  * A lens with no assessable items scores null rather than 0 — "we could not
  * see" and "it is bad" are different claims and the map must not conflate them.
  * `overall` needs at least one of its three constituent lenses; the weights of
- * the lenses that are present are renormalized, so a segment with no drainage
- * evidence still gets an honest overall from accessibility and shade rather
- * than being dragged down by a lens that was never measured.
+ * the lenses that are present are renormalized (see renormalizedOverall), so a
+ * segment with no drainage evidence still gets an honest overall from
+ * accessibility and shade rather than being dragged down by a lens that was
+ * never measured.
  */
 export function lensScoresFromItems(
   normalized: Partial<Record<RubricItemKey, number | null>>,
@@ -123,19 +159,7 @@ export function lensScoresFromItems(
   const bike = mean("bike");
 
   // Renormalize over whichever constituent lenses were actually measured.
-  let weightSum = 0;
-  let weighted = 0;
-  const parts: [number | null, number][] = [
-    [accessibility, OVERALL_WEIGHTS.accessibility],
-    [drainage, OVERALL_WEIGHTS.drainage],
-    [shade, OVERALL_WEIGHTS.shade],
-  ];
-  for (const [value, weight] of parts) {
-    if (value === null) continue;
-    weighted += value * weight;
-    weightSum += weight;
-  }
-  const overall = weightSum > 0 ? weighted / weightSum : null;
+  const overall = renormalizedOverall(accessibility, drainage, shade);
 
   const toScore = (v: number | null): number | null =>
     v === null ? null : Math.round(clamp(v * 100) * 100) / 100;

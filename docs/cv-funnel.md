@@ -121,8 +121,9 @@ flowchart TD
   server 5  lib/matching                          -> track to segment traversals
          6  POST /api/capture/pump                -> claims jobs, extracts, writes observations
          7  lib/capture/rollup                    -> per-segment medians (staged)
-         8  submissions (type cv_capture)         -> the review queue
-         9  admin approve                         -> community_cv_observations -> map
+         8  lib/extraction/synthesis              -> per-segment nuanced assessment (staged)
+         9  submissions (type cv_capture)         -> the review queue
+        10  admin approve                         -> community_cv_observations -> map
 ```
 
 Status moves: `pending_upload -> uploading -> matching -> extracting ->
@@ -499,6 +500,85 @@ per-segment lens scores. It is pure and stages its output into
 > the "overall" layer for display but do not feed the `overall` composite, which
 > keeps a CV `score_overall` byte-comparable with the demo-audit generator.
 
+### Synthesis: the nuanced verdict on top of the numbers
+
+The rollup is an average of medians, and an average erases the shape of a walk.
+It cannot see that a crosswalk present at the top of a block vanishes for the
+next two hundred metres, that a sidewalk starts and then stops, or that the one
+drain sits nowhere near where the water pools. Those are facts *across* frames,
+and they are exactly what the user asked the assessment to capture: "it cannot
+just be an average", and "there should be an explanation for each of the scores
+we output and then explanation overall."
+
+`lib/extraction/synthesis.ts` adds a SYNTHESIS stage: one text-only model call
+per segment, on the synthesis model (`synthesisModel()`, defaulting to the
+escalation model), that reads the whole traversal in order and writes a nuanced
+assessment. It runs in the pump when a session drains (`lib/capture/pump.ts`
+`synthesizeSession`), after the rollup is computed and persisted and before the
+session is filed for review.
+
+**What it reads.** The segment's frames in traversal order, each with its `seq`,
+its distance along the walk (a haversine between consecutive frame GPS positions
+from `capture_frames.location`), its `near_junction` flag, the 15 item readings
+with confidence, and the per-frame rationale. Plus the baseline lens scores and
+the item medians. The evidence also carries a continuity block: for the presence
+items (sidewalk, curb ramp, crossing, drain, bike lane) it spells out the runs of
+present / absent / not-assessable along the walk with their distance spans, which
+is what turns "a crosswalk, then none for a long stretch" into a signal the model
+can weight. The evidence is compact and deterministic (a fixture always builds
+the same bytes), and it is text only, no images.
+
+**What it may change, and by how much.** The deterministic rollup stays the
+baseline; synthesis is a bounded, reasoned correction, never a replacement. It
+may adjust each of the four measured lenses (accessibility, drainage, shade,
+bike) by at most `CV_SYNTHESIS_MAX_ADJUST` points (default 20), up or down. The
+arithmetic is ours, not the model's: `adjustedScores = clamp(baseline + bounded
+delta, 0, 100)`.
+
+**What it may not do.**
+
+- **No unexplained move.** Every non-zero adjustment must carry a written reason;
+  an adjustment with a blank reason is dropped to zero before it is applied, so no
+  number ever moves without a cause a reviewer can read.
+- **No invented lens.** A lens whose baseline is null (no frame could assess it)
+  stays null. Synthesis cannot conjure a score for a street it could not see,
+  though it may still explain in that lens's text *why* it is unknown.
+- **No model-set overall.** `overall` is never taken from the model. It is
+  recomputed from the adjusted lens values with the same renormalized
+  0.45 / 0.30 / 0.25 formula the rollup uses (`renormalizedOverall` in
+  `scoring.ts`), so the composite means the same thing whether it came from the
+  rollup or the synthesis.
+
+**The stored shape** (`segmentAssessmentSchema`, `lib/capture/schemas.ts`), which
+the review UI consumes verbatim off each rollup entry:
+
+```
+assessment = {
+  overall,                                       // a few sentences, the nuanced verdict
+  lenses: { accessibility, drainage, shade, bike },   // one explanation each
+  adjustments: { <lens>: { delta, reason } },    // only the lenses it moved
+  adjustedScores: { overall, accessibility, drainage, shade, bike },  // numbers | null
+  model,
+}
+```
+
+**Failure never blocks a session.** Synthesis is a later, independently-fallible
+step, so it is decoupled from the rollup: `capture_set_segment_assessment` (0022)
+writes the assessment onto an already-persisted rollup row. A synthesis that
+throws, times out, or returns a malformed answer is logged and leaves the
+assessment null; the baseline rollup stands and the session still reaches
+`review_ready`. A reviewer who sees "no assessment" is being told the truth, not
+shown a broken page. Synthesis also respects the same `CV_EXTRACTION_ENABLED`
+kill switch as every other spend, and it counts its own tokens: the call's input
+and output tokens are recorded on the rollup (`synthesis_input_tokens`,
+`synthesis_output_tokens`) and summed into the review read's `tokens` block, so a
+per-segment text call is never free money nobody sees.
+
+**Cost.** One small text call per segment, not per frame. A typical walk is a
+handful of segments, so a session adds a handful of synthesis calls on top of its
+per-frame extraction, on a stronger-but-cheap model. It is bounded by the kill
+switch and visible in the token ledger like everything else.
+
 ### Review: the third community kind
 
 A drained session emits a `submissions` row of type `cv_capture` with payload
@@ -516,6 +596,9 @@ scored (unscored or failed). A frame that escalated has two observation rows; th
 escalated one wins, the same "the stronger answer counts" rule the rollup uses.
 This is what lets the review UI show a reviewer the readings and the model's
 rationale next to each frame in the filmstrip, not just the per-segment rollup.
+Extended again in 0022, each rollup entry also carries its `assessment` (the
+synthesis verdict, or null), and the `tokens` block sums the synthesis spend
+beside the vision spend.
 
 **Approval is per segment, and it lands data before it closes.** The admin
 review UI (`components/admin/CaptureReview.tsx`, route
@@ -826,7 +909,9 @@ RUN_LIVE_SMOKE=1 node --env-file=.env.local scripts/live-smoke-extraction.mjs
 | `OPENAI_API_KEY` | Vision model API key. | undefined |
 | `OPENAI_VISION_MODEL` | Workhorse extraction model. | `gpt-5-nano` |
 | `OPENAI_VISION_ESCALATION_MODEL` | Stronger model used only on escalation. | `gpt-5.4-mini` |
-| `CV_EXTRACTION_ENABLED` | **Kill switch.** Must equal exactly `"true"` to enable; anything else disables (fail-closed). | disabled |
+| `OPENAI_SYNTHESIS_MODEL` | Text model for the per-segment synthesis. | the escalation model |
+| `CV_SYNTHESIS_MAX_ADJUST` | Most a synthesis may move any one lens score, in points, up or down. | `20` |
+| `CV_EXTRACTION_ENABLED` | **Kill switch.** Must equal exactly `"true"` to enable; anything else disables (fail-closed). It gates synthesis too. | disabled |
 | `CV_INPUT_TOKEN_CEILING` | Overrides the per-frame input-token ceiling (the breaker). | derived (`staticRequestApproxTokens() + 1200`) |
 | `CV_SESSION_TOKENS_PER_FRAME` | Overrides the per-frame slice of the session budget. | derived (`ceil(ceiling * 1.1)`) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase base URL; also builds public frame URLs (throws if unset when building a URL). | undefined |
@@ -840,9 +925,10 @@ The bucket name is not an env var; it is the constant `streetlens-frames`
 
 ### Applying migrations
 
-The capture funnel is migrations `0013` through `0021` (rationale in `0020`,
-reprocess in `0019`, reviewer overrides in `0021`), applied in order after
-the existing `0001..0012`. `scripts/test-capture-migrations.mjs` applies the
+The capture funnel is migrations `0013` through `0022` (rationale in `0020`,
+reprocess in `0019`, reviewer overrides in `0021`, segment synthesis in `0022`),
+applied in order after the existing `0001..0012`.
+`scripts/test-capture-migrations.mjs` applies the
 whole chain to a throwaway Supabase Postgres container and exercises every RPC;
 it needs Docker, never touches the live database, and skips cleanly when Docker
 is absent. Apply to the shared project with the Supabase CLI or the migration

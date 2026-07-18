@@ -26,8 +26,10 @@ import { publicFrameUrl } from "./storage";
 import { readCaptureReviewOverlay, readCaptureTombstones } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
 import type { FrameObservation } from "./review-overrides";
+import type { SegmentAssessment } from "./schemas";
 
 export type { FrameObservation };
+export type { SegmentAssessment };
 
 const FIXTURE_PATH = path.join(
   process.cwd(),
@@ -51,6 +53,13 @@ export type ReviewSegment = {
   confidence: number | null;
   /** Frames the model escalated to the stronger model on this segment. */
   escalated: number;
+  /**
+   * The nuanced cross-frame synthesis (0022): a prose verdict, a per-lens
+   * explanation, and the bounded adjusted scores. Null when synthesis did not run
+   * or did not succeed for this segment — the raw `scores` are always the
+   * untouched deterministic rollup, so a reviewer sees both.
+   */
+  assessment: SegmentAssessment | null;
   frames: ReviewFrame[];
 };
 
@@ -97,6 +106,9 @@ export type SessionReview = {
     outputTokens: number;
     observations: number;
     escalated: number;
+    /** Synthesis spend (0022), summed across the session's segments. */
+    synthesisInputTokens: number;
+    synthesisOutputTokens: number;
   };
   segments: ReviewSegment[];
   /**
@@ -130,6 +142,9 @@ type ReviewPayload = {
     outputTokens: number;
     observations: number;
     escalated: number;
+    /** Synthesis spend (0022); absent on an un-upgraded payload or fixture. */
+    synthesisInputTokens?: number;
+    synthesisOutputTokens?: number;
   };
   rollups: {
     segmentId: string;
@@ -138,6 +153,8 @@ type ReviewPayload = {
     coverage: number | null;
     confidence: number | null;
     escalated: number | null;
+    /** The synthesized assessment jsonb (0022), or null/absent when none. */
+    assessment?: SegmentAssessment | null;
   }[];
   frames: {
     seq: number;
@@ -269,6 +286,7 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     coverage: num(r.coverage),
     confidence: num(r.confidence),
     escalated: num(r.escalated) ?? 0,
+    assessment: r.assessment ?? null,
     frames: framesBySegment.get(r.segmentId) ?? [],
   }));
 
@@ -291,6 +309,8 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
       outputTokens: num(payload.tokens?.outputTokens) ?? 0,
       observations: num(payload.tokens?.observations) ?? 0,
       escalated: num(payload.tokens?.escalated) ?? 0,
+      synthesisInputTokens: num(payload.tokens?.synthesisInputTokens) ?? 0,
+      synthesisOutputTokens: num(payload.tokens?.synthesisOutputTokens) ?? 0,
     },
     segments,
     frames: allFrames,

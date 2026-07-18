@@ -22,6 +22,17 @@ export function escalationModel(): string {
   return process.env.OPENAI_VISION_ESCALATION_MODEL || "gpt-5.4-mini";
 }
 
+/**
+ * The model that writes the per-segment synthesis: one text-only call that reads
+ * the whole traversal and reasons across frames. Defaults to the escalation
+ * model — synthesis is a language task, not a vision one, and there is one small
+ * call per segment, so the stronger model is affordable here where it is not per
+ * frame. `OPENAI_SYNTHESIS_MODEL` overrides it independently of the vision path.
+ */
+export function synthesisModel(): string {
+  return process.env.OPENAI_SYNTHESIS_MODEL || escalationModel();
+}
+
 export function openaiApiKey(): string | undefined {
   return process.env.OPENAI_API_KEY;
 }
@@ -135,6 +146,30 @@ export const ESCALATION_CONFIDENCE_THRESHOLD = 0.35;
  * session priced at the expensive model.
  */
 export const ESCALATION_MAX_FRACTION = 0.1;
+
+/* ------------------------------------------------------------------ *
+ * Synthesis
+ * ------------------------------------------------------------------ */
+
+/**
+ * The most the synthesis pass may move any single lens score, in points, up or
+ * down from the deterministic baseline.
+ *
+ * The baseline rollup (lib/capture/rollup.ts) is the measurement; synthesis is a
+ * bounded, reasoned correction on top of it, never a replacement. A hard clamp
+ * is what keeps a language model from quietly rewriting the numbers: it may
+ * argue a segment's accessibility down twenty points because a sidewalk vanishes
+ * halfway along, but it cannot turn a 30 into an 80. Every non-zero adjustment
+ * it applies must also carry a written reason (enforced in synthesis.ts), so a
+ * reviewer can see both the size and the cause of every move.
+ *
+ * `CV_SYNTHESIS_MAX_ADJUST` overrides it.
+ */
+export function synthesisMaxAdjust(): number {
+  const override = Number(process.env.CV_SYNTHESIS_MAX_ADJUST);
+  if (Number.isFinite(override) && override >= 0) return override;
+  return 20;
+}
 
 /* ------------------------------------------------------------------ *
  * Queue + retries
