@@ -77,3 +77,14 @@ export const MUNICIPALITY = {
 } as const;
 
 export type MunicipalityConfig = typeof MUNICIPALITY;
+
+/**
+ * Adapter for surfaces written against the flat shape (insights lane).
+ * Same env-driven values, one seam.
+ */
+export type MunicipalityInfo = { id: string; name: string; country: string };
+
+export function getMunicipality(): MunicipalityInfo {
+  const c = getMunicipalityConfig();
+  return { id: c.id, name: c.name.en, country: c.region.en };
+}

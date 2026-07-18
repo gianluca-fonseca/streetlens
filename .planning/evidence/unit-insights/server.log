@@ -1,0 +1,13 @@
+▲ Next.js 16.2.10
+- Local:         http://localhost:3582
+- Network:       http://192.168.100.188:3582
+✓ Ready in 205ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/filippofonseca/package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * /Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0013-frontier-wave/worktrees/unit-insights/package-lock.json
+   * /Users/filippofonseca/Developer/Projects/streetlens/package-lock.json
+
+objc[93812]: Class GNotificationCenterDelegate is implemented in both /Users/filippofonseca/Developer/Projects/streetlens/node_modules/@img/sharp-libvips-darwin-arm64/lib/libvips-cpp.8.18.3.dylib (0x122f8da50) and /Users/filippofonseca/Developer/Projects/streetlens/node_modules/next/node_modules/@img/sharp-libvips-darwin-arm64/lib/libvips-cpp.8.17.3.dylib (0x13e491978). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.

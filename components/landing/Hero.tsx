@@ -10,6 +10,7 @@ import { showDemoData } from "@/lib/demo-flag";
 import { formatCvCoveragePct } from "@/lib/cv-provenance";
 import { hideAuditedZeros, listRecentlyCvObserved } from "@/lib/real-data-era";
 import { streetPath } from "@/lib/street-links";
+import { listWorstCvStreets } from "@/lib/insights";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import Logo from "@/components/ui/Logo";
@@ -45,13 +46,19 @@ function Banner() {
         <span className="flex flex-1 flex-wrap items-center justify-center gap-x-5 gap-y-1 text-center">
           <span className="inline-flex items-center gap-1.5">
             {t("methodQuestion")}
-            <a
-              href="#method"
+            <Link
+              href="/method"
               className="inline-flex items-center pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
             >
               {t("methodLink")}
-            </a>
+            </Link>
           </span>
+          <Link
+            href="/insights"
+            className="inline-flex items-center pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
+          >
+            {t("insightsLink")}
+          </Link>
           <span aria-hidden="true" className="hidden text-ink-faint sm:inline">
             ·
           </span>
@@ -395,6 +402,11 @@ export default function Hero({
     [auditedHidden, segments],
   );
 
+  const cvWorst = useMemo(
+    () => (auditedHidden ? listWorstCvStreets(segments, { limit: 10 }) : []),
+    [auditedHidden, segments],
+  );
+
   const cvCoverage = formatCvCoveragePct(stats.cvCoveragePct, locale);
 
   const openPlatform = () => router.push("/map");
@@ -574,7 +586,11 @@ export default function Hero({
           <div className="flex flex-col lg:col-start-1 lg:row-start-2 lg:min-h-0">
             <div className="shrink-0 text-center lg:text-left">
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
-                {auditedHidden ? t("segments.cvTitle") : t("segments.title")}
+                {auditedHidden
+                  ? cvWorst.length > 0
+                    ? t("segments.cvWorstTitle")
+                    : t("segments.cvTitle")
+                  : t("segments.title")}
               </p>
               {showDemoData() && !auditedHidden && (
                 <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
@@ -583,7 +599,21 @@ export default function Hero({
               )}
             </div>
             {auditedHidden ? (
-              cvObserved.length > 0 ? (
+              cvWorst.length > 0 ? (
+                <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
+                  {cvWorst.map((s) => (
+                    <li key={s.id}>
+                      <SegmentRow
+                        name={s.name}
+                        district={s.district}
+                        score={s.score}
+                        activateLabel={t("segments.activate", { name: s.name })}
+                        onActivate={openPlatform}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : cvObserved.length > 0 ? (
                 <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
                   {cvObserved.map((s) => (
                     <li key={s.id}>

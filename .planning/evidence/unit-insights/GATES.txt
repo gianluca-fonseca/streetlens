@@ -1,0 +1,75 @@
+npx tsc --noEmit: PASS
+npm run lint: PASS
+npm run build: PASS
+npm test: PASS
+node scripts/test-i18n-parity.mjs: PASS
+
+=== lint (verbatim tail) ===
+
+> streetlens@0.1.0 lint
+> eslint
+
+
+=== i18n (verbatim) ===
+en leaf keys: 1119
+es leaf keys: 1119
+only in en: 0 []
+only in es: 0 []
+leaf-type mismatch: 0 []
+lightbox keys present both sides: 8/8 []
+
+PARITY: OK (identical key sets)
+
+=== build (verbatim tail) ===
+├ ƒ /api/admin/logout
+├ ƒ /api/admin/review
+├ ƒ /api/capture/pump
+├ ƒ /api/capture/sessions
+├ ƒ /api/capture/sessions/[id]
+├ ƒ /api/capture/sessions/[id]/finalize
+├ ƒ /api/capture/sessions/[id]/frames
+├ ƒ /api/capture/sessions/[id]/pump
+├ ƒ /api/routing-network
+├ ƒ /api/segments/[id]/detail
+├ ƒ /api/submissions
+└ ○ /icon.svg
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+
+=== test (verbatim summary) ===
+  [PASS] test-i18n-parity.mjs (110ms)
+  [PASS] test-import-dryrun.mjs (1494ms)
+  [PASS] test-insights.mjs (1992ms)
+  [PASS] test-map-cv-visibility.mjs (191ms)
+  [PASS] test-map-payload-diet.mjs (1956ms)
+  [PASS] test-map-theme-source.mjs (167ms)
+  [PASS] test-matching-baseline.mjs (1469ms)
+  [PASS] test-matching-canton.mjs (1719ms)
+  [PASS] test-matching-hmm.mjs (1911ms)
+  [PASS] test-mp4box-contract.mjs (118ms)
+  [PASS] test-panel-vitality.mjs (168ms)
+  [PASS] test-parse-feature-props.mjs (2179ms)
+  [PASS] test-pipeline-truth.mjs (16717ms)
+  [PASS] test-provenance-visibility.mjs (1650ms)
+  [PASS] test-ramp-legibility.mjs (129ms)
+  [PASS] test-rate-limit-namespaces.mjs (1235ms)
+  [PASS] test-real-data-face.mjs (106ms)
+  [PASS] test-reprocess-core.mjs (97ms)
+  [PASS] test-require-admin.mjs (1591ms)
+  [PASS] test-review-overrides.mjs (1978ms)
+  [PASS] test-review-throughput.mjs (2229ms)
+  [PASS] test-score-color.mjs (2618ms)
+  [PASS] test-security-core.mjs (1358ms)
+  [PASS] test-submission-counts.mjs (2217ms)
+  [PASS] test-submission-history.mjs (2482ms)
+  [PASS] test-synthesis.mjs (2653ms)
+  [PASS] test-upload-client.mjs (6120ms)
+  [PASS] test-video-plan.mjs (877ms)
+
+42/42 passed

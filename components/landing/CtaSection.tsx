@@ -37,6 +37,14 @@ export default function CtaSection() {
             {t("explore")}
           </Button>
           <Button
+            href="/insights"
+            variant="ghost"
+            size="lg"
+            className="min-h-[48px] w-full sm:w-auto"
+          >
+            {t("insights")}
+          </Button>
+          <Button
             href="/map?contribute=1"
             variant="ghost"
             size="lg"

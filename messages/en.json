@@ -25,7 +25,8 @@
   "mapChrome": {
     "home": "StreetLens home",
     "tagline": "Escazú street instrument",
-    "contribute": "Contribute a street"
+    "contribute": "Contribute a street",
+    "insights": "Insights"
   },
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
@@ -610,7 +611,8 @@
       "banner": {
         "methodQuestion": "How does StreetLens work?",
         "methodLink": "Method",
-        "platform": "Open the platform"
+        "platform": "Open the platform",
+        "insightsLink": "Insights"
       },
       "segments": {
         "title": "Lowest-scoring streets",
@@ -618,7 +620,8 @@
         "activate": "Open {name} in the platform",
         "cvTitle": "Recently camera-observed",
         "cvBadge": "CV",
-        "empty": "No camera observations published yet. Record a walk or add a street from the map."
+        "empty": "No camera observations published yet. Record a walk or add a street from the map.",
+        "cvWorstTitle": "Lowest camera scores"
       },
       "stats": {
         "failLabel": "Fail Ley 7600 minimums",
@@ -795,7 +798,9 @@
           "source": "Live today: camera proposals on the map, admin-reviewed. Field audits remain the published source of truth.",
           "alt": "Method pipeline diagram: field audits flow to open data today, with a dashed roadmap loop where a computer-vision and machine-learning model scores streets and a human always verifies the result."
         }
-      }
+      },
+      "fullMethod": "Read the full method",
+      "fullRubric": "See rubric v0.1"
     },
     "grounding": {
       "eyebrow": "References",
@@ -898,7 +903,8 @@
       "heading": "Measure what the city forgot to.",
       "support": "Open the live map, or add a street you know. Every score ships with its formula.",
       "explore": "Explore the live map",
-      "contribute": "Contribute a street"
+      "contribute": "Contribute a street",
+      "insights": "Open insights"
     },
     "footer": {
       "tagline": "An open field instrument for the street. Now measuring Escazú, Costa Rica.",
@@ -908,7 +914,10 @@
       "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
       "localeLabel": "Language",
       "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins in August 2026.",
-      "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress."
+      "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress.",
+      "insights": "Insights",
+      "method": "Method",
+      "rubric": "Rubric"
     }
   },
   "collect": {
@@ -1541,6 +1550,214 @@
         "shade": "Shade",
         "bike": "Bike"
       }
+    }
+  },
+  "insights": {
+    "meta": {
+      "title": "Insights | StreetLens",
+      "description": "Live instrument panel: camera-observed coverage, district rollups, worst streets, lens distributions, and the observation timeline — kept separate from field audits."
+    },
+    "chrome": {
+      "home": "StreetLens home",
+      "insights": "Insights",
+      "method": "Method",
+      "rubric": "Rubric",
+      "map": "Map"
+    },
+    "eyebrow": "Instrument panel · {municipality}",
+    "title": "What the cameras have measured so far.",
+    "lead": "Rankings, district rollups, coverage progress, and lens shape — built only from reviewed camera observations until field audits publish. Bookmark this page for the live municipal readout.",
+    "honesty": "Camera-observed scores are provisional. They are never averaged into field-audit figures, and a low camera score is not a Ley 7600 legal determination.",
+    "coverage": {
+      "heading": "Coverage progress",
+      "support": "Network kilometres a reviewed camera walk has touched, as a sibling of audited corridor coverage — never merged with it.",
+      "observedKm": "Km camera-observed",
+      "networkKm": "Network km",
+      "pct": "Camera network share",
+      "cvSegments": "Streets camera-observed",
+      "sessions": "Walks reviewed",
+      "auditedSegments": "Segments field-audited",
+      "cameraLabel": "Camera-observed",
+      "auditedLabel": "Field-audited",
+      "networkLabel": "Full street network",
+      "overTime": "Cumulative km observed over time",
+      "sparkAria": "Sparkline of cumulative camera-observed kilometres by walk day",
+      "empty": "No approved camera walks yet. Coverage will climb here once a session is reviewed.",
+      "statsLine": "Live camera coverage from stats: {pct} of the network."
+    },
+    "districts": {
+      "heading": "District rollups",
+      "support": "Districts are computed from segment data — not a fixed list of names. Camera means and audited Ley shares stay in separate columns.",
+      "empty": "No segments available.",
+      "colName": "District",
+      "colCvKm": "CV km",
+      "colCvPct": "CV %",
+      "colMean": "Mean overall",
+      "colLey": "Ley fail",
+      "colMap": "Map",
+      "segmentMeta": "{count} segments · {cv} camera-observed",
+      "cameraMean": "Camera mean",
+      "auditedOnly": "Audited only",
+      "openMap": "Open"
+    },
+    "worst": {
+      "heading": "Lowest camera scores",
+      "support": "Ranked from canonical camera observations (overall lens). Open a street page when available, otherwise the map.",
+      "empty": "No camera-observed streets to rank yet.",
+      "cameraBadge": "Camera-observed"
+    },
+    "lenses": {
+      "heading": "Lens distribution",
+      "support": "How camera-observed segments fall across the sealed Excellent–Poor bins, per lens. Means hide whether problems are concentrated or systemic.",
+      "mean": "mean {value}",
+      "noMean": "no scores",
+      "cameraOnly": "{count} camera-observed",
+      "chartAria": "Score bin histogram for the {layer} lens"
+    },
+    "timeline": {
+      "heading": "Observation timeline",
+      "support": "Reviewed camera walks by day — a public paper trail of measurement activity, without contacts or frame paths.",
+      "empty": "No approved walks yet.",
+      "segments": "{count, plural, one {# segment} other {# segments}}",
+      "mean": "mean overall {value}",
+      "more": ", +{count} more",
+      "cameraBadge": "Camera-observed",
+      "open": "Open on map"
+    },
+    "footer": {
+      "method": "How scores are made →",
+      "rubric": "Rubric v0.1 →",
+      "map": "Open the map →"
+    }
+  },
+  "methodPage": {
+    "meta": {
+      "title": "Method | StreetLens",
+      "description": "How StreetLens turns a walked street into a checkable score: lenses, Ley 7600 threshold, bins, and the camera-vs-audit honesty contract."
+    },
+    "eyebrow": "Method",
+    "title": "How a street becomes a score.",
+    "lead": "The same open rubric, the same bins, and a hard line between what a camera proposed and what a field audit verified.",
+    "honesty": {
+      "heading": "The honesty contract",
+      "body": "StreetLens publishes two kinds of evidence. Confusing them would make the numbers look stronger than they are.",
+      "camera": "Camera-observed: a vision model proposes scores; an admin reviews the walk before anything is public. Provisional until field-audited.",
+      "audit": "Field-audited: a person scores the street against rubric v0.1 on site. This is the source of truth for Ley 7600 compliance claims.",
+      "neverMerge": "Counters and means never mix the two. Insights, the map, and the landing keep them labeled apart."
+    },
+    "lineage": {
+      "heading": "Lineage",
+      "body": "The rubric derives from validated instruments, not invented ones.",
+      "items": {
+        "maps": {
+          "title": "MAPS-Mini",
+          "desc": "A validated microscale audit of pedestrian streetscapes: sidewalks, crossings, and buffers."
+        },
+        "lanamme": {
+          "title": "LANAMME-UCR",
+          "desc": "Costa Rica's national road-materials laboratory at the University of Costa Rica, for pavement and condition standards."
+        },
+        "ley": {
+          "title": "Ley 7600",
+          "desc": "Equal Opportunities for Persons with Disabilities Act and its Reglamento (Decreto Ejecutivo N° 26831-MP)."
+        },
+        "osm": {
+          "title": "OpenStreetMap",
+          "desc": "Segment geometry under ODbL; audited sidewalk geometry is contributed back under OpenSidewalks."
+        }
+      }
+    },
+    "lenses": {
+      "heading": "The five lenses",
+      "support": "Every segment is scored 0–100 on four independent lenses plus an overall composite. The same instrument runs in any municipality — {municipality} is the pilot, not a special case in the math.",
+      "items": {
+        "accessibility": {
+          "title": "Accessibility",
+          "desc": "Curb ramps, tactile paving, safe crossings, effective width — can everyone use this sidewalk?"
+        },
+        "drainage": {
+          "title": "Drainage",
+          "desc": "Grates and inlets, cross slope, ponding history — does it flood, or drain?"
+        },
+        "shade": {
+          "title": "Shade",
+          "desc": "Tree canopy, cover, sun exposure — heat resilience on the sidewalk."
+        },
+        "bike": {
+          "title": "Bike",
+          "desc": "Lanes, separation from traffic, connectivity — can you ride it, and is it protected?"
+        },
+        "overall": {
+          "title": "Overall",
+          "desc": "The composite sidewalk score — one number anyone can act on."
+        }
+      }
+    },
+    "ley": {
+      "heading": "Accessibility and the law",
+      "body": "An accessibility score below {threshold} is treated as failing the legal minimum for audited segments. Camera scores use the same scale for orientation only — they are not legal determinations.",
+      "art125": "Art. 125 — sidewalks ≥ 1.20 m, non-slip, no steps, cross slope ≤ 3%.",
+      "art126": "Art. 126 — curb ramps at corners, gradient ≤ 10%, width ≥ 1.20 m.",
+      "art127": "Art. 127 — signs and projecting objects clear ≥ 2.20 m."
+    },
+    "bins": {
+      "heading": "Scoring bins",
+      "support": "Scores are continuous 0–100 and grouped into four legend bins. The legend is never color-only.",
+      "colBin": "Bin",
+      "colRange": "Range",
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "reaudits": {
+      "heading": "Re-audits are first-class",
+      "body": "When a street is walked again, the newest walk becomes the canonical camera reading and earlier ones move to archive. Change over time — did it get fixed? — is queryable once multiple observations exist."
+    },
+    "footer": {
+      "rubric": "See the 15 rubric items →",
+      "insights": "Open insights →",
+      "map": "Open the map →"
+    }
+  },
+  "rubricPage": {
+    "meta": {
+      "title": "Rubric v0.1 | StreetLens",
+      "description": "The 15 observed items in rubric v0.1, by lens, with response types and the Ley 7600 accessibility threshold."
+    },
+    "eyebrow": "Rubric v0.1",
+    "title": "Fifteen items. One checkable score.",
+    "lead": "Versions are permanent: an audit taken under v0.1 stays interpretable forever. Every published score carries its version.",
+    "honesty": "Camera proposals use the same item keys so they can be compared to field audits item-for-item — without ever being treated as audits.",
+    "threshold": "Accessibility scores below {threshold} fail the Ley 7600 minimum on audited segments.",
+    "colItem": "Item",
+    "colResponse": "Response",
+    "response": {
+      "boolean": "boolean",
+      "scale_0_4": "scale 0–4",
+      "percent": "percent"
+    },
+    "items": {
+      "sidewalk_present": "Sidewalk present",
+      "sidewalk_width": "Sidewalk width ≥ 1.2 m",
+      "surface_condition": "Sidewalk surface condition",
+      "curb_ramp": "Curb ramp at crossing",
+      "obstruction_free": "Path free of obstructions",
+      "drain_present": "Storm drain / grate present",
+      "standing_water": "No standing-water evidence",
+      "curb_gutter": "Curb and gutter condition",
+      "canopy_cover": "Tree canopy coverage",
+      "midday_shade": "Shade at midday",
+      "lighting": "Street lighting",
+      "crossing_safety": "Crossing safety",
+      "bike_lane_present": "Dedicated bike lane or path",
+      "bike_separation": "Separation from motor traffic",
+      "bike_surface": "Cycling surface quality"
+    },
+    "footer": {
+      "method": "Read the method →",
+      "insights": "Open insights →",
+      "map": "Open the map →"
     }
   }
 }

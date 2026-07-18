@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- first-party static SVG engineering plates; next/image adds no value for inline SVG and would need dangerouslyAllowSVG */
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import Section from "@/components/ui/Section";
 import Measure from "@/components/ui/Measure";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -224,6 +225,23 @@ export default function MethodSection() {
             decoding="async"
           />
         </Figure>
+      </Measure>
+
+      <Measure width="outset" className="mt-12">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-hairline pt-6 text-[13px]">
+          <Link
+            href="/method"
+            className="font-medium text-ink underline decoration-accent decoration-2 underline-offset-[3px]"
+          >
+            {t("fullMethod")}
+          </Link>
+          <Link
+            href="/rubric"
+            className="font-medium text-ink underline decoration-accent decoration-2 underline-offset-[3px]"
+          >
+            {t("fullRubric")}
+          </Link>
+        </div>
       </Measure>
     </Section>
   );

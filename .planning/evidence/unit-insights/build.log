@@ -1,0 +1,79 @@
+
+> streetlens@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/filippofonseca/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0013-frontier-wave/worktrees/unit-insights/package-lock.json
+   * /Users/filippofonseca/Developer/Projects/streetlens/package-lock.json
+
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.5s
+  Running TypeScript ...
+  Finished TypeScript in 6.3s ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/37) ...
+  Generating static pages using 9 workers (9/37) 
+  Generating static pages using 9 workers (18/37) 
+  Generating static pages using 9 workers (27/37) 
+✓ Generating static pages using 9 workers (37/37) in 1061ms
+  Finalizing page optimization ...
+
+Route (app)                              Revalidate  Expire
+┌ ○ /_not-found
+├ ● /[locale]                                    5m      1y
+│ ├ /en                                          5m      1y
+│ └ /es                                          5m      1y
+├ ƒ /[locale]/admin
+├ ƒ /[locale]/admin/capture/[id]
+├ ƒ /[locale]/admin/history
+├ ƒ /[locale]/admin/import
+├ ● /[locale]/admin/login
+│ ├ /en/admin/login
+│ └ /es/admin/login
+├ ƒ /[locale]/admin/queue
+├ ● /[locale]/collect
+│ ├ /en/collect
+│ └ /es/collect
+├ ƒ /[locale]/collect/status/[id]
+├ ● /[locale]/insights                           5m      1y
+│ ├ /en/insights                                 5m      1y
+│ └ /es/insights                                 5m      1y
+├ ƒ /[locale]/map
+├ ● /[locale]/method                             1h      1y
+│ ├ /en/method                                   1h      1y
+│ └ /es/method                                   1h      1y
+├ ● /[locale]/rubric                             1h      1y
+│ ├ /en/rubric                                   1h      1y
+│ └ /es/rubric                                   1h      1y
+├ ƒ /api/admin/capture/frame
+├ ƒ /api/admin/capture/resume
+├ ƒ /api/admin/capture/review
+├ ƒ /api/admin/import
+├ ƒ /api/admin/login
+├ ƒ /api/admin/logout
+├ ƒ /api/admin/review
+├ ƒ /api/capture/pump
+├ ƒ /api/capture/sessions
+├ ƒ /api/capture/sessions/[id]
+├ ƒ /api/capture/sessions/[id]/finalize
+├ ƒ /api/capture/sessions/[id]/frames
+├ ƒ /api/capture/sessions/[id]/pump
+├ ƒ /api/routing-network
+├ ƒ /api/segments/[id]/detail
+├ ƒ /api/submissions
+└ ○ /icon.svg
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
