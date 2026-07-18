@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "description": "Labeled extraction fixtures for scripts/eval-extraction.mjs. Labels are human ground truth for what is plainly visible — not model outputs. Built from committed fixture images; extend with reviewer-override frames when local copies exist (never call the live DB from this harness).",
+  "fixtures": [
+    {
+      "id": "street-real",
+      "image": "street-real.jpg",
+      "vantage": "edge_of_road",
+      "notes": "Paved single-track lane with grass/shoulder verges on both sides; no raised sidewalk, curb walkway, or bollard-protected path. Utility pole and houses in the distance.",
+      "expect": {
+        "usable": true,
+        "sidewalk_present": 0,
+        "bike_lane_present": 0
+      }
+    },
+    {
+      "id": "pulperia-control",
+      "image": "street-san-antonio-escazu.jpg",
+      "vantage": "not_a_street",
+      "notes": "Shop interior (pulpería), not a street. Correct answer is unusable.",
+      "expect": {
+        "usable": false
+      }
+    }
+  ]
+}
