@@ -482,21 +482,28 @@ function rowToCvObservation(row: CvObservationRow): CvObservation {
 async function liveCvObservations(): Promise<CvObservation[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
+
+  const page = async (columns: string, from: number, to: number) => {
+    const { data, error } = await client
+      .from("community_cv_observations")
+      .select(columns)
+      .range(from, to);
+    return { data, error };
+  };
+
   try {
     const rows = await fetchAllPages<CvObservationRow>(
       "community_cv_observations",
       async (from, to) => {
-        const { data, error } = await client
-          .from("community_cv_observations")
-          .select(
-            "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment,assessment_es",
-          )
-          .range(from, to);
+        let { data, error } = await page(CV_OBSERVATION_SELECT, from, to);
+        if (error && isMissingAssessmentEsColumn(error.message)) {
+          ({ data, error } = await page(CV_OBSERVATION_SELECT_PRE_0028, from, to));
+        }
         if (error) {
           markLiveReadFailure("cv", error.message);
           return null;
         }
-        return (data as CvObservationRow[]) ?? null;
+        return (data as unknown as CvObservationRow[]) ?? null;
       },
     );
     if (!rows) {

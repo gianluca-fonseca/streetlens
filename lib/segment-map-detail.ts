@@ -101,7 +101,7 @@ async function liveCvObservationsForSegment(
           ({ data, error } = await page(CV_OBSERVATION_SELECT_PRE_0028, from, to));
         }
         if (error || !data) return null;
-        return data as CvObservationRow[];
+        return data as unknown as CvObservationRow[];
       },
       { maxRows: MAX_CV_OBSERVATIONS_PER_SEGMENT },
     );
