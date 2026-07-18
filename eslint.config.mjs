@@ -17,6 +17,9 @@ const eslintConfig = defineConfig([
     // dir behind, and linting generated CJS would then fail the lint gate for a
     // reason that has nothing to do with the source.
     ".test-build-*/**",
+    // bgsd run records carry full worktree checkouts of this app; linting the
+    // main repo must never descend into them.
+    ".bgsd/**",
   ]),
 ]);
 
