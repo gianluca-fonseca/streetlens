@@ -27,7 +27,6 @@
 
 import {
   RUBRIC_ITEM_KEYS,
-  RUBRIC_ITEM_RESPONSE_TYPES,
   type RubricItemKey,
   type CaptureObservationItem,
 } from "@/lib/capture/types";
