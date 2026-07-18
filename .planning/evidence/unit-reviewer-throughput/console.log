@@ -1,0 +1,6 @@
+Browser drive on http://localhost:3574 (2026-07-18)
+- workbench-main.png: capture review with queue position, street names on segment cards, shortcuts button
+- shortcuts-overlay.png: keyboard cheat sheet overlay (?)
+- reason-presets-decision-bar.png: reason preset chips, select all/none, decision bar
+- queue-street-names.png: queue cards showing human street names
+Console: 0 errors during capture review and queue navigation (React DevTools info only)
