@@ -145,6 +145,7 @@ export default function ExpandedMap({
           selectedSeq={selectedSeq}
           selectedSegmentId={selectedSegmentId}
           onSelectFrame={onSelectFrame}
+          autoFollow={replay.active}
         />
       </div>
 

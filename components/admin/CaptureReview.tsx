@@ -440,6 +440,7 @@ export default function CaptureReview({
             selectedSeq={mapSelectedSeq}
             selectedSegmentId={mapSelectedSegmentId}
             onSelectFrame={handleMapSelect}
+            autoFollow={replay.active}
           />
         </section>
       ) : null}

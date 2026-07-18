@@ -318,6 +318,7 @@
       "mapExpand": "Expand map",
       "mapCollapse": "Close expanded map",
       "mapExpandedTitle": "Session map",
+      "mapRecenter": "Re-center",
       "notAssessable": "Not assessable",
       "boolYes": "Yes",
       "boolNo": "No",
