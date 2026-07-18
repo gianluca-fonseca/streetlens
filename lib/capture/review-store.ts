@@ -25,9 +25,13 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { publicFrameUrl } from "./storage";
 import { readCaptureReviewOverlay, readCaptureTombstones } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
-import type { FrameObservation } from "./review-overrides";
+import type {
+  FrameObservation,
+  SegmentAssessment,
+  SegmentAssessments,
+} from "./review-overrides";
 
-export type { FrameObservation };
+export type { FrameObservation, SegmentAssessment, SegmentAssessments };
 
 const FIXTURE_PATH = path.join(
   process.cwd(),
@@ -100,6 +104,14 @@ export type SessionReview = {
   };
   segments: ReviewSegment[];
   /**
+   * The per-segment synthesis (overall verdict, per-lens explanations, bounded score
+   * adjustments), keyed by segment id, from the sibling engine (frozen contract, u2
+   * seal #1). A segment with no synthesis has no entry; the workbench renders an
+   * honest "no assessment available" state. The recompute reads the adjustments; the
+   * workbench reads the prose.
+   */
+  assessments: SegmentAssessments;
+  /**
    * Every frame of the walk in seq order, attributed or not, deleted or not. The
    * segment cards read the grouped {@link ReviewSegment.frames}; the map panel and
    * the override recompute read this full list.
@@ -138,6 +150,12 @@ type ReviewPayload = {
     coverage: number | null;
     confidence: number | null;
     escalated: number | null;
+    /**
+     * The segment synthesis, from the sibling engine (frozen contract, u2 seal #1;
+     * its migration 0022 adds it to `capture_session_review`). Nullable/absent when
+     * no synthesis was produced. Consumed verbatim.
+     */
+    assessment?: SegmentAssessment | null;
   }[];
   frames: {
     seq: number;
@@ -220,6 +238,57 @@ function frameUrl(storagePath: string): string | null {
   }
 }
 
+/**
+ * Coerce a raw rollup `assessment` into a well-formed {@link SegmentAssessment}, or
+ * null. The engine owns the content; this guards only the shape, so a partial or
+ * malformed synthesis degrades to "no assessment" rather than crashing the page or
+ * feeding the recompute a bad delta. A string field that is missing becomes "".
+ */
+function normalizeAssessment(raw: unknown): SegmentAssessment | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const a = raw as Record<string, unknown>;
+  if (typeof a.overall !== "string") return null;
+
+  const str = (v: unknown): string => (typeof v === "string" ? v : "");
+  const lensesRaw = (a.lenses ?? {}) as Record<string, unknown>;
+  const lenses = {
+    accessibility: str(lensesRaw.accessibility),
+    drainage: str(lensesRaw.drainage),
+    shade: str(lensesRaw.shade),
+    bike: str(lensesRaw.bike),
+  };
+
+  // Only numeric-delta adjustments on a real lens key survive; the recompute must
+  // never see a delta it cannot add.
+  const adjustments: SegmentAssessment["adjustments"] = {};
+  const adjRaw = (a.adjustments ?? {}) as Record<string, unknown>;
+  for (const [lens, v] of Object.entries(adjRaw)) {
+    if (!(SCORE_LAYER_KEYS as readonly string[]).includes(lens)) continue;
+    if (!v || typeof v !== "object") continue;
+    const delta = (v as { delta?: unknown }).delta;
+    const reason = (v as { reason?: unknown }).reason;
+    if (typeof delta !== "number" || !Number.isFinite(delta)) continue;
+    adjustments[lens as keyof SegmentAssessment["adjustments"]] = {
+      delta,
+      reason: str(reason),
+    };
+  }
+
+  const adjScoresRaw = (a.adjustedScores ?? {}) as Record<string, unknown>;
+  const adjustedScores = {
+    overall: num(adjScoresRaw.overall),
+    accessibility: num(adjScoresRaw.accessibility),
+    drainage: num(adjScoresRaw.drainage),
+    shade: num(adjScoresRaw.shade),
+    bike: num(adjScoresRaw.bike),
+  };
+
+  return { overall: a.overall, lenses, adjustments, adjustedScores, model: str(a.model) };
+}
+
+/** The five lens keys, duplicated locally so this module needn't import the scorer. */
+const SCORE_LAYER_KEYS = ["overall", "accessibility", "drainage", "shade", "bike"] as const;
+
 /** Numbers arrive from postgres numerics as strings; coerce without inventing. */
 function num(value: unknown): number | null {
   if (value === null || value === undefined || value === "") return null;
@@ -272,6 +341,15 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     frames: framesBySegment.get(r.segmentId) ?? [],
   }));
 
+  // The synthesis, keyed by segment id. Only well-formed entries survive: a stray
+  // shape must not throw on the server-rendered review page, exactly as the map's
+  // parse-feature-props guards the public popover.
+  const assessments: SegmentAssessments = {};
+  for (const r of payload.rollups ?? []) {
+    const a = normalizeAssessment(r.assessment);
+    if (a) assessments[r.segmentId] = a;
+  }
+
   const jobs = payload.jobs ?? { pending: 0, done: 0, failed: 0, overbudget: 0 };
 
   return {
@@ -293,6 +371,7 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
       escalated: num(payload.tokens?.escalated) ?? 0,
     },
     segments,
+    assessments,
     frames: allFrames,
     track: (payload.track ?? []).filter(
       (p): p is FramePosition =>

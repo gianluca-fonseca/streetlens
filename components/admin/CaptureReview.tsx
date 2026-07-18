@@ -43,7 +43,7 @@ function pct(v: number | null): number | null {
 
 /** A fresh, independent corrections record (never share the frozen EMPTY one). */
 function freshCorrections(): ReviewCorrections {
-  return { itemOverrides: {}, excluded: [], deleted: [], manualScores: {} };
+  return { itemOverrides: {}, excluded: [], deleted: [], manualScores: {}, baselineLenses: {} };
 }
 
 export default function CaptureReview({
