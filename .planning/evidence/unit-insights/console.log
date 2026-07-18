@@ -1,0 +1,4 @@
+Browser drive on http://192.168.100.188:3582 (PORT 3582)
+insights/method/rubric EN+ES: no page errors
+map route emitted pre-existing MapLibre null warnings (unchanged; not introduced by insights)
+(no warnings/errors on /insights /method /rubric)
