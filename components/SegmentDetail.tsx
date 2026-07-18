@@ -259,6 +259,12 @@ function CvObservationCard({
       {/* Evidence quality as instruments rather than a run of prose (u33).
           Frames stays a bare count: it is a tally, not a proportion, so a
           0–100 track would have no honest full scale to fill against. */}
+      {/* The two gauges get the row to themselves. Sharing it three ways left
+          each label ~86px against the ~93px "Confidence 68%" needs, so the
+          label truncated to "Confide…" — by two pixels in English, and Spanish
+          has no more room to give. Frames drops to its own line instead: it is
+          a bare tally rather than a proportion, so it was never going to carry
+          a meter anyway and loses nothing by sitting apart. */}
       <div className="mt-2.5 flex items-start gap-3">
         <Gauge
           label={t("cvConfidenceLabel")}
@@ -270,15 +276,14 @@ function CvObservationCard({
           ratio={coverageRatio}
           text={coverage ?? UNSET}
         />
-        <p className="min-w-0 flex-1 font-mono text-[10.5px] text-neutral-strong">
-          {/* Label + count rather than an ICU plural: this codebase has no
-              plural/select syntax anywhere and branches plurals in TS (see
-              admin.queue's subtitleZero/One/Many). A label sidesteps the
-              grammatical number entirely. */}
-          <span className="truncate">{t("cvFramesLabel")}</span>{" "}
-          <span className="text-ink">{frames}</span>
-        </p>
       </div>
+      <p className="mt-1.5 font-mono text-[10.5px] text-neutral-strong">
+        {/* Label + count rather than an ICU plural: this codebase has no
+            plural/select syntax anywhere and branches plurals in TS (see
+            admin.queue's subtitleZero/One/Many). A label sidesteps the
+            grammatical number entirely. */}
+        {t("cvFramesLabel")} <span className="text-ink">{frames}</span>
+      </p>
       {/* The reviewer-approved synthesis (u2). Model output, in English: the
           localized labels frame it, the sentence itself is the model's. Numbers
           above are still the reviewer's; this is context. Read defensively — it
