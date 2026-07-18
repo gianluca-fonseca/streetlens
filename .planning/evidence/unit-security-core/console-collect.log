@@ -1,0 +1,6 @@
+Total messages: 4 (Errors: 0, Warnings: 0)
+
+[INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3572/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[LOG] [HMR] connected @ http://localhost:3572/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[LOG] [Fast Refresh] rebuilding @ http://localhost:3572/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[LOG] [Fast Refresh] done in 112ms @ http://localhost:3572/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
