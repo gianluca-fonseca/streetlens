@@ -8,6 +8,7 @@ import Section from "@/components/ui/Section";
 import Measure from "@/components/ui/Measure";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Figure from "@/components/ui/Figure";
+import ProvenanceNote from "@/components/ProvenanceNote";
 import StatFigure from "@/components/ui/StatFigure";
 
 /**
@@ -71,6 +72,9 @@ export default function PilotSection({
             />
           ))}
         </dl>
+        {/* Observed-but-unverified work, kept OUT of the three audited figures
+            above so the pilot row stays a pure audit claim. */}
+        <ProvenanceNote stats={stats} className="mt-4" />
         <p className="mt-8 font-serif text-[1.08rem] leading-[1.55] text-accent-text">
           {t("beginning")}
         </p>
