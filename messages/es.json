@@ -17,6 +17,16 @@
       "dark": "Oscuro"
     }
   },
+  "localeSwitcher": {
+    "label": "Idioma",
+    "en": "English",
+    "es": "Español"
+  },
+  "mapChrome": {
+    "home": "Inicio de StreetLens",
+    "tagline": "Instrumento de calles de Escazú",
+    "contribute": "Contribuir una calle"
+  },
   "map": {
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
     "demoTag": "DEMO",
@@ -584,7 +594,7 @@
       "wordmark": "StreetLens",
       "byCusp": "por CUSP",
       "question": "¿Qué tan buenas son nuestras calles?",
-      "subtitle": "Ciudades más limpias y vivibles para todas las personas empiezan con calles que se pueden medir.",
+      "subtitle": "Ciudades más limpias y habitables para todas las personas empiezan con calles que se pueden medir.",
       "pilot": "Programa piloto · Escazú, Costa Rica",
       "requestCity": "¿Quieres esto para tu ciudad? Solicítalo",
       "madeBy": "Hecho con ❤️ por <name>Gianluca Fonseca</name>",
@@ -596,7 +606,10 @@
       "segments": {
         "title": "Calles con menor puntuación",
         "caveat": "Puntuaciones de demostración sobre geometría real. No son mediciones reales.",
-        "activate": "Abrir {name} en la plataforma"
+        "activate": "Abrir {name} en la plataforma",
+        "cvTitle": "Observadas recientemente con cámara",
+        "cvBadge": "CV",
+        "empty": "Todavía no hay observaciones de cámara publicadas. Grabá una caminata o añadí una calle desde el mapa."
       },
       "stats": {
         "failLabel": "Incumplen la Ley 7600",
@@ -604,13 +617,18 @@
         "segmentsLabel": "Segmentos auditados",
         "kmLabel": "Vía auditada",
         "bikeLabel": "Infraestructura ciclista media",
-        "demoFootnote": "La tasa de incumplimiento y los promedios son cifras de demostración sobre geometría real de OSM."
+        "demoFootnote": "La tasa de incumplimiento y los promedios son cifras de demostración sobre geometría real de OSM.",
+        "cvSegmentsLabel": "Calles observadas con cámara",
+        "cvSessionsLabel": "Caminatas revisadas",
+        "cvCoverageLabel": "Cobertura de red con cámara",
+        "communityLabel": "Aportes de la comunidad",
+        "auditedPending": "Todavía no hay auditorías de campo publicadas. Las caminatas con cámara y los aportes de la comunidad son la señal en vivo hasta que empiece el trabajo de campo en el corredor."
       },
       "map": {
         "live": "Mapa en vivo",
         "affordance": "Arrastra para desplazar. Mantén ⌘ o Ctrl para hacer zoom. Toca un segmento para abrirlo en la plataforma."
       },
-      "openSource": "El código es público: ver / contribuir"
+      "openSource": "El código es público: ver o contribuir"
     },
     "mission": {
       "eyebrow": "La misión",
@@ -627,17 +645,17 @@
         },
         "implement": {
           "label": "Implementar, no solo proponer",
-          "desc": "Preferimos medir una calle real antes que publicar otro plan. Cada lectura se construye para ser concreta y accionable, y los datos crecerán hasta formar un registro público del que otras ciudades puedan aprender."
+          "desc": "Preferimos medir una calle real antes que publicar otro plan. Cada lectura se construye para ser concreta y útil, y los datos crecerán hasta formar un registro público del que otras ciudades puedan aprender."
         },
         "together": {
-          "label": "De base y sistémico",
-          "desc": "Las personas pueden evaluar las calles que caminan cada día, mientras que los datos abiertos dan a quienes deciden una imagen compartida y verificable. Así se construyen ciudades mejores, más limpias y más vivibles para todas las personas."
+          "label": "Desde la calle y desde el sistema",
+          "desc": "Las personas pueden evaluar las calles que caminan cada día, mientras que los datos abiertos dan a quienes deciden una imagen compartida y verificable. Así se construyen ciudades mejores, más limpias y más habitables para todas las personas."
         }
       }
     },
     "measure": {
       "eyebrow": "Qué medimos",
-      "heading": "Cuatro lentes sobre cada calle.",
+      "heading": "Cuatro miradas sobre cada calle.",
       "lead": "La caminabilidad se descompone en partes que se pueden medir. Cada segmento se puntúa con cuatro rúbricas independientes, igual en cualquier ciudad. Dos de ellas son resiliencia climática: la sombra mide la exposición al calor, y el drenaje mide el riesgo de inundación. Cada rampa de color es segura para el daltonismo y va con un canal de grosor de línea, y cada leyenda muestra sus rangos.",
       "plateAlt": "Puntuaciones de {name} en la red de calles del piloto",
       "items": {
@@ -699,6 +717,7 @@
       "statSegments": "Segmentos mapeados",
       "statKm": "Km de corredor",
       "statCoverage": "Cobertura del piloto",
+      "auditedEmpty": "Todavía no hay auditorías de campo publicadas. La red cantonal está en vivo en el mapa; las caminatas con cámara y los reportes de la comunidad son las señales que se mueven hoy.",
       "beginning": "Esto es un piloto, y un comienzo.",
       "demoNote": "Auditoría de demostración sobre geometría real. Ninguna puntuación es una medición hasta que el trabajo de campo comience en agosto de 2026."
     },
@@ -743,7 +762,7 @@
       "pipeline": {
         "eyebrow": "El motor que viene",
         "heading": "Cada auditoría entrena a la siguiente.",
-        "body": "Las auditorías de campo son la fuente de verdad, y así se quedan. Desde el piloto de agosto de 2026, cada corredor que un auditor camina también se fotografía, y esas imágenes se vuelven datos de entrenamiento etiquetados. Con el tiempo entrenarán un sistema de visión por computadora y aprendizaje automático que lee la condición de la acera y las obstrucciones directamente desde una foto, para que cada auditoría futura puntúe más rápido que la anterior. Hoy ningún modelo puntúa una calle. Cuando lo haga, una persona seguirá verificando lo que reporte."
+        "body": "Las auditorías de campo siguen siendo la fuente de verdad, y así se quedan. Las caminatas con cámara ya proponen puntuaciones en el mapa: cada sesión se revisa antes de publicarse, y una persona sigue verificando lo que reporta. Esas caminatas también se vuelven datos de entrenamiento etiquetados para que las auditorías futuras puntúen más rápido. Una propuesta de cámara no es una auditoría de campo hasta que una se publique."
       },
       "plates": {
         "crossSection": {
@@ -764,7 +783,7 @@
           "label": "Figura 6",
           "claim": "Auditorías de campo hoy. Un modelo verificado mañana.",
           "support": "Cada corredor caminado se fotografía, y esas imágenes se vuelven datos de entrenamiento para un sistema de visión por computadora que una persona siempre revisa.",
-          "source": "Hoja de ruta, no construido. El camino de aprendizaje automático dibujado en línea discontinua no puntúa ninguna calle hoy.",
+          "source": "En vivo hoy: propuestas de cámara en el mapa, revisadas por una persona. Las auditorías de campo siguen siendo la fuente de verdad publicada.",
           "alt": "Diagrama del método: las auditorías de campo fluyen hacia datos abiertos hoy, con un bucle de hoja de ruta en línea discontinua donde un modelo de visión por computadora y aprendizaje automático puntúa calles y una persona siempre verifica el resultado."
         }
       }
@@ -837,7 +856,7 @@
       "items": {
         "real": {
           "q": "¿Estos son datos reales?",
-          "a": "Todavía no. Cada puntuación que ves hoy es un dato de demostración generado sobre geometría real de OpenStreetMap, así que el mapa se comporta igual que lo hará con datos de campo. Las mediciones reales lo reemplazan corredor por corredor cuando el trabajo de campo comience en agosto de 2026."
+          "a": "La red de calles es geometría real de OpenStreetMap. Las puntuaciones de demostración están apagadas por defecto; lo que ves coloreado hoy es trabajo observado con cámara o reportado por la comunidad, cada uno revisado antes de aparecer. Las auditorías de campo reemplazarán las puntuaciones de demostración corredor por corredor cuando se publiquen."
         },
         "scores": {
           "q": "¿Cómo se calculan las puntuaciones?",
@@ -845,7 +864,7 @@
         },
         "ai": {
           "q": "¿StreetLens usa aprendizaje automático o visión por computadora?",
-          "a": "Para puntuar calles, hoy no. Cada puntuación que ves es un dato de demostración, y las puntuaciones reales vendrán de auditores en el campo. Sus fotos se vuelven los datos de entrenamiento de un sistema de visión por computadora y aprendizaje automático que acelerará las auditorías futuras, y una persona siempre verificará lo que produzca. El aprendizaje automático y la visión por computadora están en la hoja de ruta, no en las cifras de hoy."
+          "a": "Sí, para propuestas — no para auditorías de campo publicadas. Las caminatas con cámara ya producen puntuaciones propuestas en el mapa; una persona revisa cada sesión antes de que aparezca, y esas lecturas se mantienen separadas de las auditorías de campo hasta que una se publique. Los auditores de campo siguen siendo la fuente de verdad, y una persona siempre verifica lo que reporta la cámara."
         },
         "city": {
           "q": "¿Puede usarlo mi ciudad?",
@@ -857,7 +876,7 @@
         },
         "contribute": {
           "q": "¿Puedo contribuir?",
-          "a": "Sí. Puedes añadir una calle que nos faltó o señalar una corrección desde el mapa. Una persona revisa cada envío antes de que cambie algo en el mapa público."
+          "a": "Sí. Podés añadir una calle que nos faltó o señalar una corrección desde el mapa. Una persona revisa cada envío antes de que cambie algo en el mapa público."
         },
         "who": {
           "q": "¿Quién está detrás de esto?",
@@ -868,7 +887,7 @@
     "cta": {
       "eyebrow": "El llamado",
       "heading": "Mide lo que la ciudad olvidó medir.",
-      "support": "Abre el mapa en vivo, o añade una calle que conozcas. Cada puntuación viene con su fórmula.",
+      "support": "Abrí el mapa en vivo, o añadí una calle que conozcas. Cada puntuación viene con su fórmula.",
       "explore": "Explorar el mapa en vivo",
       "contribute": "Contribuir una calle"
     },

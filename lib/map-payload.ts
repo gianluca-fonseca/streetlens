@@ -32,6 +32,12 @@ const SCORE_LAYERS: ScoreLayer[] = [
   "bike",
 ];
 
+function hasPublishedFieldAudit(props: SegmentProperties): boolean {
+  const src = props.source;
+  if (src === "import" || src === "community") return false;
+  return Boolean(props.audited_at) && props.score_overall > 0;
+}
+
 /** Strip privacy-sensitive fields from one CV observation. */
 export function scrubCvObservation(o: CvObservation): PublicCvObservation {
   const { session_id: _sid, frame_refs, ...rest } = o;
@@ -93,6 +99,25 @@ export function toPaintProperties(
     if (stub.drainage !== null && stub.drainage !== undefined) paint.cv_drainage = stub.drainage;
     if (stub.shade !== null && stub.shade !== undefined) paint.cv_shade = stub.shade;
     if (stub.bike !== null && stub.bike !== undefined) paint.cv_bike = stub.bike;
+
+    // Camera-observed segments paint on the sealed ramps; field audits win.
+    if (!hasPublishedFieldAudit(props)) {
+      if (stub.overall !== null && stub.overall !== undefined) {
+        paint.score_overall = stub.overall;
+      }
+      if (stub.accessibility !== null && stub.accessibility !== undefined) {
+        paint.score_accessibility = stub.accessibility;
+      }
+      if (stub.drainage !== null && stub.drainage !== undefined) {
+        paint.score_drainage = stub.drainage;
+      }
+      if (stub.shade !== null && stub.shade !== undefined) {
+        paint.score_shade = stub.shade;
+      }
+      if (stub.bike !== null && stub.bike !== undefined) {
+        paint.score_bike = stub.bike;
+      }
+    }
   }
 
   return paint;
