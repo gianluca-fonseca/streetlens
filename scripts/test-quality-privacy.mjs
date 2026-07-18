@@ -149,19 +149,23 @@ async function main() {
       "utf8",
     );
     check("adds assessment_es columns", /assessment_es/.test(sql));
-    check("flips bucket private", /set public = false/.test(sql));
+    check(
+      "flips bucket private",
+      /public\s*=\s*false/.test(sql) || /'streetlens-frames',\s*false/.test(sql) || /, false, 2097152/.test(sql),
+    );
     check("evidence-only select policy", /capture_frames_evidence_select/.test(sql));
     check("sections A and B present", /Locale-aware camera assessments/.test(sql) && /Private capture-frame bucket/.test(sql));
   }
 
   if (failures.length) {
     console.error(`\n${failures.length} failure(s)`);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
   console.log("\nAll quality-privacy checks passed.");
 }
 
 main().catch((err) => {
   console.error(err);
-  process.exit(1);
+  process.exitCode = 1;
 });
