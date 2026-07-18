@@ -16,7 +16,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Ban, RotateCcw, Trash2, TriangleAlert, X, Zap } from "lucide-react";
+import { Ban, Maximize2, RotateCcw, Trash2, TriangleAlert, X, Zap } from "lucide-react";
 import {
   RUBRIC_ITEM_KEYS,
   RUBRIC_ITEM_RESPONSE_TYPES,
@@ -51,6 +51,7 @@ export default function FrameInspector({
   onToggleExclude,
   onDelete,
   onResetFrame,
+  onExpandImage,
   onClose,
 }: Readonly<{
   frame: ReviewFrame;
@@ -60,6 +61,7 @@ export default function FrameInspector({
   onToggleExclude: () => void;
   onDelete: () => void;
   onResetFrame: () => void;
+  onExpandImage: () => void;
   onClose: () => void;
 }>) {
   const t = useTranslations("admin.capture");
@@ -141,14 +143,25 @@ export default function FrameInspector({
       ) : (
         <>
           {frame.url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={frame.url}
-              alt={t("frameAlt", { seq: frame.seq })}
-              loading="lazy"
-              decoding="async"
-              className="max-h-40 w-full rounded-[4px] border border-border object-cover"
-            />
+            <button
+              type="button"
+              onClick={onExpandImage}
+              aria-label={t("enlargeFrame", { seq: frame.seq })}
+              data-expand-seq={frame.seq}
+              className={`${styles.control} group relative block w-full overflow-hidden rounded-[4px] border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={frame.url}
+                alt={t("frameAlt", { seq: frame.seq })}
+                loading="lazy"
+                decoding="async"
+                className="max-h-40 w-full object-cover"
+              />
+              <span className="absolute bottom-1 right-1 inline-flex size-6 items-center justify-center rounded-[4px] border border-ink/20 bg-surface/85 text-ink opacity-80 shadow-sm backdrop-blur-sm transition-opacity group-hover:opacity-100">
+                <Maximize2 size={13} strokeWidth={2} aria-hidden="true" />
+              </span>
+            </button>
           ) : null}
 
           {obs.rationale ? (

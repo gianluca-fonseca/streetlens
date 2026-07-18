@@ -1,0 +1,59 @@
+u1 frame lightbox — browser drive (local fixture mode, no database)
+====================================================================
+
+Reproduce
+---------
+  node scripts/seed-u2-fixture.mjs --force
+  ADMIN_PASSWORD=streetlens-u1 NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= \
+    ADMIN_RPC_SECRET= npx next dev -p 3751          # fixture mode
+  # log in at /en/admin/login (password streetlens-u1), then open:
+  /en/admin/capture/9c2e6a71-4f38-4a1b-b7d0-2e5a1c9f3b84
+
+Seeded walk: 7 frames (seq 0-6) across two real demo segments (esc-sa-0001,
+esc-sa-0002), plus one unmatched frame (seq 5). All observed via Playwright.
+
+Steps verified (screenshot)
+---------------------------
+1. Workbench renders an explicit "Enlarge frame N" magnifier on EVERY thumbnail
+   (both segment filmstrips and the unmatched section). Click-to-inspect on the
+   thumbnail body is unchanged.                                 [u1-00]
+
+2. OPEN: the magnifier on frame 0 opens the full-size lightbox — dialog
+   role=dialog aria-modal, counter "1 of 7", caption "Frame 0 / esc-sa-0001",
+   the model rationale, prev/next controls.                     [u1-01]
+
+3. NAVIGATE: ArrowRight -> "Frame 1 / 2 of 7" with its own rationale. Keyboard
+   arrows drive the same nav as the on-screen chevrons.         [u1-02]
+
+4. WRAP: from Frame 0, ArrowLeft wraps to the last frame in seq order — asserted
+   programmatically: data-frame-seq="6", counter "7 of 7". Nothing skipped (all
+   7 frames, unmatched frame 5 included, are navigable).
+
+5. CLOSE + FOCUS RETURN: Esc closes the overlay and returns focus to the
+   "Enlarge frame 0" button that opened it — asserted: document.activeElement
+   aria-label === "Enlarge frame 0". (X button and backdrop tap also close.)
+
+6. INSPECTOR IMAGE: clicking the inspector's own image (the surface a map-dot
+   selection routes to) opens the lightbox on that frame — asserted: the image
+   is a button[data-expand-seq] whose click opens data-lightbox frame 2. The
+   inspector shows the enlarge affordance on hover.             [u1-03]
+
+7. TOMBSTONE: delete frame 2 via the inspector (Delete -> Delete it; POST
+   /api/admin/capture/frame 200, local tombstone), then enlarge it. The lightbox
+   shows the tombstone PLACEHOLDER, not a broken image — asserted: no <img>
+   inside the dialog, placeholder text "This frame was deleted for privacy...",
+   and a "Deleted" state badge in the caption.                  [u1-04]
+
+8. MOBILE: at 390x844 the overlay fills the viewport, the image fits to screen,
+   and the caption/nav/close stay reachable.                    [u1-05]
+
+9. ES LOCALE: /es/... renders every new string in Spanish — asserted:
+   aria-label "Cuadro 0, a tamaño completo", counter "1 de 7", controls
+   "Cerrar la vista a tamaño completo" / "Cuadro anterior" / "Cuadro siguiente".
+                                                                 [u1-06]
+
+Console
+-------
+The only console error observed is a pre-existing SSR/client hydration-attribute
+mismatch that is present on the plain /admin/login page BEFORE any lightbox code
+runs (fires at page-load, not on lightbox open). It is unrelated to this unit.
