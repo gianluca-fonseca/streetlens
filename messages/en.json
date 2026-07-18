@@ -54,6 +54,7 @@
     "title": "Legend",
     "scaleHint": "Higher is better (0–100)",
     "community": "Community (unverified)",
+    "cameraObserved": "Camera-observed",
     "widthNote": "Thicker lines mark lower-scoring segments.",
     "bins": {
       "poor": "Poor",
