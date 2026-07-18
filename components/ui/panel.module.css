@@ -17,6 +17,98 @@
  */
 
 /* ---------------------------------------------------------------- *
+ * Dark elevation scope (u34).
+ *
+ * The panel shipped painting every tier onto the same near-black: shell
+ * #141414, inner blocks #050505 sinking FURTHER toward pure black, and
+ * #262626 hairlines as the only thing separating them. On a phone that
+ * reads as one flat void with seams — no depth to group by, and the
+ * saturated pink and pure-white ink sitting on it at maximum edge
+ * contrast, which is the "too high contrast" half of the report.
+ *
+ * The fix is elevation, not more borders. This block re-values the
+ * EXISTING surface tokens for the panel subtree only, so every rule
+ * below and every `bg-surface-*` utility inside the panel keeps styling
+ * through the same names it already used — no parallel token system,
+ * and nothing outside the panel moves.
+ *
+ * The ladder, each step a visible +6/255 rather than a hairline:
+ *
+ *   page ground   #0a0a0a  (untouched, outside the panel)
+ *   panel ground  #141414
+ *   recessed      #1a1a1a  --surface-sunken   (archived cards, wells)
+ *   elevated      #212121  --surface-elevated (shell, canonical card)
+ *
+ * Note that --surface-sunken goes UP, not down: its job is "recessed
+ * relative to the card above it", and on black the way to say recessed
+ * is still to have substance, not to vanish. It stays below
+ * --surface-elevated, so the canonical-vs-archived argument the panel
+ * makes with those two tokens is unchanged — only now both are visible.
+ *
+ * Tailwind's `--color-*` aliases are re-declared alongside the base
+ * tokens deliberately. `--color-surface-sunken: var(--surface-sunken)`
+ * is declared at :root, so it computes to a VALUE there and inherits
+ * resolved; re-valuing only `--surface-sunken` deeper would move the
+ * CSS-module rules and leave every `bg-surface-sunken` utility behind.
+ *
+ * SURFACE_DARK in components/scoreColor.ts is pinned to #212121, the
+ * top of this ladder. Change a value here and change it there too.
+ * ---------------------------------------------------------------- */
+
+:global(html.dark) .panelScope {
+  --paper: #141414;
+  --paper-white: #212121;
+  --paper-sunken: #1a1a1a;
+
+  --surface-base: #141414;
+  --surface-elevated: #212121;
+  --surface-sunken: #1a1a1a;
+  --surface-raised: #2b2b2b;
+  --color-surface: #141414;
+  --color-surface-elevated: #212121;
+  --color-surface-sunken: #1a1a1a;
+  --color-background: #141414;
+
+  /* Hairlines lift with the surfaces or they disappear: #262626 on a
+     #212121 plate is a 1.05:1 line, i.e. nothing. */
+  --hairline: #383838;
+  --hairline-strong: #545454;
+  --border: #383838;
+  --border-strong: #545454;
+  --color-border: #383838;
+  --color-border-strong: #545454;
+  --neutral-soft: #383838;
+  --color-neutral-soft: #383838;
+
+  /* Secondary ink was #a3a3a3, fitted to the old near-black. On #212121
+     it lands 6.10:1; #b5b5b5 restores it to 7.85:1 — labels, dates, and
+     provenance lines are read at a glance, not deciphered. */
+  --ink-muted: #b5b5b5;
+  --neutral-strong: #b5b5b5;
+  --color-neutral-strong: #b5b5b5;
+
+  /* Softened accents: same pink identity, less sear. The global dark
+     accent is #ff4fa3 — full-saturation magenta against black, which is
+     the single harshest thing on the panel. Dropping saturation and
+     adding luminance keeps it unmistakably the map's CV pink while
+     letting it glow on the lifted surface instead of vibrating on it.
+     --accent-text measures 7.61:1 on #212121 (was 6.03:1 as #ff6fb0). */
+  --accent: #ff6fb0;
+  --accent-strong: #ff8ec4;
+  --accent-text: #ff8ec4;
+
+  /* Desktop glass over the map: near-opaque, and lifted to the shell's
+     own value so the popover composites to the same ladder the solid
+     mobile sheet uses. The old rgba(12,12,12,0.64) let dark basemap
+     through and dropped the effective surface below every ink here. */
+  --glass-bg: rgba(33, 33, 33, 0.90);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-chip-bg: rgba(42, 42, 42, 0.82);
+  --glass-chip-border: rgba(255, 255, 255, 0.16);
+  --glass-chip-solid: rgba(33, 33, 33, 0.94);
+}
+
+/* ---------------------------------------------------------------- *
  * Score ink — the map's hue, luminance-fitted to the panel surface.
  * See components/scoreColor.ts for why the raw ramp hex is not used.
  * ---------------------------------------------------------------- */
@@ -43,6 +135,16 @@
   border-radius: 999px;
   background: var(--border);
   overflow: hidden;
+}
+
+/* In dark the track has to be its own object, not an absence. On the old
+   near-black ground a #262626 track was invisible, so a low score read as a
+   stray 3px dash with nothing to measure it against — you could see the fill
+   but not the scale it was filling. Lifted to the strong hairline the empty
+   remainder is legible (2.0:1 on the elevated plate) while the fill still
+   clears it by ~4:1, so magnitude reads even at 8/100. */
+:global(html.dark) .meterTrack {
+  background: var(--border-strong);
 }
 
 .meterFill {
