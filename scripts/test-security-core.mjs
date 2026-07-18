@@ -2,7 +2,7 @@
 /**
  * test-security-core.mjs (bgsd-0011 unit-security-core)
  *
- * Locks the application-side security contracts from 0025:
+ * Locks the application-side security contracts from 0026:
  *   - SUBMISSIONS_IP_SALT fail-closed in production
  *
  * Exits 0 on PASS, 1 on any failure.

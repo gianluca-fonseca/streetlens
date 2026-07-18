@@ -143,12 +143,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0025", files.some((f) => f.startsWith("0025")), files.join(" "));
+    check("found the full migration chain through 0026", files.some((f) => f.startsWith("0026")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025") || file.startsWith("0026")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -251,7 +251,7 @@ function main() {
       storagePolicies,
     );
 
-    /* ---------------- 0014 + 0025: submissions ---------------- */
+    /* ---------------- 0014 + 0026: submissions ---------------- */
 
     const SECRET = "test-secret";
     const seedSecret = () => {
@@ -262,7 +262,7 @@ function main() {
     seedSecret();
 
     check(
-      "anon INSERT on submissions is blocked (0025)",
+      "anon INSERT on submissions is blocked (0026)",
       psqlExpectError(`insert into submissions (type, payload) values ('add_segment', '{}'::jsonb);`) !== null,
     );
 

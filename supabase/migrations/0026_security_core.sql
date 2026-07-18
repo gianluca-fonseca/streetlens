@@ -1,4 +1,4 @@
--- 0025_security_core.sql
+-- 0026_security_core.sql
 -- Close the PostgREST bypass on capture create/register/finalize and submissions
 -- INSERT; hash admin_rpc_secret at rest with constant-time compare; DB-side
 -- submission rate limits. Server-only callers pass ADMIN_RPC_SECRET from Next.js.
