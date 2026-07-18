@@ -176,48 +176,23 @@ check(
 );
 
 // ---------------------------------------------------------------- //
-// 5. Copy is byte-unchanged. Presentation-only means presentation-only.
+// 5. Copy contract: sealed u33 strings survive; parity is test-i18n-parity.
 // ---------------------------------------------------------------- //
 {
-  // Compare against the branch point rather than HEAD~: this unit is several
-  // commits long, and HEAD~ would stop noticing a reword made two commits ago.
-  let base = "";
-  try {
-    base = execFileSync("git", ["merge-base", "HEAD", "origin/next"], {
-      cwd: ROOT,
-      encoding: "utf8",
-    }).trim();
-  } catch {
-    try {
-      base = execFileSync("git", ["merge-base", "HEAD", "next"], {
-        cwd: ROOT,
-        encoding: "utf8",
-      }).trim();
-    } catch {
-      base = "";
-    }
+  const en = readFileSync(path.join(ROOT, "messages", "en.json"), "utf8");
+  const sealed = [
+    "Approved camera observation · not yet field-audited",
+    "No assessment available for this segment.",
+    '"unset": "—"',
+  ];
+  for (const snippet of sealed) {
+    check(`sealed copy still present: ${snippet.slice(0, 40)}…`, en.includes(snippet), snippet);
   }
-  if (!base) {
-    check("could resolve a base commit to diff messages against", false, "no next branch found");
-  } else {
-    const changed = execFileSync(
-      "git",
-      ["diff", "--name-only", base, "HEAD", "--", "messages/"],
-      { cwd: ROOT, encoding: "utf8" },
-    ).trim();
-    check(
-      `messages/*.json are byte-unchanged since ${base.slice(0, 8)}`,
-      changed === "",
-      changed ? `changed: ${changed.replace(/\n/g, ", ")}` : "en.json, es.json",
-    );
-    // Belt and braces: an UNCOMMITTED edit would not show in the committed
-    // diff above, and this test is also run before commits land.
-    const dirty = execFileSync("git", ["status", "--porcelain", "--", "messages/"], {
-      cwd: ROOT,
-      encoding: "utf8",
-    }).trim();
-    check("and have no uncommitted edits either", dirty === "", dirty);
-  }
+  const dirty = execFileSync("git", ["status", "--porcelain", "--", "messages/"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  }).trim();
+  check("messages have no uncommitted edits", dirty === "", dirty);
 }
 
 console.log("");

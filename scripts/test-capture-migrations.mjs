@@ -1187,6 +1187,81 @@ function main() {
 
     /* ---------------- Cascades ---------------- */
 
+    /* ---------------- 0025: pipeline truth (resume + reclaim) ---------------- */
+
+    const cpSid = psql(`select capture_create_session('live', 'iphash-cp');`).trim();
+    psql(`
+      insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
+      values ('${cpSid}'::uuid, 0, 'captures/${cpSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-a'),
+             ('${cpSid}'::uuid, 1, 'captures/${cpSid}/frame-0001.jpg', 1784000002000, 640, 480, 1000, 'seg-a');
+      insert into capture_frame_jobs (frame_id) select id from capture_frames where session_id='${cpSid}'::uuid;
+      update capture_sessions set status='cost_paused', pause_reason='session budget exhausted (10/10)' where id='${cpSid}'::uuid;
+      update capture_frame_jobs j set status='failed_overbudget', error='input_tokens=999'
+        from capture_frames f where f.id=j.frame_id and f.session_id='${cpSid}'::uuid and f.seq=0;
+      update capture_frame_jobs j set status='pending'
+        from capture_frames f where f.id=j.frame_id and f.session_id='${cpSid}'::uuid and f.seq=1;
+    `);
+    check(
+      "capture_resume_cost_paused is secret-gated",
+      (psqlExpectError(`select capture_resume_cost_paused('${cpSid}'::uuid, 'ops', 'budget raised', 'nope');`) || "").includes("unauthorized"),
+    );
+    check(
+      "resume refuses a session that is not cost_paused",
+      (() => {
+        const other = psql(`select capture_create_session('live', 'iphash-not-cp');`).trim();
+        return (psqlExpectError(`select capture_resume_cost_paused('${other}'::uuid, 'ops', 'try', 'test-secret');`) || "").includes("not cost_paused");
+      })(),
+    );
+    const resumeResult = psql(
+      `select capture_resume_cost_paused('${cpSid}'::uuid, 'ops@streetlens', 'budget raised for pilot', 'test-secret');`,
+    );
+    check("resume returns extracting", resumeResult.includes("extracting"));
+    check(
+      "resume flips session to extracting and records actor",
+      psql(`select status || '|' || resume_actor from capture_sessions where id='${cpSid}'::uuid;`).trim()
+        === "extracting|ops@streetlens",
+    );
+    check(
+      "resume requeues failed_overbudget to pending",
+      psql(`select status from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+             where f.session_id='${cpSid}'::uuid and f.seq=0;`).trim() === "pending",
+    );
+    check(
+      "capture_session_status surfaces pauseReason",
+      psql(`select (capture_session_status('${cpSid}'::uuid)::jsonb->>'pauseReason') is not null;`).trim() === "t",
+    );
+    check(
+      "capture_reclaim_stale_jobs is secret-gated",
+      (psqlExpectError(`select capture_reclaim_stale_jobs('nope');`) || "").includes("unauthorized"),
+    );
+    {
+      const staleSid = psql(`select capture_create_session('live', 'iphash-stale');`).trim();
+      psql(`
+        insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
+        values ('${staleSid}'::uuid, 0, 'captures/${staleSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-z');
+        insert into capture_frame_jobs (frame_id, status, claimed_at, attempts)
+          select id, 'running', now() - interval '15 minutes', 1 from capture_frames where session_id='${staleSid}'::uuid;
+        update capture_sessions set status='extracting' where id='${staleSid}'::uuid;
+      `);
+      const reclaimed = psql(`select capture_reclaim_stale_jobs('test-secret');`).trim();
+      check("stale running job is reclaimed to pending", reclaimed === "1");
+      check(
+        "reclaimed job is pending again",
+        psql(`select status from capture_frame_jobs j join capture_frames f on f.id=j.frame_id
+               where f.session_id='${staleSid}'::uuid;`).trim() === "pending",
+      );
+    }
+    check(
+      "capture_session_review frames carry jobStatus and jobError",
+      (() => {
+        psql(`update capture_sessions set status='cost_paused' where id='${cpSid}'::uuid;`);
+        const review = psql(`select capture_session_review('${cpSid}'::uuid, 'test-secret');`);
+        return review.includes("jobStatus") && review.includes("jobError");
+      })(),
+    );
+
+    psql(`delete from capture_sessions where id='${cpSid}';`);
+
     psql(`delete from capture_sessions where id='${sid}';`);
     check(
       "deleting a session cascades to frames, jobs, observations and rollups",
