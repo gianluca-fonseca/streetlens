@@ -121,6 +121,8 @@ export type SegmentAssessmentWrite = {
 export type SessionStatusPayload = {
   status: CaptureSessionStatus;
   frameCount: number;
+  /** Set when status is cost_paused (0025). */
+  pauseReason?: string | null;
   jobs: { pending: number; done: number; failed: number };
   rollups?: {
     segmentId: string;
@@ -172,7 +174,17 @@ export interface CaptureDb {
    * row.
    */
   setSegmentAssessment(args: SegmentAssessmentWrite): Promise<void>;
-  setSessionStatus(sessionId: string, status: CaptureSessionStatus): Promise<void>;
+  setSessionStatus(
+    sessionId: string,
+    status: CaptureSessionStatus,
+    pauseReason?: string,
+  ): Promise<void>;
+  /** Resume a cost_paused session: requeue failed_overbudget jobs (0025). */
+  resumeCostPaused(
+    sessionId: string,
+    actor: string,
+    reason: string,
+  ): Promise<{ requeued: number }>;
 }
 
 /**
@@ -387,12 +399,23 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
       });
     },
 
-    async setSessionStatus(sessionId, status) {
+    async setSessionStatus(sessionId, status, pauseReason) {
       await rpc<void>("capture_set_session_status", {
         p_session_id: sessionId,
         p_status: status,
         p_secret: adminSecret(),
+        p_pause_reason: pauseReason ?? null,
       });
+    },
+
+    async resumeCostPaused(sessionId, actor, reason) {
+      const result = await rpc<{ requeued: number }>("capture_resume_cost_paused", {
+        p_session_id: sessionId,
+        p_actor: actor,
+        p_reason: reason,
+        p_secret: adminSecret(),
+      });
+      return { requeued: result?.requeued ?? 0 };
     },
   };
 }

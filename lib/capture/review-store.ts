@@ -81,6 +81,12 @@ export type ReviewFrame = {
   position: FramePosition | null;
   /** The frozen per-frame reading, or null when none. See {@link FrameObservation}. */
   observation: FrameObservation | null;
+  /** Extraction job state from capture_frame_jobs (0025). */
+  jobStatus?: string | null;
+  /** Machine error when the job failed (0025). */
+  jobError?: string | null;
+  /** Claim attempts on this job (0025). */
+  jobAttempts?: number | null;
   /**
    * A tombstone: the frame's bytes were hard-deleted by a reviewer for privacy.
    * The seq stays so the record never lies about how many frames a walk had, but
@@ -136,6 +142,11 @@ export type SessionReview = {
    * were failed for budget. Distinct from `failed`, which means the frame was bad.
    */
   overbudget: boolean;
+  /** Why extraction paused (0025), when status is cost_paused. */
+  pauseReason: string | null;
+  resumeActor: string | null;
+  resumeReason: string | null;
+  resumedAt: string | null;
   source: "live" | "fixture";
 };
 
@@ -146,6 +157,10 @@ type ReviewPayload = {
   frameCount: number | null;
   capturedOn: string | null;
   reviewedAt: string | null;
+  pauseReason?: string | null;
+  resumeActor?: string | null;
+  resumeReason?: string | null;
+  resumedAt?: string | null;
   /** From the detail RPC (0024); absent on the anon review RPC and on fixtures. */
   contact?: string | null;
   jobs: { pending: number; done: number; failed: number; overbudget: number };
@@ -193,6 +208,9 @@ type ReviewPayload = {
     usable?: boolean;
     position?: FramePosition | null;
     observation?: FrameObservation | null;
+    jobStatus?: string | null;
+    jobError?: string | null;
+    jobAttempts?: number | null;
     deleted?: boolean;
   }[];
   /** GPS track polyline, from `capture_session_review_detail` or the fixture. */
@@ -279,6 +297,9 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
       usable: f.usable ?? true,
       position: f.position ?? null,
       observation: f.observation ?? null,
+      jobStatus: f.jobStatus ?? null,
+      jobError: f.jobError ?? null,
+      jobAttempts: num(f.jobAttempts),
       deleted: f.deleted ?? tombstoned.has(f.seq),
     };
     allFrames.push(frame);
@@ -352,6 +373,10 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     unattributedFrames: unattributed,
     overbudget:
       payload.status === "cost_paused" || (num(jobs.overbudget) ?? 0) > 0,
+    pauseReason: typeof payload.pauseReason === "string" ? payload.pauseReason : null,
+    resumeActor: typeof payload.resumeActor === "string" ? payload.resumeActor : null,
+    resumeReason: typeof payload.resumeReason === "string" ? payload.resumeReason : null,
+    resumedAt: payload.resumedAt ?? null,
     source,
   };
 }

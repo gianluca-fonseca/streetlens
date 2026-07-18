@@ -124,6 +124,11 @@ export default function FrameInspector({
             {t("notUsable")}
           </span>
         ) : null}
+        {frame.jobStatus && frame.jobStatus !== "done" ? (
+          <span className="inline-flex items-center gap-1 rounded-[4px] border border-clay/45 bg-clay/10 px-1.5 py-0.5 font-mono text-[10.5px] font-medium text-clay">
+            {frame.jobStatus}
+          </span>
+        ) : null}
         {obs?.escalated ? (
           <span className="inline-flex items-center gap-1 rounded-[4px] border border-border bg-surface-sunken px-1.5 py-0.5 font-medium text-neutral-strong">
             <Zap size={11} strokeWidth={2} aria-hidden="true" />
@@ -137,9 +142,16 @@ export default function FrameInspector({
           {t("frameDeletedNote")}
         </p>
       ) : !obs ? (
-        <p className="rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-3 py-4 text-center text-[12px] text-neutral-strong">
-          {t("noReading")}
-        </p>
+        <div className="flex flex-col gap-2">
+          {frame.jobError ? (
+            <p className="rounded-[4px] border border-clay/45 bg-clay/10 px-3 py-2 font-mono text-[11.5px] leading-relaxed text-clay">
+              {frame.jobError}
+            </p>
+          ) : null}
+          <p className="rounded-[4px] border border-dashed border-border-strong bg-surface-sunken px-3 py-4 text-center text-[12px] text-neutral-strong">
+            {t("noReading")}
+          </p>
+        </div>
       ) : (
         <>
           {frame.url ? (
@@ -167,6 +179,12 @@ export default function FrameInspector({
           {obs.rationale ? (
             <p className="rounded-[4px] border border-border bg-surface-sunken px-3 py-2 text-[12.5px] leading-relaxed text-ink">
               {obs.rationale}
+            </p>
+          ) : null}
+
+          {frame.jobError && frame.jobStatus !== "done" ? (
+            <p className="rounded-[4px] border border-clay/45 bg-clay/10 px-3 py-2 font-mono text-[11.5px] leading-relaxed text-clay">
+              {frame.jobError}
             </p>
           ) : null}
 

@@ -66,6 +66,7 @@ export async function GET(
         ? {
             status: review.status,
             frameCount: review.frameCount,
+            pauseReason: review.pauseReason,
             jobs: {
               pending: review.jobs.pending,
               done: review.jobs.done,
@@ -76,6 +77,7 @@ export async function GET(
         : {
             status: review.status,
             frameCount: review.frameCount,
+            pauseReason: review.pauseReason,
             jobs: {
               pending: review.jobs.pending,
               done: review.jobs.done,
