@@ -19,7 +19,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { getSessionReview } from "@/lib/capture/review-store";
 import { applyApprovedCaptureSession } from "@/lib/apply-submissions";
 import { finalizeCaptureReview } from "@/lib/capture/review-actions";
@@ -88,10 +88,8 @@ function toCorrections(input: z.infer<typeof correctionsSchema> | undefined): Re
 }
 
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  if (!(await verifySessionToken(token))) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
 
   let raw: unknown;
   try {

@@ -21,19 +21,24 @@
 
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { existsSync, rmSync, readFileSync } from "node:fs";
+import { rmSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  setupIsolatedDataDir,
+  cleanupIsolatedDataDir,
+  localDataPath,
+} from "./lib/test-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const require = createRequire(import.meta.url);
 const BUILD_DIR = path.join(ROOT, ".test-build-cv-apply");
 
-const LOCAL_FILES = [
-  path.join(ROOT, "data", "community-cv-observations.local.json"),
-  path.join(ROOT, "data", "community-segments.local.json"),
-  path.join(ROOT, "data", "community-reports.local.json"),
+const LOCAL_FILE_NAMES = [
+  "community-cv-observations.local.json",
+  "community-segments.local.json",
+  "community-reports.local.json",
 ];
 
 const failures = [];
@@ -42,8 +47,8 @@ function check(label, ok, detail = "") {
   if (!ok) failures.push(label);
 }
 
-function cleanup() {
-  for (const f of LOCAL_FILES) if (existsSync(f)) rmSync(f);
+function cleanup(localFiles) {
+  for (const f of localFiles) rmSync(f, { force: true });
   rmSync(BUILD_DIR, { recursive: true, force: true });
 }
 
@@ -65,15 +70,10 @@ function observation(segmentId, overrides = {}) {
 }
 
 async function main() {
-  // Refuse to clobber a real local store.
-  const existing = LOCAL_FILES.filter((f) => existsSync(f));
-  if (existing.length > 0) {
-    console.error("Refusing to clobber real local data:");
-    for (const f of existing) console.error(`  ${path.relative(ROOT, f)}`);
-    process.exit(1);
-  }
+  const isolatedDir = setupIsolatedDataDir();
+  const LOCAL_FILES = LOCAL_FILE_NAMES.map((name) => localDataPath(name));
 
-  // Force local mode: no Supabase, no secret.
+  try {
   delete process.env.NEXT_PUBLIC_SUPABASE_URL;
   delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   delete process.env.ADMIN_RPC_SECRET;
@@ -317,6 +317,10 @@ async function main() {
     check("the CV counts go back to zero", stats.cvSessionsReviewed === 0 && stats.cvSegments === 0);
     check("and the audited dataset is exactly where it started", stats.segments === 535 && stats.km === statsBefore.km);
   }
+  } finally {
+    cleanup(LOCAL_FILES);
+    cleanupIsolatedDataDir(isolatedDir);
+  }
 }
 
 main()
@@ -325,7 +329,6 @@ main()
     failures.push(String(err));
   })
   .finally(() => {
-    cleanup();
     console.log(
       failures.length === 0
         ? "\nPASS — CV apply attaches, upserts, retracts, and never touches an audit"

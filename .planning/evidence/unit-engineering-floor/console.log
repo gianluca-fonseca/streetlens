@@ -1,0 +1,7 @@
+Total messages: 6 (Errors: 0, Warnings: 4)
+Returning 4 messages for level "warning"
+
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3576/4b108aaa-bd38-4ee7-8e70-bbb0076d06a1:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3576/4b108aaa-bd38-4ee7-8e70-bbb0076d06a1:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3576/4b108aaa-bd38-4ee7-8e70-bbb0076d06a1:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3576/4b108aaa-bd38-4ee7-8e70-bbb0076d06a1:8091

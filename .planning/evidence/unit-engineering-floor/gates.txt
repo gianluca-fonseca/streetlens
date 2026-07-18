@@ -1,0 +1,5 @@
+npx tsc --noEmit: PASS (exit 0)
+npm run lint: PASS (exit 0)
+npm run build: PASS (exit 0)
+npm test: PASS (34/34 suites)
+node scripts/test-i18n-parity.mjs: PASS (included in npm test)

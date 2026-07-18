@@ -15,18 +15,18 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { getDataDir } from "@/lib/data-dir";
 import { getSupabaseClient } from "@/lib/supabase";
 import type { CaptureSessionStatus } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const QUEUE_PATH = path.join(DATA_DIR, "pending-submissions.local.json");
-const SUBMISSION_REVIEWS_PATH = path.join(DATA_DIR, "submission-reviews.local.json");
+const QUEUE_PATH = path.join(getDataDir(), "pending-submissions.local.json");
+const SUBMISSION_REVIEWS_PATH = path.join(getDataDir(), "submission-reviews.local.json");
 export const CAPTURE_REVIEW_OVERLAY_PATH = path.join(
-  DATA_DIR,
+  getDataDir(),
   "capture-review-overlay.local.json",
 );
 export const CAPTURE_TOMBSTONES_PATH = path.join(
-  DATA_DIR,
+  getDataDir(),
   "capture-frame-tombstones.local.json",
 );
 

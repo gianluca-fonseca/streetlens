@@ -21,23 +21,17 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { segmentAssessmentSchema, type SegmentAssessment } from "@/lib/assessment";
+import { getDataDir } from "@/lib/data-dir";
 import { getSupabaseClient } from "@/lib/supabase";
 import { publicFrameUrl } from "./storage";
 import { readCaptureReviewOverlay, readCaptureTombstones } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
-import type {
-  FrameObservation,
-  SegmentAssessment,
-  SegmentAssessments,
-} from "./review-overrides";
+import type { FrameObservation, SegmentAssessments } from "./review-overrides";
 
 export type { FrameObservation, SegmentAssessment, SegmentAssessments };
 
-const FIXTURE_PATH = path.join(
-  process.cwd(),
-  "data",
-  "capture-review.local.json",
-);
+const FIXTURE_PATH = path.join(getDataDir(), "capture-review.local.json");
 
 /** One rubric item's median, as the rollup stored it. */
 export type ReviewItemMedian = {
@@ -262,57 +256,6 @@ function frameUrl(storagePath: string): string | null {
   }
 }
 
-/**
- * Coerce a raw rollup `assessment` into a well-formed {@link SegmentAssessment}, or
- * null. The engine owns the content; this guards only the shape, so a partial or
- * malformed synthesis degrades to "no assessment" rather than crashing the page or
- * feeding the recompute a bad delta. A string field that is missing becomes "".
- */
-function normalizeAssessment(raw: unknown): SegmentAssessment | null {
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
-  const a = raw as Record<string, unknown>;
-  if (typeof a.overall !== "string") return null;
-
-  const str = (v: unknown): string => (typeof v === "string" ? v : "");
-  const lensesRaw = (a.lenses ?? {}) as Record<string, unknown>;
-  const lenses = {
-    accessibility: str(lensesRaw.accessibility),
-    drainage: str(lensesRaw.drainage),
-    shade: str(lensesRaw.shade),
-    bike: str(lensesRaw.bike),
-  };
-
-  // Only numeric-delta adjustments on a real lens key survive; the recompute must
-  // never see a delta it cannot add.
-  const adjustments: SegmentAssessment["adjustments"] = {};
-  const adjRaw = (a.adjustments ?? {}) as Record<string, unknown>;
-  for (const [lens, v] of Object.entries(adjRaw)) {
-    if (!(SCORE_LAYER_KEYS as readonly string[]).includes(lens)) continue;
-    if (!v || typeof v !== "object") continue;
-    const delta = (v as { delta?: unknown }).delta;
-    const reason = (v as { reason?: unknown }).reason;
-    if (typeof delta !== "number" || !Number.isFinite(delta)) continue;
-    adjustments[lens as keyof SegmentAssessment["adjustments"]] = {
-      delta,
-      reason: str(reason),
-    };
-  }
-
-  const adjScoresRaw = (a.adjustedScores ?? {}) as Record<string, unknown>;
-  const adjustedScores = {
-    overall: num(adjScoresRaw.overall),
-    accessibility: num(adjScoresRaw.accessibility),
-    drainage: num(adjScoresRaw.drainage),
-    shade: num(adjScoresRaw.shade),
-    bike: num(adjScoresRaw.bike),
-  };
-
-  return { overall: a.overall, lenses, adjustments, adjustedScores, model: str(a.model) };
-}
-
-/** The five lens keys, duplicated locally so this module needn't import the scorer. */
-const SCORE_LAYER_KEYS = ["overall", "accessibility", "drainage", "shade", "bike"] as const;
-
 /** Numbers arrive from postgres numerics as strings; coerce without inventing. */
 function num(value: unknown): number | null {
   if (value === null || value === undefined || value === "") return null;
@@ -371,7 +314,8 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
   // parse-feature-props guards the public popover.
   const assessments: SegmentAssessments = {};
   for (const r of payload.rollups ?? []) {
-    const a = normalizeAssessment(r.assessment);
+    const parsed = segmentAssessmentSchema.safeParse(r.assessment);
+    const a = parsed.success ? parsed.data : null;
     if (a) assessments[r.segmentId] = a;
   }
 

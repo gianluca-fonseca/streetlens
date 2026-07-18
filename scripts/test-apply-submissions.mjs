@@ -20,19 +20,23 @@ import { promises as fs } from "node:fs";
 import { rmSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  setupIsolatedDataDir,
+  cleanupIsolatedDataDir,
+  localDataPath,
+} from "./lib/test-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".test-build-apply");
-const DATA = path.join(ROOT, "data");
 const require = createRequire(import.meta.url);
 
-const LOCAL_FILES = [
-  path.join(DATA, "pending-submissions.local.json"),
-  path.join(DATA, "submission-reviews.local.json"),
-  path.join(DATA, "approved-submissions.local.json"),
-  path.join(DATA, "community-segments.local.json"),
-  path.join(DATA, "community-reports.local.json"),
+const LOCAL_FILE_NAMES = [
+  "pending-submissions.local.json",
+  "submission-reviews.local.json",
+  "approved-submissions.local.json",
+  "community-segments.local.json",
+  "community-reports.local.json",
 ];
 
 const failures = [];
@@ -41,8 +45,8 @@ function check(label, ok, detail = "") {
   if (!ok) failures.push(label);
 }
 
-async function cleanup() {
-  for (const f of LOCAL_FILES) {
+async function cleanup(localFiles) {
+  for (const f of localFiles) {
     try {
       await fs.rm(f, { force: true });
     } catch {
@@ -53,13 +57,10 @@ async function cleanup() {
 }
 
 async function main() {
-  // Refuse to clobber a real local queue if one somehow exists.
-  for (const f of LOCAL_FILES) {
-    if (existsSync(f)) {
-      throw new Error(`refusing to run: ${path.basename(f)} already exists`);
-    }
-  }
+  const isolatedDir = setupIsolatedDataDir();
+  const LOCAL_FILES = LOCAL_FILE_NAMES.map((name) => localDataPath(name));
 
+  try {
   delete process.env.NEXT_PUBLIC_SUPABASE_URL;
   delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   delete process.env.ADMIN_RPC_SECRET;
@@ -138,7 +139,7 @@ async function main() {
     },
   ];
   await fs.writeFile(
-    path.join(DATA, "pending-submissions.local.json"),
+    LOCAL_FILES[0],
     JSON.stringify(queue, null, 2),
     "utf8",
   );
@@ -203,11 +204,14 @@ async function main() {
   } else {
     console.log("\nAPPLY-TEST PASS");
   }
+  } finally {
+    await cleanup(LOCAL_FILES);
+    cleanupIsolatedDataDir(isolatedDir);
+  }
 }
 
 main()
   .catch((err) => {
     console.error("[test-apply] crashed:", err);
     process.exitCode = 1;
-  })
-  .finally(cleanup);
+  });
