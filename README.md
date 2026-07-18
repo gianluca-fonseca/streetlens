@@ -81,7 +81,7 @@ The ramps, bins, and width channel live in `components/mapConfig.ts` and are tre
 
 ## The CV data-collection funnel
 
-Alongside the manual audit flow, a contributor can film a street (live on the phone or by uploading a video) and have a vision model score the frames against the same rubric v0.1 a human auditor uses. Frames are placed on the street network by map matching, scored one call per frame, and rolled up into per-segment lens scores. The result is a **proposal, not data**: it enters the same review queue a manual contribution does, and nothing reaches the published map without a human approving it. See [`docs/cv-funnel.md`](docs/cv-funnel.md) for the full architecture, cost model, edge-case catalog, and ops runbook.
+Alongside the manual audit flow, a contributor can film a street (live on the phone or by uploading a video) and have a vision model score the frames against the same rubric v0.1 a human auditor uses. Frames are placed on the street network by map matching, scored one call per frame, and rolled up into per-segment lens scores. The result is a **proposal, not data**: it enters the same review queue a manual contribution does, and nothing reaches the published map without a human approving it. To understand what every number means (the per-item confidence percentages, and the baseline versus adjusted scores a reviewer sees), read [How the model works, end to end](docs/cv-funnel.md#how-the-model-works-end-to-end). The full architecture, cost model, edge-case catalog, and ops runbook are in [`docs/cv-funnel.md`](docs/cv-funnel.md).
 
 ## Method
 
@@ -113,7 +113,7 @@ flowchart TB
   I["next-intl · EN / ES"]
   ADP["Data adapter<br/>lib/segments.ts (frozen contract)"]
   DEMO[("Demo GeoJSON<br/>data/*.geojson · real OSM geometry")]
-  SB[("Supabase · Postgres + PostGIS<br/>planned, schema'd, env-gated off")]
+  SB[("Supabase · Postgres + PostGIS<br/>schema'd 0001..0023 · backs the CV capture funnel")]
   MAP["MapLibre GL<br/>OpenFreeMap Liberty tiles<br/>AWS Terrarium DEM hillshade"]
   CFG["mapConfig.ts<br/>sealed ramps · bins · width channel"]
   RENDER["render-map-images.mjs<br/>static SVG map plates"]
@@ -140,12 +140,88 @@ The single read surface is a frozen data adapter (`lib/segments.ts`): it tries S
 | i18n | next-intl, English and Spanish (es-CR) at parity |
 | Map | MapLibre GL · OpenFreeMap Liberty vector tiles · AWS Terrarium DEM |
 | Styling | Tailwind CSS v4 · Space Grotesk, Newsreader, IBM Plex Mono |
-| Data | Frozen adapter: static demo GeoJSON today, Supabase (Postgres + PostGIS) planned |
+| Data | Frozen adapter: static demo GeoJSON serves map scores today; Supabase (Postgres + PostGIS) schema'd across 0001..0023 and backing the CV capture funnel |
 | Geometry | Turf, `geojson-path-finder` (street-following trace) |
 | Validation | Zod |
 | Hosting | Vercel |
 
 More depth: [`docs/architecture.md`](docs/architecture.md).
+
+---
+
+## Tech stack
+
+Every choice below is pinned in `package.json` and verified against the code, with one line on why it is here.
+
+**Framework and language**
+
+| Piece | Version | Why |
+|---|---|---|
+| Next.js (App Router) | `16.2.10` | Server Components render the map's data on the server and ship a small client; the App Router gives per-locale routes (`/[locale]/...`). |
+| React | `19.2.4` | The UI runtime the App Router builds on. |
+| TypeScript | `^5` | The whole codebase is typed, and the data contracts (`lib/segments.ts`, `lib/capture/types.ts`) are enforced at the type level. |
+| Zod | `^4.4.3` | Runtime validation at every trust boundary: submissions, capture schemas, and a second check on the vision model's JSON (`lib/capture/schemas.ts`). |
+| Tailwind CSS | `v4` | Utility styling for the zen instrument look; type scale set in Space Grotesk, Newsreader, and IBM Plex Mono. |
+
+**Map**
+
+| Piece | Source | Why |
+|---|---|---|
+| MapLibre GL | `^5.24.0` | The vector map engine; renders the sealed score ramps and the redundant line-width channel. |
+| OpenFreeMap Liberty | vector tiles | The basemap, recolored by a post-load transform to a near-neutral grayscale so the score ramp is the loudest color on screen (`components/mapConfig.ts`, `BASEMAP`). |
+| AWS Terrarium DEM | `elevation-tiles-prod` | Hillshade relief under the muted basemap for hilly Escazú, tuned so it never fights the ramps (`mapConfig.ts`, `TERRAIN` / `HILLSHADE_PAINT`). |
+| Sealed ramps, bins, width channel | `components/mapConfig.ts` | One source of truth for the visual encoding, mirrored into the static-plate render script. |
+
+**i18n**
+
+| Piece | Version | Why |
+|---|---|---|
+| next-intl | `^4.13.2` | English and Spanish (es-CR conventions) at full parity; `messages/en.json` and `messages/es.json` carry the same 846 keys. |
+
+**Data and backend**
+
+| Piece | Version | Why |
+|---|---|---|
+| Supabase Postgres + PostGIS | `@supabase/supabase-js ^2.109.0` | The planned live database and the live backend for the CV capture funnel; PostGIS handles segment geometry and geography. |
+| RLS-deny tables + SECURITY DEFINER RPCs | `supabase/migrations/` | There is no service-role key: every capture table is RLS-on with zero policies, and secret-gated `SECURITY DEFINER` RPCs are the only way in (`0007`, `0013`). |
+| Supabase Storage | `streetlens-frames` bucket | Capture frames upload directly to storage, armed by frame registration; public-read behind an unguessable session uuid (`0013`, `0016`). |
+| Migrations chain | `0001..0023` | Applied in order; `scripts/test-capture-migrations.mjs` runs the whole chain against a throwaway PostGIS container and exercises every RPC. |
+
+**CV pipeline**
+
+| Piece | Choice | Why |
+|---|---|---|
+| Vision model | OpenAI `gpt-5-nano` | The workhorse: one structured call per frame scores all 15 rubric items (`lib/extraction/`, over the Responses API on raw `fetch`, no SDK). |
+| Escalation model | OpenAI `gpt-5.4-mini` | Asked again only on low-confidence frames (below 0.35), capped per session; the escalated answer wins (`lib/extraction/config.ts`). |
+| Structured outputs | `json_schema, strict: true` | The schema is generated from the rubric so it cannot drift, and a single call returns every item (`lib/extraction/schema.ts`). |
+| Image downscale | `sharp ^0.35.3` | Re-encodes each frame to a 512 px longest edge before it is sent, so the model cannot bill for pixels it was never handed (`lib/extraction/downscale.ts`). |
+| Prompt caching | byte-identical prefix | The system prompt and schema are the cacheable prefix, so after the first frame most of the request bills at the reduced cached rate. |
+| Cross-frame synthesis | `lib/extraction/synthesis.ts` | A second text-only call per segment reasons across frames and applies bounded, reasoned score adjustments the median cannot see. |
+| Cost breaker / budgets / kill switch | `lib/extraction/config.ts` | A derived per-frame input-token ceiling, a per-session budget, and a fail-closed `CV_EXTRACTION_ENABLED` switch stand between a pilot and a surprise invoice. |
+
+**Capture**
+
+| Piece | Choice | Why |
+|---|---|---|
+| Live recording | `getUserMedia` + `requestVideoFrameCallback` | Films while walking and samples about one frame per second, gated by GPS movement and filtered for blur and duplicates (`components/capture/engine/`). |
+| Durability | OPFS write-through + Wake Lock | Every kept frame is written to the Origin Private File System the instant it exists, and the screen lock is re-acquired on visibility change, so an iOS tab kill loses at most the frame in flight. |
+| Video upload | `WebCodecs` + `mp4box ^2.4.1` | Decodes an uploaded POV video locally with a streaming demux (4 MB chunks), with a `<video>` seek-decoder fallback when WebCodecs fails. |
+| Route input | GPX parsing | Phone videos carry no GPS track, so the contributor imports a GPX file or traces the route (`lib/capture/gpx.ts`). |
+
+**Matching**
+
+| Piece | Choice | Why |
+|---|---|---|
+| Map matching | Newson-Krumm HMM | A Hidden Markov Model pins each frame to an exact street segment and makes a jump to a parallel street expensive (`lib/matching/hmm.ts`). |
+| Spatial index | `rbush ^4.0.1` | Fast nearest-segment lookups over the canton-wide street graph (`lib/matching/graph.ts`). |
+
+**Testing and hosting**
+
+| Piece | Choice | Why |
+|---|---|---|
+| Unit and contract tests | `node scripts/test-*.mjs` | Plain-node suites lock the matcher, rollup, extraction worker, migrations, and reviewer-override math; none need a live database. |
+| Browser drives | Playwright | Drives the running app for end-to-end verification. |
+| Hosting | Vercel | Serverless deploy; the extraction pump is pull-based because there is no long-lived worker, and a daily cron backstops it. |
 
 ---
 
@@ -173,7 +249,7 @@ Three drawing sheets, drawn in the project's zen instrument style, with real dim
 - **Scores publish with their formula.** Each lens is scored from a rubric of observed items, higher is better, and the legend always shows the value bins.
 - **Community contributions stay unverified until audited.** Resident-added segments carry no score and render in a neutral casing until a field audit confirms them.
 - **The map covers the whole canton; the pilot corridor is the audited part.** The street network spans all three Escazú districts (San Antonio, Escazú centro, San Rafael), so a capture walk anywhere in the canton matches to real segments. Only the San Antonio pilot carries audit scores today; the rest of the canton renders in the same neutral casing as community adds until fieldwork reaches it.
-- **Machine learning is on the roadmap, not in today's numbers.** There is no model scoring streets, and there is no "AI-powered" claim. When a model is built, a human still verifies every reading.
+- **Model scores are proposals, never today's published numbers.** A vision model can pre-score filmed streets through the [CV data-collection funnel](docs/cv-funnel.md), but its output is a proposal only: it enters the same review queue as a manual contribution, and a person verifies every reading before it reaches the map. No number on the published map comes from a model.
 - **Open by default.** Open code, open rubric, open method, GeoJSON and CSV exports, and sidewalk geometry contributed back to OpenStreetMap.
 
 Full method and rubric detail: [`docs/method.md`](docs/method.md).

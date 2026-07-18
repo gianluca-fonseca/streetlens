@@ -21,7 +21,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Camera, Check, FlaskConical, Pencil, RotateCcw, Sparkles, TriangleAlert, X } from "lucide-react";
+import { Camera, Check, FlaskConical, Maximize2, Pencil, RotateCcw, Sparkles, TriangleAlert, X } from "lucide-react";
 import type { ReviewFrame, SessionReview, SegmentAssessment } from "@/lib/capture/review-store";
 import {
   recomputeReview,
@@ -31,6 +31,7 @@ import {
 import { LENS_KEYS, type LensKey } from "@/lib/capture/scoring";
 import type { RubricItemKey } from "@/lib/capture/types";
 import FrameInspector from "./FrameInspector";
+import FrameLightbox from "./FrameLightbox";
 import ReviewMap, { type MatchedGeometry } from "./ReviewMap";
 import styles from "@/components/ui/zen.module.css";
 
@@ -57,6 +58,7 @@ export default function CaptureReview({
 
   const [corrections, setCorrections] = useState<ReviewCorrections>(freshCorrections);
   const [selectedSeq, setSelectedSeq] = useState<number | null>(null);
+  const [lightboxSeq, setLightboxSeq] = useState<number | null>(null);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -557,7 +559,9 @@ export default function CaptureReview({
                                 overridden={Boolean(corrections.itemOverrides[f.seq])}
                                 selected={selectedSeq === f.seq}
                                 onSelect={() => setSelectedSeq((s) => (s === f.seq ? null : f.seq))}
+                                onExpand={() => setLightboxSeq(f.seq)}
                                 alt={t("frameAlt", { seq: f.seq })}
+                                expandLabel={t("enlargeFrame", { seq: f.seq })}
                               />
                             </li>
                           ))}
@@ -585,7 +589,9 @@ export default function CaptureReview({
                       overridden={false}
                       selected={selectedSeq === f.seq}
                       onSelect={() => setSelectedSeq((s) => (s === f.seq ? null : f.seq))}
+                      onExpand={() => setLightboxSeq(f.seq)}
                       alt={t("frameAlt", { seq: f.seq })}
+                      expandLabel={t("enlargeFrame", { seq: f.seq })}
                     />
                   </li>
                 ))}
@@ -607,6 +613,7 @@ export default function CaptureReview({
               onToggleExclude={() => toggleExclude(selectedFrame.seq)}
               onDelete={() => deleteFrame(selectedFrame.seq)}
               onResetFrame={() => resetFrame(selectedFrame.seq)}
+              onExpandImage={() => setLightboxSeq(selectedFrame.seq)}
               onClose={() => setSelectedSeq(null)}
             />
           ) : (
@@ -663,6 +670,17 @@ export default function CaptureReview({
             </button>
           </div>
         </section>
+      ) : null}
+
+      {lightboxSeq !== null ? (
+        <FrameLightbox
+          frames={review.frames}
+          seq={lightboxSeq}
+          excluded={excludedSet}
+          deleted={deletedSet}
+          onSeqChange={setLightboxSeq}
+          onClose={() => setLightboxSeq(null)}
+        />
       ) : null}
     </div>
   );
@@ -820,7 +838,13 @@ function SegmentAssessmentPanel({
   );
 }
 
-/** One clickable frame thumbnail: struck when excluded, tombstoned when deleted. */
+/**
+ * One clickable frame thumbnail: struck when excluded, tombstoned when deleted.
+ *
+ * The thumbnail body still opens the inspector (unchanged); the corner magnifier
+ * is the explicit one-tap escape hatch to the full-size lightbox. They are
+ * siblings, not nested, so the markup stays a valid pair of buttons.
+ */
 function FrameThumb({
   frame,
   excluded,
@@ -828,7 +852,9 @@ function FrameThumb({
   overridden,
   selected,
   onSelect,
+  onExpand,
   alt,
+  expandLabel,
 }: Readonly<{
   frame: ReviewFrame;
   excluded: boolean;
@@ -836,46 +862,59 @@ function FrameThumb({
   overridden: boolean;
   selected: boolean;
   onSelect: () => void;
+  onExpand: () => void;
   alt: string;
+  expandLabel: string;
 }>) {
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-pressed={selected}
-      data-frame-seq={frame.seq}
-      className={`relative block size-[72px] w-[96px] overflow-hidden rounded-[4px] border ${
-        selected ? "border-ink ring-2 ring-ink" : "border-border"
-      }`}
-    >
-      {deleted ? (
-        <span className="flex h-full w-full items-center justify-center bg-surface-sunken font-mono text-[10px] text-clay line-through">
-          {frame.seq}
-        </span>
-      ) : frame.url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={frame.url}
-          alt={alt}
-          loading="lazy"
-          decoding="async"
-          width={96}
-          height={72}
-          className={`h-[72px] w-[96px] object-cover ${excluded ? "opacity-40 grayscale" : ""}`}
-        />
-      ) : (
-        <span className={`flex h-full w-full items-center justify-center bg-surface-sunken font-mono text-[10px] text-neutral-strong ${excluded ? "line-through" : ""}`}>
-          {frame.seq}
-        </span>
-      )}
-      {excluded && !deleted ? (
-        <span className="absolute inset-x-0 bottom-0 bg-ink/70 py-0.5 text-center text-[8.5px] font-medium uppercase tracking-wide text-surface">
-          excl
-        </span>
-      ) : null}
-      {overridden && !excluded && !deleted ? (
-        <span className="absolute right-0.5 top-0.5 size-2 rounded-full bg-pine ring-1 ring-surface" aria-hidden="true" />
-      ) : null}
-    </button>
+    <div className="group relative size-[72px] w-[96px]">
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={selected}
+        data-frame-seq={frame.seq}
+        className={`relative block size-full overflow-hidden rounded-[4px] border ${
+          selected ? "border-ink ring-2 ring-ink" : "border-border"
+        }`}
+      >
+        {deleted ? (
+          <span className="flex h-full w-full items-center justify-center bg-surface-sunken font-mono text-[10px] text-clay line-through">
+            {frame.seq}
+          </span>
+        ) : frame.url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={frame.url}
+            alt={alt}
+            loading="lazy"
+            decoding="async"
+            width={96}
+            height={72}
+            className={`h-[72px] w-[96px] object-cover ${excluded ? "opacity-40 grayscale" : ""}`}
+          />
+        ) : (
+          <span className={`flex h-full w-full items-center justify-center bg-surface-sunken font-mono text-[10px] text-neutral-strong ${excluded ? "line-through" : ""}`}>
+            {frame.seq}
+          </span>
+        )}
+        {excluded && !deleted ? (
+          <span className="absolute inset-x-0 bottom-0 bg-ink/70 py-0.5 text-center text-[8.5px] font-medium uppercase tracking-wide text-surface">
+            excl
+          </span>
+        ) : null}
+        {overridden && !excluded && !deleted ? (
+          <span className="absolute right-0.5 top-0.5 size-2 rounded-full bg-pine ring-1 ring-surface" aria-hidden="true" />
+        ) : null}
+      </button>
+      <button
+        type="button"
+        onClick={onExpand}
+        aria-label={expandLabel}
+        data-expand-seq={frame.seq}
+        className="absolute bottom-0.5 left-0.5 inline-flex size-5 items-center justify-center rounded-[3px] border border-ink/20 bg-surface/85 text-ink opacity-80 shadow-sm backdrop-blur-sm transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ink group-hover:opacity-100"
+      >
+        <Maximize2 size={11} strokeWidth={2} aria-hidden="true" />
+      </button>
+    </div>
   );
 }
