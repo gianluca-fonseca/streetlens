@@ -33,8 +33,9 @@ import { PUMP_BATCH_SIZE } from "@/lib/extraction/config";
 export const runtime = "nodejs";
 
 // Model calls are slow and this claims a batch of them. Vercel's default (10s)
-// would kill a full batch mid-flight, leaving jobs stuck `running` until their
-// attempts run out.
+// would kill a full batch mid-flight, leaving jobs stuck `running`. The claim
+// RPCs reclaim stale `running` rows (>10 min) before each claim (0025), so a
+// timeout does not strand a session forever.
 export const maxDuration = 300;
 
 const pumpRequestSchema = z.object({
