@@ -24,6 +24,8 @@ import {
   lineWidthExpression,
 } from "@/components/mapConfig";
 import { parseFeatureProps } from "@/lib/parse-feature-props";
+import { useTheme } from "@/components/ThemeProvider";
+import { readStoredPreference, resolveTheme } from "@/lib/theme";
 import MapPanel from "@/components/MapPanel";
 import ThreeDToggle from "@/components/ThreeDToggle";
 import SegmentDetail from "@/components/SegmentDetail";
@@ -46,11 +48,25 @@ const COMMUNITY_LAYER_ID = "segments-community";
 /** Layers that respond to hover / click (score ramp + neutral community casing). */
 const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID];
 
-function prefersDark(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
+/**
+ * The app's RESOLVED theme right now, read straight from the theme store's own
+ * resolver — never from a raw `prefers-color-scheme` query.
+ *
+ * That raw query was the bug (#27): the map asked the OS directly, so toggling
+ * the in-app switcher to light on a dark Mac left the whole instrument painted
+ * dark. `resolveTheme(readStoredPreference())` is the same computation
+ * lib/theme.ts's pre-paint init script and ThemeProvider both perform, so the
+ * map agrees with the `.light`/`.dark` class already on <html> — including the
+ * "system" case, which still follows the OS, just through the store rather than
+ * around it.
+ *
+ * Used only where React's render value is not reachable or not yet settled (the
+ * once-created map effect and the fallback-style handler). Everywhere else the
+ * component uses the reactive `resolved` from useTheme(), which re-renders on a
+ * switcher toggle AND on a live OS flip while the preference is "system".
+ */
+function resolvedDark(): boolean {
+  return resolveTheme(readStoredPreference()) === "dark";
 }
 
 function prefersReducedMotion(): boolean {
@@ -428,6 +444,12 @@ export default function AuditMap({
   openContributeOnMount?: boolean;
 }>) {
   const t = useTranslations("map");
+  // The instrument follows the APP theme (#27), not the OS. `resolved` collapses
+  // the light/dark/system preference to the concrete theme currently rendering,
+  // and re-renders this component the moment the switcher flips — or, while the
+  // preference is "system", when the OS itself flips.
+  const { resolved } = useTheme();
+  const dark = resolved === "dark";
   const isHero = variant === "hero";
   const heroInteractive = isHero && interactive;
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -532,7 +554,11 @@ export default function AuditMap({
     const onLoad = () => {
       styleLoaded = true;
       map.resize();
-      const dark = prefersDark();
+      // Read the store directly rather than the render closure: this effect runs
+      // once, and on the very first pass the theme store may not have published
+      // its snapshot yet. resolvedDark() is authoritative at call time, so the
+      // map's first paint is already the right theme (no dark flash then correct).
+      const dark = resolvedDark();
       muteBasemap(map, dark);
       addDataLayers(map, segmentsRef.current);
       // DEM + hillshade load lazily when 3D is toggled on (applyThreeD).
@@ -644,7 +670,7 @@ export default function AuditMap({
     // Re-apply muting after a fallback style loads.
     map.on("styledata", () => {
       if (fallbackApplied && map.isStyleLoaded()) {
-        muteBasemap(map, prefersDark());
+        muteBasemap(map, resolvedDark());
       }
     });
 
@@ -655,27 +681,28 @@ export default function AuditMap({
     };
   }, []);
 
-  // React to prefers-color-scheme changes (basemap + data glow).
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => {
-      const map = mapRef.current;
-      if (!map || !readyRef.current) return;
-      const dark = mq.matches;
-      muteBasemap(map, dark);
-      applyLayer(map, activeLayerRef.current, dark);
-      applyThreeDTheme(map, dark);
-    };
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  // Repaint when the active score layer changes.
+  // Re-theme the instrument whenever the APP theme resolves differently (#27):
+  // basemap palette, hillshade, building tints. No matchMedia listener of its
+  // own any more — that listener was what let the OS override the switcher. A
+  // live OS flip still lands here, because while the preference is "system" the
+  // theme store re-resolves and re-renders us, which changes `dark`.
+  //
+  // `mapReady` is a dependency, not just `dark`: the theme can settle before the
+  // style finishes loading, and these calls no-op until the map is ready.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !readyRef.current) return;
-    applyLayer(map, activeLayer, prefersDark());
-  }, [activeLayer]);
+    muteBasemap(map, dark);
+    applyThreeDTheme(map, dark);
+  }, [dark, mapReady]);
+
+  // Repaint the data layers when the active score layer — or the theme, which
+  // drives the glow — changes.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !readyRef.current) return;
+    applyLayer(map, activeLayer, dark);
+  }, [activeLayer, dark, mapReady]);
 
   // Cooperative wheel gating (research §4): a plain wheel over the embedded hero
   // map scrolls the PAGE — we stop the event in the capture phase before it reaches
@@ -709,7 +736,7 @@ export default function AuditMap({
   const handleToggleThreeD = (next: boolean) => {
     setThreeD(next);
     const map = mapRef.current;
-    if (map && readyRef.current) applyThreeD(map, next, prefersDark());
+    if (map && readyRef.current) applyThreeD(map, next, dark);
   };
 
   const handleClose = () => {

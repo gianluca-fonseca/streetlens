@@ -28,29 +28,29 @@ const OUT_DIR = join(ROOT, "public", "render");
 // --- RAMP: mirrors mapConfig.ts RAMP (3 stops per lens, high = good) ---------
 const RAMP = {
   overall: [
-    { at: 0, hex: "#C0472B" },
-    { at: 50, hex: "#E8B84B" },
-    { at: 100, hex: "#0E7C66" },
+    { at: 0, hex: "#F45E53" },
+    { at: 50, hex: "#CE4D02" },
+    { at: 100, hex: "#056E48" },
   ],
   accessibility: [
-    { at: 0, hex: "#FFE945" },
-    { at: 50, hex: "#7C7B78" },
-    { at: 100, hex: "#00204D" },
+    { at: 0, hex: "#CE63E9" },
+    { at: 50, hex: "#A844EA" },
+    { at: 100, hex: "#7629F1" },
   ],
   drainage: [
-    { at: 0, hex: "#C7C13B" },
-    { at: 50, hex: "#4CA377" },
-    { at: 100, hex: "#21808C" },
+    { at: 0, hex: "#0E9EAF" },
+    { at: 50, hex: "#077FA8" },
+    { at: 100, hex: "#0263A8" },
   ],
   shade: [
-    { at: 0, hex: "#DDE3CE" },
-    { at: 50, hex: "#6E9463" },
-    { at: 100, hex: "#14532D" },
+    { at: 0, hex: "#729D0D" },
+    { at: 50, hex: "#148918" },
+    { at: 100, hex: "#07703F" },
   ],
   bike: [
-    { at: 0, hex: "#E8D9C4" },
-    { at: 50, hex: "#C88C5E" },
-    { at: 100, hex: "#8A4B2D" },
+    { at: 0, hex: "#EF599A" },
+    { at: 50, hex: "#DF1194" },
+    { at: 100, hex: "#B20795" },
   ],
 };
 

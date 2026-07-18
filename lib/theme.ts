@@ -8,10 +8,17 @@
  * resolves live when the OS flips). CSS tokens in globals.css key off the `.dark`
  * class; a `prefers-color-scheme` fallback covers the JS-off case.
  *
- * The MapLibre instrument (basemap + score ramps in components/mapConfig.ts /
- * AuditMap.tsx) is intentionally NOT wired to this class — it keys off the OS
- * setting independently, so flipping the in-app switcher never changes the map.
- * The instrument does not change with the lighting (sealed).
+ * The MapLibre instrument (basemap in components/mapConfig.ts / AuditMap.tsx)
+ * follows this preference too. It used to query `prefers-color-scheme` on its
+ * own, which meant the in-app switcher could not move it: choosing light on a
+ * dark OS left the map painted dark against a light page (#27). AuditMap now
+ * derives from resolveTheme(readStoredPreference()) and from the useTheme()
+ * store, so the switcher wins and "system" still tracks the OS — through here,
+ * not around it. Nothing outside this module and ThemeProvider should query
+ * `prefers-color-scheme` directly; scripts/test-map-theme-source.mjs enforces it.
+ *
+ * The score RAMP itself is theme-independent: a segment's colour encodes its
+ * score, not the lighting, so it is identical in both themes by design.
  */
 
 export const THEME_STORAGE_KEY = "streetlens-theme";
