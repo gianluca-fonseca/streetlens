@@ -7,6 +7,8 @@
 - `be2b8c5` — feat(insights): add municipality config and insights aggregations
 - `7b2fbf8` — feat(insights): ship insights, method, and rubric public surfaces
 - `68840e8` — docs(insights): add evidence, REPORT, and done control
+- `d1a00ae` — docs(insights): record evidence commit hash in REPORT
+- `69cf14e` — chore(insights): mark CONTROL status done
 
 ## Gates (verbatim)
 
