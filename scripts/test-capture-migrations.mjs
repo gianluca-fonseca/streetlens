@@ -259,12 +259,14 @@ function main() {
       select (not public)::text from storage.buckets where id='streetlens-frames';
     `).trim();
     const bucketMeta = psql(`
-      select file_size_limit::text || '|' || array_to_string(allowed_mime_types, ',')
+      select file_size_limit::text || '|' || coalesce(array_to_string(allowed_mime_types, ','), 'any')
         from storage.buckets where id='streetlens-frames';
     `).trim();
     check(
-      "the frames bucket is private, 2 MB, jpeg-only (0028)",
-      (bucketPrivate === "t" || bucketPrivate === "true") && bucketMeta === "2097152|image/jpeg",
+      // 0033: the mime allowlist is gone (OPFS blobs upload as octet-stream);
+      // privacy (0028) and the 2 MiB cap are what this bucket still asserts.
+      "the frames bucket is private, 2 MB, mime-unrestricted (0028+0033)",
+      (bucketPrivate === "t" || bucketPrivate === "true") && bucketMeta === "2097152|any",
       `${bucketPrivate}|${bucketMeta}`,
     );
 
