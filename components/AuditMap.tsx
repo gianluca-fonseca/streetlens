@@ -15,11 +15,14 @@ import {
   BUILDINGS,
   COMMUNITY_CASING,
   COMMUNITY_LAYER_FILTER,
+  CV_CASING,
+  CV_LAYER_FILTER,
   HILLSHADE_LAYER_ID,
   HILLSHADE_PAINT,
   RAMP_LAYER_FILTER,
   TERRAIN,
   communityWidthExpression,
+  cvWidthExpression,
   lineColorExpression,
   lineWidthExpression,
 } from "@/components/mapConfig";
@@ -43,8 +46,14 @@ const SOURCE_ID = "segments";
 const LINE_LAYER_ID = "segments-line";
 const GLOW_LAYER_ID = "segments-glow";
 const COMMUNITY_LAYER_ID = "segments-community";
-/** Layers that respond to hover / click (score ramp + community casing). */
-const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID];
+const CV_LAYER_ID = "segments-cv";
+/**
+ * Layers that respond to hover / click (score ramp + community + camera casing).
+ * The CV layer must be here: it draws the features it steals from the community
+ * filter, so leaving it out would make a camera-observed import segment
+ * unclickable.
+ */
+const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID, CV_LAYER_ID];
 
 function prefersDark(): boolean {
   return (
@@ -72,7 +81,15 @@ const HERO_END: { center: [number, number]; zoom: number; bearing: number } = {
   bearing: 4,
 };
 
-/** Strip POIs / most labels and recolor Liberty to a calm warm-neutral basemap. */
+/**
+ * Recolour Liberty into the calm zen basemap, keeping its labels.
+ *
+ * This used to hide every symbol layer except place labels, which left the
+ * public map without street names or businesses while the admin ReviewMap
+ * (same Liberty style, unstripped) had them. The label hierarchy is now kept
+ * whole and *tuned* rather than removed: recoloured into the palette with a
+ * halo so it stays legible over the score casings in both themes.
+ */
 function muteBasemap(map: maplibregl.Map, dark: boolean) {
   const pal = dark ? BASEMAP.dark : BASEMAP.light;
   const style = map.getStyle();
@@ -80,25 +97,24 @@ function muteBasemap(map: maplibregl.Map, dark: boolean) {
 
   for (const layer of style.layers) {
     const id = layer.id;
-    const set = (prop: string, value: string) => {
+    const set = (prop: string, value: string | number) => {
       try {
         map.setPaintProperty(id, prop, value);
       } catch {
         /* layer uses a different paint prop; ignore */
       }
     };
-    const hide = () => {
-      try {
-        map.setLayoutProperty(id, "visibility", "none");
-      } catch {
-        /* no-op */
-      }
-    };
-
     if (layer.type === "symbol") {
-      // Keep a restrained place-label hierarchy; drop POIs and the rest.
-      const keep = /place|city|town|state|country|continent/i.test(id);
-      if (!keep) hide();
+      // Keep every label category — place, street, business, POI — and tune it
+      // into the palette. Places carry the full label ink; the denser street /
+      // POI tier sits a step lighter so it never shouts over the score ramps.
+      // The halo is the page ground, which is what keeps a name readable where
+      // it crosses a segment casing.
+      const isPlace = /place|city|town|state|country|continent/i.test(id);
+      set("text-color", isPlace ? pal.label : pal.labelMinor);
+      set("text-halo-color", pal.labelHalo);
+      set("text-halo-width", 1.25);
+      set("text-halo-blur", 0.3);
       continue;
     }
     if (layer.type === "background") {
@@ -156,28 +172,11 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
     });
   }
 
-  if (!map.getLayer(LINE_LAYER_ID)) {
-    map.addLayer({
-      id: LINE_LAYER_ID,
-      type: "line",
-      source: SOURCE_ID,
-      filter: RAMP_LAYER_FILTER,
-      layout: { "line-cap": "round", "line-join": "round" },
-      paint: {
-        "line-color": color,
-        "line-width": width,
-        "line-opacity": [
-          "case",
-          ["boolean", ["feature-state", "selected"], false],
-          1,
-          0.82,
-        ],
-      },
-    });
-  }
-
   // Community / import segments: fixed neutral warm-grey dashed casing, never a
   // score color (contract v3, ruling 1). Verified in applyLayer for dark mode.
+  // Added BEFORE the CV casing and the score line so the draw order runs
+  // glow → neutral → camera-observed → score ramp (the three casing filters are
+  // mutually exclusive, so ordering is about the CV halo, not overlap).
   if (!map.getLayer(COMMUNITY_LAYER_ID)) {
     map.addLayer({
       id: COMMUNITY_LAYER_ID,
@@ -194,6 +193,47 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
           ["boolean", ["feature-state", "selected"], false],
           1,
           0.85,
+        ],
+      },
+    });
+  }
+
+  // Camera-observed segments (u31): the accent casing that makes a street the
+  // cameras have actually seen unmistakable. It sits ABOVE the neutral overlay
+  // and BELOW the score line, so on an audited segment it reads as a pink halo
+  // around the score colour (which stays fully visible), and on an unaudited
+  // import segment — the demo-off case, where everything else is neutral — it
+  // is the mark itself.
+  if (!map.getLayer(CV_LAYER_ID)) {
+    map.addLayer({
+      id: CV_LAYER_ID,
+      type: "line",
+      source: SOURCE_ID,
+      filter: CV_LAYER_FILTER,
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: {
+        "line-color": CV_CASING.color,
+        "line-width": cvWidthExpression,
+        "line-opacity": CV_CASING.opacity,
+      },
+    });
+  }
+
+  if (!map.getLayer(LINE_LAYER_ID)) {
+    map.addLayer({
+      id: LINE_LAYER_ID,
+      type: "line",
+      source: SOURCE_ID,
+      filter: RAMP_LAYER_FILTER,
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: {
+        "line-color": color,
+        "line-width": width,
+        "line-opacity": [
+          "case",
+          ["boolean", ["feature-state", "selected"], false],
+          1,
+          0.82,
         ],
       },
     });
@@ -216,6 +256,12 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
       COMMUNITY_LAYER_ID,
       "line-color",
       dark ? COMMUNITY_CASING.colorDark : COMMUNITY_CASING.color,
+    );
+    // Likewise the camera casing: score-independent, only its accent tracks theme.
+    map.setPaintProperty(
+      CV_LAYER_ID,
+      "line-color",
+      dark ? CV_CASING.colorDark : CV_CASING.color,
     );
   } catch {
     /* layers not ready yet */

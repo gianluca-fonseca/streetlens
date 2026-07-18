@@ -1,0 +1,9 @@
+### npx tsc --noEmit
+tsc exit=0
+
+### npm run lint
+
+> streetlens@0.1.0 lint
+> eslint
+
+lint exit=0

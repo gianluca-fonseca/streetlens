@@ -189,6 +189,16 @@ export type SegmentProperties = {
   community_reports?: CommunityReport[];
   /** Approved camera observations of this segment (u30). Never fold into score_*. */
   cv_observations?: CvObservation[];
+  /**
+   * Count of `cv_observations`, precomputed as a flat number.
+   *
+   * MapLibre JSON-stringifies non-primitive feature properties at the worker
+   * boundary, so a style filter cannot look inside `cv_observations` (and
+   * `["has", ...]` would also match community features, which always carry the
+   * key even when the array is empty). The map's camera-observed layer filters
+   * on this primitive instead. Always mirrors `cv_observations.length`.
+   */
+  cv_count?: number;
 };
 
 export type SegmentFeature = Feature<LineString, SegmentProperties>;
