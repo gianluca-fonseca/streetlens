@@ -25,17 +25,22 @@ Optional configuration, documented by **name only** (never commit a secret value
 | `ADMIN_RPC_SECRET` | Secret the admin RPCs check inside Supabase. |
 | `SUBMISSIONS_IP_SALT` | Salt for hashing submitter IPs in the contribute flow. |
 
-Put these in `.env.local` (gitignored). Do not paste real values into issues, PRs, commits, or docs.
+Put these in `.env.local` (gitignored). Copy `.env.local.example` for the full variable list with placeholders. Do not paste real values into issues, PRs, commits, or docs.
 
 ## Gates
 
-Run all three before you push. CI and review expect them green.
+Run all four before you push. CI on `main` and `next` runs the same checks.
 
 ```bash
 npx tsc --noEmit     # types
 npm run lint         # eslint (eslint-config-next)
+npm test             # all scripts/test-*.mjs contract suites
 npm run build        # production build must pass
 ```
+
+`npm test` runs every `scripts/test-*.mjs` suite serially and prints a summary. Tests use isolated temp data stores (`STREETLENS_DATA_DIR`) so they do not touch your real `data/*.local.json` files. The migration suite (`test-capture-migrations.mjs`) requires Docker; it skips with a warning locally but **fails in CI** when Docker is unavailable.
+
+Also run `node scripts/test-i18n-parity.mjs` if you change message keys (included in `npm test`).
 
 If you change the sealed map config (`components/mapConfig.ts` ramps, bins, width, or basemap), also regenerate the static plates so the landing art stays in sync:
 
@@ -68,7 +73,7 @@ These are not style preferences. They are what makes StreetLens trustworthy, and
 - **Demo data is always labeled.** Anything shown before the August 2026 pilot is demo data over real geometry. Never present a demo number as a real measurement, and never remove a demo caveat.
 - **Scores publish with their formula.** A score is a rubric of observed items, higher is better, with visible value bins. Do not add a score you cannot explain.
 - **No fabricated metrics, users, cities, or impact.** No invented adoption, no fake testimonials, no "we improved N streets." Aspiration is fine as principle, never as a data claim.
-- **Machine learning stays on the roadmap.** There is no model scoring streets today and no "AI-powered" badge. When a model is built, a human still verifies every reading. Frame CV/ML in the future tense.
+- **Machine learning proposes; humans approve.** Vision models may propose readings and synthesis text for the CV funnel (see [docs/cv-funnel.md](docs/cv-funnel.md)), but a human admin must approve every observation before it lands on the public map. Never claim published map scores are model output, and never add an "AI-powered" badge.
 - **Community contributions are unverified until audited.** Resident-added segments carry no score and render in the neutral casing.
 - **The sealed data layer is off-limits.** The ramps, bins, width channel, and basemap semantics in `mapConfig.ts` (and their mirror in the render script) are sealed. Do not recolor or rescale them without an explicit design ruling.
 - **No secrets.** Environment variables are referenced by name only. Scan your diff before committing.
