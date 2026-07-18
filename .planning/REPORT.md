@@ -11,7 +11,7 @@ unit-civic-pack delivered the Ley 7600 compliance brief, scrubbed open-data GeoJ
 - `cb92941` test(civic): lock Ley brief aggregations and open-data scrub contract
 - `c369d27` fix(civic): allow API download anchors on the open-data page
 - `74d8db2` fix(civic): define gejson route locally for Next segment config
-- *(evidence + report commit follows this file)*
+- `9effd2a` docs(civic): add unit-civic-pack evidence, report, and control done
 
 ## Gates (verbatim)
 
