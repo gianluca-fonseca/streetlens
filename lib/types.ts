@@ -253,6 +253,23 @@ export type StreetStats = {
    */
   cvSessionsReviewed: number;
   cvSegments: number;
+  /**
+   * Camera-observed coverage: the summed `length_m` of every segment carrying at
+   * least one approved CV observation, over the whole canton street network, as a
+   * percent. This is THE number that moves the moment an approval lands, and the
+   * reason it exists: the audited figures are sealed honest and read 0 with
+   * nothing published, so an owner who approved a real capture session saw
+   * nothing change and read it as breakage.
+   *
+   * It is a sibling of `coveragePct`, never a substitute: a camera pass is not an
+   * audit, so this is labelled and rendered apart and is never folded into
+   * `coveragePct`, `segments`, `km`, or `heroPct`.
+   *
+   * UNROUNDED. A single street is ~0.09% of the canton, so rounding to one
+   * decimal here would print the very "0.0%" this field exists to banish; the
+   * display layer floors it at "<0.1%" instead (see `formatCvCoveragePct`).
+   */
+  cvCoveragePct: number;
 };
 
 /**
