@@ -4,12 +4,59 @@ import type { ExpressionSpecification } from "maplibre-gl";
 import type { ScoreLayer } from "@/lib/segments";
 
 /*
- * Score-layer visual encoding — sealed from docs/design-direction.md and
- * advisor rev 2. Semantics: HIGH = GOOD for every layer. Each ramp is
- * colorblind-safe and paired with a redundant line-WIDTH channel.
+ * Score-layer visual encoding — rev 7, resealed. Semantics: HIGH = GOOD for
+ * every layer. Each ramp is colorblind-safe and paired with a redundant
+ * line-WIDTH channel.
  *
  * value0 = worst (score 0), value100 = best (score 100). These are asserted
  * explicitly per layer so the direction cannot silently regress.
+ *
+ * ── Why rev 7 replaced rev 2 (#28) ────────────────────────────────────────
+ * The owner's ruling: the ramps were muddy and hard to read, and the seal was
+ * lifted for exactly this change. Rev 2's real defect was that it ignored the
+ * basemap it is painted on. BASEMAP is near-WHITE in light (land #fafafa, roads
+ * #ffffff) and near-BLACK in dark (land #0a0a0a) — so a stop is only legible in
+ * BOTH themes if its luminance sits in a middle band. Rev 2 broke that at both
+ * ends: shade@0 #DDE3CE (pale bone) all but vanished on the light basemap, and
+ * accessibility@100 #00204D vanished on the dark one.
+ *
+ * Rev 7 is therefore constructed rather than picked. Every stop is solved to a
+ * TARGET RELATIVE LUMINANCE — 0.278 at score 0, 0.183 at 50, 0.118 at 100 — by
+ * fixing the hue and saturation and binary-searching lightness. Three
+ * consequences, all of them the point:
+ *
+ *   1. Legibility in both themes, by construction. The band was derived from
+ *      the 3:1 non-text contrast floor against the extreme surfaces: L ≤ 0.30
+ *      to clear white roads, L ≥ 0.111 to clear the near-black land. Every stop
+ *      lands ≥3.06:1 on the light basemap and ≥2.92:1 on the dark one.
+ *
+ *   2. CVD safety without relying on hue. Luminance descends monotonically
+ *      across all five ramps, so bad→good survives grayscale (≈1.95:1
+ *      end-to-end) and any form of colour blindness. Hue and the width channel
+ *      are redundant reinforcement, not the sole carrier — which is what rev 2's
+ *      red/green overall ramp leaned on.
+ *
+ *   3. Maximum chroma at both ends. Bad is the LIGHT end and good is the DARK
+ *      end, chosen to run WITH the physics rather than against it: saturated
+ *      warm hues are naturally high-luminance and saturated cool hues naturally
+ *      low, so red stays a vivid red at 0.278 instead of the muddy maroon it
+ *      becomes when forced dark, and indigo/teal/forest stay rich at 0.118.
+ *      That is where the "flashier" comes from — it is bought with saturation,
+ *      not with brightness the basemap cannot afford.
+ *
+ * Each lens owns a distinct HUE FAMILY so a view is recognisable at a glance:
+ * overall is the only multi-hue ramp (the traffic light, red low end), and the
+ * other four are single-family journeys. Note bike deliberately left the old
+ * copper for magenta: a warm rust high end meant the BEST bike streets rendered
+ * in alarm-red, directly contradicting the overall lens the user just came from.
+ *
+ * Verified against the light and dark basemap at z12–z17 in a real browser, not
+ * by intuition; screenshots in .planning/evidence/map-theme-ramps/.
+ *
+ * SEALED AGAIN at these values. scripts/test-score-color.mjs freezes the table
+ * stop-for-stop, scripts/test-ramp-legibility.mjs re-derives the luminance band
+ * and the monotonicity, and scripts/render-map-images.mjs mirrors it verbatim —
+ * change one and you must change all three (then re-run `npm run render:maps`).
  */
 
 /** Client-safe layer order (mirrors SCORE_LAYERS without importing the fs adapter). */
@@ -24,38 +71,43 @@ export const LAYER_ORDER: ScoreLayer[] = [
 type RampStop = { at: number; hex: string };
 
 export const RAMP: Record<ScoreLayer, RampStop[]> = {
-  // { value0: #C0472B clay, value100: #0E7C66 teal } — teal→amber→clay, high=good
+  // TRAFFIC LIGHT (the only multi-hue ramp; red low end is a design mandate).
+  // { value0: #F45E53 vivid coral-red (worst), value100: #056E48 deep emerald (best) }
   overall: [
-    { at: 0, hex: "#C0472B" },
-    { at: 50, hex: "#E8B84B" },
-    { at: 100, hex: "#0E7C66" },
+    { at: 0, hex: "#F45E53" },
+    { at: 50, hex: "#CE4D02" },
+    { at: 100, hex: "#056E48" },
   ],
-  // { value0: #FFE945 pale yellow (barriers), value100: #00204D deep Cividis blue (accessible) }
+  // VIOLET lens. { value0: #CE63E9 orchid (barriers), value100: #7629F1 electric indigo (accessible) }
   accessibility: [
-    { at: 0, hex: "#FFE945" },
-    { at: 50, hex: "#7C7B78" },
-    { at: 100, hex: "#00204D" },
+    { at: 0, hex: "#CE63E9" },
+    { at: 50, hex: "#A844EA" },
+    { at: 100, hex: "#7629F1" },
   ],
-  // { value0: #C7C13B dull yellow (flood-prone), value100: #21808C blue-teal (well-drained) }
+  // CYAN→AZURE lens, the water register.
+  // { value0: #0E9EAF bright cyan (flood-prone), value100: #0263A8 deep azure (well-drained) }
   drainage: [
-    { at: 0, hex: "#C7C13B" },
-    { at: 50, hex: "#4CA377" },
-    { at: 100, hex: "#21808C" },
+    { at: 0, hex: "#0E9EAF" },
+    { at: 50, hex: "#077FA8" },
+    { at: 100, hex: "#0263A8" },
   ],
-  // { value0: #DDE3CE pale bone (exposed), value100: #14532D canopy green (shaded) }
+  // GREEN lens, and the one ramp whose luminance direction is also literal:
+  // exposed asphalt is the bright end, canopy the dark end.
+  // { value0: #729D0D dry lime (exposed), value100: #07703F deep canopy (shaded) }
   shade: [
-    { at: 0, hex: "#DDE3CE" },
-    { at: 50, hex: "#6E9463" },
-    { at: 100, hex: "#14532D" },
+    { at: 0, hex: "#729D0D" },
+    { at: 50, hex: "#148918" },
+    { at: 100, hex: "#07703F" },
   ],
-  // { value0: #E8D9C4 pale sand (no/poor bike infra), value100: #8A4B2D deep copper (protected) }
-  // Monotonic warm ramp (sand → tan → copper). Distinct from drainage's yellow
-  // end (#C7C13B): the copper hue is orange-brown and only one layer is active
-  // at a time, with the redundant width channel as backup for CVD.
+  // MAGENTA lens. Replaced rev 2's sand→copper: a warm rust high end painted the
+  // BEST bike streets in alarm-red, which reads as "bad" to anyone arriving from
+  // the overall lens. Magenta carries no good/bad prior and clears violet
+  // (accessibility) by ~25° of hue at these luminances.
+  // { value0: #EF599A pink (no/poor infra), value100: #B20795 deep magenta (protected) }
   bike: [
-    { at: 0, hex: "#E8D9C4" },
-    { at: 50, hex: "#C88C5E" },
-    { at: 100, hex: "#8A4B2D" },
+    { at: 0, hex: "#EF599A" },
+    { at: 50, hex: "#DF1194" },
+    { at: 100, hex: "#B20795" },
   ],
 };
 

@@ -4,15 +4,24 @@
  * The detail panel must speak the map's colour language: a score's value should
  * carry the same hue the segment carries on the map, so Accessibility 87.5
  * visibly towers over Bike 16.67. But the sealed RAMP in components/mapConfig.ts
- * is tuned for LINES ON A BASEMAP, not for text on a panel surface, and several
- * of its stops are unusable as ink:
+ * is tuned for LINES ON A BASEMAP, not for text on a panel surface, and under
+ * rev 7 essentially NONE of its stops is usable as ink:
  *
- *   accessibility @100 = #00204D (deep Cividis blue) → 1.35:1 on dark #141414
- *   shade         @100 = #14532D (canopy green)      → 1.68:1 on dark #141414
- *   shade         @0   = #DDE3CE (pale bone)         → 1.34:1 on light #ffffff
+ *   every @0   stop (e.g. overall #F45E53) → ~2.8:1 on light #f1f1f1
+ *   every @50  stop (e.g. overall #CE4D02) → ~4.0:1 light AND ~3.6:1 dark
+ *   every @100 stop (e.g. overall #056E48) → ~2.6:1 on dark #212121
  *
- * Painting those raw would fail WCAG AA outright in one theme or the other, and
+ * That is not an accident of colour picking, it is structural. Rev 7 solves
+ * every stop to a target luminance inside a narrow middle band (0.118–0.278),
+ * because the basemap is near-white in light and near-black in dark and only
+ * that band clears both. A colour engineered to sit in the middle is by
+ * definition too dark for the light panel at one end and too light for the dark
+ * panel at the other. Painting those raw would fail WCAG AA outright, and
  * accessibility is a hard constraint on this panel, not a preference.
+ *
+ * So the map's constraint and the panel's genuinely conflict, and this module is
+ * the resolution: same hue, different lightness, each surface getting the value
+ * it can actually carry.
  *
  * So this module derives ink from the ramp instead of replacing it. It samples
  * the SEALED ramp, converts to HSL, holds hue and saturation fixed — the colour
