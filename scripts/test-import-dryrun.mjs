@@ -16,16 +16,20 @@ import { createRequire } from "node:module";
 import { rmSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  setupIsolatedDataDir,
+  cleanupIsolatedDataDir,
+  localDataPath,
+} from "./lib/test-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".test-build-dryrun");
-const DATA = path.join(ROOT, "data");
 const require = createRequire(import.meta.url);
 
-const SIDE_EFFECT_FILES = [
-  path.join(DATA, "community-segments.local.json"),
-  path.join(DATA, "community-reports.local.json"),
+const SIDE_EFFECT_NAMES = [
+  "community-segments.local.json",
+  "community-reports.local.json",
 ];
 
 const failures = [];
@@ -35,10 +39,10 @@ function check(label, ok, detail = "") {
 }
 
 function main() {
-  for (const f of SIDE_EFFECT_FILES) {
-    if (existsSync(f)) throw new Error(`refusing to run: ${path.basename(f)} exists`);
-  }
+  const isolatedDir = setupIsolatedDataDir();
+  const SIDE_EFFECT_FILES = SIDE_EFFECT_NAMES.map((name) => localDataPath(name));
 
+  try {
   rmSync(BUILD_DIR, { recursive: true, force: true });
   execFileSync(
     "npx",
@@ -134,6 +138,9 @@ function main() {
     process.exit(1);
   }
   console.log("\nDRYRUN-TEST PASS");
+  } finally {
+    cleanupIsolatedDataDir(isolatedDir);
+  }
 }
 
 try {

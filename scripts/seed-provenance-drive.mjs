@@ -14,7 +14,7 @@
  * gitignored runtime data.
  *
  * Usage:
- *   node scripts/seed-provenance-drive.mjs          # seed
+ *   node scripts/seed-provenance-drive.mjs          # seed (requires --force if files exist)
  *   node scripts/seed-provenance-drive.mjs --clean  # remove
  */
 
@@ -82,6 +82,13 @@ function main() {
     }
     console.log("clean");
     return;
+  }
+
+  const existing = [CV_PATH, SEGMENTS_PATH].filter((f) => existsSync(f));
+  if (existing.length > 0 && !process.argv.includes("--force")) {
+    console.error("Refusing to clobber existing local data (pass --force to overwrite):");
+    for (const f of existing) console.error(`  ${path.relative(ROOT, f)}`);
+    process.exit(1);
   }
 
   mkdirSync(DATA, { recursive: true });
