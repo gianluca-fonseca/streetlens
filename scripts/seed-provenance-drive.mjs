@@ -33,12 +33,12 @@ const SEGMENT = "esc-sa-0001";
 const SESSION_A = "3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b";
 const SESSION_B = "8c1e4d05-2a9f-4b73-8e16-7d4f0a2b9c31";
 
-function observation(sessionId, capturedOn, frames) {
+function observation(sessionId, capturedOn, frames, scores, assessment) {
   return {
     id: `cv-${sessionId}-${SEGMENT}`,
     segment_id: SEGMENT,
     session_id: sessionId,
-    scores: { overall: 54, accessibility: 41, drainage: 60, shade: 58, bike: 33 },
+    scores,
     item_medians: {
       sidewalk_present: { value: 0.5, confidence: 0.72, frames: frames },
       curb_ramp: { value: 0.25, confidence: 0.64, frames: frames },
@@ -54,7 +54,7 @@ function observation(sessionId, capturedOn, frames) {
     created_at: capturedOn,
     human_corrected: false,
     overrides: {},
-    assessment: null,
+    assessment,
   };
 }
 
@@ -74,12 +74,30 @@ function main() {
 
   // Two sessions over the SAME street: cvSegments = 1, cvSessionsReviewed = 2 —
   // the singular and the plural in one line, which is the case the owner hit.
+  //
+  // The two walks are months apart and score differently on purpose (u32): this
+  // is also the fixture for canonical selection, and a screenshot only proves
+  // the newest walk is driving the panel if the older one would have looked
+  // visibly different. Session A is listed FIRST while being the OLDER walk, so
+  // the ordering cannot pass by accidentally taking the last row.
   writeFileSync(
     CV_PATH,
     JSON.stringify(
       [
-        observation(SESSION_A, "2026-07-15T02:00:00.000Z", 3),
-        observation(SESSION_B, "2026-07-16T02:00:00.000Z", 2),
+        observation(
+          SESSION_A,
+          "2026-03-04T02:00:00.000Z",
+          3,
+          { overall: 54, accessibility: 41, drainage: 60, shade: 58, bike: 33 },
+          "Broken sidewalk on the north side with a missing curb ramp at the corner.",
+        ),
+        observation(
+          SESSION_B,
+          "2026-07-16T02:00:00.000Z",
+          2,
+          { overall: 71, accessibility: 68, drainage: 74, shade: 58, bike: 45 },
+          "Sidewalk has been repaved since the earlier pass and the corner now has a curb ramp.",
+        ),
       ],
       null,
       2,
