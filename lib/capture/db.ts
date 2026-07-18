@@ -26,6 +26,7 @@ import type {
   CaptureObservationItem,
 } from "./types";
 import type { TrackPoint } from "./types";
+import type { SegmentAssessment } from "./schemas";
 
 /* ------------------------------------------------------------------ *
  * Row shapes returned by the RPCs (0013 + 0015)
@@ -62,6 +63,11 @@ export type ObservationRow = {
   escalated: boolean;
   near_junction: boolean;
   seq: number;
+  /** The model's per-frame note (0020). Null on rows that predate it. */
+  rationale: string | null;
+  /** Interpolated capture position (0022), from capture_frames.location. Null when unplaced. */
+  lng: number | null;
+  lat: number | null;
 };
 
 export type TokenUsage = {
@@ -101,6 +107,15 @@ export type RollupWrite = {
   itemMedians: Record<string, unknown>;
   coverage: number | null;
   confidence: number | null;
+};
+
+export type SegmentAssessmentWrite = {
+  sessionId: string;
+  segmentId: string;
+  assessment: SegmentAssessment;
+  /** The synthesis call's spend, recorded on the rollup for the session ledger. */
+  inputTokens: number;
+  outputTokens: number;
 };
 
 export type SessionStatusPayload = {
@@ -151,6 +166,12 @@ export interface CaptureDb {
   drainedSessions(limit: number): Promise<string[]>;
   pendingJobCount(): Promise<number>;
   upsertRollup(rollup: RollupWrite): Promise<void>;
+  /**
+   * Attach a synthesized assessment (and its token spend) to an existing segment
+   * rollup (0022). Runs after upsertRollup; a no-op when the segment has no rollup
+   * row.
+   */
+  setSegmentAssessment(args: SegmentAssessmentWrite): Promise<void>;
   setSessionStatus(sessionId: string, status: CaptureSessionStatus): Promise<void>;
 }
 
@@ -351,6 +372,17 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
         p_item_medians: rollup.itemMedians,
         p_coverage: rollup.coverage,
         p_confidence: rollup.confidence,
+        p_secret: adminSecret(),
+      });
+    },
+
+    async setSegmentAssessment(args) {
+      await rpc<void>("capture_set_segment_assessment", {
+        p_session_id: args.sessionId,
+        p_segment_id: args.segmentId,
+        p_assessment: args.assessment,
+        p_input_tokens: args.inputTokens,
+        p_output_tokens: args.outputTokens,
         p_secret: adminSecret(),
       });
     },
