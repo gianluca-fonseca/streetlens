@@ -15,6 +15,7 @@ import { useTranslations } from "next-intl";
 import { Camera, MapPin, Sun } from "lucide-react";
 import { Action, Eyebrow, Notice, Plate, Screen } from "@/components/capture/ui";
 import type { CameraState } from "@/components/capture/hooks/useCamera";
+import type { SegmentBrief } from "@/lib/capture/segment-brief";
 
 function Ask({
   icon,
@@ -39,25 +40,37 @@ export function StartScreen({
   starting,
   camera,
   durable,
+  spotBrief,
 }: Readonly<{
   onStart: () => void;
   starting: boolean;
   camera: CameraState;
   durable: boolean;
+  spotBrief?: SegmentBrief | null;
 }>) {
   const t = useTranslations("collect");
 
   return (
     <Screen>
       <header className="flex flex-col gap-3">
-        <Eyebrow>{t("start.eyebrow")}</Eyebrow>
+        <Eyebrow>{spotBrief ? t("mission.eyebrow") : t("start.eyebrow")}</Eyebrow>
         <h1 className="font-display text-[30px] font-bold leading-[1.05] tracking-[-0.03em] text-ink-display">
-          {t("start.title")}
+          {spotBrief ? t("mission.title", { street: spotBrief.name }) : t("start.title")}
         </h1>
         <p className="font-serif text-[17px] leading-[1.6] text-neutral-strong">
-          {t("start.lead")}
+          {spotBrief ? t("mission.lead", { district: spotBrief.district }) : t("start.lead")}
         </p>
       </header>
+
+      {spotBrief ? (
+        <Plate className="flex items-start gap-2 p-4">
+          <MapPin className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+          <div>
+            <p className="text-[13px] font-semibold text-ink">{spotBrief.name}</p>
+            <p className="mt-0.5 text-[12px] text-neutral-strong">{spotBrief.district}</p>
+          </div>
+        </Plate>
+      ) : null}
 
       {camera.status === "error" ? (
         <Notice tone="stop" title={t(`camera.${camera.reason}_title`)}>

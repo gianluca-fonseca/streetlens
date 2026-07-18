@@ -28,6 +28,10 @@ import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Eyebrow, LiveDot, Notice, Plate } from "@/components/capture/ui";
+import { MyWalksShelf } from "@/components/capture/MyWalksShelf";
+import { formatSegmentTitle } from "@/lib/capture/segment-label";
+import { updateMyWalk } from "@/lib/capture/my-walks";
+import type { SegmentBrief } from "@/lib/capture/segment-brief";
 import { cn } from "@/components/ui/cn";
 import type { CaptureSessionStatus } from "@/lib/capture/types";
 
@@ -118,6 +122,7 @@ export function StatusClient({ sessionId }: Readonly<{ sessionId: string }>) {
   const t = useTranslations("collect");
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [error, setError] = useState<StatusError | null>(null);
+  const [segmentNames, setSegmentNames] = useState<Readonly<Record<string, SegmentBrief>>>({});
 
   useEffect(() => {
     // Loop state is per-effect and closed over, not refs: there is exactly one
@@ -210,6 +215,41 @@ export function StatusClient({ sessionId }: Readonly<{ sessionId: string }>) {
     };
   }, [sessionId]);
 
+  useEffect(() => {
+    const rollups = snapshot?.rollups ?? [];
+    if (rollups.length === 0) return;
+    let cancelled = false;
+    void (async () => {
+      const names: Record<string, SegmentBrief> = {};
+      await Promise.all(
+        rollups.map(async (rollup) => {
+          try {
+            const res = await fetch(`/api/segments/${encodeURIComponent(rollup.segmentId)}/brief`);
+            if (res.ok) {
+              names[rollup.segmentId] = (await res.json()) as SegmentBrief;
+            }
+          } catch {
+            // non-fatal
+          }
+        }),
+      );
+      if (cancelled) return;
+      setSegmentNames(names);
+      const streetNames = Object.values(names).map((b) => b.name);
+      if (streetNames.length > 0 && snapshot?.status) {
+        updateMyWalk(sessionId, { status: snapshot.status, streetNames });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, snapshot?.rollups, snapshot?.status]);
+
+  useEffect(() => {
+    if (!snapshot?.status) return;
+    updateMyWalk(sessionId, { status: snapshot.status });
+  }, [sessionId, snapshot?.status]);
+
   // A walk that is not there, or a link that was never one. There is no progress
   // to render behind this, so it is the whole view.
   if (error === "not_found" || error === "invalid_session") {
@@ -226,6 +266,8 @@ export function StatusClient({ sessionId }: Readonly<{ sessionId: string }>) {
 
   return (
     <div className="flex flex-col gap-6">
+      <MyWalksShelf />
+
       {error !== null ? (
         <Alert title={t(`status.errors.${error}.title`)} body={t(`status.errors.${error}.body`)} />
       ) : null}
@@ -318,12 +360,18 @@ export function StatusClient({ sessionId }: Readonly<{ sessionId: string }>) {
             {t("status.segmentsLead", { count: rollups.length })}
           </p>
           <ul className="flex flex-col gap-2">
-            {rollups.map((rollup) => (
+            {rollups.map((rollup) => {
+              const brief = segmentNames[rollup.segmentId];
+              const label = formatSegmentTitle(
+                brief ? { id: brief.id, name: brief.name, district: brief.district } : undefined,
+                rollup.segmentId,
+              );
+              return (
               <li
                 key={rollup.segmentId}
                 className="flex items-baseline justify-between gap-3 rounded-[2px] border border-border bg-surface-elevated px-3 py-2"
               >
-                <span className="truncate font-mono text-[12px] text-ink">{rollup.segmentId}</span>
+                <span className="truncate text-[13px] text-ink">{label}</span>
                 {/* Coverage is 0..1 from lib/capture/rollup. Rounded to a whole
                     percent: three decimals of a ratio is a number for the
                     reviewer's table, not for the person who walked the street. */}
@@ -333,7 +381,8 @@ export function StatusClient({ sessionId }: Readonly<{ sessionId: string }>) {
                   })}
                 </span>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </section>
       ) : null}

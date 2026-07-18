@@ -17,8 +17,11 @@ import { RecordingHUD } from "@/components/capture/screens/RecordingHUD";
 import { ReviewScreen } from "@/components/capture/screens/ReviewScreen";
 import { DoneScreen } from "@/components/capture/screens/DoneScreen";
 import { RecoverScreen, UnsupportedScreen } from "@/components/capture/screens/GateScreens";
+import type { SegmentBrief } from "@/lib/capture/segment-brief";
 
-export default function LiveRecorder() {
+export default function LiveRecorder({
+  spotBrief,
+}: Readonly<{ spotBrief?: SegmentBrief | null }>) {
   // Destructured in full, not held as `recorder.x`. The hook's return carries
   // refs, and the compiler's alias analysis taints the whole object once it does:
   // every property read off it, ref or not, then trips react-hooks/refs.
@@ -108,6 +111,7 @@ export default function LiveRecorder() {
           starting={camera.status === "starting"}
           camera={camera}
           durable={durable}
+          spotBrief={spotBrief}
         />
       ) : null}
 
@@ -139,7 +143,16 @@ export default function LiveRecorder() {
       ) : null}
 
       {phase === "done" ? (
-        <DoneScreen sessionId={sessionId} onAgain={() => void discard()} />
+        <DoneScreen
+          sessionId={sessionId}
+          frameCount={stats.framesKept}
+          distanceM={stats.distanceM}
+          elapsedMs={stats.elapsedMs}
+          track={reviewTrack}
+          streetNames={spotBrief ? [spotBrief.name] : undefined}
+          submittedAt={new Date()}
+          onAgain={() => void discard()}
+        />
       ) : null}
     </div>
   );

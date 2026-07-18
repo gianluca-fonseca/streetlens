@@ -29,6 +29,7 @@ import type {
 } from "@/components/capture/hooks/useRecorder";
 import type { SessionCapReason } from "@/components/capture/engine/gating";
 import type { UploadProgress } from "@/lib/capture/upload-client";
+import { PreUploadGate } from "@/components/capture/PreUploadGate";
 import styles from "@/components/ui/zen.module.css";
 
 const INPUT =
@@ -131,6 +132,8 @@ export function ReviewScreen({
           </dl>
         )}
       </Plate>
+
+      {!uploading ? <PreUploadGate stats={stats} track={track} /> : null}
 
       {uploading ? (
         <Plate className="p-4">
