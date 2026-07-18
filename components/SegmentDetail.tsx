@@ -410,6 +410,11 @@ export default function SegmentDetail({
         // §4 z-layering). Desktop: Recipe A glass popover floating over tiles,
         // applied ≥768px only via the module's media-gated class.
         "pointer-events-auto flex flex-col overflow-hidden border border-border bg-surface-elevated shadow-[var(--shadow-popover)]",
+        // Dark elevation scope (u34). Re-values the surface/hairline/accent
+        // tokens for this subtree only, so the panel reads as a lit object with
+        // depth instead of a void with seams. Must sit on the root, above every
+        // `bg-surface-*` utility inside — see panel.module.css.
+        panel.panelScope,
         styles.glassPanelDesktop,
         styles.enter,
         // Mobile: full-width bottom sheet flush to the bottom edge.

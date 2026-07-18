@@ -189,6 +189,19 @@ function main() {
         bad === 0,
         bad ? `${bad} failing pairs` : "",
       );
+
+      // 3b. DARK AIMS HIGHER THAN THE FLOOR (u34). Ink fitted to exactly 4.5:1
+      //     on near-black measures compliant and still reads muddy on a phone
+      //     at low brightness, which is what the panel shipped with. Dark now
+      //     targets DARK_INK_TARGET (7:1); this asserts the delivered floor of
+      //     6.5:1, the margin below the target that the binary search plus
+      //     8-bit rounding can actually cost. Light is untouched and keeps AA.
+      const DARK_FLOOR = 6.5;
+      check(
+        `every dark score ink clears ${DARK_FLOOR}:1 (target ${S.DARK_INK_TARGET}:1, AAA-ish)`,
+        worstDark.ratio >= DARK_FLOOR,
+        `worst ${worstDark.ratio.toFixed(2)}:1`,
+      );
       console.log(
         `       worst light: ${worstLight.hex} (${worstLight.layer}@${worstLight.v}) ` +
           `${worstLight.ratio.toFixed(2)}:1 on ${S.SURFACE_LIGHT}`,
@@ -199,28 +212,39 @@ function main() {
       );
     }
 
-    // 4. Also safe on the OTHER surface each theme uses. SURFACE_LIGHT /
+    // 4. Also safe on every OTHER surface each theme uses. SURFACE_LIGHT /
     //    SURFACE_DARK are the GOVERNING pair (--surface-sunken in light,
-    //    --surface-elevated in dark); this covers their opposites, so the
-    //    "worst case" reasoning in scoreColor.ts is asserted, not trusted.
-    //    Getting that argument backwards is precisely how the first draft of
-    //    this module shipped 86 sub-AA pairs.
+    //    --surface-elevated in dark); this covers the rest of each theme's
+    //    ladder, so the "worst case" reasoning in scoreColor.ts is asserted,
+    //    not trusted. Getting that argument backwards is precisely how the
+    //    first draft of this module shipped 86 sub-AA pairs.
+    //
+    //    The dark entries are the panel's scoped elevation ladder from
+    //    panel.module.css, NOT the global dark tokens: inside the panel,
+    //    --surface-sunken is #1a1a1a and the panel ground is #141414. Both are
+    //    darker than the governing #212121, so light ink only gains on them.
     {
       let bad = 0;
       const misses = [];
+      const OTHER = [
+        ["#ffffff", "light"], // --surface-elevated, light
+        ["#1a1a1a", "dark"], // --surface-sunken, dark panel scope
+        ["#141414", "dark"], // --surface-base, dark panel scope
+      ];
       for (const layer of LAYERS) {
         for (let v = 0; v <= 100; v += 1) {
           const ink = S.rampInk(layer, v);
-          const rl = S.contrastRatio(ink.light, "#ffffff"); // --surface-elevated, light
-          const rd = S.contrastRatio(ink.dark, "#050505"); // --surface-sunken, dark
-          if (rl < S.AA_TEXT || rd < S.AA_TEXT) {
-            bad++;
-            if (misses.length < 3) misses.push(`${layer}@${v} ${rl.toFixed(2)}/${rd.toFixed(2)}`);
+          for (const [bg, key] of OTHER) {
+            const r = S.contrastRatio(ink[key], bg);
+            if (r < S.AA_TEXT) {
+              bad++;
+              if (misses.length < 3) misses.push(`${layer}@${v} ${key} on ${bg} ${r.toFixed(2)}`);
+            }
           }
         }
       }
       check(
-        "also clears AA on the non-governing surface in both themes",
+        "also clears AA on every non-governing surface in both themes",
         bad === 0,
         bad ? `${bad} pairs, e.g. ${misses.join(", ")}` : "",
       );
@@ -272,29 +296,46 @@ function main() {
       );
     }
 
-    // 7. The adjustment is minimal: the result sits close to the AA threshold
-    //    rather than being slammed to black or white. If this fails, scores
-    //    have stopped looking like the map even though they still "pass".
+    // 7. The adjustment is minimal: the result sits close to the threshold it
+    //    was fitted to rather than being slammed to black or white. If this
+    //    fails, scores have stopped looking like the map even though they still
+    //    "pass".
+    //
+    //    The bound is per-theme because the TARGET is per-theme (u34): light
+    //    fits to AA_TEXT 4.5 and is bounded at 6, dark fits to DARK_INK_TARGET
+    //    7 and is bounded at 8.5. Same rule, "≤ target + ~1.5"; raising the
+    //    dark ceiling is the direct consequence of raising the dark target, not
+    //    a slackened assertion.
     {
-      let worst = 0;
+      const BOUND = { light: 6, dark: 8.5 };
+      let bad = 0;
+      let worst = -Infinity; // largest overshoot past the theme's own bound
       let where = "";
       for (const layer of LAYERS) {
         for (let v = 0; v <= 100; v += 1) {
-          for (const [bg, key] of [[S.SURFACE_LIGHT, "light"], [S.SURFACE_DARK, "dark"]]) {
+          for (const [bg, key, target] of [
+            [S.SURFACE_LIGHT, "light", S.AA_TEXT],
+            [S.SURFACE_DARK, "dark", S.DARK_INK_TARGET],
+          ]) {
             const hex = S.rampInk(layer, v)[key];
             const r = S.contrastRatio(hex, bg);
             // Untouched colours may legitimately be far above the bar; only
             // ADJUSTED ones must land near it.
             const base = M.sampleRamp(layer, v);
-            if (S.contrastRatio(base, bg) >= S.AA_TEXT) continue;
-            if (r > worst) {
-              worst = r;
-              where = `${layer}@${v} ${key} ${r.toFixed(2)}:1`;
+            if (S.contrastRatio(base, bg) >= target) continue;
+            if (r > BOUND[key]) bad++;
+            if (r - BOUND[key] > worst) {
+              worst = r - BOUND[key];
+              where = `${layer}@${v} ${key} ${r.toFixed(2)}:1 (bound ${BOUND[key]})`;
             }
           }
         }
       }
-      check("adjusted ink lands near the AA threshold, not slammed to b/w (≤6:1)", worst <= 6, where);
+      check(
+        "adjusted ink lands near its own threshold, not slammed to b/w (light ≤6:1, dark ≤8.5:1)",
+        bad === 0,
+        bad ? `${bad} over bound, e.g. ${where}` : "",
+      );
     }
 
     // 8. meterWidth clamps whatever crosses the maplibre boundary.
