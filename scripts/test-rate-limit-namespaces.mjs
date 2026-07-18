@@ -8,6 +8,8 @@
  * The thing most worth pinning: the existing submissions limits are UNCHANGED
  * and the two namespaces cannot spend each other's tokens.
  *
+ * Capture ceiling is 30/hour (testing-era relief, 0031 / owner 2026-07-18).
+ *
  * Exits 0 on PASS, 1 on any failure.
  */
 
@@ -43,6 +45,7 @@ function main() {
   const RL = require(path.join(BUILD_DIR, "rate-limit.js"));
 
   const T0 = 1_784_000_000_000;
+  const CAPTURE_CAP = RL.RATE_LIMITS.capture.capacity;
 
   /* ---------------- Submissions: unchanged ---------------- */
 
@@ -60,16 +63,21 @@ function main() {
   RL.resetRateLimits();
   check("a null key is never rate-limited (no derivable IP)", RL.consumeToken(null, T0).allowed);
 
-  /* ---------------- Capture: 3/hour ---------------- */
+  /* ---------------- Capture: 30/hour (testing-era relief) ---------------- */
 
   RL.resetRateLimits();
-  check("capture allows 3 per hour", RL.RATE_LIMITS.capture.capacity === 3 && RL.RATE_LIMITS.capture.refillWindowMs === 3_600_000);
+  check(
+    "capture allows 30 per hour",
+    CAPTURE_CAP === 30 && RL.RATE_LIMITS.capture.refillWindowMs === 3_600_000,
+  );
   {
-    const results = Array.from({ length: 4 }, () => RL.consumeNamespacedToken("capture", "ip-b", T0));
+    const results = Array.from({ length: CAPTURE_CAP + 1 }, () =>
+      RL.consumeNamespacedToken("capture", "ip-b", T0),
+    );
     check(
-      "the 4th capture session in an hour is blocked",
-      results.slice(0, 3).every((r) => r.allowed) && !results[3].allowed,
-      results.map((r) => (r.allowed ? "y" : "n")).join(""),
+      "the 31st capture session in an hour is blocked",
+      results.slice(0, CAPTURE_CAP).every((r) => r.allowed) && !results[CAPTURE_CAP].allowed,
+      `${results.filter((r) => r.allowed).length}y / ${results.filter((r) => !r.allowed).length}n`,
     );
   }
 
@@ -78,7 +86,7 @@ function main() {
   RL.resetRateLimits();
   {
     // Exhaust capture for one origin; that origin must still be able to submit.
-    for (let i = 0; i < 3; i++) RL.consumeNamespacedToken("capture", "ip-c", T0);
+    for (let i = 0; i < CAPTURE_CAP; i++) RL.consumeNamespacedToken("capture", "ip-c", T0);
     check("capture is exhausted for this origin", !RL.consumeNamespacedToken("capture", "ip-c", T0).allowed);
     check(
       "the SAME origin can still post a text submission (namespaces are isolated)",
@@ -96,7 +104,7 @@ function main() {
   }
   RL.resetRateLimits();
   {
-    for (let i = 0; i < 3; i++) RL.consumeNamespacedToken("capture", "ip-e", T0);
+    for (let i = 0; i < CAPTURE_CAP; i++) RL.consumeNamespacedToken("capture", "ip-e", T0);
     check(
       "the ceiling is per-origin: another IP is unaffected",
       RL.consumeNamespacedToken("capture", "ip-f", T0).allowed,
@@ -107,19 +115,23 @@ function main() {
 
   RL.resetRateLimits();
   {
-    for (let i = 0; i < 3; i++) RL.consumeNamespacedToken("capture", "ip-g", T0);
-    check("capture is blocked immediately after the 3rd", !RL.consumeNamespacedToken("capture", "ip-g", T0).allowed);
+    // At 30/hour one token needs 2 minutes.
+    for (let i = 0; i < CAPTURE_CAP; i++) RL.consumeNamespacedToken("capture", "ip-g", T0);
     check(
-      "still blocked 20 minutes later (one token needs 20 min at 3/hour)",
-      !RL.consumeNamespacedToken("capture", "ip-g", T0 + 19 * 60_000).allowed,
+      "capture is blocked immediately after the 30th",
+      !RL.consumeNamespacedToken("capture", "ip-g", T0).allowed,
     );
     check(
-      "a token is back after 21 minutes",
-      RL.consumeNamespacedToken("capture", "ip-g", T0 + 21 * 60_000).allowed,
+      "still blocked 90 seconds later (one token needs 2 min at 30/hour)",
+      !RL.consumeNamespacedToken("capture", "ip-g", T0 + 90_000).allowed,
+    );
+    check(
+      "a token is back after 121 seconds",
+      RL.consumeNamespacedToken("capture", "ip-g", T0 + 121_000).allowed,
     );
     check(
       "a full hour restores the whole allowance",
-      Array.from({ length: 3 }, () =>
+      Array.from({ length: CAPTURE_CAP }, () =>
         RL.consumeNamespacedToken("capture", "ip-h", T0 + 3_600_000),
       ).every((r) => r.allowed),
     );
