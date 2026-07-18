@@ -175,9 +175,13 @@ function main() {
       // extension survive every re-run.
       psql(readFileSync(path.join(MIGRATIONS, "0022_segment_synthesis.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0023_assessment_apply.sql"), "utf8"));
-      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 are re-runnable (idempotent)", true);
+      // 0024 last so the contact column AND the contact-populating apply RPC survive
+      // the re-run (0023 above reverts admin_apply_capture_session to its no-contact
+      // body; 0024 re-establishes the session-sourced contact the assertions rely on).
+      psql(readFileSync(path.join(MIGRATIONS, "0024_cv_observation_contact.sql"), "utf8"));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", true);
     } catch (err) {
-      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
     }
 
     /* ---------------- Schema shape ---------------- */
@@ -588,7 +592,9 @@ function main() {
     // between re-emits on the next pump. That retry is only safe if a second emit
     // is a no-op, and TS cannot dedupe it — 0006 gives anon INSERT on submissions
     // and no SELECT policy, so the check has to live in here.
-    const cvSid = psql(`select capture_create_session('live', 'iphash-cv');`).trim();
+    // A contact on this session, so the apply can prove contact is published from
+    // the SESSION (server-side, 0024) rather than from the observation payload.
+    const cvSid = psql(`select capture_create_session('live', 'iphash-cv', 'walker@example.org');`).trim();
     check(
       "capture_emit_submission is secret-gated",
       (psqlExpectError(`select capture_emit_submission('${cvSid}'::uuid, 'nope');`) || "").includes("unauthorized"),
@@ -687,6 +693,10 @@ function main() {
       "the observation keeps its provenance and capture date",
       psql(`select (submission_id='${cvSub}')::text || '|' || (captured_on is not null)::text
               from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "true|true",
+    );
+    check(
+      "contact is published from the SESSION, server-side (0024), not the payload",
+      psql(`select contact from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "walker@example.org",
     );
 
     // Re-approving with one segment unticked. Upsert alone would leave seg-b

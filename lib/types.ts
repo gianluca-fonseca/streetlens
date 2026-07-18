@@ -137,6 +137,14 @@ export type CvObservation = {
   submission_id: string | null;
   created_at: string;
   /**
+   * The contributor's contact as given on the capture session (u-provenance), or
+   * null when the walk was submitted anonymously. May be an email; the public
+   * popover shows it as given (sanitized, no mailto) or "Anonymous contributor"
+   * when absent. Sourced server-side at approval from `capture_sessions.contact`;
+   * the raw ip hash is NEVER carried here.
+   */
+  contact?: string | null;
+  /**
    * True when a reviewer corrected this observation before approving it — an item
    * override, an excluded/deleted frame, or a hand-edited lens score (u2). The map
    * shows a small "human-corrected" marker beside the CV chip when set.

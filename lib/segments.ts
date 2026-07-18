@@ -262,6 +262,7 @@ type CvObservationRow = {
   human_corrected: boolean | null;
   overrides: Record<string, unknown> | null;
   assessment: CvAssessment | null;
+  contact: string | null;
 };
 
 /** PostgREST returns numeric as number or string; coerce to a finite number or null. */
@@ -294,6 +295,7 @@ function rowToCvObservation(row: CvObservationRow): CvObservation {
     human_corrected: row.human_corrected ?? false,
     overrides: row.overrides ?? {},
     assessment: row.assessment ?? null,
+    contact: row.contact ?? null,
   };
 }
 
@@ -315,7 +317,7 @@ async function liveCvObservations(): Promise<CvObservation[] | null> {
     const { data, error } = await client
       .from("community_cv_observations")
       .select(
-        "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
+        "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment,contact",
       );
     if (error || !data) return null;
     return (data as CvObservationRow[]).map(rowToCvObservation);
