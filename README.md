@@ -113,7 +113,7 @@ flowchart TB
   I["next-intl · EN / ES"]
   ADP["Data adapter<br/>lib/segments.ts (frozen contract)"]
   DEMO[("Demo GeoJSON<br/>data/*.geojson · real OSM geometry")]
-  SB[("Supabase · Postgres + PostGIS<br/>planned, schema'd, env-gated off")]
+  SB[("Supabase · Postgres + PostGIS<br/>schema'd 0001..0023 · backs the CV capture funnel")]
   MAP["MapLibre GL<br/>OpenFreeMap Liberty tiles<br/>AWS Terrarium DEM hillshade"]
   CFG["mapConfig.ts<br/>sealed ramps · bins · width channel"]
   RENDER["render-map-images.mjs<br/>static SVG map plates"]
@@ -140,7 +140,7 @@ The single read surface is a frozen data adapter (`lib/segments.ts`): it tries S
 | i18n | next-intl, English and Spanish (es-CR) at parity |
 | Map | MapLibre GL · OpenFreeMap Liberty vector tiles · AWS Terrarium DEM |
 | Styling | Tailwind CSS v4 · Space Grotesk, Newsreader, IBM Plex Mono |
-| Data | Frozen adapter: static demo GeoJSON today, Supabase (Postgres + PostGIS) planned |
+| Data | Frozen adapter: static demo GeoJSON serves map scores today; Supabase (Postgres + PostGIS) schema'd across 0001..0023 and backing the CV capture funnel |
 | Geometry | Turf, `geojson-path-finder` (street-following trace) |
 | Validation | Zod |
 | Hosting | Vercel |
@@ -249,7 +249,7 @@ Three drawing sheets, drawn in the project's zen instrument style, with real dim
 - **Scores publish with their formula.** Each lens is scored from a rubric of observed items, higher is better, and the legend always shows the value bins.
 - **Community contributions stay unverified until audited.** Resident-added segments carry no score and render in a neutral casing until a field audit confirms them.
 - **The map covers the whole canton; the pilot corridor is the audited part.** The street network spans all three Escazú districts (San Antonio, Escazú centro, San Rafael), so a capture walk anywhere in the canton matches to real segments. Only the San Antonio pilot carries audit scores today; the rest of the canton renders in the same neutral casing as community adds until fieldwork reaches it.
-- **Machine learning is on the roadmap, not in today's numbers.** There is no model scoring streets, and there is no "AI-powered" claim. When a model is built, a human still verifies every reading.
+- **Model scores are proposals, never today's published numbers.** A vision model can pre-score filmed streets through the [CV data-collection funnel](docs/cv-funnel.md), but its output is a proposal only: it enters the same review queue as a manual contribution, and a person verifies every reading before it reaches the map. No number on the published map comes from a model.
 - **Open by default.** Open code, open rubric, open method, GeoJSON and CSV exports, and sidewalk geometry contributed back to OpenStreetMap.
 
 Full method and rubric detail: [`docs/method.md`](docs/method.md).
