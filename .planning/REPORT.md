@@ -15,8 +15,9 @@ All three SECURITY-RELEVANT mandates shipped: bilingual camera assessments (EN+E
 | `1103729d3e336f7deed608d9b559f4a3ab3d5274` | fix(privacy): re-privatize frames bucket after 0013 idempotency re-run |
 | `21e99554d371146c3ad5856334dd2d191306f8a1` | feat(ui): show evidence strip on CV segments and commit drive evidence |
 | `772e4371ac385231598ade7d5af7b33365ae82e0` | test(privacy): align bucket-private assertion with 0028 upsert form |
+| `e022ae481253992afd65f32ca000687734f76b36` | docs(unit-quality-privacy): report PASS and mark CONTROL done |
+| `undefined` | docs(unit-quality-privacy): report PASS and mark CONTROL done |
 
-(Final docs commit for REPORT/CONTROL/gates may follow this file.)
 
 ## Gates (verbatim)
 
