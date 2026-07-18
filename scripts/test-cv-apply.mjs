@@ -77,6 +77,10 @@ async function main() {
   delete process.env.NEXT_PUBLIC_SUPABASE_URL;
   delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   delete process.env.ADMIN_RPC_SECRET;
+  // The 535-audited baseline (a camera pass is not an audit; the count never
+  // moves) exists only with demo data on, which is no longer the default. Pin it
+  // on so this suite still exercises the audited path.
+  process.env.NEXT_PUBLIC_SHOW_DEMO_DATA = "true";
 
   execFileSync(
     "npx",
