@@ -353,46 +353,51 @@ export default function CaptureReview({
         </div>
       ) : null}
 
-      <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-4`}>
-        <h2 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
-          {t("sessionHeading")}
-        </h2>
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[13px] sm:grid-cols-4">
-          <div>
-            <dt className="text-neutral-strong">{t("statusLabel")}</dt>
-            <dd className="font-mono font-medium text-ink">{t(`status.${review.status}`)}</dd>
-          </div>
-          <div>
-            <dt className="text-neutral-strong">{t("framesLabel")}</dt>
-            <dd className="font-mono font-medium text-ink">{numFmt.format(review.frameCount)}</dd>
-          </div>
-          <div>
-            <dt className="text-neutral-strong">{t("capturedLabel")}</dt>
-            <dd className="font-medium text-ink">
-              {formatProvenanceDate(review.capturedOn, locale) ?? t("unset")}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-neutral-strong">{t("tokensLabel")}</dt>
-            <dd className="font-mono font-medium text-ink">
-              {numFmt.format(review.tokens.inputTokens + review.tokens.outputTokens)}
-            </dd>
-          </div>
-          {/* The SAME "submitted by" fact the public popover shows, so reviewer and
-              public read one truth. Contact only reaches here via the secret-gated
-              detail RPC (0024); anonymous / fixture sessions fall back. Never a hash. */}
-          <div className="col-span-2 sm:col-span-2">
-            <dt className="text-neutral-strong">{t("submittedByLabel")}</dt>
-            <dd className="break-words font-medium text-ink">
-              {sanitizeContact(review.contact) ?? t("submittedAnonymous")}
-            </dd>
-          </div>
-        </dl>
+      {/* Session strip — the control-room telemetry band: status, frames, walked
+          date, tokens, and provenance on one line, the run-quality chips on the
+          other side. Sticky just under the admin header so the reviewer keeps the
+          session context in view while scanning the segment column below. */}
+      <section
+        className={`${styles.plate} sticky top-[3.25rem] z-20 rounded-[8px] border border-border bg-surface-elevated px-3.5 py-2.5`}
+      >
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <h2 className="sr-only">{t("sessionHeading")}</h2>
+          <dl className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-1.5 text-[13px]">
+            <div className="flex items-center gap-1.5">
+              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-neutral-strong">{t("statusLabel")}</dt>
+              <dd className="font-mono font-medium text-ink">{t(`status.${review.status}`)}</dd>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-neutral-strong">{t("framesLabel")}</dt>
+              <dd className="font-mono font-medium text-ink">{numFmt.format(review.frameCount)}</dd>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-neutral-strong">{t("capturedLabel")}</dt>
+              <dd className="font-medium text-ink">
+                {formatProvenanceDate(review.capturedOn, locale) ?? t("unset")}
+              </dd>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-neutral-strong">{t("tokensLabel")}</dt>
+              <dd className="font-mono font-medium text-ink">
+                {numFmt.format(review.tokens.inputTokens + review.tokens.outputTokens)}
+              </dd>
+            </div>
+            {/* The SAME "submitted by" fact the public popover shows, so reviewer and
+                public read one truth. Contact only reaches here via the secret-gated
+                detail RPC (0024); anonymous / fixture sessions fall back. Never a hash. */}
+            <div className="flex min-w-0 items-center gap-1.5">
+              <dt className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-neutral-strong">{t("submittedByLabel")}</dt>
+              <dd className="truncate font-medium text-ink">
+                {sanitizeContact(review.contact) ?? t("submittedAnonymous")}
+              </dd>
+            </div>
+          </dl>
 
-        <ul className="mt-3 flex flex-wrap gap-1.5">
-          <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-neutral-strong">
-            {t("jobsDone", { count: review.jobs.done })}
-          </li>
+          <ul className="flex flex-wrap items-center gap-1.5 lg:ml-auto">
+            <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-neutral-strong">
+              {t("jobsDone", { count: review.jobs.done })}
+            </li>
           {review.jobs.failed - review.jobs.overbudget > 0 ? (
             <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-clay/45 bg-clay/10 px-2 py-0.5 text-[11px] font-medium text-clay">
               <X size={12} strokeWidth={2} aria-hidden="true" />
@@ -421,48 +426,54 @@ export default function CaptureReview({
               {t("correctionsMade", { count: totalCorrections })}
             </li>
           ) : null}
-        </ul>
+          </ul>
+        </div>
       </section>
 
-      {hasMap ? (
-        <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-3`}>
-          <div className="mb-2 flex items-center gap-2">
-            <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
-              {t("mapHeading")}
-            </h2>
-            <button
-              type="button"
-              onClick={() => setMapExpanded(true)}
-              aria-label={t("mapExpand")}
-              data-map-expand
-              className={`${styles.control} ml-auto inline-flex items-center gap-1.5 rounded-[4px] border border-border px-2 py-0.5 text-[11px] font-medium text-neutral-strong hover:text-ink`}
-            >
-              <Maximize2 size={12} strokeWidth={1.75} aria-hidden="true" />
-              {t("mapExpand")}
-            </button>
-          </div>
-          <ReviewMap
-            track={review.track}
-            frames={review.frames}
-            matchedGeometry={matchedGeometry}
-            excludedSeqs={corrections.excluded}
-            deletedSeqs={corrections.deleted}
-            selectedSeq={mapSelectedSeq}
-            selectedSegmentId={mapSelectedSegmentId}
-            onSelectFrame={handleMapSelect}
-            autoFollow={replay.active}
-          />
-        </section>
-      ) : null}
+      {/* The workbench: a situational zone (map + segment column) beside a detail
+          dock (the frame inspector). One grid, min-w-0 tracks so nothing can force
+          the body wider than the viewport. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-start lg:gap-4">
+        {/* Situational zone: the map with its expand / re-center / replay controls
+            sits above the segment column, so the detail dock at right stands beside
+            the whole zone. */}
+        <div className="flex min-w-0 flex-col gap-3">
+          {hasMap ? (
+            <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-3`}>
+              <div className="mb-2 flex items-center gap-2">
+                <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+                  {t("mapHeading")}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setMapExpanded(true)}
+                  aria-label={t("mapExpand")}
+                  data-map-expand
+                  className={`${styles.control} ml-auto inline-flex items-center gap-1.5 rounded-[4px] border border-border px-2 py-0.5 text-[11px] font-medium text-neutral-strong hover:text-ink`}
+                >
+                  <Maximize2 size={12} strokeWidth={1.75} aria-hidden="true" />
+                  {t("mapExpand")}
+                </button>
+              </div>
+              <ReviewMap
+                track={review.track}
+                frames={review.frames}
+                matchedGeometry={matchedGeometry}
+                excludedSeqs={corrections.excluded}
+                deletedSeqs={corrections.deleted}
+                selectedSeq={mapSelectedSeq}
+                selectedSegmentId={mapSelectedSegmentId}
+                onSelectFrame={handleMapSelect}
+                autoFollow={replay.active}
+              />
+            </section>
+          ) : null}
 
-      {review.frames.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <ReplayButton label={t("replayAll")} onClick={startWholeReplay} />
-        </div>
-      ) : null}
-
-      <div className="lg:grid lg:grid-cols-[1fr_minmax(300px,360px)] lg:items-start lg:gap-4">
-        <div className="flex flex-col gap-3">
+          {review.frames.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <ReplayButton label={t("replayAll")} onClick={startWholeReplay} />
+            </div>
+          ) : null}
           {segmentIds.length === 0 ? (
             <p className="rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-4 py-8 text-center text-[13px] text-neutral-strong">
               {t("noSegments")}
@@ -485,9 +496,10 @@ export default function CaptureReview({
                 return (
                   <li
                     key={segmentId}
-                    className={`${styles.plate} rounded-[8px] border bg-surface-elevated p-4 ${
+                    data-segment-id={segmentId}
+                    className={`${styles.plate} min-w-0 rounded-[8px] border bg-surface-elevated p-4 ${
                       dropped ? "border-dashed border-border opacity-55" : isOn ? "border-border-strong" : "border-border opacity-60"
-                    }`}
+                    } ${segmentId === selectedSegmentId ? "ring-2 ring-accent ring-offset-2 ring-offset-surface-base" : ""}`}
                   >
                     <div className="flex flex-wrap items-center gap-2">
                       <label className="flex items-center gap-2 text-[13px] font-medium text-ink">
@@ -673,9 +685,14 @@ export default function CaptureReview({
           ) : null}
         </div>
 
-        {/* Right rail: the frame inspector. Sticky on desktop; scrolls into view on
-            phones when a frame is tapped. */}
-        <aside ref={inspectorRef} className="mt-3 lg:mt-0 lg:sticky lg:top-4">
+        {/* Detail dock: the frame inspector as a right-side panel that fills the
+            available height and scrolls internally, so it never detaches from the
+            column or clips its controls at the edge. On phones it stacks below the
+            situational zone and scrolls into view when a frame is tapped. */}
+        <aside
+          ref={inspectorRef}
+          className="mt-3 min-w-0 lg:mt-0 lg:sticky lg:top-[6.75rem] lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:overflow-x-hidden lg:pr-0.5"
+        >
           {selectedFrame ? (
             <FrameInspector
               key={selectedFrame.seq}
@@ -698,50 +715,57 @@ export default function CaptureReview({
       </div>
 
       {!decided ? (
-        <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-4`}>
-          <label className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
-              {t("reasonLabel")}
-            </span>
-            <textarea
-              rows={2}
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder={t("reasonPlaceholder")}
-              className="resize-y rounded-[4px] border border-border bg-surface-base px-3 py-2 text-[16px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-ink sm:text-[13px]"
-            />
-          </label>
+        // Decision bar — the reviewer's finish line. Pinned to the bottom of the
+        // viewport so approve / reject / reason are always one reach away (thumb
+        // reach on phones, always in view on desktop) no matter how far the
+        // segment column scrolls.
+        <section className={`${styles.plate} sticky bottom-0 z-30 rounded-[8px] border border-border-strong bg-surface-elevated p-3.5`}>
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end sm:gap-3">
+            <label className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+                {t("reasonLabel")}
+              </span>
+              <textarea
+                rows={2}
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder={t("reasonPlaceholder")}
+                className="resize-y rounded-[4px] border border-border bg-surface-base px-3 py-2 text-[16px] text-ink outline-none transition-colors placeholder:text-neutral focus-visible:border-border-strong focus-visible:ring-2 focus-visible:ring-ink sm:text-[13px]"
+              />
+            </label>
+
+            <div className="flex shrink-0 flex-col gap-1.5 sm:items-end">
+              <p className="text-[12px] text-neutral-strong">
+                {t("approveSummary", { count: approvableSelected.length, total: segmentIds.length })}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => submit("approve")}
+                  disabled={busy}
+                  className={`${styles.controlSoft} inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-1.5 text-[12.5px] font-semibold text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55`}
+                >
+                  <Check size={14} strokeWidth={2.25} aria-hidden="true" />
+                  {busy ? t("working") : t("approve")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => submit("reject")}
+                  disabled={busy}
+                  className={`${styles.control} inline-flex items-center gap-1.5 rounded-[4px] border border-clay/45 bg-clay/10 px-3 py-1.5 text-[12.5px] font-semibold text-clay hover:bg-clay/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-55`}
+                >
+                  <X size={14} strokeWidth={2.25} aria-hidden="true" />
+                  {busy ? t("working") : t("rejectSession")}
+                </button>
+              </div>
+            </div>
+          </div>
 
           {error ? (
             <p role="alert" className="mt-2 text-[12px] font-medium text-clay">
               {error}
             </p>
           ) : null}
-
-          <p className="mt-2 text-[12px] text-neutral-strong">
-            {t("approveSummary", { count: approvableSelected.length, total: segmentIds.length })}
-          </p>
-
-          <div className="mt-2.5 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => submit("approve")}
-              disabled={busy}
-              className={`${styles.controlSoft} inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-3 py-1.5 text-[12.5px] font-semibold text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated disabled:cursor-not-allowed disabled:opacity-55`}
-            >
-              <Check size={14} strokeWidth={2.25} aria-hidden="true" />
-              {busy ? t("working") : t("approve")}
-            </button>
-            <button
-              type="button"
-              onClick={() => submit("reject")}
-              disabled={busy}
-              className={`${styles.control} inline-flex items-center gap-1.5 rounded-[4px] border border-clay/45 bg-clay/10 px-3 py-1.5 text-[12.5px] font-semibold text-clay hover:bg-clay/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-55`}
-            >
-              <X size={14} strokeWidth={2.25} aria-hidden="true" />
-              {busy ? t("working") : t("rejectSession")}
-            </button>
-          </div>
         </section>
       ) : null}
 

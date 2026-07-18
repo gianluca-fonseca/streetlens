@@ -62,12 +62,12 @@ export default async function AdminCaptureReviewPage({
   return (
     <>
       <AdminHeader locale={locale} active="queue" />
-      <main className="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6 sm:px-6">
-        <div>
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 sm:px-6">
+        <div className="min-w-0">
           <h1 className="font-display text-[1.4rem] font-semibold tracking-tight text-ink">
             {t("title")}
           </h1>
-          <p className="mt-0.5 font-mono text-[12px] text-neutral-strong">
+          <p className="mt-0.5 truncate font-mono text-[12px] text-neutral-strong">
             {review.sessionId}
           </p>
         </div>
