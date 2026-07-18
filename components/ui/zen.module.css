@@ -5,8 +5,9 @@
  * (Recipe A/C glass §1, zen-soft T1/T2/T3 shadows §2, motion §3). They live here,
  * not in app/globals.css, because globals.css is owned by u17 this sesh; when u17's
  * token vars land these classes should collapse onto tokens (see u18 report,
- * token-swap follow-up). Theming mirrors globals.css: values flip in
- * `@media (prefers-color-scheme: dark)`, so consumers style through one class name.
+ * token-swap follow-up). Theming mirrors globals.css: dark values bind to the
+ * `.dark` class on <html> (u7 class strategy) via `:global(html.dark)`, so
+ * consumers style through one class name and the in-app switcher drives them.
  *
  * Discipline (dossier §6): glass ONLY over live map tiles, never stacked, never
  * pink-tinted; flat grounds get hairline + zen-soft shadow, never glass. Every
@@ -63,8 +64,8 @@
       0 2px 6px rgba(0, 0, 0, 0.08);
   }
 }
-@media (min-width: 768px) and (prefers-color-scheme: dark) {
-  .glassPanelDesktop.glassPanelDesktop {
+@media (min-width: 768px) {
+  :global(html.dark) .glassPanelDesktop.glassPanelDesktop {
     background: var(--glass-bg);
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
     backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
@@ -81,10 +82,8 @@
     .glassPanelDesktop.glassPanelDesktop {
       background: rgba(255, 255, 255, 0.92);
     }
-    @media (prefers-color-scheme: dark) {
-      .glassPanelDesktop.glassPanelDesktop {
-        background: rgba(10, 10, 10, 0.90);
-      }
+    :global(html.dark) .glassPanelDesktop.glassPanelDesktop {
+      background: rgba(10, 10, 10, 0.90);
     }
   }
   @media (prefers-contrast: more) {
@@ -92,11 +91,9 @@
       background: rgba(255, 255, 255, 0.96);
       border-color: rgba(0, 0, 0, 0.55);
     }
-    @media (prefers-color-scheme: dark) {
-      .glassPanelDesktop.glassPanelDesktop {
-        background: rgba(10, 10, 10, 0.94);
-        border-color: rgba(255, 255, 255, 0.5);
-      }
+    :global(html.dark) .glassPanelDesktop.glassPanelDesktop {
+      background: rgba(10, 10, 10, 0.94);
+      border-color: rgba(255, 255, 255, 0.5);
     }
   }
 }
@@ -108,28 +105,26 @@
   background: rgba(255, 255, 255, 0.55);
 }
 
-@media (prefers-color-scheme: dark) {
-  .glassPanel {
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
-    backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
-    border: 1px solid var(--glass-border);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.09),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-      0 10px 30px rgba(0, 0, 0, 0.55),
-      0 2px 8px rgba(0, 0, 0, 0.40);
-  }
-  .glassChip {
-    background: var(--glass-chip-bg);
-    -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
-    backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
-    border: 1px solid var(--glass-chip-border);
-    box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift);
-  }
-  .glassScrim {
-    background: rgba(10, 10, 10, 0.55);
-  }
+:global(html.dark) .glassPanel {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%) brightness(1.08);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 10px 30px rgba(0, 0, 0, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.40);
+}
+:global(html.dark) .glassChip {
+  background: var(--glass-chip-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+  backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+  border: 1px solid var(--glass-chip-border);
+  box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift);
+}
+:global(html.dark) .glassScrim {
+  background: rgba(10, 10, 10, 0.55);
 }
 
 /* Blur unsupported → fall back to a near-solid surface (never leave the translucent
@@ -139,11 +134,9 @@
   .glassChip {
     background: rgba(255, 255, 255, 0.92);
   }
-  @media (prefers-color-scheme: dark) {
-    .glassPanel,
-    .glassChip {
-      background: rgba(10, 10, 10, 0.90);
-    }
+  :global(html.dark) .glassPanel,
+  :global(html.dark) .glassChip {
+    background: rgba(10, 10, 10, 0.90);
   }
 }
 
@@ -158,15 +151,13 @@
   .glassScrim {
     background: rgba(255, 255, 255, 0.85);
   }
-  @media (prefers-color-scheme: dark) {
-    .glassPanel,
-    .glassChip {
-      background: rgba(10, 10, 10, 0.94);
-      border-color: rgba(255, 255, 255, 0.5);
-    }
-    .glassScrim {
-      background: rgba(10, 10, 10, 0.82);
-    }
+  :global(html.dark) .glassPanel,
+  :global(html.dark) .glassChip {
+    background: rgba(10, 10, 10, 0.94);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  :global(html.dark) .glassScrim {
+    background: rgba(10, 10, 10, 0.82);
   }
 }
 
@@ -219,13 +210,11 @@
   box-shadow: var(--shadow-raised);
 }
 
-@media (prefers-color-scheme: dark) {
-  .plateInteractive:hover {
-    /* +8/255 surface step from the #141414 rest plate → tiers separate on black. The
-       box-shadow flips through --shadow-raised on the base rule; only the dark surface
-       tint needs a dark override (light hover does not tint). */
-    background-color: var(--surface-raised);
-  }
+:global(html.dark) .plateInteractive:hover {
+  /* +8/255 surface step from the #141414 rest plate → tiers separate on black. The
+     box-shadow flips through --shadow-raised on the base rule; only the dark surface
+     tint needs a dark override (light hover does not tint). */
+  background-color: var(--surface-raised);
 }
 
 /* ─── Motion (dossier §3) — one settle, one hover, one press. No loops. ──────── */
