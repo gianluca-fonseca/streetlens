@@ -341,6 +341,13 @@ export const segmentAssessmentDraftSchema = z.object({
     shade: lensAdjustmentSchema,
     bike: lensAdjustmentSchema,
   }),
+  /**
+   * Spanish prose produced in the SAME synthesis call (0028). Optional at the
+   * Zod layer so older fixtures / EN-only drafts still parse; the strict model
+   * schema requires both locales.
+   */
+  overall_es: z.string().optional(),
+  lenses_es: perLensProse.optional(),
 });
 export type SegmentAssessmentDraft = z.infer<typeof segmentAssessmentDraftSchema>;
 
@@ -376,6 +383,16 @@ export const segmentAssessmentSchema = z.object({
 });
 export type SegmentAssessment = z.infer<typeof segmentAssessmentSchema>;
 
+/**
+ * Spanish prose companion stored in `assessment_es` (0028). Numbers stay on the
+ * English assessment; only overall + per-lens explanations are localized.
+ */
+export const segmentAssessmentEsSchema = z.object({
+  overall: z.string(),
+  lenses: perLensProse,
+});
+export type SegmentAssessmentEs = z.infer<typeof segmentAssessmentEsSchema>;
+
 /* ------------------------------------------------------------------ *
  * Parse helpers
  * ------------------------------------------------------------------ */
@@ -388,4 +405,41 @@ export function parseCaptureObservation(input: unknown): CaptureObservationParse
 /** Parse+validate a stored segment assessment. Throws on invalid input. */
 export function parseSegmentAssessment(input: unknown): SegmentAssessment {
   return segmentAssessmentSchema.parse(input);
+}
+
+/** Parse+validate Spanish assessment prose. Throws on invalid input. */
+export function parseSegmentAssessmentEs(input: unknown): SegmentAssessmentEs {
+  return segmentAssessmentEsSchema.parse(input);
+}
+
+/**
+ * Prefer Spanish prose when the viewer locale is `es` and assessment_es exists;
+ * otherwise fall back to the English assessment overall. Never throws.
+ */
+export function assessmentOverallForLocale(
+  assessment: unknown,
+  assessmentEs: unknown,
+  locale: string,
+): string | null {
+  const readOverall = (raw: unknown): string | null => {
+    let a: unknown = raw;
+    if (typeof a === "string") {
+      const s = a.trim();
+      if (!s || s === "null") return null;
+      try {
+        a = JSON.parse(s);
+      } catch {
+        return null;
+      }
+    }
+    if (!a || typeof a !== "object" || Array.isArray(a)) return null;
+    const overall = (a as { overall?: unknown }).overall;
+    return typeof overall === "string" && overall.trim() ? overall.trim() : null;
+  };
+
+  if (locale === "es") {
+    const es = readOverall(assessmentEs);
+    if (es) return es;
+  }
+  return readOverall(assessment);
 }

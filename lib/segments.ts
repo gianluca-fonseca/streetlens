@@ -20,6 +20,11 @@ import { fetchAllPages } from "./supabase-bounded";
 import { toPaintFeature } from "./map-payload";
 import { showDemoData } from "./demo-flag";
 import {
+  CV_OBSERVATION_SELECT,
+  CV_OBSERVATION_SELECT_PRE_0028,
+  isMissingAssessmentEsColumn,
+} from "./cv-observation-select";
+import {
   readCommunityReports,
   readCommunitySegments,
   readCvObservations,
@@ -426,6 +431,7 @@ type CvObservationRow = {
   human_corrected: boolean | null;
   overrides: Record<string, unknown> | null;
   assessment: CvAssessment | null;
+  assessment_es: CvObservation["assessment_es"];
 };
 
 /** PostgREST returns numeric as number or string; coerce to a finite number or null. */
@@ -458,6 +464,7 @@ function rowToCvObservation(row: CvObservationRow): CvObservation {
     human_corrected: row.human_corrected ?? false,
     overrides: row.overrides ?? {},
     assessment: row.assessment ?? null,
+    assessment_es: row.assessment_es ?? null,
   };
 }
 
@@ -475,21 +482,28 @@ function rowToCvObservation(row: CvObservationRow): CvObservation {
 async function liveCvObservations(): Promise<CvObservation[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
+
+  const page = async (columns: string, from: number, to: number) => {
+    const { data, error } = await client
+      .from("community_cv_observations")
+      .select(columns)
+      .range(from, to);
+    return { data, error };
+  };
+
   try {
     const rows = await fetchAllPages<CvObservationRow>(
       "community_cv_observations",
       async (from, to) => {
-        const { data, error } = await client
-          .from("community_cv_observations")
-          .select(
-            "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
-          )
-          .range(from, to);
+        let { data, error } = await page(CV_OBSERVATION_SELECT, from, to);
+        if (error && isMissingAssessmentEsColumn(error.message)) {
+          ({ data, error } = await page(CV_OBSERVATION_SELECT_PRE_0028, from, to));
+        }
         if (error) {
           markLiveReadFailure("cv", error.message);
           return null;
         }
-        return (data as CvObservationRow[]) ?? null;
+        return (data as unknown as CvObservationRow[]) ?? null;
       },
     );
     if (!rows) {

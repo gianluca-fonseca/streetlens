@@ -35,12 +35,20 @@ import type { ItemMedian } from "@/lib/capture/rollup";
 import {
   SYNTHESIS_LENS_KEYS,
   segmentAssessmentDraftSchema,
+  segmentAssessmentEsSchema,
   type SynthesisLensKey,
   type LensAdjustment,
   type SegmentAssessment,
   type SegmentAssessmentDraft,
+  type SegmentAssessmentEs,
 } from "@/lib/capture/schemas";
-import { HTTP_MAX_RETRIES, openaiApiKey, synthesisMaxAdjust, synthesisModel } from "./config";
+import {
+  HTTP_MAX_RETRIES,
+  openaiApiKey,
+  synthesisMaxAdjust,
+  synthesisMaxOutputTokens,
+  synthesisModel,
+} from "./config";
 import {
   backoffMs,
   isRetryable,
@@ -89,7 +97,14 @@ export type SynthesizeOptions = {
 };
 
 export type SynthesisOutcome =
-  | { kind: "ok"; assessment: SegmentAssessment; usage: VisionUsage; model: string }
+  | {
+      kind: "ok";
+      assessment: SegmentAssessment;
+      /** Spanish prose companion; null when the model omitted usable ES copy. */
+      assessmentEs: SegmentAssessmentEs | null;
+      usage: VisionUsage;
+      model: string;
+    }
   | { kind: "failed"; reason: string; usage: VisionUsage; model: string };
 
 const NO_USAGE: VisionUsage = { inputTokens: 0, outputTokens: 0, cachedTokens: 0 };
@@ -333,7 +348,7 @@ export function buildSynthesisEvidence(input: SynthesisSegmentInput): string {
  */
 export function synthesisSystemPrompt(maxAdjust: number): string {
   return [
-    `You are a senior street-infrastructure reviewer for San Antonio de Escazú, Costa Rica. You are given ONE street segment as a traversal: a sequence of frames in the order they were walked, each with its distance along the walk, whether it sits at a junction, the 15 rubric item readings the vision pass produced (with the model's confidence), and a per-frame note. You are also given the deterministic BASELINE lens scores (an average of medians) and the item medians.`,
+    `You are a senior street-infrastructure reviewer for a Costa Rican municipality pilot. You are given ONE street segment as a traversal: a sequence of frames in the order they were walked, each with its distance along the walk, whether it sits at a junction, the 15 rubric item readings the vision pass produced (with the model's confidence), and a per-frame note. You are also given the deterministic BASELINE lens scores (an average of medians) and the item medians.`,
     ``,
     `YOUR JOB is to read the segment AS A WHOLE and write a nuanced assessment that an averaging rollup cannot. Reason ACROSS the frames, not frame by frame:`,
     `- CONTINUITY AND GAPS. A feature that is present in one place and absent for a long stretch is worse than its average suggests. A crosswalk at the top of the block then none for two hundred metres, a sidewalk that starts and stops, a single drain on a long hill: name these, and let them move the score. The continuity block spells out the runs and their distances for you.`,
@@ -342,11 +357,13 @@ export function synthesisSystemPrompt(maxAdjust: number): string {
     ``,
     `DO NOT RE-AVERAGE. The baseline already is the average. Your value is the reasoning the average cannot capture. Do not recompute the mean of the readings and report it back.`,
     ``,
-    `BOUNDED ADJUSTMENTS. For each of the four adjustable lenses — accessibility, drainage, shade, bike — you may propose a delta in points to add to (negative: subtract from) the baseline, bounded to at most ${maxAdjust} points either way. Anything larger will be clamped. Every non-zero delta MUST carry a written reason grounded in the evidence; a delta with no reason is discarded. Leave a lens at delta 0 when the baseline is already right. You do NOT set the overall score: it is recomputed from your adjusted lenses. You cannot score a lens whose baseline is null (no frame could assess it) — leave its delta 0, but you may still explain in its lens text WHY it is unknown.`,
+    `BOUNDED ADJUSTMENTS. For each of the four adjustable lenses — accessibility, drainage, shade, bike — you may propose a delta in points to add to (negative: subtract from) the baseline, bounded to at most ${maxAdjust} points either way. Anything larger will be clamped. Every non-zero delta MUST carry a written reason grounded in the evidence; a delta with no reason is discarded. Leave a lens at delta 0 when the baseline is already right. You do NOT set the overall score: it is recomputed from your adjusted lenses. You cannot score a lens whose baseline is null (no frame could assess it) — leave its delta 0, but you may still explain in its lens text WHY it is unknown. Adjustment reasons stay in English (reviewer-facing).`,
+    ``,
+    `BILINGUAL PROSE (ONE CALL). Write the assessment twice: English in overall/lenses, and a faithful Spanish translation in overall_es/lenses_es. Same facts and tone; do not invent different claims per locale. Keep each field concise — a few sentences for overall, one short paragraph per lens — to stay within the output token budget.`,
     ``,
     `OUTPUT. Return JSON matching the provided schema exactly:`,
-    `- overall: a few sentences, the nuanced verdict for the whole segment, grounded in what changes along the walk.`,
-    `- lenses: one honest explanation each for accessibility, drainage, shade, bike — what the frames show and why the score is what it is.`,
+    `- overall / overall_es: a few sentences, the nuanced verdict for the whole segment, grounded in what changes along the walk.`,
+    `- lenses / lenses_es: one honest explanation each for accessibility, drainage, shade, bike.`,
     `- adjustments: for each of the four lenses, { delta, reason }. delta 0 with an empty reason means no change.`,
     `No prose outside these fields.`,
   ].join("\n");
@@ -387,9 +404,14 @@ function lensProseSchema(lens: string): JsonSchema {
 /** The `text.format` block for the synthesis call — strict, so the shape is guaranteed. */
 export function synthesisResponseFormat(maxAdjust: number) {
   const proseProps: Record<string, JsonSchema> = {};
+  const proseEsProps: Record<string, JsonSchema> = {};
   const adjProps: Record<string, JsonSchema> = {};
   for (const lens of SYNTHESIS_LENS_KEYS) {
     proseProps[lens] = lensProseSchema(lens);
+    proseEsProps[lens] = {
+      type: "string",
+      description: `Spanish translation of the ${lens} lens explanation. Same facts as English.`,
+    };
     adjProps[lens] = adjustmentSchema(lens, maxAdjust);
   }
 
@@ -400,12 +422,12 @@ export function synthesisResponseFormat(maxAdjust: number) {
     schema: {
       type: "object",
       additionalProperties: false,
-      required: ["overall", "lenses", "adjustments"],
+      required: ["overall", "lenses", "adjustments", "overall_es", "lenses_es"],
       properties: {
         overall: {
           type: "string",
           description:
-            "A few sentences: the nuanced overall verdict for this segment, grounded in the cross-frame evidence, not a re-average of the readings.",
+            "English: a few sentences — the nuanced overall verdict for this segment, grounded in the cross-frame evidence, not a re-average of the readings.",
         },
         lenses: {
           type: "object",
@@ -419,9 +441,43 @@ export function synthesisResponseFormat(maxAdjust: number) {
           required: [...SYNTHESIS_LENS_KEYS],
           properties: adjProps,
         },
+        overall_es: {
+          type: "string",
+          description:
+            "Spanish translation of overall. Same verdict and facts; natural Costa Rican Spanish.",
+        },
+        lenses_es: {
+          type: "object",
+          additionalProperties: false,
+          required: [...SYNTHESIS_LENS_KEYS],
+          properties: proseEsProps,
+        },
       },
     },
   } satisfies JsonSchema;
+}
+
+/**
+ * Extract Spanish prose from a draft. Returns null when ES fields are missing
+ * or empty so callers fall back to English on public surfaces.
+ */
+export function extractAssessmentEs(draft: SegmentAssessmentDraft): SegmentAssessmentEs | null {
+  const overall = (draft.overall_es ?? "").trim();
+  if (!overall) return null;
+  const lenses = draft.lenses_es;
+  if (!lenses) return null;
+  const parsed = segmentAssessmentEsSchema.safeParse({
+    overall,
+    lenses: {
+      accessibility: (lenses.accessibility ?? "").trim(),
+      drainage: (lenses.drainage ?? "").trim(),
+      shade: (lenses.shade ?? "").trim(),
+      bike: (lenses.bike ?? "").trim(),
+    },
+  });
+  if (!parsed.success) return null;
+  // Require non-empty overall; empty lens strings are allowed (unknown lens).
+  return parsed.data;
 }
 
 /* ------------------------------------------------------------------ *
@@ -535,6 +591,8 @@ export function buildSynthesisRequestBody(request: SynthesisRequest): Record<str
       },
     ],
     text: { format: request.format },
+    // Bound bilingual output so one call cannot runaway-bill on long prose.
+    max_output_tokens: synthesisMaxOutputTokens(),
     // NO temperature — the gpt-5 reasoning models 400 the whole request on it.
     store: false,
   };
@@ -661,6 +719,7 @@ export async function synthesizeSegment(
   }
 
   const assessment = applyAssessment(parsed.data, input.baselineScores, model, maxAdjust);
-  return { kind: "ok", assessment, usage: response.usage, model };
+  const assessmentEs = extractAssessmentEs(parsed.data);
+  return { kind: "ok", assessment, assessmentEs, usage: response.usage, model };
 }
 

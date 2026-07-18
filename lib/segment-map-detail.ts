@@ -11,6 +11,11 @@ import {
 } from "./community-store";
 import { scrubCvObservations, type SegmentMapDetail } from "./map-payload";
 import { fetchAllPages } from "./supabase-bounded";
+import {
+  CV_OBSERVATION_SELECT,
+  CV_OBSERVATION_SELECT_PRE_0028,
+  isMissingAssessmentEsColumn,
+} from "./cv-observation-select";
 import type { CommunityReport, CvObservation } from "./types";
 
 const MAX_CV_OBSERVATIONS_PER_SEGMENT = 50;
@@ -35,6 +40,7 @@ type CvObservationRow = {
   human_corrected: boolean | null;
   overrides: Record<string, unknown> | null;
   assessment: CvObservation["assessment"] | null;
+  assessment_es: CvObservation["assessment_es"] | null;
 };
 
 function toNum(v: number | string | null | undefined): number | null {
@@ -66,6 +72,7 @@ function rowToCvObservation(row: CvObservationRow): CvObservation {
     human_corrected: row.human_corrected ?? false,
     overrides: row.overrides ?? {},
     assessment: row.assessment ?? null,
+    assessment_es: row.assessment_es ?? null,
   };
 }
 
@@ -74,20 +81,27 @@ async function liveCvObservationsForSegment(
 ): Promise<CvObservation[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
+
+  const page = async (columns: string, from: number, to: number) => {
+    const { data, error } = await client
+      .from("community_cv_observations")
+      .select(columns)
+      .eq("segment_id", segmentId)
+      .order("created_at", { ascending: false })
+      .range(from, to);
+    return { data, error };
+  };
+
   try {
     const rows = await fetchAllPages<CvObservationRow>(
       `community_cv_observations segment=${segmentId}`,
       async (from, to) => {
-        const { data, error } = await client
-          .from("community_cv_observations")
-          .select(
-            "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
-          )
-          .eq("segment_id", segmentId)
-          .order("created_at", { ascending: false })
-          .range(from, to);
+        let { data, error } = await page(CV_OBSERVATION_SELECT, from, to);
+        if (error && isMissingAssessmentEsColumn(error.message)) {
+          ({ data, error } = await page(CV_OBSERVATION_SELECT_PRE_0028, from, to));
+        }
         if (error || !data) return null;
-        return data as CvObservationRow[];
+        return data as unknown as CvObservationRow[];
       },
       { maxRows: MAX_CV_OBSERVATIONS_PER_SEGMENT },
     );

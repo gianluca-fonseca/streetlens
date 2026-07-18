@@ -46,7 +46,7 @@ import {
 } from "@/lib/extraction/synthesis";
 import type { CaptureDb, ClaimedJob, ObservationRow } from "./db";
 import { getCaptureDb } from "./db";
-import { publicFrameUrl } from "./storage";
+import { signedFrameUrl } from "./storage";
 import { computeRollups, type RollupObservation, type SegmentRollup } from "./rollup";
 import { emitCaptureSubmission } from "@/lib/submissions-sink";
 import type { PumpResponse } from "./schemas";
@@ -57,7 +57,7 @@ export type PumpDeps = {
   /** The text model that writes the per-segment synthesis. Injectable for tests. */
   synthesis?: SynthesisClient;
   /** Injectable so tests can assert URL construction without Supabase env. */
-  frameUrl?: (storagePath: string) => string;
+  frameUrl?: (storagePath: string) => string | Promise<string>;
   /** Injectable so tests drive the real downscale without fetching anything. */
   prepareImage?: ImagePreparer;
   /** Injectable so tests assert the queue emit without writing a real queue file. */
@@ -103,7 +103,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
 
   const vision = deps?.vision ?? createOpenAiVisionClient();
   const synthesis = deps?.synthesis ?? createOpenAiSynthesisClient();
-  const frameUrl = deps?.frameUrl ?? publicFrameUrl;
+  const frameUrl = deps?.frameUrl ?? ((path: string) => signedFrameUrl(path, { privileged: true }));
   const prepareImage = deps?.prepareImage ?? downscaleFrame;
   const emitSubmission = deps?.emitSubmission ?? emitCaptureSubmission;
   const batch = deps?.limit ?? PUMP_BATCH_SIZE;
@@ -171,7 +171,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
 type JobDeps = {
   db: CaptureDb;
   vision: VisionClient;
-  frameUrl: (storagePath: string) => string;
+  frameUrl: (storagePath: string) => string | Promise<string>;
   prepareImage: ImagePreparer;
   loadSession: (sessionId: string) => Promise<SessionState>;
 };
@@ -210,7 +210,7 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
 
   let url: string;
   try {
-    url = frameUrl(job.storage_path);
+    url = await frameUrl(job.storage_path);
   } catch (err) {
     await db.failJob(job.frame_id, "failed", `frame_url: ${errText(err)}`);
     return "failed";
@@ -493,6 +493,7 @@ export async function synthesizeSession(
         sessionId,
         segmentId: rollup.segmentId,
         assessment: outcome.assessment,
+        assessmentEs: outcome.assessmentEs,
         inputTokens: outcome.usage.inputTokens,
         outputTokens: outcome.usage.outputTokens,
       });

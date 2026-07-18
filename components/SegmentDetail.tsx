@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown, ImageOff, Pencil, ScanLine, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
 import type { CvObservation } from "@/lib/types";
+import { assessmentOverallForLocale } from "@/lib/assessment";
 import {
   parseCommunityReport,
   parseCommunityReports,
@@ -52,9 +53,18 @@ function asRatio(value: unknown): number | null {
  * design: `assessment` crosses the maplibre property boundary and may arrive as a
  * string, a malformed object, or absent, so a bad shape must degrade to "no
  * assessment", never throw under the popover (which has no error boundary).
+ * Prefers Spanish when the viewer locale is `es` and assessment_es exists.
  */
-function cvOverall(assessment: unknown): string | null {
-  return cvOverallAssessment(assessment);
+function cvOverall(
+  assessment: unknown,
+  assessmentEs: unknown,
+  locale: string,
+): string | null {
+  return assessmentOverallForLocale(assessment, assessmentEs, locale);
+}
+
+function hasAssessmentEs(assessmentEs: unknown): boolean {
+  return Boolean(assessmentOverallForLocale(null, assessmentEs, "es"));
 }
 
 /**
@@ -278,28 +288,27 @@ function CvObservationCard({
             grammatical number entirely. */}
         {t("cvFramesLabel")} <span className="text-ink">{frames}</span>
       </p>
-      {/* The reviewer-approved synthesis (u2). Model output, in English: the
-          localized labels frame it, the sentence itself is the model's. Numbers
-          above are still the reviewer's; this is context. Read defensively — it
-          crosses the maplibre boundary. */}
-      {cvOverall(o.assessment) ? (
+      {/* The reviewer-approved synthesis (u2 / 0028). Model output: prefer the
+          viewer locale when assessment_es exists; fall back to English. Numbers
+          above are still the reviewer's; this is context. */}
+      {cvOverall(o.assessment, o.assessment_es, locale) ? (
         <div
           className={`mt-2.5 rounded-[6px] border border-border bg-surface-sunken px-2.5 py-1.5 ${panel.assessment}`}
         >
-          {/* Accent on the frame and the label only. The sentence itself stays
-              plain ink: this is the one block on the panel meant to be READ as
-              prose, and colouring body text would slow that down for style. */}
           <p
             className={`font-mono text-[10px] uppercase tracking-[0.1em] ${panel.assessmentLabel}`}
           >
             {t("cvAssessmentLabel")}
           </p>
           <p className="mt-0.5 text-[12px] leading-snug text-ink">
-            {cvOverall(o.assessment)}
+            {cvOverall(o.assessment, o.assessment_es, locale)}
           </p>
-          <p className="mt-1 text-[9.5px] leading-snug text-neutral-strong">
-            {t("cvAssessmentNote")}
-          </p>
+          {/* Hide the "written in English" note when Spanish prose is shown. */}
+          {locale === "es" && hasAssessmentEs(o.assessment_es) ? null : (
+            <p className="mt-1 text-[9.5px] leading-snug text-neutral-strong">
+              {t("cvAssessmentNote")}
+            </p>
+          )}
         </div>
       ) : null}
     </li>
@@ -333,6 +342,10 @@ export default function SegmentDetail({
   const [detailEmbedded, setDetailEmbedded] = useState<
     ReturnType<typeof parseCommunityReport> | null
   >(null);
+  const [evidence, setEvidence] = useState<{
+    frames: { i: number; url: string }[];
+    emptyReason: "none" | "unavailable" | null;
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -354,6 +367,24 @@ export default function SegmentDetail({
         /* degrade to paint-only props */
       } finally {
         if (!cancelled) setDetailLoading(false);
+      }
+    })();
+
+    void (async () => {
+      try {
+        const res = await fetch(`/api/segments/${encodeURIComponent(segment.id)}/evidence`);
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          frames?: { i: number; url: string }[];
+          emptyReason?: "none" | "unavailable" | null;
+        };
+        if (cancelled) return;
+        setEvidence({
+          frames: Array.isArray(data.frames) ? data.frames : [],
+          emptyReason: data.emptyReason ?? "none",
+        });
+      } catch {
+        if (!cancelled) setEvidence({ frames: [], emptyReason: "unavailable" });
       }
     })();
 
@@ -637,31 +668,6 @@ export default function SegmentDetail({
             </li>
           ))}
         </ul>
-
-        <h3
-          style={settleDelay(120)}
-          className={`mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong ${panel.settle}`}
-        >
-          {t("photosHeading")}
-        </h3>
-        <div style={settleDelay(120)} className={`grid grid-cols-3 gap-2 ${panel.settle}`}>
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="flex aspect-square flex-col items-center justify-center gap-1 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-1 text-center"
-            >
-              <ImageOff
-                size={18}
-                strokeWidth={1.75}
-                className="text-neutral"
-                aria-hidden="true"
-              />
-              <span className="text-[9.5px] leading-tight text-neutral-strong">
-                {t("photoPlaceholder")}
-              </span>
-            </div>
-          ))}
-        </div>
           </>
         ) : null}
 
@@ -687,6 +693,49 @@ export default function SegmentDetail({
               <CvObservationCard observation={canonical} superseded={false} />
             </ul>
             ) : null}
+
+            {/* Privacy-safe evidence strip: signed URLs only, via /evidence.
+                Lives with the CV block so import/community camera streets show
+                it (field-audit score chrome above stays gated on !isCommunity). */}
+            <h3
+              className="mb-2 mt-3 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong"
+            >
+              {t("photosHeading")}
+            </h3>
+            <div>
+              {evidence && evidence.frames.length > 0 ? (
+                <ul className="grid grid-cols-3 gap-2" aria-label={t("photosHeading")}>
+                  {evidence.frames.map((frame) => (
+                    <li key={frame.i} className="aspect-square overflow-hidden rounded-[8px] border border-border bg-surface-sunken">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- signed URLs are ephemeral; next/image cannot optimize them */}
+                      <img
+                        src={frame.url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="flex aspect-[3/1] flex-col items-center justify-center gap-1 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 text-center">
+                  <ImageOff
+                    size={18}
+                    strokeWidth={1.75}
+                    className="text-neutral"
+                    aria-hidden="true"
+                  />
+                  <span className="text-[9.5px] leading-tight text-neutral-strong">
+                    {evidence?.emptyReason === "unavailable"
+                      ? t("photoUnavailable")
+                      : evidence?.emptyReason === "none"
+                        ? t("photoHeld")
+                        : t("photoPlaceholder")}
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Archive. Only rendered when something was actually superseded:
                 with zero or one observation there is no history to disclose, and

@@ -1,0 +1,16 @@
+unit-quality-privacy evidence drive — port 3585
+local-mode next (Supabase unset for seed visibility)
+
+API checks:
+- GET /api/segments/esc-sa-0001/detail → 200, 2 cv_observations
+- assessment EN + assessment_es present; session_id/frame_refs scrubbed; frame_count set
+- GET /api/segments/esc-sa-0001/evidence → { frames: [], emptyReason: "unavailable" }
+  (no private-frame signing in local drive — privacy-safe empty strip)
+
+Browser (Playwright MCP):
+- EN: ASSESSMENT English prose; PHOTOS empty/unavailable state
+- ES: Spanish assessment prose; FOTOS empty state
+- screenshots: map-detail-en.png, map-detail-es.png
+- console: console.log (MapLibre null warnings pre-existing; no app errors)
+
+Evidence strip placed under CV block so import/community camera streets show it.
