@@ -6,6 +6,9 @@
   "demoBanner": {
     "message": "Datos de demostración sobre geometría vial real. El piloto de campo inicia en agosto de 2026: ninguna cifra mostrada es una medición real."
   },
+  "dataDegradedBanner": {
+    "message": "No se puede conectar a la base de datos en vivo — mostrando datos estáticos en caché. Las cifras del mapa pueden estar desactualizadas hasta que se recupere la conexión."
+  },
   "theme": {
     "label": "Tema",
     "options": {
@@ -294,6 +297,14 @@
       "jobsDone": "{count} extraídos",
       "jobsFailed": "{count} con fallo",
       "overbudget": "El presupuesto se detuvo antes de leer todos los cuadros",
+      "pauseBannerTitle": "Extracción en pausa — límite de presupuesto alcanzado",
+      "pauseBannerBody": "Esta sesión alcanzó su presupuesto de procesamiento y se detuvo automáticamente. Reanude solo después de decidir gastar más.",
+      "pauseReasonLabel": "Motivo de la pausa",
+      "resumeExtraction": "Reanudar extracción",
+      "resumeReasonLabel": "Motivo de reanudación",
+      "resumeReasonPlaceholder": "¿Por qué reanuda esta sesión?",
+      "resumeReasonRequired": "Se requiere un motivo de reanudación.",
+      "resumeError": "No se pudo reanudar la extracción. Inténtelo de nuevo.",
       "escalated": "{count} escaladas",
       "unattributed": "{count} cuadros no coincidieron con ninguna calle",
       "cameraObserved": "Lectura de cámara",
@@ -1165,7 +1176,7 @@
         "uploading": "Tus cuadros todavía están llegando.",
         "matching": "Uniendo tus cuadros a las calles que caminaste.",
         "extracting": "Leyendo tus cuadros. Esta es la parte lenta, y avanza más rápido mientras esta página esté abierta.",
-        "cost_paused": "La lectura está en pausa en este envío.",
+        "cost_paused": "La lectura está en pausa — esperando que el equipo la reanude.",
         "review_ready": "Tu sesión está esperando a una persona revisora.",
         "approved": "Aprobada. Lo que midió tu sesión ya es dato público.",
         "rejected": "Una persona revisora no aprobó este envío, así que nada de él se volvió dato público.",
@@ -1174,12 +1185,13 @@
       "framesRead": "{done} de {total} cuadros leídos",
       "framesFailed": "Cuadros que no se pudieron leer: {count}. El resto de la sesión sigue contando.",
       "paused": {
-        "title": "La lectura está en pausa",
-        "body": "Este envío llegó a su límite de procesamiento, así que ya no se gasta nada más en ella de forma automática. Alguien tiene que verlo y decidir. Mientras tanto, tus cuadros están a salvo."
+        "title": "La lectura está en pausa por el equipo",
+        "body": "Este envío alcanzó su presupuesto de procesamiento y se detuvo automáticamente. No se reanudará sola — un miembro del equipo debe revisarla y reanudar la extracción explícitamente. Tus cuadros están a salvo.",
+        "reason": "Detalle técnico: {reason}"
       },
       "failedNotice": {
         "title": "Este envío no se pudo procesar",
-        "body": "Algo salió mal al unirlo o al leerlo, y preferimos decirlo antes que mostrarte un número en el que no confiamos. Nada de este envío se volvió dato público."
+        "body": "Algo salió mal al unirlo o al leerlo antes de que el recorrido pudiera terminar. Esto no es una pausa por presupuesto — la sesión falló y no se completará sin ayuda. Nada de este envío se volvió dato público."
       },
       "segmentsEyebrow": "CALLES UNIDAS",
       "segmentsLead": "Segmentos de calle unidos hasta ahora: {count}. Los puntajes quedan provisionales hasta que una persona revisora apruebe la sesión.",
