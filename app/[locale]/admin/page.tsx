@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
-import { ListChecks } from "lucide-react";
+import { History, ListChecks } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
 import { getSubmissionCounts } from "@/lib/submissions";
@@ -100,13 +100,22 @@ export default async function AdminDashboardPage({
             <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
               {t("pending")} · {t("approved")} · {t("rejected")}
             </h2>
-            <Link
-              href={`/${locale}/admin/queue`}
-              className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12px] font-medium text-ink transition-colors hover:border-border-strong"
-            >
-              <ListChecks size={14} strokeWidth={1.75} aria-hidden="true" />
-              {t("queueLink")}
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/${locale}/admin/history`}
+                className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12px] font-medium text-ink transition-colors hover:border-border-strong"
+              >
+                <History size={14} strokeWidth={1.75} aria-hidden="true" />
+                {t("historyLink")}
+              </Link>
+              <Link
+                href={`/${locale}/admin/queue`}
+                className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-2.5 py-1.5 text-[12px] font-medium text-ink transition-colors hover:border-border-strong"
+              >
+                <ListChecks size={14} strokeWidth={1.75} aria-hidden="true" />
+                {t("queueLink")}
+              </Link>
+            </div>
           </div>
           <StatTiles tiles={submissionTiles} />
         </section>
