@@ -118,6 +118,10 @@ export default function CaptureReview({
   const [resumeReason, setResumeReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [resumeBusy, setResumeBusy] = useState(false);
+  const [reprocessBusy, setReprocessBusy] = useState(false);
+  const [reprocessMsg, setReprocessMsg] = useState<string | null>(null);
+  const [rerunBusySegment, setRerunBusySegment] = useState<string | null>(null);
+  const [assessments, setAssessments] = useState(review.assessments);
   const [error, setError] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [draftRestored] = useState(
@@ -148,8 +152,8 @@ export default function CaptureReview({
   // carries its own pure baseline (`baselineScores`) and adjusted proposal
   // (`adjustedScores`) for the side-by-side, so no second recompute is needed.
   const result = useMemo(
-    () => recomputeReview(review.frames, corrections, review.assessments),
-    [review.frames, corrections, review.assessments],
+    () => recomputeReview(review.frames, corrections, assessments),
+    [review.frames, corrections, assessments],
   );
 
   const survivingById = useMemo(
@@ -465,6 +469,92 @@ export default function CaptureReview({
     }
   }
 
+  async function reprocessSession(dryRun: boolean) {
+    setReprocessBusy(true);
+    setReprocessMsg(null);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/capture/reprocess", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          session_id: review.sessionId,
+          dry_run: dryRun,
+        }),
+      });
+      const body = (await res.json()) as {
+        attributed?: number;
+        total?: number;
+        reprocessed?: number;
+        requeued?: number;
+      };
+      if (res.ok) {
+        if (dryRun) {
+          setReprocessMsg(
+            t("reprocessPreviewResult", {
+              attributed: body.attributed ?? 0,
+              total: body.total ?? 0,
+            }),
+          );
+        } else {
+          setReprocessMsg(
+            t("reprocessCommitResult", {
+              reprocessed: body.reprocessed ?? 0,
+              requeued: body.requeued ?? 0,
+            }),
+          );
+          router.refresh();
+        }
+        return;
+      }
+      setError(t("reprocessError"));
+    } catch {
+      setError(t("reprocessError"));
+    } finally {
+      setReprocessBusy(false);
+    }
+  }
+
+  async function rerunAnalysis(segmentId: string) {
+    setRerunBusySegment(segmentId);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/capture/rerun-synthesis", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          session_id: review.sessionId,
+          segment_id: segmentId,
+          corrections,
+        }),
+      });
+      const body = (await res.json()) as {
+        assessment?: SegmentAssessment;
+        tokens?: { input: number; output: number };
+        error?: string;
+      };
+      if (res.ok && body.assessment) {
+        setAssessments((prev) => ({ ...prev, [segmentId]: body.assessment! }));
+        setReprocessMsg(
+          t("rerunSuccess", {
+            input: body.tokens?.input ?? 0,
+            output: body.tokens?.output ?? 0,
+          }),
+        );
+        return;
+      }
+      if (body.error === "extraction_disabled") {
+        setError(t("rerunDisabled"));
+        return;
+      }
+      setError(t("rerunError"));
+    } catch {
+      setError(t("rerunError"));
+    } finally {
+      setRerunBusySegment(null);
+    }
+  }
+
   const totalCorrections =
     Object.keys(corrections.itemOverrides).length +
     corrections.excluded.length +
@@ -676,6 +766,36 @@ export default function CaptureReview({
               {resumeBusy ? t("working") : t("resumeExtraction")}
             </button>
           </div>
+        </div>
+      ) : null}
+
+      {!decided &&
+      (review.status === "extracting" || review.status === "review_ready") &&
+      review.unattributedFrames > 0 ? (
+        <div className="flex flex-col gap-2 rounded-[8px] border border-border bg-surface-sunken px-3.5 py-3 text-[13px]">
+          <p className="font-medium text-ink">{t("reprocessHeading")}</p>
+          <p className="text-neutral-strong">{t("reprocessBody")}</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={reprocessBusy}
+              onClick={() => void reprocessSession(true)}
+              className={`${styles.control} rounded-[4px] border border-border px-3 py-1.5 text-[12px] font-medium`}
+            >
+              {reprocessBusy ? t("working") : t("reprocessPreviewBtn")}
+            </button>
+            <button
+              type="button"
+              disabled={reprocessBusy}
+              onClick={() => {
+                if (window.confirm(t("reprocessConfirm"))) void reprocessSession(false);
+              }}
+              className={`${styles.control} rounded-[4px] border border-border-strong bg-surface-elevated px-3 py-1.5 text-[12px] font-semibold`}
+            >
+              {t("reprocessCommitBtn")}
+            </button>
+          </div>
+          {reprocessMsg ? <p className="text-[12px] text-neutral-strong">{reprocessMsg}</p> : null}
         </div>
       ) : null}
 
@@ -899,11 +1019,14 @@ export default function CaptureReview({
                     ) : (
                       <>
                         <SegmentAssessmentPanel
-                          assessment={review.assessments[segmentId] ?? null}
+                          assessment={assessments[segmentId] ?? null}
                           seg={seg}
                           baselineChoice={baselineChoice}
                           manual={manual}
                           disabled={busy || decided}
+                          rerunBusy={rerunBusySegment === segmentId}
+                          canRerun={!decided && Boolean(seg?.assessmentStale)}
+                          onRerun={() => void rerunAnalysis(segmentId)}
                           lensName={(lens) => tl(`${lens}.name`)}
                           onToggleLens={(lens) => toggleBaselineLens(segmentId, lens)}
                           onSetBaselineAll={(lenses) => setSegmentBaseline(segmentId, lenses)}
@@ -1283,6 +1406,9 @@ function SegmentAssessmentPanel({
   baselineChoice,
   manual,
   disabled,
+  rerunBusy,
+  canRerun,
+  onRerun,
   lensName,
   onToggleLens,
   onSetBaselineAll,
@@ -1292,6 +1418,9 @@ function SegmentAssessmentPanel({
   baselineChoice: LensKey[];
   manual: Partial<Record<LensKey, number | null>>;
   disabled: boolean;
+  rerunBusy?: boolean;
+  canRerun?: boolean;
+  onRerun?: () => void;
   lensName: (lens: LensKey) => string;
   onToggleLens: (lens: LensKey) => void;
   onSetBaselineAll: (lenses: LensKey[]) => void;
@@ -1330,6 +1459,17 @@ function SegmentAssessmentPanel({
             <TriangleAlert size={11} strokeWidth={1.75} aria-hidden="true" />
             {t("assessmentStale")}
           </span>
+        ) : null}
+        {canRerun && onRerun ? (
+          <button
+            type="button"
+            disabled={disabled || rerunBusy}
+            onClick={onRerun}
+            className={`${styles.control} inline-flex items-center gap-1 rounded-[4px] border border-accent/45 bg-accent/10 px-2 py-0.5 text-[10.5px] font-medium text-ink hover:bg-accent/15 disabled:opacity-55`}
+          >
+            <Sparkles size={11} strokeWidth={1.75} aria-hidden="true" />
+            {rerunBusy ? t("working") : t("rerunAnalysis")}
+          </button>
         ) : null}
         {adjustedLenses.length > 0 ? (
           <button
