@@ -18,9 +18,10 @@
  * wrote at match time), never a second interpolation that could drift.
  */
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { useTranslations } from "next-intl";
+import { LocateFixed } from "lucide-react";
 import type { ReviewFrame, FramePosition } from "@/lib/capture/review-store";
 
 // Mirrors the private constants in components/AuditMap.tsx (kept private there).
@@ -69,6 +70,8 @@ export default function ReviewMap({
   selectedSeq,
   selectedSegmentId,
   onSelectFrame,
+  variant = "panel",
+  autoFollow = false,
 }: Readonly<{
   track: readonly FramePosition[];
   frames: readonly ReviewFrame[];
@@ -78,6 +81,10 @@ export default function ReviewMap({
   selectedSeq: number | null;
   selectedSegmentId: string | null;
   onSelectFrame: (seq: number) => void;
+  /** "panel" is the fixed-height card; "expanded" fills its container (full-viewport overlay). */
+  variant?: "panel" | "expanded";
+  /** Gently pan to the selected dot (replay playhead) while the user has not panned. */
+  autoFollow?: boolean;
 }>) {
   const t = useTranslations("admin.capture");
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -88,6 +95,23 @@ export default function ReviewMap({
     selectRef.current = onSelectFrame;
   }, [onSelectFrame]);
   const prevSegmentRef = useRef<string | null>(null);
+
+  // Re-center (Waze-style): the bounds of the whole session geometry, whether the
+  // user has manually panned away, and whether to show the floating button.
+  const geomBoundsRef = useRef<maplibregl.LngLatBounds | null>(null);
+  const userMovedRef = useRef(false);
+  const [showRecenter, setShowRecenter] = useState(false);
+  const fitPadding = variant === "expanded" ? 60 : 36;
+
+  const recenter = useCallback(() => {
+    const map = mapRef.current;
+    const gb = geomBoundsRef.current;
+    if (!map || !gb) return;
+    // Manual-follow resumes and the button hides; playback (if any) is untouched.
+    userMovedRef.current = false;
+    setShowRecenter(false);
+    map.fitBounds(gb, { padding: fitPadding, maxZoom: 17, duration: 600 });
+  }, [fitPadding]);
 
   const excluded = new Set(excludedSeqs);
   const deleted = new Set(deletedSeqs);
@@ -229,8 +253,26 @@ export default function ReviewMap({
           (acc, c) => acc.extend(c),
           new maplibregl.LngLatBounds(all[0], all[0]),
         );
-        map.fitBounds(bounds, { padding: 36, animate: false, maxZoom: 17 });
+        geomBoundsRef.current = bounds;
+        map.fitBounds(bounds, { padding: fitPadding, animate: false, maxZoom: 17 });
       }
+
+      // Re-center button: appears once the user pans/zooms so the session geometry
+      // is no longer fully in view; hides again when it is. A user-driven move
+      // (originalEvent present) also disables the replay's gentle auto-follow.
+      const geometryInView = () => {
+        const gb = geomBoundsRef.current;
+        if (!gb) return true;
+        const vb = map.getBounds();
+        return vb.contains(gb.getNorthEast()) && vb.contains(gb.getSouthWest());
+      };
+      const markUserMoved = (e: { originalEvent?: unknown }) => {
+        if (e.originalEvent) userMovedRef.current = true;
+      };
+      map.on("dragstart", markUserMoved);
+      map.on("zoomstart", markUserMoved);
+      map.on("rotatestart", markUserMoved);
+      map.on("moveend", () => setShowRecenter(userMovedRef.current && !geometryInView()));
     });
 
     return () => {
@@ -252,6 +294,18 @@ export default function ReviewMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [frames, excludedSeqs, deletedSeqs, selectedSeq]);
 
+  // Gently follow the replay playhead: pan (not zoom) to the active dot while the
+  // user has not manually panned. A manual pan disables this until re-center.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !loadedRef.current || !autoFollow || userMovedRef.current) return;
+    if (selectedSeq === null) return;
+    const f = frames.find((x) => x.seq === selectedSeq);
+    if (f?.position) map.easeTo({ center: [f.position.lng, f.position.lat], duration: 500 });
+    // frames is stable per render; depend on the selected seq and follow toggle.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFollow, selectedSeq]);
+
   // Highlight the selected segment.
   useEffect(() => {
     const map = mapRef.current;
@@ -266,14 +320,32 @@ export default function ReviewMap({
     prevSegmentRef.current = selectedSegmentId;
   }, [selectedSegmentId]);
 
+  const expanded = variant === "expanded";
   return (
-    <div className="overflow-hidden rounded-[8px] border border-border">
+    <div
+      className={
+        expanded
+          ? "relative h-full w-full overflow-hidden"
+          : "relative overflow-hidden rounded-[8px] border border-border"
+      }
+    >
       <div
         ref={containerRef}
         role="application"
         aria-label={t("mapLabel")}
-        className="h-56 w-full sm:h-64"
+        className={expanded ? "h-full min-h-0 w-full" : "h-56 w-full sm:h-64"}
       />
+      {showRecenter ? (
+        <button
+          type="button"
+          onClick={recenter}
+          data-map-recenter
+          className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-border-strong bg-surface/95 px-3 py-1.5 text-[12px] font-medium text-ink shadow-md backdrop-blur-sm transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        >
+          <LocateFixed size={14} strokeWidth={2} aria-hidden="true" />
+          {t("mapRecenter")}
+        </button>
+      ) : null}
     </div>
   );
 }
