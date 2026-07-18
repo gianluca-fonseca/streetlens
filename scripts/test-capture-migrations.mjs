@@ -191,6 +191,10 @@ function main() {
       psql(readFileSync(path.join(MIGRATIONS, "0025_pipeline_truth.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0026_security_core.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0027_compose_pipeline_security.sql"), "utf8"));
+      // 0028 last: re-running 0013 above flips streetlens-frames back to public and
+      // drops the evidence SELECT / assessment_es wiring. Re-apply so the privacy
+      // and bilingual schema the checks below assert actually stick.
+      psql(readFileSync(path.join(MIGRATIONS, "0028_quality_privacy.sql"), "utf8"));
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", true);
     } catch (err) {
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
@@ -243,11 +247,18 @@ function main() {
 
     /* ---------------- Storage ---------------- */
 
-    const bucket = psql(`
-      select public::text || '|' || file_size_limit::text || '|' || array_to_string(allowed_mime_types, ',')
+    const bucketPrivate = psql(`
+      select (not public)::text from storage.buckets where id='streetlens-frames';
+    `).trim();
+    const bucketMeta = psql(`
+      select file_size_limit::text || '|' || array_to_string(allowed_mime_types, ',')
         from storage.buckets where id='streetlens-frames';
     `).trim();
-    check("the frames bucket is private, 2 MB, jpeg-only (0028)", bucket === "false|2097152|image/jpeg", bucket);
+    check(
+      "the frames bucket is private, 2 MB, jpeg-only (0028)",
+      (bucketPrivate === "t" || bucketPrivate === "true") && bucketMeta === "2097152|image/jpeg",
+      `${bucketPrivate}|${bucketMeta}`,
+    );
 
     const storagePolicies = psql(`
       select string_agg(policyname || ':' || cmd, ',' order by policyname)

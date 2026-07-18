@@ -288,9 +288,25 @@ $$;
  * fetch raw frames.
  * ================================================================== */
 
-update storage.buckets
-   set public = false
- where id = 'streetlens-frames';
+-- Flip the bucket private. Use the same upsert shape as 0013 so the write is
+-- unambiguous against both live Supabase storage and the migration-test stub.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('streetlens-frames', 'streetlens-frames', false, 2097152, array['image/jpeg'])
+on conflict (id) do update
+  set public             = false,
+      file_size_limit    = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
+
+-- Fail loud if the bucket is still public — the privacy mandate depends on it.
+do $$
+declare
+  v_public boolean;
+begin
+  select public into v_public from storage.buckets where id = 'streetlens-frames';
+  if v_public is distinct from false then
+    raise exception '0028: streetlens-frames must be private, found public=%', v_public;
+  end if;
+end $$;
 
 -- Is this exact storage path published as approved camera evidence?
 create or replace function capture_frame_evidence_readable(p_name text)
