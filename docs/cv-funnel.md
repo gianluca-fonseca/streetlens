@@ -64,6 +64,299 @@ segment with a required reason. Only approved segments land in
 chip as CV-derived; re-reviewing and unticking a segment removes it. Nothing
 reaches the published map without a human ticking it.
 
+## How the model works, end to end
+
+This section exists because the product shows numbers a reader is entitled to
+understand: the small percentage next to every item a frame reads, and the two
+scores (baseline and adjusted) a reviewer sees side by side. What follows makes
+each of those numbers self-explanatory, in order, with one worked example per
+idea. It is written for a careful reader who is not an ML person; every claim
+is checked against the code and cites where it lives.
+
+### 1. What one frame becomes
+
+A frame is one photo from a walk. It goes to the vision model in a single
+structured call, and comes back as fifteen rubric readings plus a short note.
+There is no chain of calls and no second opinion at this stage: one image in,
+one JSON object out (`lib/extraction/client.ts`, `lib/extraction/extract.ts`).
+
+Each of the fifteen items is a pair, `{ value, confidence }`
+(`lib/extraction/schema.ts`, `itemSchema`):
+
+- **value** is the reading itself, in the item's own units: a boolean is `0` or
+  `1`, a `scale_0_4` item is `0..4`, a percent item is `0..100`. Higher is
+  always better, including items phrased as a problem (a low `standing_water`
+  reading is a wet street; the rubric wording flips so the number does not).
+- **confidence** is a number from 0 to 1: the model's own certainty in *that
+  value*, on *that frame*. The schema tells the model exactly this: "0..1, your
+  own certainty in this value for this frame. Be honest: a low number is
+  useful, a confident guess is not." (`lib/extraction/schema.ts`). The review UI
+  renders it as a percent, `Math.round(item.confidence * 100)` followed by `%`
+  (`components/admin/FrameInspector.tsx`). So a "60%" next to an item is not an
+  accuracy statistic and not a probability the value is right in some measured
+  sense. It is the model saying "on this frame, I am 60 percent sure of this
+  particular reading."
+
+Two more fields ride along. `frameQuality: { usable, reason }` is the model's
+own judgement that the frame can be scored at all (motion blur, lens flare, no
+street in shot make it unusable). And one required free-text `rationale`: one to
+three plain sentences on what the model saw and why the notable scores are what
+they are, for example "Narrow paved road, no sidewalk on either side; dense
+canopy left; standing water at the right edge." It is one note per frame, not a
+justification per item, and it exists for the human reviewer, who reads one
+honest paragraph faster than fifteen (`lib/extraction/schema.ts`, the
+`rationale` description).
+
+**Null is a first-class answer, and it is never a zero.** When the crossing is
+behind the camera or the sign is out of shot, the value comes back `null`,
+meaning "not assessable from this frame" (`lib/capture/types.ts`, and the
+nullable value schemas in `lib/extraction/schema.ts`). A zero says "I looked and
+it is bad"; a null says "I could not look." The rollup skips nulls entirely
+(`lib/capture/rollup.ts`), because scoring a null as a zero would quietly punish
+a street for being photographed from the wrong angle. The UI honors the same
+line, showing a null as "not assessable", never as 0
+(`components/admin/FrameInspector.tsx`).
+
+### 2. Image economics, in two sentences
+
+Every frame is re-encoded server-side to a longest edge of 512 px before it is
+sent, so the model never sees the full-resolution image and cannot bill for
+pixels it was not handed (`lib/extraction/downscale.ts`); the large, constant
+part of each request (a byte-identical system prompt and the strict schema) is
+sent as a cacheable prefix, so after the first frame the provider charges its
+reduced cached-input rate for most of the request
+(`lib/extraction/prompt.ts`, the "Prompt caching" note in the Extraction
+section below). The cheap model runs first and a frame escalates to the stronger
+one only when it is genuinely unsure (section 3b). The real measured token
+counts and how they convert to money live in the **Cost model** section further
+down; this section is only about where the numbers come from, not what they are.
+
+### 3. Where confidence actually does work
+
+Confidence is not decoration. It changes three concrete things.
+
+**(a) It weights the rollup's median.** When several frames of one segment read
+the same item, the rollup does not average them and does not take a plain
+median. It takes a confidence-weighted median (`lib/capture/scoring.ts`,
+`confidenceWeightedMedian`): entries are sorted by value, and the winning value
+is the first one at which the running sum of confidence crosses half of the
+total confidence. Ties fall to the lower (more conservative) value.
+
+> Worked example. Three frames read one `scale_0_4` item (say surface
+> condition) as 4 at 90% confidence, 2 at 60%, and 1 at 40%. Sorted by value:
+> `1@0.40, 2@0.60, 4@0.90`. The total confidence is 1.90, so half is 0.95. Walk
+> the sorted list accumulating confidence: after the "1" you are at 0.40 (below
+> 0.95), after the "2" you are at 1.00 (past 0.95), so the weighted median is
+> **2**. Note what did not happen: the plain average would be about 2.3, and the
+> single most-confident frame's "4" did not drag the answer up to 4. A median
+> means one confidently-wrong outlier cannot move the result, and the confidence
+> weighting means a 40%-sure dissent counts for less than a 90%-sure agreement.
+
+**(b) It triggers escalation, and the escalated answer wins.** After the cheap
+model (`gpt-5-nano`) scores a frame, the worker escalates that one frame to the
+stronger model (`gpt-5.4-mini`) when the frame is `usable` AND at least one item
+came back with a non-null value below `ESCALATION_CONFIDENCE_THRESHOLD` (0.35)
+(`lib/extraction/config.ts`, and the Extraction section's "Model and
+escalation"). A low-confidence *null* does not escalate: an honest "cannot see"
+is not the same as a hedged guess. Escalation reuses the already-downscaled
+512 px image, is capped at `floor(frameCount * 0.1)` per session so poor light
+cannot silently reprice the whole walk at the expensive model, and when it runs,
+the stronger model's answer is the one that counts. In the rollup a frame that
+escalated has two observation rows and only the escalated one votes, so a single
+frame never votes twice (`lib/capture/rollup.ts`, "One vote per frame").
+
+**(c) It tells the reviewer where to look.** A wrong value at low confidence is
+the model flagging itself: it already told you it was unsure, and the rollup
+already discounted it, so it is rarely worth a reviewer's override. A wrong value
+at high confidence is the error worth catching: the model was certain and wrong,
+which is exactly the case the weighted median cannot protect against and a human
+can. So the inspector shows value and confidence together on every item
+(`components/admin/FrameInspector.tsx`): the confidence is a reading-priority
+hint, not a grade.
+
+### 4. From frames to a segment score: the baseline
+
+The per-segment score, before any reasoning on top, is a deterministic pipeline
+in `lib/capture/rollup.ts` (`computeRollups`) and `lib/capture/scoring.ts`. It
+runs the same four steps every time and in an order that does not depend on the
+order the frames arrived. This is the **baseline**: auditable, reproducible, and
+by construction order-blind.
+
+1. **Median per item.** For each of the fifteen items, the confidence-weighted
+   median across the segment's frames (section 3a). Junction items (`curb_ramp`,
+   `crossing_safety`) read only frames taken at a junction; every other item
+   reads only non-junction frames, so a crossing is scored from frames at the
+   crossing, not mid-block (`lib/capture/rollup.ts`). A null or missing value is
+   skipped, never counted as 0.
+2. **Normalize to 0..1.** Each item median is put on a common scale by its
+   response type: a boolean is already `0` or `1`, a percent is `value / 100`, a
+   `scale_0_4` is `value / 4` (`normalizeItemValue` in `lib/capture/scoring.ts`).
+3. **Average into lens scores.** The normalized items are grouped by lens and
+   averaged (`lensScoresFromItems`): five accessibility items, three drainage,
+   two shade, two "overall" display items, three bike. A lens no frame could
+   assess stays `null`, not 0.
+4. **The overall composite.** `overall = 0.45 * accessibility + 0.30 * drainage
+   + 0.25 * shade`, renormalized over whichever of those three lenses were
+   actually measured, and **bike stands alone** (it is its own lens, never part
+   of the composite). Final scores are multiplied by 100 and clamped to 0..100
+   (`renormalizedOverall`, `OVERALL_WEIGHTS`).
+
+> Worked example. A segment's frames give accessibility 0.70 (normalized) and
+> shade 0.50, but no frame could assess drainage, so drainage is null. The
+> composite renormalizes over the two lenses present: `(0.70 * 0.45 + 0.50 *
+> 0.25) / (0.45 + 0.25) = 0.44 / 0.70 = 0.63`, so overall is about 63. The null
+> drainage does not drag the street to a zero; it simply does not vote, and the
+> two lenses that were measured are reweighted to still sum to one.
+
+> One deliberate quirk (`lib/capture/scoring.ts`): `lighting` and
+> `crossing_safety` map to the "overall" display layer but do NOT feed the
+> `overall` composite, which keeps a CV overall byte-comparable with the
+> demo-audit generator's definition of the same number.
+
+### 5. The synthesis stage: a bounded, reasoned correction
+
+An average of medians erases the shape of a walk. It cannot see that a crosswalk
+present at the top of a block vanishes for the next two hundred metres, or that
+the one drain sits nowhere near where the water pools. Those are facts *across*
+frames, and a per-item median is blind to them. Synthesis
+(`lib/extraction/synthesis.ts`) is a second, text-only model call per segment
+that reads the walk in order and corrects the baseline within a hard bound. It
+runs in the pump after the rollup is computed and persisted, before the session
+is filed for review (`lib/capture/pump.ts`, `synthesizeSession`).
+
+**What it reads.** The segment's frames in traversal order, each with its `seq`,
+its distance along the walk (a haversine between consecutive frame GPS
+positions), its near-junction flag, all fifteen item readings with their
+confidences, and the per-frame rationale, plus the baseline lens scores and the
+item medians. It also gets a continuity block that, for the presence items
+(sidewalk, curb ramp, crossing, drain, bike lane), spells out the runs of
+present / absent / not-assessable along the walk with their distance spans. That
+block is what turns "a crosswalk, then none for a long stretch" into something
+the model can weight. The evidence is text only, no images, and deterministic
+(the same frames build the same bytes).
+
+**What it may do.** For each of the four measured lenses it may propose a delta
+in points, added to (or subtracted from) the baseline, bounded to at most
+`CV_SYNTHESIS_MAX_ADJUST` points either way (default 20)
+(`lib/extraction/config.ts`, `synthesisMaxAdjust`). The arithmetic is ours, not
+the model's: `adjusted = clamp(baseline + boundedDelta, 0, 100)`
+(`lib/capture/review-overrides.ts`, `computeAdjusted`). The composite `overall`
+is never taken from the model; it is recomputed from the adjusted lens values
+with the same renormalized 0.45 / 0.30 / 0.25 formula the baseline uses, so
+"72" means the same thing whether it came from the rollup or from synthesis.
+
+**What it may not do.** It may not move a number without a written reason: every
+non-zero delta must carry one, and a delta whose reason is blank is dropped to
+zero before it is applied (`lib/extraction/synthesis.ts`, `if (delta !== 0 &&
+reason.length === 0) delta = 0`). It may not exceed the bound (anything larger is
+clamped). It may not invent a lens: a lens whose baseline is null stays null,
+though the model may still explain in that lens's text *why* it is unknown. And
+it may not set the overall directly.
+
+> Two canonical examples of what sequence reasoning catches that a median
+> cannot. **Crosswalk gap:** frame 1 at 0 m shows a crosswalk, then the next
+> frames across 200 m show none. The median over the accessibility items can
+> still read "crossing present" because one strong frame carried it, but the
+> continuity block shows present-then-absent, so synthesis can argue
+> accessibility down (say a delta of -15, reason citing the gap) where the
+> average could not. **Intermittent drain:** a single drain grate scores well on
+> the one frame that catches it, but standing water shows up in frames a hundred
+> metres downhill; the median sees "a drain" and "some water" as separate item
+> facts, and only reading them in sequence reveals that the drainage does not
+> serve where the water actually collects.
+
+**Synthesis never blocks a session.** It is a later, independently fallible step
+decoupled from the rollup: a synthesis that throws, times out, or returns a
+malformed answer is logged and leaves the assessment null; the baseline rollup
+stands and the session still reaches `review_ready`. It respects the same
+`CV_EXTRACTION_ENABLED` kill switch as every other spend, and its own tokens are
+counted into the review read's token ledger (see the Synthesis section below for
+the stored shape and persistence details).
+
+### 6. The human layer: baseline, adjusted, and what lands
+
+Nothing a model produced reaches the public map on its own. A reviewer opens the
+session in the workbench (`components/admin/CaptureReview.tsx`) and sees, per
+segment, two numbers per lens: the **baseline** (the deterministic rollup) and
+the **adjusted** value (baseline plus the synthesis delta). The adjusted value is
+the default proposal. The reviewer has four kinds of control, and they all flow
+through one pure recompute so the numbers on screen are byte-identical to the
+numbers that land (`lib/capture/review-overrides.ts`, `recomputeReview`, run
+client-side for the live preview and server-side as the authoritative persist):
+
+- **Use baseline, per lens or per segment.** A one-tap control declines the
+  synthesis adjustment for a single lens (reverting it to the recomputed
+  baseline), and a segment-level control reverts them all
+  (`CaptureReview.tsx`, `toggleBaselineLens` / `setSegmentBaseline`).
+- **Item overrides.** In the frame inspector a reviewer can replace any item's
+  value on any frame. A human reading is an assertion, not a guess, so it is
+  minted with full confidence (`OVERRIDE_CONFIDENCE = 1` in
+  `review-overrides.ts`), which means it participates in and dominates the
+  confidence-weighted median for that item. A null override drops out exactly
+  like a model null.
+- **Frame exclude and delete.** Excluding a frame removes it from scoring
+  immediately but reversibly; it stays visibly struck in the filmstrip and on
+  the map. Deleting is for privacy and is irreversible: the secret-gated
+  `capture_delete_frame` RPC removes the bytes and the row and records a
+  tombstone so the record never lies about how many frames a walk had. A deleted
+  frame never scores.
+- **Manual score edit.** A reviewer can type a lens score by hand, and it wins
+  over both the baseline and the adjusted value.
+
+**The exact recompute order is a contract** (`review-overrides.ts`,
+`recomputeReview`, and the Segment synthesis section below):
+
+```
+drop deleted frames
+  -> drop excluded frames
+  -> apply item overrides (each at full confidence)
+  -> computeRollups  (the real rollup math, producing a FRESH baseline)
+  -> synthesis adjustment: the clamped delta rides the fresh baseline
+  -> per-lens "use baseline" opt-outs
+  -> manual score edits win
+  -> drop any segment that lost its last supporting frame
+```
+
+The single most important consequence: when a reviewer excludes or corrects
+frames, the baseline moves, and the adjusted value is that *moved* baseline plus
+the same delta, never the engine's original `adjustedScores` (which were computed
+on the original frames). When that happens the explanation prose is flagged
+"written before your corrections" (`assessmentStale` in `review-overrides.ts`),
+so the reviewer knows the words predate the evidence even though the number is
+honest.
+
+**Provenance, and the wall before the map.** Approval is per segment, with a
+mandatory reason, and it writes only to `community_cv_observations`; it never
+touches an `audits`, `observations`, or `segments` row, so an audited segment's
+scores are byte-for-byte identical before and after a CV approval
+(`scripts/test-cv-apply.mjs`). Each approved observation carries a
+`human_corrected` boolean and a compact `overrides` jsonb recording exactly what
+a human changed (item overrides by frame seq, excluded and deleted seqs, manual
+edits, baseline opt-outs) (`review-overrides.ts`, `SegmentOverrideRecord`;
+migration `0021`). On the map, `community_cv_observations` rides alongside
+audited data, never folded into a `score_*`, behind a provenance chip that reads
+"Camera: not field-verified", with a "human-corrected" marker when any
+observation on the segment was touched (`components/SegmentDetail.tsx`). Nothing
+reaches the published map without a person ticking it.
+
+### Reading the review workbench
+
+A compact legend, one line each, mapping what a reviewer sees to what it means.
+
+| Element | Where | Meaning |
+| --- | --- | --- |
+| `%` next to an item | frame inspector | The model's own confidence in *that* reading on *that* frame (`0..1`, shown as a percent). Not an accuracy statistic. |
+| Item value shown struck through | frame inspector | The model's original reading, kept visible after a reviewer overrode it, so nothing is silently rewritten. |
+| The per-item dropdown (default "use model") | frame inspector | The override control: leave it to keep the model's value, or pick a new value (or "not assessable") to override at full confidence. |
+| `baseline N -> adjusted M` with a signed delta | segment card | The deterministic rollup (baseline) and the synthesis proposal (adjusted); the delta is the bounded nudge, green up, clay down. Adjusted is the default. |
+| "use baseline" (per lens) / "use baseline for all" (per segment) | segment card | Decline the synthesis adjustment and keep the recomputed baseline for that lens, or for every adjusted lens at once. |
+| "written before your corrections" hint | segment card | The synthesis prose predates a reviewer's frame edits, so the words are stale even though the delta still rides the fresh baseline. |
+| A lens score you typed | segment card | A manual edit; it wins over both baseline and adjusted, and a small dot marks the lens as edited. |
+| Frame struck through / dimmed ("excl") | filmstrip, review map | An excluded frame: out of scoring but reversible and still shown. |
+| Frame tombstone (seq only, no image) | filmstrip, review map | A deleted frame: bytes gone for privacy, the seq kept so the count stays honest. |
+| Numbered dots on the map | review map | Each frame at the position the pipeline recorded; grey means unmatched (off-network), dim means excluded, tombstoned means deleted, and the polyline is the GPS track (`components/admin/ReviewMap.tsx`). |
+| "not assessable" | anywhere a value shows | A null reading: the model could not see it. Distinct from a zero, and it never scores. |
+
 ## Three ways in, one way out
 
 There are three ways a street's condition enters StreetLens, and they converge
