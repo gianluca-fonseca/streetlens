@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- first-party static SVG map art; next/image adds no value for inline SVG and would need dangerouslyAllowSVG */
 import { useTranslations } from "next-intl";
 import type { StreetStats } from "@/lib/segments";
+import { showDemoData } from "@/lib/demo-flag";
 import Section from "@/components/ui/Section";
 import Measure from "@/components/ui/Measure";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -73,9 +74,11 @@ export default function PilotSection({
         <p className="mt-8 font-serif text-[1.08rem] leading-[1.55] text-accent-text">
           {t("beginning")}
         </p>
-        <p className="mt-5 text-[12.5px] leading-snug text-ink-muted">
-          {t("demoNote")}
-        </p>
+        {showDemoData() && (
+          <p className="mt-5 text-[12.5px] leading-snug text-ink-muted">
+            {t("demoNote")}
+          </p>
+        )}
       </Measure>
     </Section>
   );

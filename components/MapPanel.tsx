@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { ScoreLayer, StreetStats } from "@/lib/segments";
+import { showDemoData } from "@/lib/demo-flag";
 import LayerSwitcher from "@/components/LayerSwitcher";
 import Legend from "@/components/Legend";
 import styles from "@/components/ui/zen.module.css";
@@ -88,9 +89,11 @@ export default function MapPanel({
           <p className="mt-1.5 font-display text-[0.95rem] leading-snug text-ink">
             {t("heroStat", { pct: stats.heroPct })}
           </p>
-          <p className="mt-1 text-[11px] text-neutral-strong">
-            {t("heroDemoNote")}
-          </p>
+          {showDemoData() && (
+            <p className="mt-1 text-[11px] text-neutral-strong">
+              {t("heroDemoNote")}
+            </p>
+          )}
         </div>
       </header>
 

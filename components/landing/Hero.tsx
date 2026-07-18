@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
+import { showDemoData } from "@/lib/demo-flag";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import AuditMap from "@/components/AuditMap";
@@ -462,9 +463,11 @@ export default function Hero({
                 delay={700}
               />
             </div>
-            <p className="px-1 text-center font-mono text-[11px] leading-snug text-ink-muted lg:px-0 lg:text-left">
-              {t("stats.demoFootnote")}
-            </p>
+            {showDemoData() && (
+              <p className="px-1 text-center font-mono text-[11px] leading-snug text-ink-muted lg:px-0 lg:text-left">
+                {t("stats.demoFootnote")}
+              </p>
+            )}
           </div>
 
           {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}
@@ -473,9 +476,11 @@ export default function Hero({
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
                 {t("segments.title")}
               </p>
-              <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
-                {t("segments.caveat")}
-              </p>
+              {showDemoData() && (
+                <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
+                  {t("segments.caveat")}
+                </p>
+              )}
             </div>
             <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
               {worst.map((s) => (

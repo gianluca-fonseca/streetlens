@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { showDemoData } from "@/lib/demo-flag";
 import Section from "@/components/ui/Section";
 import Measure from "@/components/ui/Measure";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -23,7 +24,10 @@ export default function GapSection({
   const stats = [
     { key: "1", value: t("stat1Value"), label: t("stat1Label"), note: t("stat1Note") },
     { key: "2", value: t("stat2Value"), label: t("stat2Label"), note: t("stat2Note") },
-    { key: "3", value: `${heroPct}%`, label: t("stat3Label"), note: t("stat3Note") },
+    // stat3 is the pilot's own fail rate; with demo off it degrades to 0% and its
+    // "demo figure" caveat no longer applies, so it drops. The two Costa Rican
+    // anchors above are real and always keep their sourced notes.
+    { key: "3", value: `${heroPct}%`, label: t("stat3Label"), note: showDemoData() ? t("stat3Note") : "" },
   ];
 
   return (
@@ -56,9 +60,11 @@ export default function GapSection({
               <dt className="mt-3 text-[0.95rem] font-medium leading-snug text-ink">
                 {s.label}
               </dt>
-              <p className="mt-2 text-[12.5px] leading-snug text-ink-muted">
-                {s.note}
-              </p>
+              {s.note ? (
+                <p className="mt-2 text-[12.5px] leading-snug text-ink-muted">
+                  {s.note}
+                </p>
+              ) : null}
             </div>
           ))}
         </dl>
