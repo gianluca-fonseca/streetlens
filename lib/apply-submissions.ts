@@ -265,12 +265,6 @@ export type CvApplyInput = {
   submission_id: string | null;
   /** When the walk happened, not when it was approved. */
   captured_on: string;
-  /**
-   * The contributor's contact from the capture session, or null when anonymous.
-   * The DB path re-sources this server-side in the apply RPC (authoritative); this
-   * carries it for the local mirror, which has no session table to read from.
-   */
-  contact?: string | null;
   observations: CvApplyObservation[];
   createdAt?: string;
 };
@@ -301,7 +295,6 @@ export function buildCvObservations(input: CvApplyInput): CvObservation[] {
     human_corrected: o.human_corrected ?? false,
     overrides: o.overrides ?? {},
     assessment: o.assessment ?? null,
-    contact: input.contact ?? null,
   }));
 }
 

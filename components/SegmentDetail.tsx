@@ -9,7 +9,7 @@ import {
   parseCommunityReports,
   parseCvObservations,
 } from "@/lib/parse-feature-props";
-import { formatProvenanceDate, sanitizeContact } from "@/lib/cv-provenance";
+import { formatProvenanceDate } from "@/lib/cv-provenance";
 import {
   LAYER_ORDER,
   RUBRIC_ITEMS,
@@ -327,12 +327,14 @@ export default function SegmentDetail({
                 const confidence = asPercent(o.confidence);
                 const coverage = asPercent(o.coverage);
                 // Provenance the segment must answer at a glance (u-provenance):
-                // when it was walked, when the reading last changed (created_at
-                // moves on re-approval upsert, so it reads "last updated"), and who
-                // sent it. All cross the maplibre boundary; the helpers never throw.
+                // when it was walked and when the reading last changed (created_at
+                // moves on re-approval upsert, so it reads "last updated"). Both
+                // cross the maplibre boundary; the helper never throws. The
+                // contributor's contact is PII and is NEVER shown publicly (conductor
+                // privacy rule) — the public attribution is a generic "Community
+                // contributor"; contact lives only on the admin workbench.
                 const walked = formatProvenanceDate(o.captured_on, locale);
                 const updated = formatProvenanceDate(o.created_at, locale);
-                const contact = sanitizeContact(o.contact);
                 return (
                   <li key={o.id} className="px-3 py-2">
                     <p className="font-mono text-[10.5px] text-neutral-strong">
@@ -356,9 +358,7 @@ export default function SegmentDetail({
                       ) : null}
                       <div className="flex flex-wrap gap-x-1.5">
                         <dt>{t("cvSubmittedByLabel")}</dt>
-                        <dd className="text-ink">
-                          {contact ?? t("cvSubmittedAnonymous")}
-                        </dd>
+                        <dd className="text-ink">{t("cvSubmittedCommunity")}</dd>
                       </div>
                     </dl>
                     {/* Observed lens values. Mono numerals, no ramp dots: the

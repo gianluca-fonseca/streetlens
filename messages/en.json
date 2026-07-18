@@ -86,7 +86,7 @@
     "cvWalkedLabel": "Walked",
     "cvUpdatedLabel": "Last updated",
     "cvSubmittedByLabel": "Submitted by",
-    "cvSubmittedAnonymous": "Anonymous contributor",
+    "cvSubmittedCommunity": "Community contributor",
     "cvUnknown": "No frame supported this lens",
     "cvConfidenceLabel": "Confidence",
     "cvCoverageLabel": "Coverage",

@@ -694,9 +694,21 @@ function main() {
       psql(`select (submission_id='${cvSub}')::text || '|' || (captured_on is not null)::text
               from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "true|true",
     );
+    // The public observation table must NEVER carry contact (conductor privacy rule).
     check(
-      "contact is published from the SESSION, server-side (0024), not the payload",
-      psql(`select contact from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "walker@example.org",
+      "community_cv_observations has NO contact column (contact stays admin-only)",
+      psql(`select count(*) from information_schema.columns
+             where table_name='community_cv_observations' and column_name='contact';`).trim() === "0",
+    );
+    // Contact reaches an admin ONLY via the secret-gated detail RPC (0024), never
+    // the anon-callable review RPC.
+    check(
+      "the ADMIN detail RPC surfaces contact for the reviewer (0024)",
+      JSON.parse(psql(`select capture_session_review_detail('${cvSid}'::uuid, 'test-secret');`).trim()).contact === "walker@example.org",
+    );
+    check(
+      "the anon review RPC still withholds contact",
+      !psql(`select capture_session_review('${cvSid}'::uuid, 'test-secret');`).includes("walker@example.org"),
     );
 
     // Re-approving with one segment unticked. Upsert alone would leave seg-b
