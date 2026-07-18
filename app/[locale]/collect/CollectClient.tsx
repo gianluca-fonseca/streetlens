@@ -37,6 +37,7 @@ import { openCaptureStore } from "@/components/capture/engine/opfs";
 import { isRecoverable } from "@/components/capture/engine/session";
 import { looksLikeVideoSession } from "@/components/capture/engine/video-session";
 import { cn } from "@/components/ui/cn";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import styles from "@/components/ui/zen.module.css";
 
 const LiveRecorder = dynamic(() => import("@/components/capture/LiveRecorder"), {
@@ -104,7 +105,10 @@ function ModeChooser({ onChoose }: Readonly<{ onChoose: (mode: Mode) => void }>)
   return (
     <Screen>
       <header className="flex flex-col gap-3">
-        <Eyebrow>{t("chooser.eyebrow")}</Eyebrow>
+        <div className="flex items-center justify-between gap-3">
+          <Eyebrow>{t("chooser.eyebrow")}</Eyebrow>
+          <ThemeSwitcher className="shrink-0 text-ink-muted" />
+        </div>
         <h1 className="font-display text-[30px] font-bold leading-[1.05] tracking-[-0.03em] text-ink-display">
           {t("chooser.title")}
         </h1>

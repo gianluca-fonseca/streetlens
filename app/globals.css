@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
 /*
+ * Theme strategy (u7): CLASS-based dark mode. The `dark:` utility variant keys off
+ * a `.dark` class on <html> (written pre-paint by lib/theme's THEME_INIT_SCRIPT),
+ * NOT `prefers-color-scheme`. This lets the in-app switcher drive a persisted
+ * light / dark / system choice with no FOUC. A `prefers-color-scheme` fallback is
+ * still authored for the JS-off case (see the token blocks below).
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
  * StreetLens design tokens — sealed from docs/design-direction.md (rev 6, 2026-07-16).
  * "Zen Instrument": pure black-and-white zen (Japanese-zen meets Notion), one loud
  * FLASH-PINK signal. Light = soft-white page, pure-black ink. Dark = near-black page,
@@ -180,63 +189,67 @@
 
 /* Dark mode: black zen (the negative). Near-black ground, pure-white ink. Overrides
    base-token VALUES only; the legacy aliases above re-resolve through var(), so
-   components style through the same names as light. Auto via prefers-color-scheme. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0a0a0a;
-    --paper-white: #141414;
-    --paper-sunken: #050505;
+   components style through the same names as light.
 
-    --ink: #f2f2f2; /* min 16.46:1 on dark grounds */
-    --ink-display: #ffffff; /* pure-white headlines (min 18.42:1) */
-    --ink-muted: #a3a3a3; /* AA 7.30–8.08 on dark grounds */
-    --ink-faint: #666666; /* graphic/large only */
+   u7: CLASS strategy — dark values bind to `.dark` on <html>, written pre-paint by
+   THEME_INIT_SCRIPT (light / dark / system, persisted, no FOUC). With JS the class
+   is always present, so this is the single source of truth for dark. With JS off no
+   class is set and the page falls to the light `:root` tokens above — fully readable
+   (the static landing is the only no-JS surface; map/collect require JS regardless). */
+:root.dark {
+  --paper: #0a0a0a;
+  --paper-white: #141414;
+  --paper-sunken: #050505;
 
-    --hairline: #262626;
-    --hairline-strong: #3d3d3d;
+  --ink: #f2f2f2; /* min 16.46:1 on dark grounds */
+  --ink-display: #ffffff; /* pure-white headlines (min 18.42:1) */
+  --ink-muted: #a3a3a3; /* AA 7.30–8.08 on dark grounds */
+  --ink-faint: #666666; /* graphic/large only */
 
-    --pine: #f2f2f2; /* interim ink hold */
-    --pine-strong: #ffffff;
+  --hairline: #262626;
+  --hairline-strong: #3d3d3d;
 
-    --accent: #ff4fa3; /* flash pink pops on near-black */
-    --accent-strong: #ff77b8;
-    --accent-text: #ff6fb0; /* AA 7.15–7.91 on dark grounds */
-    /* --accent-fg intentionally NOT re-valued: stays #000000 (black label on pink). */
+  --pine: #f2f2f2; /* interim ink hold */
+  --pine-strong: #ffffff;
 
-    --terracotta: #ef8f56;
+  --accent: #ff4fa3; /* flash pink pops on near-black */
+  --accent-strong: #ff77b8;
+  --accent-text: #ff6fb0; /* AA 7.15–7.91 on dark grounds */
+  /* --accent-fg intentionally NOT re-valued: stays #000000 (black label on pink). */
 
-    --amber: #e0a93a; /* AA 8.69–9.61 */
-    --clay: #f0876b; /* AA 7.35–8.14 */
+  --terracotta: #ef8f56;
 
-    --ring: #f2f2f2;
+  --amber: #e0a93a; /* AA 8.69–9.61 */
+  --clay: #f0876b; /* AA 7.35–8.14 */
 
-    /* Dark elevation (research §2): lighter surface + border + inset top highlight
-       lead; black shadow supports. Each tier's own stack (a light stack is invisible
-       on black). Inset white highlight <= 0.06 or it reads as a glowing seam. */
-    --shadow-panel:
-      0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    --shadow-raised:
-      0 1px 2px rgba(0, 0, 0, 0.40), 0 8px 24px -6px rgba(0, 0, 0, 0.50),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-popover:
-      0 1px 2px rgba(0, 0, 0, 0.50), 0 12px 32px -8px rgba(0, 0, 0, 0.60),
-      0 24px 48px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --ring: #f2f2f2;
 
-    /* Card hover lifts the surface +8/255 (the dual-channel tint+lift cue on black). */
-    --surface-raised: #1c1c1c;
+  /* Dark elevation (research §2): lighter surface + border + inset top highlight
+     lead; black shadow supports. Each tier's own stack (a light stack is invisible
+     on black). Inset white highlight <= 0.06 or it reads as a glowing seam. */
+  --shadow-panel:
+    0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-raised:
+    0 1px 2px rgba(0, 0, 0, 0.40), 0 8px 24px -6px rgba(0, 0, 0, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-popover:
+    0 1px 2px rgba(0, 0, 0, 0.50), 0 12px 32px -8px rgba(0, 0, 0, 0.60),
+    0 24px 48px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
-    --glass-bg: rgba(12, 12, 12, 0.64);
-    --glass-border: rgba(255, 255, 255, 0.10);
+  /* Card hover lifts the surface +8/255 (the dual-channel tint+lift cue on black). */
+  --surface-raised: #1c1c1c;
 
-    --glass-chip-bg: rgba(14, 14, 14, 0.70);
-    --glass-chip-border: rgba(255, 255, 255, 0.14);
-    --glass-chip-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.10);
-    --glass-chip-lift: 0 2px 10px rgba(0, 0, 0, 0.5);
-    --glass-chip-solid: rgba(10, 10, 10, 0.90);
+  --glass-bg: rgba(12, 12, 12, 0.64);
+  --glass-border: rgba(255, 255, 255, 0.10);
 
-    --sl-pulse-from: rgba(255, 79, 163, 0.45);
-    --sl-pulse-to: rgba(255, 79, 163, 0);
-  }
+  --glass-chip-bg: rgba(14, 14, 14, 0.70);
+  --glass-chip-border: rgba(255, 255, 255, 0.14);
+  --glass-chip-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  --glass-chip-lift: 0 2px 10px rgba(0, 0, 0, 0.5);
+  --glass-chip-solid: rgba(10, 10, 10, 0.90);
+
+  --sl-pulse-from: rgba(255, 79, 163, 0.45);
+  --sl-pulse-to: rgba(255, 79, 163, 0);
 }
 
 * {
@@ -300,11 +313,9 @@ body {
   backdrop-filter: blur(var(--glass-blur-chip)) saturate(160%);
   box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift) !important;
 }
-@media (prefers-color-scheme: dark) {
-  .maplibregl-ctrl-group {
-    -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
-    backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
-  }
+:root.dark .maplibregl-ctrl-group {
+  -webkit-backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
+  backdrop-filter: blur(var(--glass-blur-chip)) saturate(150%) brightness(1.1);
 }
 /* During pan/zoom the backdrop re-blurs every frame; the app map container carries
    data-map-moving, so swap the controls to the near-opaque solid (no blur) while it
@@ -345,10 +356,8 @@ body {
 .maplibregl-ctrl-attrib a {
   color: var(--ink-muted) !important;
 }
-@media (prefers-color-scheme: dark) {
-  .maplibregl-ctrl-attrib {
-    background: rgba(10, 10, 10, 0.80) !important;
-  }
+:root.dark .maplibregl-ctrl-attrib {
+  background: rgba(10, 10, 10, 0.80) !important;
 }
 
 /* ─── u15 landing utilities (added at end, clearly namespaced) ───────────────
@@ -446,11 +455,9 @@ section[id] {
   backdrop-filter: blur(14px) saturate(160%);
   box-shadow: var(--glass-chip-highlight), var(--glass-chip-lift);
 }
-@media (prefers-color-scheme: dark) {
-  .sl-glass-chip {
-    -webkit-backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
-    backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
-  }
+:root.dark .sl-glass-chip {
+  -webkit-backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
+  backdrop-filter: blur(14px) saturate(150%) brightness(1.1);
 }
 /* During active pan/zoom the backdrop re-blurs every frame (the costly path on a
    moving map). Swap to a near-opaque solid, no blur — visually close, zero cost —

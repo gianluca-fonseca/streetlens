@@ -6,6 +6,14 @@
   "demoBanner": {
     "message": "Datos de demostración sobre geometría vial real. El piloto de campo inicia en agosto de 2026: ninguna cifra mostrada es una medición real."
   },
+  "theme": {
+    "label": "Tema",
+    "options": {
+      "light": "Claro",
+      "system": "Sistema",
+      "dark": "Oscuro"
+    }
+  },
   "map": {
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
     "demoTag": "DEMO",

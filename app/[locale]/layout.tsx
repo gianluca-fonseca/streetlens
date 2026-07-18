@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "../globals.css";
 
 // Display + UI/body (single app-wide typeface, variable axis 300–700)
@@ -76,11 +77,20 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
+    // suppressHydrationWarning: THEME_INIT_SCRIPT mutates <html>'s class (adds
+    // `.dark`/`.light`) before React hydrates, so the server/client class attribute
+    // differ by design — tell React not to warn or reconcile it away (u7).
     <html
       lang={locale}
+      suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${plexMono.variable} ${newsreader.variable} h-full antialiased`}
     >
       <body className="flex h-dvh-safe flex-col overflow-hidden font-sans">
+        {/* No-flash theme resolver: set the resolved `.dark`/`.light` class + native
+            color-scheme on <html> from localStorage (falling back to the OS setting)
+            BEFORE first paint, so the persisted light/dark/system choice never
+            flashes the wrong theme (u7). Must run before any content renders. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* Mark the document JS-enabled before paint so the section-reveal hidden
             pre-state applies only when JS can reveal it (research §3 JS-off rule). */}
         <script
