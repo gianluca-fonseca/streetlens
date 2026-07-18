@@ -1,0 +1,31 @@
+u2 segment-synthesis browser drive (local mode, port 3742, next start)
+
+Flow driven in a real browser (bgsd playwright):
+  admin login -> review workbench -> assessment panel renders (overall verdict
+  first, per-lens explanations, baseline vs adjusted with delta + reason) ->
+  one-tap "Use baseline" on Accessibility (segment becomes Human-corrected) ->
+  open Frame 1, Exclude -> assessment shows "Written before your corrections"
+  (stale hint), deltas keep riding the fresh baseline -> approve both segments
+  with a reason -> public map segment popover shows the approved overall
+  assessment, labeled "Written by the camera model, in English. Not a field
+  audit." -> ES locale review page (Spanish framing labels around the model's
+  English text) -> mobile 390px review card.
+
+Console: 0 errors across the review workbench, approve, and map popover in true
+local mode. (An earlier approve returned 500 ONLY because .env.local injected
+live Supabase creds into `next start`, so finalizeCaptureReview correctly took
+the live path and failed against the fixture session; re-run with .env.local
+moved aside = clean, which is how the shots below were captured.)
+
+Screenshots:
+  01-assessment-panel-en.png     assessment panel + per-lens explanations (desktop)
+  02-baseline-toggle-en.png      "Use baseline" opt-out, Human-corrected + Reset
+  03-stale-hint-en.png           "Written before your corrections" after an exclusion
+  04-map-popover-assessment-en.png  public popover with the approved assessment
+  05-assessment-panel-es.png     Spanish locale (labels ES, model text EN)
+  06-assessment-panel-mobile.png mobile 390px card
+
+Note: the map popover numbers reflect the build-time community-store snapshot
+(the map segment data is baked at build); the assessment TEXT and model-written
+label are what this screenshot verifies. The live store held the adjusted
+defaults (accessibility 7) at capture time.
