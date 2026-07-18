@@ -1,0 +1,39 @@
+scripts/test-apply-submissions.mjs             PASS
+scripts/test-canton-identity.mjs               PASS
+scripts/test-capture-gating.mjs                PASS
+scripts/test-capture-migrations.mjs            PASS
+scripts/test-capture-rollup.mjs                PASS
+scripts/test-capture-route.mjs                 PASS
+scripts/test-capture-schemas.mjs               PASS
+scripts/test-cv-apply.mjs                      FAIL (exit 1)
+      |   [fail] THE INVARIANT holds under correction: audited properties untouched
+      | 
+      | approve nothing (a full retraction)
+      |   [ok ] the store is empty for that session (0)
+      |   [ok ] the CV counts go back to zero
+      |   [ok ] and the audited dataset is exactly where it started
+      | 
+      | FAIL — 2 failing: THE INVARIANT: the audited segment's own properties are untouched, THE INVARIANT holds under correction: audited properties untouched
+scripts/test-cv-provenance.mjs                 PASS
+scripts/test-extraction-worker.mjs             PASS
+scripts/test-honeypot-type.mjs                 PASS
+scripts/test-i18n-parity.mjs                   PASS
+scripts/test-import-dryrun.mjs                 PASS
+scripts/test-map-cv-visibility.mjs             PASS
+scripts/test-matching-baseline.mjs             PASS
+scripts/test-matching-canton.mjs               PASS
+scripts/test-matching-hmm.mjs                  PASS
+scripts/test-mp4box-contract.mjs               PASS
+scripts/test-parse-feature-props.mjs           PASS
+scripts/test-provenance-visibility.mjs         PASS
+scripts/test-rate-limit-namespaces.mjs         PASS
+scripts/test-reprocess-core.mjs                PASS
+scripts/test-review-overrides.mjs              PASS
+scripts/test-submission-counts.mjs             PASS
+scripts/test-submission-history.mjs            PASS
+scripts/test-synthesis.mjs                     PASS
+scripts/test-upload-client.mjs                 PASS
+scripts/test-video-plan.mjs                    PASS
+
+TOTAL: 27 passed, 1 failed
+FAILED: scripts/test-cv-apply.mjs
