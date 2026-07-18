@@ -49,12 +49,15 @@ export default async function DataPage({
             {t("downloadHeading")}
           </h2>
           <div className="mt-3 flex flex-wrap gap-3">
+            {/* File downloads — plain anchors (not next/link page navigation). */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/api/open-data/geojson"
               className="inline-flex min-h-[44px] items-center justify-center rounded-[4px] border border-border bg-ink px-4 py-2 text-[13px] font-medium text-surface transition-colors hover:bg-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {t("downloadGeojson")}
             </a>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/api/open-data/csv"
               className="inline-flex min-h-[44px] items-center justify-center rounded-[4px] border border-border bg-surface-elevated px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
