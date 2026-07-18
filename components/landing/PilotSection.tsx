@@ -4,6 +4,7 @@
 import { useTranslations } from "next-intl";
 import type { StreetStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
+import { hideAuditedZeros } from "@/lib/real-data-era";
 import Section from "@/components/ui/Section";
 import Measure from "@/components/ui/Measure";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -23,6 +24,7 @@ export default function PilotSection({
   stats: StreetStats;
 }>) {
   const t = useTranslations("landing.pilot");
+  const auditedHidden = hideAuditedZeros(stats);
 
   const figures = [
     { key: "segments", value: String(stats.segments), label: t("statSegments") },
@@ -61,17 +63,23 @@ export default function PilotSection({
       </Measure>
 
       <Measure width="text" className="mt-12">
-        <dl className="grid grid-cols-3 gap-6 border-t border-hairline pt-6">
-          {figures.map((f) => (
-            <StatFigure
-              key={f.key}
-              value={f.value}
-              unit={f.unit}
-              label={f.label}
-              size="md"
-            />
-          ))}
-        </dl>
+        {auditedHidden ? (
+          <p className="border-t border-hairline pt-6 font-mono text-[12.5px] leading-relaxed text-ink-muted">
+            {t("auditedEmpty")}
+          </p>
+        ) : (
+          <dl className="grid grid-cols-3 gap-6 border-t border-hairline pt-6">
+            {figures.map((f) => (
+              <StatFigure
+                key={f.key}
+                value={f.value}
+                unit={f.unit}
+                label={f.label}
+                size="md"
+              />
+            ))}
+          </dl>
+        )}
         {/* Observed-but-unverified work, kept OUT of the three audited figures
             above so the pilot row stays a pure audit claim. */}
         <ProvenanceNote stats={stats} className="mt-4" />

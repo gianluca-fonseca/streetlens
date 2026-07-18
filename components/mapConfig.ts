@@ -165,101 +165,25 @@ export const COMMUNITY_CASING = {
 /** Sources rendered with the community casing rather than the score ramp. */
 const COMMUNITY_SOURCES = ["community", "import"] as const;
 
-/** Score-ramp layers draw everything EXCEPT community/import features. */
-export const RAMP_LAYER_FILTER = [
-  "!",
-  ["in", ["get", "source"], ["literal", COMMUNITY_SOURCES]],
-] as unknown as ExpressionSpecification;
-
-/* ------------------------------------------------------------------ *
- * Camera-observed segments (u31)
- *
- * A street with approved CV observations must be unmistakable on the public
- * map. With demo data off every segment is `source: "import"`, so an observed
- * street was previously pixel-identical to the ~1,456 others: same neutral
- * dashed casing, nothing to see. This adds a third, dedicated treatment.
- *
- * Colour is the sealed flash-pink accent (--accent / dark --accent-strong),
- * the one strong non-ramp chroma in the design register. It cannot collide
- * with any score ramp (none of the five reach magenta) nor with the warm
- * neutral grey, so the three casings stay mutually unambiguous.
- *
- * SOLID (not dashed) and wider than the neutral casing: dashes read as
- * provisional, and camera evidence is the opposite of provisional. It still
- * carries no score semantics — it marks that a street was SEEN, never how it
- * scored, so it is deliberately not a ramp.
- * ------------------------------------------------------------------ */
-
-export const CV_CASING = {
-  /** Flash pink, the sealed graphic-signal accent. */
-  color: "#f0268c",
-  /** The lighter dark-theme form (--accent-strong), for contrast on near-black. */
-  colorDark: "#ff77b8",
-  /** Solid, and wider than COMMUNITY_CASING so it reads as the stronger mark. */
-  width: 5,
-  widthSelected: 7,
-  /**
-   * Floor on the rendered width so an observed street stays clearly visible
-   * when zoomed out ("very clear, even if small"). Below this zoom the casing
-   * stops shrinking with the viewport.
-   */
-  minWidth: 3.5,
-  /** Zoom at and below which `minWidth` holds. */
-  minWidthZoom: 12,
-  /** Zoom at and above which the full `width` is used. */
-  fullWidthZoom: 14.5,
-  opacity: 0.95,
-} as const;
-
 /**
- * The camera-observed layer draws ONLY features carrying at least one approved
- * CV observation. It filters on the precomputed `cv_count` primitive rather
- * than `cv_observations` itself: MapLibre stringifies array properties at the
- * worker boundary, and community features always carry the array key even when
- * it is empty, so neither `["get"]`-into-array nor `["has"]` would work.
+ * Score-ramp layers draw audited segments and camera-observed import/community
+ * segments (canonical scores applied at payload build time). Unaudited
+ * community/import features with no camera observation stay on the neutral casing.
  */
-export const CV_LAYER_FILTER = [
-  ">",
-  ["coalesce", ["get", "cv_count"], 0],
-  0,
+export const RAMP_LAYER_FILTER = [
+  "any",
+  ["!", ["in", ["get", "source"], ["literal", COMMUNITY_SOURCES]]],
+  [">", ["coalesce", ["get", "cv_count"], 0], 0],
 ] as unknown as ExpressionSpecification;
 
 /**
- * The community casing layer draws community/import features EXCEPT those with
- * camera observations, which get the CV casing instead — otherwise an observed
- * import segment would be drawn twice and the neutral dash would fight the
- * accent.
+ * The community casing layer draws community/import features with no approved
+ * camera observation. Observed streets route through the score ramp instead.
  */
 export const COMMUNITY_LAYER_FILTER = [
   "all",
   ["in", ["get", "source"], ["literal", COMMUNITY_SOURCES]],
-  ["!", CV_LAYER_FILTER],
-] as unknown as ExpressionSpecification;
-
-/**
- * CV casing width: zoom-interpolated with a floor, and thicker when selected.
- *
- * The zoom `interpolate` MUST be the outermost expression — MapLibre rejects a
- * zoom curve nested inside a `case`, and `addLayer` throws outright rather than
- * degrading, which silently costs you the whole layer. So the selected/base
- * choice lives inside each zoom stop instead of wrapping them.
- */
-const cvSelectedWidth = (base: number) =>
-  [
-    "case",
-    ["boolean", ["feature-state", "selected"], false],
-    CV_CASING.widthSelected,
-    base,
-  ] as unknown as ExpressionSpecification;
-
-export const cvWidthExpression = [
-  "interpolate",
-  ["linear"],
-  ["zoom"],
-  CV_CASING.minWidthZoom,
-  cvSelectedWidth(CV_CASING.minWidth),
-  CV_CASING.fullWidthZoom,
-  cvSelectedWidth(CV_CASING.width),
+  ["==", ["coalesce", ["get", "cv_count"], 0], 0],
 ] as unknown as ExpressionSpecification;
 
 /** Community casing width, thicker when this feature is selected. */
