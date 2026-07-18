@@ -14,7 +14,9 @@ create or replace function assert_admin_secret(p_secret text)
 returns void
 language plpgsql
 security definer
-set search_path = public
+-- pgcrypto lives in the `extensions` schema on Supabase (and may on any managed
+-- Postgres); a pinned search_path of bare `public` cannot resolve digest().
+set search_path = public, extensions
 as $$
 declare
   v_expected bytea;

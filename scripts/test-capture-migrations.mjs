@@ -143,12 +143,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0026", files.some((f) => f.startsWith("0026")), files.join(" "));
+    check("found the full migration chain through 0027", files.some((f) => f.startsWith("0027")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025") || file.startsWith("0026")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025") || file.startsWith("0026") || file.startsWith("0027")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -183,6 +183,14 @@ function main() {
       // the re-run (0023 above reverts admin_apply_capture_session to its no-contact
       // body; 0024 re-establishes the session-sourced contact the assertions rely on).
       psql(readFileSync(path.join(MIGRATIONS, "0024_cv_observation_contact.sql"), "utf8"));
+      // 0025..0027 last, and in order: re-running 0013/0017 above reverted the
+      // claim/status/review bodies to plaintext-compare shapes. 0025 restores the
+      // pipeline-truth semantics, 0026 restores the hashed-secret regime (its
+      // UPDATE re-hashes only a plaintext row, so a second run is a no-op), and
+      // 0027 re-establishes the composed truth the behavioral checks below assert.
+      psql(readFileSync(path.join(MIGRATIONS, "0025_pipeline_truth.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0026_security_core.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0027_compose_pipeline_security.sql"), "utf8"));
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", true);
     } catch (err) {
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
@@ -263,7 +271,7 @@ function main() {
 
     check(
       "anon INSERT on submissions is blocked (0026)",
-      psqlExpectError(`insert into submissions (type, payload) values ('add_segment', '{}'::jsonb);`) !== null,
+      psqlExpectError(`set role anon; insert into submissions (type, payload) values ('add_segment', '{}'::jsonb); reset role;`) !== null,
     );
 
     const subId = psql(`
@@ -370,7 +378,7 @@ function main() {
 
     const finalized = psql(`
       select capture_finalize_session('${sid}'::uuid,
-        '[{"lat":9.907,"lng":-84.152,"t":1784000000000},{"lat":9.907,"lng":-84.150,"t":1784000010000}]'::jsonb, 250, '${SECRET}');
+        '[{"lat":9.907,"lng":-84.152,"t":1784000000000},{"lat":9.907,"lng":-84.150,"t":1784000030000}]'::jsonb, 250, '${SECRET}');
     `).trim();
     check("capture_finalize_session hands the session to the matcher", finalized === "matching", finalized);
     check(
@@ -1225,7 +1233,7 @@ function main() {
 
     /* ---------------- 0025: pipeline truth (resume + reclaim) ---------------- */
 
-    const cpSid = psql(`select capture_create_session('live', 'iphash-cp');`).trim();
+    const cpSid = psql(`select capture_create_session('live', 'iphash-cp', null, '${SECRET}');`).trim();
     psql(`
       insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
       values ('${cpSid}'::uuid, 0, 'captures/${cpSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-a'),
@@ -1244,7 +1252,7 @@ function main() {
     check(
       "resume refuses a session that is not cost_paused",
       (() => {
-        const other = psql(`select capture_create_session('live', 'iphash-not-cp');`).trim();
+        const other = psql(`select capture_create_session('live', 'iphash-not-cp', null, '${SECRET}');`).trim();
         return (psqlExpectError(`select capture_resume_cost_paused('${other}'::uuid, 'ops', 'try', 'test-secret');`) || "").includes("not cost_paused");
       })(),
     );
@@ -1271,7 +1279,7 @@ function main() {
       (psqlExpectError(`select capture_reclaim_stale_jobs('nope');`) || "").includes("unauthorized"),
     );
     {
-      const staleSid = psql(`select capture_create_session('live', 'iphash-stale');`).trim();
+      const staleSid = psql(`select capture_create_session('live', 'iphash-stale', null, '${SECRET}');`).trim();
       psql(`
         insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
         values ('${staleSid}'::uuid, 0, 'captures/${staleSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-z');
