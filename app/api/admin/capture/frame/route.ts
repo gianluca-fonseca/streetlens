@@ -47,7 +47,10 @@ export async function DELETE(request: NextRequest) {
       seq: parsed.data.seq,
     });
     return NextResponse.json({ ok: true, ...result });
-  } catch {
+  } catch (err) {
+    // Log before swallowing into an opaque server_error, so a prod delete failure
+    // is diagnosable from the Vercel logs. Response body is intentionally unchanged.
+    console.error("[capture frame] delete failed:", err);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }
