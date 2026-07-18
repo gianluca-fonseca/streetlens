@@ -33,12 +33,15 @@ alter table community_cv_observations
 comment on column community_cv_observations.assessment_es is
   'Spanish prose companion to assessment. Public surfaces pick viewer locale; fall back to assessment (EN).';
 
--- Persist both locales from the pump. p_assessment_es is optional (null keeps
+-- Persist both locales from the pump. p_assessment_es is nullable (null keeps
 -- the EN-only path for older callers / failed ES generation).
 --
--- Postgres: adding a DEFAULT arg creates a new overload. Drop the 6-arg form
--- so callers always hit the 7-arg signature (p_assessment_es nullable).
+-- No DEFAULT on the new arg: a 6-arg + 7-arg-with-default overload pair is
+-- ambiguous for 6-arg calls. Drop every known signature, then create exactly
+-- one 7-arg function. Callers (and the migration test) pass NULL when ES is
+-- absent.
 drop function if exists capture_set_segment_assessment(uuid, text, jsonb, integer, integer, text);
+drop function if exists capture_set_segment_assessment(uuid, text, jsonb, integer, integer, text, jsonb);
 
 create or replace function capture_set_segment_assessment(
   p_session_id    uuid,
@@ -47,7 +50,7 @@ create or replace function capture_set_segment_assessment(
   p_input_tokens  integer,
   p_output_tokens integer,
   p_secret        text,
-  p_assessment_es jsonb default null
+  p_assessment_es jsonb
 ) returns void
 language plpgsql
 security definer

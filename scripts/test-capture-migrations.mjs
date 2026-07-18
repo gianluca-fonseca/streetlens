@@ -247,15 +247,17 @@ function main() {
       select public::text || '|' || file_size_limit::text || '|' || array_to_string(allowed_mime_types, ',')
         from storage.buckets where id='streetlens-frames';
     `).trim();
-    check("the frames bucket is public-read, 2 MB, jpeg-only", bucket === "true|2097152|image/jpeg", bucket);
+    check("the frames bucket is private, 2 MB, jpeg-only (0028)", bucket === "false|2097152|image/jpeg", bucket);
 
     const storagePolicies = psql(`
-      select policyname || ':' || cmd from pg_policies
-       where schemaname='storage' and tablename='objects' order by 1;
+      select string_agg(policyname || ':' || cmd, ',' order by policyname)
+        from pg_policies
+       where schemaname='storage' and tablename='objects'
+         and policyname like 'capture_frames%';
     `).trim();
     check(
-      "storage has exactly one INSERT policy and no update/delete policy",
-      storagePolicies === "capture_frames_anon_insert:INSERT",
+      "storage has INSERT + evidence SELECT, and no update/delete policy (0028)",
+      storagePolicies === "capture_frames_anon_insert:INSERT,capture_frames_evidence_select:SELECT",
       storagePolicies,
     );
 
@@ -566,7 +568,7 @@ function main() {
         model: "gpt-5.4-mini",
       });
       psql(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001',
-              '${assessment}'::jsonb, 512, 210, 'test-secret');`);
+              '${assessment}'::jsonb, 512, 210, 'test-secret', null::jsonb);`);
       check(
         "capture_set_segment_assessment writes the assessment onto the rollup",
         psql(`select assessment->>'model' from capture_segment_rollups
@@ -577,14 +579,26 @@ function main() {
         psql(`select (synthesis_input_tokens=512 and synthesis_output_tokens=210)::text
                 from capture_segment_rollups where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() === "true",
       );
+      const assessmentEs = JSON.stringify({
+        overall: "La acera desaparece a mitad de cuadra.",
+        lenses: { accessibility: "a", drainage: "d", shade: "s", bike: "b" },
+      });
+      psql(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001',
+              '${assessment}'::jsonb, 512, 210, 'test-secret', '${assessmentEs}'::jsonb);`);
+      check(
+        "capture_set_segment_assessment writes assessment_es alongside EN",
+        psql(`select assessment_es->>'overall' from capture_segment_rollups
+                where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() ===
+          "La acera desaparece a mitad de cuadra.",
+      );
       check(
         "capture_set_segment_assessment is secret-gated",
-        (psqlExpectError(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001', '{}'::jsonb, 0, 0, 'nope');`) || "").includes("unauthorized"),
+        (psqlExpectError(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001', '{}'::jsonb, 0, 0, 'nope', null::jsonb);`) || "").includes("unauthorized"),
       );
       check(
         "writing an assessment for an absent segment is a no-op, not an orphan row",
         (() => {
-          psql(`select capture_set_segment_assessment('${sid}'::uuid, 'no-such-seg', '{}'::jsonb, 0, 0, 'test-secret');`);
+          psql(`select capture_set_segment_assessment('${sid}'::uuid, 'no-such-seg', '{}'::jsonb, 0, 0, 'test-secret', null::jsonb);`);
           return psql(`select count(*) from capture_segment_rollups
                          where session_id='${sid}' and segment_id='no-such-seg';`).trim() === "0";
         })(),
