@@ -1,0 +1,9 @@
+files changed vs bed92e2:
+   components/SegmentDetail.tsx   |   5 ++
+   components/scoreColor.ts       |  50 +++++++++++++-----
+   components/ui/panel.module.css | 114 +++++++++++++++++++++++++++++++++++++++++
+   scripts/test-score-color.mjs   |  83 ++++++++++++++++++++++--------
+   4 files changed, 218 insertions(+), 34 deletions(-)
+
+sealed map ramp (components/mapConfig.ts) vs base:
+  (empty = untouched; test-score-color.mjs also asserts RAMP byte-identity against its own frozen snapshot)

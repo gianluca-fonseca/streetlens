@@ -38,23 +38,46 @@ import type { ScoreLayer } from "@/lib/segments";
 /**
  * Worst-case surfaces the panel paints score ink onto.
  *
- * Cards sit on --surface-elevated or --surface-sunken: #ffffff / #f1f1f1 in
- * light, #141414 / #050505 in dark. In BOTH themes the worst case is the
- * background nearest the ink's own luminance, because that is where the gap is
- * narrowest — so light ink (dark theme) is governed by the LIGHTER surface
- * #141414, and dark ink (light theme) by the DARKER surface #f1f1f1.
+ * In BOTH themes the worst case is the background nearest the ink's own
+ * luminance, because that is where the gap is narrowest — so light ink (dark
+ * theme) is governed by the LIGHTEST panel surface, and dark ink (light theme)
+ * by the DARKEST one.
  *
  * The light value is easy to get backwards (white is the "extreme" surface, so
  * it looks like the hard case) and #ffffff was in fact wrong here first: it let
- * 86 layer/value pairs through that then failed on #f1f1f1. Clear these two and
- * every surface the panel actually uses is covered; test-score-color.mjs checks
- * the other two as well rather than trusting the argument.
+ * 86 layer/value pairs through that then failed on #f1f1f1. Light cards sit on
+ * #ffffff / #f1f1f1, so #f1f1f1 governs.
+ *
+ * SURFACE_DARK tracks the panel's DARK ELEVATION LADDER, not the global dark
+ * tokens. panel.module.css lifts the whole panel off the near-black page ground
+ * (#0a0a0a) onto ground #141414 → recessed plate #1a1a1a → elevated shell and
+ * canonical card #212121 (see the elevation block there for why), so the
+ * lightest surface score ink is ever painted on is #212121 and that is what
+ * governs. Fitting to the old #141414 would measure every ink against a
+ * background it is no longer painted on, which is exactly the flavour of
+ * mistake the light side already made once.
  */
 export const SURFACE_LIGHT = "#f1f1f1";
-export const SURFACE_DARK = "#141414";
+export const SURFACE_DARK = "#212121";
 
-/** WCAG 2.1 AA for normal-size body text. */
+/** WCAG 2.1 AA for normal-size body text. The hard floor, in both themes. */
 export const AA_TEXT = 4.5;
+
+/**
+ * The DARK-theme target: AAA-for-body, not AA.
+ *
+ * AA is a floor, not a goal, and on a phone the difference is not academic. Ink
+ * fitted to exactly 4.5:1 on near-black measures compliant and still reads
+ * muddy outdoors or at low display brightness — which is what the panel shipped
+ * with, and what "not able to see well" was reporting. Targeting 7:1 costs
+ * nothing structural (the derivation only moves lightness, so hue identity is
+ * untouched) and buys ink that stays legible when the screen is dimmed.
+ *
+ * Light theme keeps AA_TEXT: dark ink on a bright surface was never the
+ * complaint, and raising it there would only push the ramp toward black and
+ * cost the map-colour reading that the whole module exists to preserve.
+ */
+export const DARK_INK_TARGET = 7;
 
 /** A colour resolved for both themes; the CSS module picks one via `html.dark`. */
 export type ThemedInk = Readonly<{ light: string; dark: string }>;
@@ -138,8 +161,9 @@ function hslToHex(h: number, s: number, l: number): string {
  *
  * Direction is set by the background: darken against a light surface, lighten
  * against a dark one. A binary search on lightness converges in ~24 steps and
- * always terminates, because the extreme (pure black on white, pure white on
- * #141414) clears AA by a wide margin in both directions.
+ * always terminates, because the extreme (pure black on #f1f1f1, pure white on
+ * #212121) clears both the AA floor and the 7:1 dark target by a wide margin —
+ * 18.1:1 and 16.1:1 respectively — so a `pass` bound always exists.
  */
 export function readableInk(hex: string, bg: string, target = AA_TEXT): string {
   if (contrastRatio(hex, bg) >= target) return hex;
@@ -171,7 +195,7 @@ export function rampInk(layer: ScoreLayer, value: number): ThemedInk {
   const base = sampleRamp(layer, value);
   return {
     light: readableInk(base, SURFACE_LIGHT),
-    dark: readableInk(base, SURFACE_DARK),
+    dark: readableInk(base, SURFACE_DARK, DARK_INK_TARGET),
   };
 }
 

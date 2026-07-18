@@ -1,0 +1,11 @@
+messages/*.json vs bed92e2 (the run's base commit)
+  (empty diffstat above = byte-identical)
+
+sha256 comparison:
+  messages/en.json  base=9e186bd831039c1efaa3c25c6185248d17ab8d4210db4805eeac2fb885ef992f
+                    work=9e186bd831039c1efaa3c25c6185248d17ab8d4210db4805eeac2fb885ef992f  IDENTICAL
+  messages/es.json  base=d1384a68d50e8fa8516dc8efc2e9bac5fd3e0eb3b475f9759e4479fdb9ce16f8
+                    work=d1384a68d50e8fa8516dc8efc2e9bac5fd3e0eb3b475f9759e4479fdb9ce16f8  IDENTICAL
+
+working-tree cleanliness for messages/:
+  (no lines above = no uncommitted edits)
