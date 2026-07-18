@@ -186,6 +186,23 @@ export interface CaptureDb {
     actor: string,
     reason: string,
   ): Promise<{ requeued: number }>;
+  /** Stored track vertices + session meta (0019). */
+  sessionTrack(sessionId: string): Promise<{
+    status: string;
+    mode: string;
+    frameCount: number;
+    track: { lng: number; lat: number }[];
+  }>;
+  /** Re-attribute no_segment_match frames after network expansion (0019). */
+  reprocessSession(
+    sessionId: string,
+    attributions: { seq: number; segmentId: string | null; nearJunction: boolean }[],
+  ): Promise<{
+    reprocessed: number;
+    requeued: number;
+    noop: boolean;
+    status: string;
+  }>;
 }
 
 /**
@@ -420,6 +437,43 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
         p_secret: adminSecret(),
       });
       return { requeued: result?.requeued ?? 0 };
+    },
+
+    async sessionTrack(sessionId) {
+      const data = await rpc<{
+        status: string;
+        mode: string;
+        frameCount: number;
+        track: { lng: number; lat: number }[];
+      }>("capture_session_track", {
+        p_session_id: sessionId,
+        p_secret: adminSecret(),
+      });
+      return {
+        status: data?.status ?? "unknown",
+        mode: data?.mode ?? "unknown",
+        frameCount: data?.frameCount ?? 0,
+        track: Array.isArray(data?.track) ? data.track : [],
+      };
+    },
+
+    async reprocessSession(sessionId, attributions) {
+      const data = await rpc<{
+        reprocessed: number;
+        requeued: number;
+        noop: boolean;
+        status: string;
+      }>("capture_reprocess_session", {
+        p_session_id: sessionId,
+        p_attributions: attributions,
+        p_secret: adminSecret(),
+      });
+      return {
+        reprocessed: data?.reprocessed ?? 0,
+        requeued: data?.requeued ?? 0,
+        noop: data?.noop ?? false,
+        status: data?.status ?? "unknown",
+      };
     },
   };
 }
