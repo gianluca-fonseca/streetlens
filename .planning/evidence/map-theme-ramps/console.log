@@ -1,0 +1,27 @@
+Total messages: 6 (Errors: 0, Warnings: 4)
+Returning 24 messages for level "info"
+
+[INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[LOG] [HMR] connected @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/1e1e88a2-6787-44f0-84bd-1acd1fa90708:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/1e1e88a2-6787-44f0-84bd-1acd1fa90708:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/1e1e88a2-6787-44f0-84bd-1acd1fa90708:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/1e1e88a2-6787-44f0-84bd-1acd1fa90708:8091
+[INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[LOG] [HMR] connected @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/ac0d2946-5926-44ca-b6dd-0c30efbb5284:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/ac0d2946-5926-44ca-b6dd-0c30efbb5284:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/ac0d2946-5926-44ca-b6dd-0c30efbb5284:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/ac0d2946-5926-44ca-b6dd-0c30efbb5284:8091
+[INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[LOG] [HMR] connected @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/fee2ecff-2c40-40a0-9a0c-25eae3bf999d:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/fee2ecff-2c40-40a0-9a0c-25eae3bf999d:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/fee2ecff-2c40-40a0-9a0c-25eae3bf999d:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/fee2ecff-2c40-40a0-9a0c-25eae3bf999d:8091
+[INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[LOG] [HMR] connected @ http://localhost:3577/_next/static/chunks/165u_next_dist_0y1tt01._.js:2477
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/c0cb4230-a089-4dcd-8760-d74ba89e1e60:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/c0cb4230-a089-4dcd-8760-d74ba89e1e60:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/c0cb4230-a089-4dcd-8760-d74ba89e1e60:8091
+[WARNING] Expected value to be of type number, but found null instead. @ blob:http://localhost:3577/c0cb4230-a089-4dcd-8760-d74ba89e1e60:8091
