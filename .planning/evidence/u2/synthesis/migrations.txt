@@ -1,0 +1,139 @@
+Starting public.ecr.aws/supabase/postgres:17.6.1.143...
+  [ok ] found the full migration chain through 0023 0001_extensions.sql 0002_geography.sql 0003_rubric.sql 0004_audits.sql 0005_submissions.sql 0006_rls.sql 0007_admin_rpcs.sql 0008_views.sql 0009_views_district_audited_at.sql 0010_admin_list_rpc.sql 0011_bike_layer.sql 0012_community.sql 0013_capture.sql 0014_submission_types.sql 0015_capture_worker.sql 0016_capture_storage_policy_fix.sql 0017_capture_review.sql 0018_admin_list_null_filter.sql 0019_capture_reprocess.sql 0020_observation_rationale.sql 0021_review_overrides.sql 0023_assessment_apply.sql
+  [ok ] 0013_capture.sql applies cleanly
+  [ok ] 0014_submission_types.sql applies cleanly
+  [ok ] 0017_capture_review.sql applies cleanly
+  [ok ] 0019_capture_reprocess.sql applies cleanly
+  [ok ] 0020_observation_rationale.sql applies cleanly
+  [ok ] 0021_review_overrides.sql applies cleanly
+  [ok ] 0023_assessment_apply.sql applies cleanly
+  [ok ] 0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0023 are re-runnable (idempotent)
+  [ok ] all five capture tables exist capture_frame_jobs capture_frame_tombstones capture_frames capture_observations capture_segment_rollups capture_sessions
+  [ok ] capture_sessions.track is geography, not geometry
+  [ok ] capture_frames.t is bigint (epoch ms overflows int4)
+  [ok ] RLS is enabled on every capture table
+  [ok ] capture tables have ZERO policies (deny-by-default; RPCs are the only way in) 0 policies
+  [ok ] the GIST indexes exist
+  [ok ] the frames bucket is public-read, 2 MB, jpeg-only true|2097152|image/jpeg
+  [ok ] storage has exactly one INSERT policy and no update/delete policy capture_frames_anon_insert:INSERT
+  [ok ] submissions accepts cv_capture
+  [ok ] submissions accepts unknown (the honeypot landing place)
+  [ok ] submissions still rejects a garbage type
+  [ok ] the two original types still work (manual flow unchanged)
+  [ok ] capture_create_session returns a session uuid c99eb7a9-e859-458c-949a-28a2b6e0709d
+  [ok ] a new session starts at pending_upload
+  [ok ] an invalid mode is rejected
+  [ok ] a 4th session from one origin within the hour is rate_limited IN THE DATABASE
+  [ok ] the ceiling is per-origin: a different ip hash is unaffected
+  [ok ] capture_register_frames returns the accepted seqs {0,1}
+  [ok ] registering moves the session to uploading and counts the frames
+  [ok ] the storage path is DERIVED server-side, never taken from the client
+  [ok ] a client-supplied storagePath is ignored
+  [ok ] re-registering the same seq is idempotent (retry-safe), not a duplicate
+  [ok ] an oversized frame is rejected by the CHECK
+  [ok ] seq >= 400 is rejected by the CHECK
+  [ok ] capture_session_status returns the progress shape {"status" : "uploading", "frameCount" : 2, "jobs" : {"pending" : 0, "done" : 0, "failed" : 0}, "rollups" : []}
+  [ok ] session status leaks NO ip hash and NO contact {"status" : "uploading", "frameCount" : 2, "jobs" : {"pending" : 0, "done" : 0, "failed" : 0}, "rollups" : []}
+  [ok ] reading an unknown session raises rather than returning null
+  [ok ] capture_finalize_session hands the session to the matcher matching
+  [ok ] finalize writes a real geography LineString
+  [ok ] finalize records the clock offset without touching the track
+  [ok ] finalize enqueues exactly one job per frame
+  [ok ] a finalized session cannot be finalized again (no track rewrite)
+  [ok ] a finalized session no longer accepts frames
+  [ok ] capture_claim_jobs without the secret is unauthorized
+  [ok ] the secret gate holds even when app_secrets has no row yet
+  [ok ] capture_claim_jobs claims the pending jobs with the right secret 2
+  [ok ] claiming marks them running and counts the attempt
+  [ok ] a second claim returns nothing (no double-spend on the same frame)
+  [ok ] capture_complete_job stores the observation and closes the job
+  [ok ] capture_complete_job persists the per-frame rationale (0020)
+  [ok ] re-running one model REPLACES its answer rather than double-counting
+  [ok ] the re-run overwrites the rationale too, not just the items
+  [ok ] a DIFFERENT model on the same frame is kept alongside (A/B, escalation)
+  [ok ] failed_overbudget is recorded distinctly from failed (it is retryable)
+  [ok ] an invalid job status is rejected
+  [ok ] a scored frame carries observation { items, rationale, escalated, model } {"items":{"sidewalk_present":{"value":1,"confidence":0.99}},"model":"gpt-5","escalated":true,"rationale":"Escalated read: clearly a two-lane street with intact gutters."}
+  [ok ] the escalated row wins the frame's observation, with its rationale {"items":{"sidewalk_present":{"value":1,"confidence":0.99}},"model":"gpt-5","escalated":true,"rationale":"Escalated read: clearly a two-lane street with intact gutters."}
+  [ok ] an unscored/failed frame reports observation: null (not an empty object) {"seq":1,"segmentId":null,"observation":null,"storagePath":"captures/c99eb7a9-e859-458c-949a-28a2b6e0709d/frame-0001.jpg"}
+  [ok ] capture_upsert_rollup writes the per-segment rollup
+  [ok ] re-rolling one segment updates in place (one row per session+segment)
+  [ok ] an out-of-range score is rejected by the CHECK
+  [ok ] the rollup now surfaces in the public session status
+  [ok ] capture_set_session_status stamps the lifecycle timestamp
+  [ok ] status transitions are secret-gated too
+  [ok ] capture_emit_submission is secret-gated
+  [ok ] emitting for a session that does not exist raises
+  [ok ] the drained session is filed as a pending cv_capture row
+  [ok ] re-emitting is a no-op, so the pump's retry cannot double-file the walk
+  [ok ] capture_session_review is secret-gated
+  [ok ] the review read returns the session shape the page needs {"jobs": {"done": 0, "failed": 0, "pending": 0, "overbudget": 0}, "mode": "live", "frames": [], "status": "pending_upload", "tokens": {"escalated": 0, "inputTok
+  [ok ] overbudget is reported separately from failed (money out != frame bad) {"done":0,"failed":0,"pending":0,"overbudget":0}
+  [ok ] the review read reports token spend (which the PUBLIC status must not) {"escalated":0,"inputTokens":0,"observations":0,"outputTokens":0}
+  [ok ] an unknown session raises rather than returning null
+  [ok ] admin_apply_capture_session is secret-gated
+  [ok ] approving two segments lands exactly two observations
+  [ok ] a lens no frame supported stays NULL rather than becoming a zero
+  [ok ] the observation keeps its provenance and capture date
+  [ok ] re-approving is idempotent for the segments that stayed ticked
+  [ok ] an UNTICKED segment is retracted, not left published
+  [ok ] retraction is scoped to its own session
+  [ok ] an out-of-range CV score is rejected by the CHECK
+  [ok ] approving a capture NEVER writes an audit (the prime invariant)
+  [ok ] a human-corrected approval persists human_corrected = true
+  [ok ] the compact overrides record round-trips verbatim
+  [ok ] a payload with no provenance fields defaults to human_corrected = false, overrides = {}
+  [ok ] a payload with no assessment leaves the column NULL
+  [ok ] the assessment overall text round-trips verbatim
+  [ok ] the assessment's per-lens explanation and adjustment delta round-trip
+  [ok ] the reviewer's chosen NUMBERS still land, not the synthesis's adjustedScores
+  [ok ] re-approving with no assessment resets the column to NULL
+  [ok ] capture_close_review is secret-gated
+  [ok ] a reason is mandatory, in the database and not just the UI
+  [ok ] an invalid action is rejected
+  [ok ] closing stamps the session AND closes its queue row in one go
+  [ok ] capture_claim_jobs_for_session is secret-gated
+  [ok ] the scoped claim takes MY session's job claimed=1
+  [ok ] and it CANNOT reach another session's frames — the whole point of the route
+  [ok ] a cost_paused session is not claimable, so polling cannot resurrect it
+  [ok ] capture_session_track is secret-gated
+  [ok ] capture_session_track returns status + the ordered track vertices {"mode": "live", "track": [{"lat": 9.907, "lng": -84.152}, {"lat": 9.907, "lng": -84.15}, {"lat": 9.907, "lng": -84.148}], "status": "review_ready", "frameCount
+  [ok ] capture_session_track raises on an unknown session
+  [ok ] capture_reprocess_session is secret-gated
+  [ok ] reprocess touches only the three no_segment_match frames {"noop":false,"status":"extracting","requeued":2,"matchedNow":2,"reprocessed":3,"stillUnmatched":1}
+  [ok ] it re-queues the two that now match and reports the one still off-network {"noop":false,"status":"extracting","requeued":2,"matchedNow":2,"reprocessed":3,"stillUnmatched":1}
+  [ok ] a review_ready session with fresh work flips back to extracting
+  [ok ] the now-matched frames are pending again with the error cleared
+  [ok ] and they carry the new segment attribution
+  [ok ] a frame still off-network stays failed no_segment_match, so the session can still drain
+  [ok ] an already-extracted (done) frame keeps its job AND its segment provenance
+  [ok ] a failed_overbudget job is NOT silently retried
+  [ok ] a model-error failed job (not a matching failure) is left alone
+  [ok ] a re-run only reconsiders the still-unmatched frame and changes nothing {"noop":true,"status":"extracting","requeued":0,"matchedNow":0,"reprocessed":1,"stillUnmatched":1}
+  [ok ] the re-queued frames are untouched by the idempotent re-run (still pending)
+  [ok ] reprocess refuses a payload that names a frame not in the session
+  [ok ] reprocess refuses a decided (approved) session — history, not a retry target
+  [ok ] reprocess refuses a rejected session too
+  [ok ] reprocess refuses a session that is not extracting/review_ready (e.g. cost_paused)
+  [ok ] capture_session_review_detail is secret-gated
+  [ok ] detail returns a frame per capture frame, in seq order, with geography + quality [{"seq":0,"usable":false,"position":{"lat":9.907,"lng":-84.15},"nearJunction":false},{"seq":1,"usable":false,"position":{"lat":9.9071,"lng":-84.149},"nearJunction":true},{"seq":2,"usable":true,"position":null,"nearJunction":false}]
+  [ok ] a matched frame carries its ground position; an unmatched one carries null [{"lat":9.907,"lng":-84.15},{"lat":9.9071,"lng":-84.149},null]
+  [ok ] near_junction rides through per frame
+  [ok ] usable comes from the winning (escalated) observation, matching the rollup [false,false,true]
+  [ok ] a session with no finalized track returns an empty track and no tombstones
+  [ok ] capture_delete_frame is secret-gated
+  [ok ] deleting a frame reports the bytes were removed {"seq":0,"deleted":true,"bytesRemoved":true}
+  [ok ] the frame row is gone, and its observations cascaded with it
+  [ok ] the storage object is deleted, revoking all access to the bytes
+  [ok ] a tombstone records the deleted seq so the frame count never silently lies
+  [ok ] after delete, the detail read drops the frame and surfaces the tombstone {"frames":[1,2],"tombstones":[{"seq":0}]}
+  [ok ] re-deleting an already-gone frame is idempotent (deleted, but no bytes to remove) {"seq":0,"deleted":true,"bytesRemoved":false}
+  [ok ] deleting a seq that never existed still tombstones it, without error
+  [ok ] deleting a session cascades to its CV observations
+  [ok ] deleting a session cascades to its frame tombstones
+  [ok ] deleting a session cascades to frames, jobs, observations and rollups
+  [ok ] the owner CAN see the session (so the next check is not vacuous)
+  [ok ] anon cannot read that session directly — only the RPCs let anything out anon saw: denied
+  [ok ] anon cannot forge a capture_frames row (which would authorize an upload)
+
+PASS — migrations apply and the capture RPCs behave

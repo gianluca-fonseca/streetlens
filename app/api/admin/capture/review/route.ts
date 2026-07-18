@@ -45,6 +45,11 @@ const correctionsSchema = z.object({
   manualScores: z
     .record(z.string().max(64), z.record(z.string().max(32), z.number().nullable()))
     .default({}),
+  // Per segment, the lenses where the reviewer declined the synthesis adjustment.
+  // Loosely typed on the wire; the recompute ignores any key it does not recognize.
+  baselineLenses: z
+    .record(z.string().max(64), z.array(z.string().max(32)).max(10))
+    .default({}),
 });
 
 const bodySchema = z.object({
@@ -78,6 +83,7 @@ function toCorrections(input: z.infer<typeof correctionsSchema> | undefined): Re
     excluded: input.excluded,
     deleted: input.deleted,
     manualScores: input.manualScores as ReviewCorrections["manualScores"],
+    baselineLenses: input.baselineLenses as ReviewCorrections["baselineLenses"],
   };
 }
 
@@ -119,7 +125,7 @@ export async function POST(request: NextRequest) {
   // reviewer's corrections applied, reusing the same rollup math as the server —
   // so what lands is what the reviewer saw, and the client cannot inject scores.
   const corrections = toCorrections(parsed.data.corrections);
-  const recompute = recomputeReview(review.frames, corrections);
+  const recompute = recomputeReview(review.frames, corrections, review.assessments);
 
   const surviving = new Map(recompute.segments.map((s) => [s.segmentId, s]));
   const dropped = new Set(recompute.droppedSegmentIds);
@@ -176,6 +182,9 @@ export async function POST(request: NextRequest) {
         frame_refs: s.frameRefs,
         human_corrected: s.humanCorrected,
         overrides: s.humanCorrected ? s.overrides : undefined,
+        // The synthesis is context that rides along to the map (seal #3): the overall
+        // verdict shown on the public popover. The chosen NUMBERS are still s.scores.
+        assessment: s.assessment ?? undefined,
       })),
     });
 

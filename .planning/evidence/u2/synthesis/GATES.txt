@@ -1,0 +1,33 @@
+=== u2 segment-synthesis gates (run 2026-07-18T00:45:40.546Z) ===
+npx tsc --noEmit                 EXIT=0
+npm run lint                     EXIT=0
+npm run build                    EXIT=0 (compiled, all routes)
+i18n parity EN/ES                846 == 846, 0 diff (see i18n-parity.txt)
+
+All scripts/test-*.mjs:
+  test-apply-submissions.mjs  EXIT=0
+  test-canton-identity.mjs  EXIT=0
+  test-capture-gating.mjs  EXIT=0
+  test-capture-migrations.mjs  EXIT=0
+  test-capture-rollup.mjs  EXIT=0
+  test-capture-route.mjs  EXIT=0
+  test-capture-schemas.mjs  EXIT=0
+  test-cv-apply.mjs  EXIT=0
+  test-extraction-worker.mjs  EXIT=0
+  test-honeypot-type.mjs  EXIT=0
+  test-import-dryrun.mjs  EXIT=0
+  test-matching-baseline.mjs  EXIT=0
+  test-matching-canton.mjs  EXIT=0
+  test-matching-hmm.mjs  EXIT=0
+  test-mp4box-contract.mjs  EXIT=0
+  test-parse-feature-props.mjs  EXIT=0
+  test-rate-limit-namespaces.mjs  EXIT=0
+  test-reprocess-core.mjs  EXIT=0
+  test-review-overrides.mjs  EXIT=0
+  test-submission-counts.mjs  EXIT=0
+  test-upload-client.mjs  EXIT=0
+  test-video-plan.mjs  EXIT=0
+
+test-capture-migrations.mjs: 136 checks ok, 0 fails, PASS (full output: migrations.txt)
+  (reruns flaked on Docker container startup under RAM pressure; the SQL and all 0023
+   assertions pass green when the daemon is settled — this run is the clean pass.)

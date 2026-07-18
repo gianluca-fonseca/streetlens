@@ -21,12 +21,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Camera, Check, FlaskConical, Pencil, RotateCcw, TriangleAlert, X } from "lucide-react";
-import type { ReviewFrame, SessionReview } from "@/lib/capture/review-store";
+import { Camera, Check, FlaskConical, Pencil, RotateCcw, Sparkles, TriangleAlert, X } from "lucide-react";
+import type { ReviewFrame, SessionReview, SegmentAssessment } from "@/lib/capture/review-store";
 import {
   recomputeReview,
-  EMPTY_CORRECTIONS,
   type ReviewCorrections,
+  type RecomputedSegment,
 } from "@/lib/capture/review-overrides";
 import { LENS_KEYS, type LensKey } from "@/lib/capture/scoring";
 import type { RubricItemKey } from "@/lib/capture/types";
@@ -43,7 +43,7 @@ function pct(v: number | null): number | null {
 
 /** A fresh, independent corrections record (never share the frozen EMPTY one). */
 function freshCorrections(): ReviewCorrections {
-  return { itemOverrides: {}, excluded: [], deleted: [], manualScores: {} };
+  return { itemOverrides: {}, excluded: [], deleted: [], manualScores: {}, baselineLenses: {} };
 }
 
 export default function CaptureReview({
@@ -69,24 +69,18 @@ export default function CaptureReview({
 
   const decided = review.status === "approved" || review.status === "rejected";
 
-  // The two recomputes: the model's baseline (for diffing) and the live result the
-  // reviewer's corrections produce. Both from the frames, via the real rollup math.
-  const baseline = useMemo(
-    () => recomputeReview(review.frames, EMPTY_CORRECTIONS),
-    [review.frames],
-  );
+  // The live recompute the reviewer's corrections produce, from the frames via the
+  // real rollup math, with the synthesis adjustments applied (seal #2). Each segment
+  // carries its own pure baseline (`baselineScores`) and adjusted proposal
+  // (`adjustedScores`) for the side-by-side, so no second recompute is needed.
   const result = useMemo(
-    () => recomputeReview(review.frames, corrections),
-    [review.frames, corrections],
+    () => recomputeReview(review.frames, corrections, review.assessments),
+    [review.frames, corrections, review.assessments],
   );
 
   const survivingById = useMemo(
     () => new Map(result.segments.map((s) => [s.segmentId, s])),
     [result],
-  );
-  const baselineById = useMemo(
-    () => new Map(baseline.segments.map((s) => [s.segmentId, s])),
-    [baseline],
   );
   const droppedIds = useMemo(() => new Set(result.droppedSegmentIds), [result]);
 
@@ -176,12 +170,37 @@ export default function CaptureReview({
       for (const seq of seqs) delete items[seq];
       const scores = { ...prev.manualScores };
       delete scores[segmentId];
+      const baselineLenses = { ...prev.baselineLenses };
+      delete baselineLenses[segmentId];
       return {
         ...prev,
         itemOverrides: items,
         excluded: prev.excluded.filter((s) => !seqs.has(s)),
         manualScores: scores,
+        baselineLenses,
       };
+    });
+  }
+
+  /** Toggle one lens between the synthesis-adjusted proposal (default) and the baseline. */
+  function toggleBaselineLens(segmentId: string, lens: LensKey) {
+    setCorrections((prev) => {
+      const bl = { ...prev.baselineLenses };
+      const cur = bl[segmentId] ?? [];
+      const next = cur.includes(lens) ? cur.filter((l) => l !== lens) : [...cur, lens];
+      if (next.length === 0) delete bl[segmentId];
+      else bl[segmentId] = next;
+      return { ...prev, baselineLenses: bl };
+    });
+  }
+
+  /** Per segment: take the baseline for every adjusted lens, or (empty) revert to adjusted. */
+  function setSegmentBaseline(segmentId: string, lenses: LensKey[]) {
+    setCorrections((prev) => {
+      const bl = { ...prev.baselineLenses };
+      if (lenses.length === 0) delete bl[segmentId];
+      else bl[segmentId] = [...lenses];
+      return { ...prev, baselineLenses: bl };
     });
   }
 
@@ -266,7 +285,8 @@ export default function CaptureReview({
     Object.keys(corrections.itemOverrides).length +
     corrections.excluded.length +
     corrections.deleted.length +
-    Object.keys(corrections.manualScores).length;
+    Object.keys(corrections.manualScores).length +
+    Object.keys(corrections.baselineLenses).length;
 
   return (
     <div className="flex flex-col gap-4">
@@ -383,15 +403,16 @@ export default function CaptureReview({
             <ul className="flex flex-col gap-3">
               {segmentIds.map((segmentId) => {
                 const seg = survivingById.get(segmentId);
-                const base = baselineById.get(segmentId);
                 const dropped = droppedIds.has(segmentId);
                 const isOn = selected.has(segmentId) && !dropped;
                 const frames = framesBySegment.get(segmentId) ?? [];
                 const manual = corrections.manualScores[segmentId] ?? {};
+                const baselineChoice = corrections.baselineLenses[segmentId] ?? [];
                 const corrected = Boolean(seg?.humanCorrected);
                 const segReset =
                   frames.some((f) => corrections.itemOverrides[f.seq] || excludedSet.has(f.seq)) ||
-                  Object.keys(manual).length > 0;
+                  Object.keys(manual).length > 0 ||
+                  baselineChoice.length > 0;
 
                 return (
                   <li
@@ -443,10 +464,21 @@ export default function CaptureReview({
                       <p className="mt-3 text-[12px] text-neutral-strong">{t("segmentDroppedNote")}</p>
                     ) : (
                       <>
+                        <SegmentAssessmentPanel
+                          assessment={review.assessments[segmentId] ?? null}
+                          seg={seg}
+                          baselineChoice={baselineChoice}
+                          manual={manual}
+                          disabled={busy || decided}
+                          lensName={(lens) => tl(`${lens}.name`)}
+                          onToggleLens={(lens) => toggleBaselineLens(segmentId, lens)}
+                          onSetBaselineAll={(lenses) => setSegmentBaseline(segmentId, lenses)}
+                        />
+
                         <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
                           {LENS_ORDER.map((lens) => {
                             const v = seg?.scores[lens] ?? null;
-                            const modelV = base?.scores[lens] ?? null;
+                            const modelV = seg?.baselineScores[lens] ?? null;
                             const edited = Object.prototype.hasOwnProperty.call(manual, lens);
                             const changed = edited || (modelV !== null && v !== null && Math.round(modelV) !== Math.round(v)) || (modelV === null) !== (v === null);
                             return (
@@ -632,6 +664,158 @@ export default function CaptureReview({
           </div>
         </section>
       ) : null}
+    </div>
+  );
+}
+
+/** Round a score for display; a null (unmeasured) lens shows an em-free dash. */
+function fmtScore(v: number | null | undefined): string {
+  return typeof v === "number" ? String(Math.round(v)) : "–";
+}
+
+/**
+ * The segment synthesis, per sealed decision 2: the overall verdict a reviewer
+ * reads first, then per-lens explanations beside their scores, with each
+ * adjustment's baseline and adjusted value side by side (delta + reason) and a
+ * one-tap "use baseline" per lens and per segment. The ADJUSTED value is the
+ * default; the chosen number lives in the score grid below and a manual edit wins.
+ * A null assessment renders an honest "no assessment available" state.
+ */
+function SegmentAssessmentPanel({
+  assessment,
+  seg,
+  baselineChoice,
+  manual,
+  disabled,
+  lensName,
+  onToggleLens,
+  onSetBaselineAll,
+}: Readonly<{
+  assessment: SegmentAssessment | null;
+  seg: RecomputedSegment | undefined;
+  baselineChoice: LensKey[];
+  manual: Partial<Record<LensKey, number | null>>;
+  disabled: boolean;
+  lensName: (lens: LensKey) => string;
+  onToggleLens: (lens: LensKey) => void;
+  onSetBaselineAll: (lenses: LensKey[]) => void;
+}>) {
+  const t = useTranslations("admin.capture");
+
+  if (!assessment) {
+    return (
+      <p className="mt-3 rounded-[6px] border border-dashed border-border bg-surface-sunken px-3 py-2 text-[12px] text-neutral-strong">
+        {t("noAssessment")}
+      </p>
+    );
+  }
+
+  const chosenBaseline = new Set(baselineChoice);
+  const adjustedLenses = LENS_ORDER.filter((lens) => {
+    const a = assessment.adjustments?.[lens];
+    return a && typeof a.delta === "number" && Number.isFinite(a.delta);
+  });
+  const allBaseline =
+    adjustedLenses.length > 0 && adjustedLenses.every((lens) => chosenBaseline.has(lens));
+
+  return (
+    <div className="mt-3 rounded-[8px] border border-accent/35 bg-accent/5 p-3">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+          <Sparkles size={13} strokeWidth={1.75} className="text-accent" aria-hidden="true" />
+          {t("assessmentHeading")}
+        </span>
+        <span className="text-[10.5px] text-neutral-strong">
+          {t("assessmentModel", { model: assessment.model || "—" })}
+        </span>
+        {seg?.assessmentStale ? (
+          <span className="inline-flex items-center gap-1 rounded-[4px] border border-amber/45 bg-amber/10 px-1.5 py-0.5 text-[10px] font-medium text-ink">
+            <TriangleAlert size={11} strokeWidth={1.75} aria-hidden="true" />
+            {t("assessmentStale")}
+          </span>
+        ) : null}
+        {adjustedLenses.length > 0 ? (
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onSetBaselineAll(allBaseline ? [] : adjustedLenses)}
+            className={`${styles.control} ml-auto inline-flex items-center gap-1 rounded-[4px] border border-border px-2 py-0.5 text-[10.5px] font-medium text-neutral-strong hover:text-ink disabled:opacity-55`}
+          >
+            <RotateCcw size={11} strokeWidth={1.75} aria-hidden="true" />
+            {allBaseline ? t("useAdjustedAll") : t("useBaselineAll")}
+          </button>
+        ) : null}
+      </div>
+
+      {/* The overall verdict — the first thing a reviewer reads. */}
+      <p className="mt-2 text-[13px] leading-snug text-ink">{assessment.overall}</p>
+      <p className="mt-1 text-[10.5px] text-neutral-strong">{t("assessmentNote")}</p>
+
+      {/* Per-lens explanations, each beside its baseline/adjusted comparison. */}
+      <ul className="mt-2.5 flex flex-col gap-1.5">
+        {LENS_ORDER.map((lens) => {
+          const explanation = lens === "overall" ? null : assessment.lenses?.[lens] ?? null;
+          const adj = adjustedLenses.includes(lens) ? assessment.adjustments![lens]! : null;
+          if (!explanation && !adj) return null;
+
+          const baseVal = seg?.baselineScores[lens] ?? null;
+          const adjVal = seg?.adjustedScores[lens] ?? null;
+          const usingBaseline = chosenBaseline.has(lens);
+          const manualSet = Object.prototype.hasOwnProperty.call(manual, lens);
+          const delta = adj ? adj.delta : 0;
+          const sign = delta >= 0 ? "+" : "";
+
+          return (
+            <li
+              key={lens}
+              className="rounded-[6px] border border-border bg-surface-elevated px-2.5 py-2"
+            >
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="text-[11px] font-mono uppercase tracking-[0.12em] text-neutral-strong">
+                  {lensName(lens)}
+                </span>
+                {adj ? (
+                  <span className="inline-flex items-center gap-1.5 font-mono text-[11px]">
+                    <span className={`${usingBaseline ? "font-semibold text-ink" : "text-neutral-strong"}`}>
+                      {t("baselineLabel")} {fmtScore(baseVal)}
+                    </span>
+                    <span className="text-neutral-strong" aria-hidden="true">→</span>
+                    <span className={`${usingBaseline ? "text-neutral-strong" : "font-semibold text-ink"}`}>
+                      {t("adjustedLabel")} {fmtScore(adjVal)}
+                    </span>
+                    <span
+                      className={`rounded-[3px] px-1 py-0.5 text-[9.5px] font-medium ${
+                        delta >= 0 ? "bg-pine/12 text-pine" : "bg-clay/12 text-clay"
+                      }`}
+                    >
+                      {sign}
+                      {Math.round(delta)}
+                    </span>
+                  </span>
+                ) : null}
+                {adj ? (
+                  <button
+                    type="button"
+                    disabled={disabled || manualSet}
+                    onClick={() => onToggleLens(lens)}
+                    className={`${styles.control} ml-auto inline-flex items-center gap-1 rounded-[4px] border px-2 py-0.5 text-[10.5px] font-medium disabled:opacity-45 ${
+                      usingBaseline
+                        ? "border-border text-neutral-strong hover:text-ink"
+                        : "border-accent/45 bg-accent/10 text-accent hover:bg-accent/20"
+                    }`}
+                    title={manualSet ? t("wasValue", { value: fmtScore(seg?.scores[lens] ?? null) }) : undefined}
+                  >
+                    {usingBaseline ? t("useAdjusted") : t("useBaseline")}
+                  </button>
+                ) : null}
+              </div>
+              {explanation ? (
+                <p className="mt-1 text-[12px] leading-snug text-ink">{explanation}</p>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
