@@ -47,6 +47,9 @@ import {
 } from "@/components/capture/engine/session";
 import { looksLikeVideoSession } from "@/components/capture/engine/video-session";
 import { CAPTURE_TUNING } from "@/components/capture/engine/tuning";
+import { haversineMeters } from "@/components/capture/engine/geo";
+import { updateMeanGray } from "@/lib/capture/quality-coach";
+import { addMyWalk } from "@/lib/capture/my-walks";
 import {
   isCameraSupported,
   isSecureCameraContext,
@@ -95,6 +98,8 @@ export type RecorderStats = {
   elapsedMs: number;
   accuracyM: number | null;
   trackPoints: number;
+  meanGray: number | null;
+  speedMps: number | null;
 };
 
 const emptyStats = (): RecorderStats => ({
@@ -104,6 +109,8 @@ const emptyStats = (): RecorderStats => ({
   elapsedMs: 0,
   accuracyM: null,
   trackPoints: 0,
+  meanGray: null,
+  speedMps: null,
 });
 
 function initialPhase(): RecorderPhase {
@@ -161,6 +168,8 @@ export function useRecorder() {
   const manifestRef = useRef<SessionManifest | null>(null);
   const gateRef = useRef<GateMemory>({ lastKeptT: null, lastKeptPosition: null, prevGray: null });
   const latestFixRef = useRef<TrackPoint | null>(null);
+  const meanGrayRef = useRef<number | null>(null);
+  const speedMpsRef = useRef<number | null>(null);
   // Guards against a second frame entering the encode path while `toBlob` is
   // still resolving. Without it a slow phone stacks encodes and seq numbers race.
   const encodingRef = useRef(false);
@@ -177,6 +186,17 @@ export function useRecorder() {
   const wakeLock = useWakeLock(isRecording || phase === "paused");
 
   const onFix = useCallback((point: TrackPoint) => {
+    const prev = latestFixRef.current;
+    if (prev && point.t > prev.t) {
+      const dt = (point.t - prev.t) / 1000;
+      if (dt > 0) {
+        const dist = haversineMeters(
+          { lat: prev.lat, lng: prev.lng },
+          { lat: point.lat, lng: point.lng },
+        );
+        speedMpsRef.current = dist / dt;
+      }
+    }
     latestFixRef.current = point;
     const manifest = manifestRef.current;
     if (!manifest || phaseRef.current !== "recording") return;
@@ -234,6 +254,8 @@ export function useRecorder() {
       elapsedMs: Date.now() - manifest.startedAt,
       accuracyM: latestFixRef.current?.accuracy ?? null,
       trackPoints: manifest.track.length,
+      meanGray: meanGrayRef.current,
+      speedMps: speedMpsRef.current,
     });
   }, []);
 
@@ -433,7 +455,10 @@ export function useRecorder() {
         gateRef.current,
       );
 
-      if (verdict.gray) gateRef.current = { ...gateRef.current, prevGray: verdict.gray };
+      if (verdict.gray) {
+        gateRef.current = { ...gateRef.current, prevGray: verdict.gray };
+        meanGrayRef.current = updateMeanGray(meanGrayRef.current, verdict.gray);
+      }
 
       if (!verdict.keep) {
         tallyDrop(verdict.reason);
@@ -564,6 +589,8 @@ export function useRecorder() {
       elapsedMs: (recoverable.endedAt ?? Date.now()) - recoverable.startedAt,
       accuracyM: null,
       trackPoints: recoverable.track.length,
+      meanGray: null,
+      speedMps: null,
     });
     setRecoverable(null);
     setPhase("review");
@@ -605,6 +632,17 @@ export function useRecorder() {
         // The frames are on the server now; holding local copies just occupies a
         // phone. The manifest goes with them.
         await store.discard(manifest.localId);
+
+        const submittedAt = new Date().toISOString();
+        addMyWalk({
+          sessionId: result.sessionId,
+          submittedAt,
+          mode: "live",
+          frameCount: manifest.frames.length,
+          distanceM: trackDistanceMeters(manifest.track),
+          elapsedMs: (manifest.endedAt ?? Date.now()) - manifest.startedAt,
+          status: "matching",
+        });
 
         setSessionId(result.sessionId);
         setPhase("done");

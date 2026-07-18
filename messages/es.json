@@ -190,6 +190,15 @@
       "colAvg": "Promedio general",
       "demoNote": "Conjunto de datos de demostración sobre geometría real de OSM. Ninguna cifra es una medición real hasta que inicie la recolección de campo."
     },
+    "qrPosters": {
+      "title": "Carteles QR",
+      "subtitle": "Genere un cartel bilingüe imprimible para un tramo. Los enlaces profundos abren /collect con src=qr y el id del punto.",
+      "spotLabel": "Id del tramo",
+      "spotHint": "p. ej. esc-sa-0001 — debe existir en la red de calles.",
+      "originLabel": "Origen del sitio (para la URL del QR)",
+      "generate": "Abrir cartel imprimible",
+      "scriptHint": "CLI: node scripts/generate-qr-poster.mjs --spot <id> --origin <url>"
+    },
     "queue": {
       "title": "Cola de verificación",
       "subtitleZero": "No hay contribuciones pendientes de revisión.",
@@ -1271,6 +1280,107 @@
       },
       "sessionLabel": "SESIÓN",
       "backToMap": "Volver al mapa"
+    },
+    "qr": {
+      "eyebrow": "BIENVENIDA",
+      "title": "Ayude a medir {municipality}",
+      "lead": "Escaneó un código en la calle. StreetLens convierte una caminata corta en datos públicos sobre la acera — después de que un revisor humano lo revise.",
+      "loadingSpot": "Cargando esta calle…",
+      "spotUnknown": "No pudimos cargar los detalles de este punto, pero igual puede grabar una caminata aquí.",
+      "howEyebrow": "QUÉ HACER",
+      "how1": "Sostenga el teléfono en vertical, cámara hacia adelante por la acera.",
+      "how2": "Camine a paso normal por una cuadra o más.",
+      "how3": "Revise y suba al terminar — nada sale del teléfono hasta que usted lo confirme.",
+      "privacy": "No grabe personas de cerca ni dentro de propiedad privada.",
+      "cta": "Empezar — muéstreme cómo"
+    },
+    "mission": {
+      "eyebrow": "SU CALLE",
+      "title": "Camine {street}",
+      "lead": "Este código del poste apunta a {district}. Camine la acera frente a usted y emparejaremos sus fotogramas con esta calle."
+    },
+    "coach": {
+      "gps_poor": "La precisión del GPS es baja — salga al exterior si puede y manténgase en la línea de la acera.",
+      "moving_fast": "Puede ir demasiado rápido — baje a paso de caminata para que los fotogramas queden nítidos.",
+      "too_dark": "La escena se ve oscura — busque mejor luz o limpie el lente si está sucio.",
+      "stationary": "El teléfono casi no se movió — siga caminando; se guardan fotogramas cada pocos metros."
+    },
+    "myWalks": {
+      "eyebrow": "MIS CAMINATAS",
+      "lead": "Guardado solo en este dispositivo. Toque para abrir el estado.",
+      "unnamedWalk": "Caminata en revisión",
+      "meta": "{frames} fotogramas · {distance} · {duration}",
+      "status": {
+        "pending_upload": "Subiendo",
+        "uploading": "Subiendo",
+        "matching": "Emparejando",
+        "extracting": "Leyendo",
+        "cost_paused": "Pausada",
+        "review_ready": "En revisión",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "failed": "Fallida"
+      }
+    },
+    "gate": {
+      "eyebrow": "¿LISTO PARA ENVIAR?",
+      "lead": "Una revisión rápida antes de que la caminata salga de este dispositivo.",
+      "coverageEstimate": "Corredor aproximado cubierto: ~{meters} m",
+      "ready": "Se ve listo — puede subir cuando esté conforme.",
+      "blocked": "Esta caminata aún no se puede subir — vea las indicaciones arriba.",
+      "items": {
+        "frames": {
+          "label": "Fotogramas guardados",
+          "hints": {
+            "frames_none": "No se guardó ningún fotograma. Camine más e intente de nuevo.",
+            "frames_low": "Muy pocos fotogramas — camine un tramo más largo para mejor cobertura."
+          }
+        },
+        "fixes": {
+          "label": "Fijaciones GPS",
+          "hints": {
+            "fixes_low": "No hay suficientes fijaciones GPS — active la ubicación y camine al exterior."
+          }
+        },
+        "duration": {
+          "label": "Duración (min)",
+          "hints": {
+            "duration_short": "Caminata muy corta — considere cubrir más de la cuadra."
+          }
+        },
+        "track_length": {
+          "label": "Longitud del recorrido (m)",
+          "hints": {
+            "track_short": "El recorrido GPS es corto — camine más a lo largo de la calle."
+          }
+        },
+        "gps_quality": {
+          "label": "Precisión GPS (m)",
+          "hints": {
+            "gps_poor": "GPS débil — fijaciones por encima de 25 m pueden descartarse al emparejar.",
+            "gps_unknown": "Sin datos de precisión aún — espere una fijación GPS antes de subir."
+          }
+        },
+        "drop_ratio": {
+          "label": "Fotogramas descartados",
+          "hints": {
+            "drops_displacement": "La mayoría se descartó porque el teléfono no se movió — camine de forma constante.",
+            "drops_blurry": "Muchos fotogramas estaban borrosos — limpie el lente y baje el ritmo.",
+            "drops_high": "Se descartó la mayoría de fotogramas — revise GPS, ritmo e iluminación."
+          }
+        }
+      }
+    },
+    "receipt": {
+      "eyebrow": "COMPROBANTE",
+      "streetsPending": "Calles pendientes de emparejar",
+      "frames": "Fotogramas",
+      "distance": "Distancia",
+      "duration": "Duración",
+      "pendingNote": "Pendiente de revisión humana — aún no es dato público.",
+      "share": "Compartir enlace de estado",
+      "shareTitle": "Mi caminata StreetLens",
+      "shareText": "Caminé {streets} — {frames} fotogramas el {date}. Pendiente de revisión en StreetLens."
     }
   }
 }

@@ -190,6 +190,15 @@
       "colAvg": "Avg. overall",
       "demoNote": "Demo dataset over real OSM geometry. No figure is a real measurement until field collection begins."
     },
+    "qrPosters": {
+      "title": "QR posters",
+      "subtitle": "Generate a bilingual printable poster for a street segment. Deep links open /collect with src=qr and the spot id.",
+      "spotLabel": "Segment id",
+      "spotHint": "e.g. esc-sa-0001 — must exist in the street network.",
+      "originLabel": "Site origin (for the QR URL)",
+      "generate": "Open printable poster",
+      "scriptHint": "CLI: node scripts/generate-qr-poster.mjs --spot <id> --origin <url>"
+    },
     "queue": {
       "title": "Verification queue",
       "subtitleZero": "No submissions awaiting review.",
@@ -1271,6 +1280,107 @@
       },
       "sessionLabel": "SESSION",
       "backToMap": "Back to the map"
+    },
+    "qr": {
+      "eyebrow": "WELCOME",
+      "title": "Help measure {municipality}",
+      "lead": "You scanned a code on the street. StreetLens turns a short walk into public data about sidewalk condition — after a human reviewer checks it.",
+      "loadingSpot": "Loading this street…",
+      "spotUnknown": "We could not load details for this spot, but you can still record a walk here.",
+      "howEyebrow": "WHAT TO DO",
+      "how1": "Hold your phone in portrait, camera pointed forward down the sidewalk.",
+      "how2": "Walk at a normal pace for one block or more.",
+      "how3": "Review and upload when you stop — nothing leaves your phone until you say so.",
+      "privacy": "Do not record people close up or inside private property.",
+      "cta": "Start — show me how"
+    },
+    "mission": {
+      "eyebrow": "YOUR STREET",
+      "title": "Walk {street}",
+      "lead": "This lamppost code points at {district}. Walk the sidewalk in front of you and we will match your frames to this street."
+    },
+    "coach": {
+      "gps_poor": "GPS accuracy is weak — step outside if you can, and stay on the sidewalk line.",
+      "moving_fast": "You may be moving too fast — slow to a walking pace so frames stay sharp.",
+      "too_dark": "Scene looks dark — move to better light or wipe the lens if it is smudged.",
+      "stationary": "Phone has not moved much — keep walking; frames are kept every few metres."
+    },
+    "myWalks": {
+      "eyebrow": "MY WALKS",
+      "lead": "Saved on this device only. Tap to open the status page.",
+      "unnamedWalk": "Walk in review",
+      "meta": "{frames} frames · {distance} · {duration}",
+      "status": {
+        "pending_upload": "Uploading",
+        "uploading": "Uploading",
+        "matching": "Matching",
+        "extracting": "Reading",
+        "cost_paused": "Paused",
+        "review_ready": "In review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "failed": "Failed"
+      }
+    },
+    "gate": {
+      "eyebrow": "READY TO SEND?",
+      "lead": "A quick check before your walk leaves this device.",
+      "coverageEstimate": "Rough corridor covered: ~{meters} m",
+      "ready": "Looks ready — you can upload when you are satisfied.",
+      "blocked": "This walk cannot be uploaded yet — see the hints above.",
+      "items": {
+        "frames": {
+          "label": "Frames kept",
+          "hints": {
+            "frames_none": "No frames were kept. Walk farther and try again.",
+            "frames_low": "Very few frames — walk a longer stretch for better coverage."
+          }
+        },
+        "fixes": {
+          "label": "GPS fixes",
+          "hints": {
+            "fixes_low": "Not enough GPS fixes — enable location and walk outside."
+          }
+        },
+        "duration": {
+          "label": "Duration (min)",
+          "hints": {
+            "duration_short": "Very short walk — consider covering more of the block."
+          }
+        },
+        "track_length": {
+          "label": "Track length (m)",
+          "hints": {
+            "track_short": "GPS track is short — walk farther along the street."
+          }
+        },
+        "gps_quality": {
+          "label": "GPS accuracy (m)",
+          "hints": {
+            "gps_poor": "Weak GPS — fixes above 25 m may be dropped when matched.",
+            "gps_unknown": "No accuracy data yet — wait for a GPS fix before uploading."
+          }
+        },
+        "drop_ratio": {
+          "label": "Dropped frames",
+          "hints": {
+            "drops_displacement": "Most drops were because the phone had not moved — keep walking steadily.",
+            "drops_blurry": "Many frames were too blurry — wipe the lens and slow down.",
+            "drops_high": "Most camera frames were dropped — check GPS, pace, and lighting."
+          }
+        }
+      }
+    },
+    "receipt": {
+      "eyebrow": "WALK RECEIPT",
+      "streetsPending": "Streets pending match",
+      "frames": "Frames",
+      "distance": "Distance",
+      "duration": "Duration",
+      "pendingNote": "Pending human review — not public data yet.",
+      "share": "Share status link",
+      "shareTitle": "My StreetLens walk",
+      "shareText": "I walked {streets} — {frames} frames on {date}. Pending review on StreetLens."
     }
   }
 }
