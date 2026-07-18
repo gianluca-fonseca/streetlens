@@ -357,6 +357,27 @@ A compact legend, one line each, mapping what a reviewer sees to what it means.
 | Numbered dots on the map | review map | Each frame at the position the pipeline recorded; grey means unmatched (off-network), dim means excluded, tombstoned means deleted, and the polyline is the GPS track (`components/admin/ReviewMap.tsx`). |
 | "not assessable" | anywhere a value shows | A null reading: the model could not see it. Distinct from a zero, and it never scores. |
 
+### Provenance a segment answers at a glance
+
+An approved camera observation carries three provenance facts, and the public
+popover (`components/SegmentDetail.tsx`) renders them as one compact block per
+observation: **walked** is `captured_on` (when the street was actually filmed,
+the session's `extracted_at`), and **last updated** is `created_at` (when the
+observation was approved). `created_at` is labelled "last updated" rather than
+"approved" because the observation id is derived (`cv-<session>-<segment>`), so a
+re-approval upserts the same row and moves `created_at` forward; it is shown once.
+Both dates render as friendly localized text (EN/ES), pinned to UTC so the same
+instant reads as the same calendar day everywhere (`lib/cv-provenance.ts`).
+
+The third fact, **who submitted it**, is deliberately generic in public: the
+popover attributes every observation to "Community contributor" and never shows
+the contributor's contact. That contact (`capture_sessions.contact`, often an
+email) is PII collected without publish consent, so no public read, RPC, or
+feature property carries it; the ip hash is never surfaced either. The contact is
+admin-only, reaching the review workbench header solely through the secret-gated
+`capture_session_review_detail` RPC (migration `0024`), so a reviewer sees who
+sent a walk while the public map stays anonymous.
+
 ## Three ways in, one way out
 
 There are three ways a street's condition enters StreetLens, and they converge

@@ -102,6 +102,12 @@ export type SessionReview = {
   /** When the walk happened, not when it was reviewed. */
   capturedOn: string | null;
   reviewedAt: string | null;
+  /**
+   * The contributor's contact (u-provenance), or null when anonymous. From the
+   * SECRET-gated detail RPC only, so the reviewer sees the same "submitted by"
+   * fact the public popover shows; the anon review RPC still withholds it.
+   */
+  contact: string | null;
   jobs: { pending: number; done: number; failed: number; overbudget: number };
   tokens: {
     inputTokens: number;
@@ -146,6 +152,8 @@ type ReviewPayload = {
   frameCount: number | null;
   capturedOn: string | null;
   reviewedAt: string | null;
+  /** From the detail RPC (0024); absent on the anon review RPC and on fixtures. */
+  contact?: string | null;
   jobs: { pending: number; done: number; failed: number; overbudget: number };
   tokens: {
     inputTokens: number;
@@ -199,7 +207,7 @@ type ReviewPayload = {
   tombstones?: { seq: number }[] | null;
 };
 
-/** The `capture_session_review_detail` payload (u2 migration 0021). */
+/** The `capture_session_review_detail` payload (u2 migration 0021; contact in 0024). */
 type SessionDetail = {
   track?: FramePosition[] | null;
   frames?: {
@@ -209,6 +217,8 @@ type SessionDetail = {
     position?: FramePosition | null;
   }[] | null;
   tombstones?: { seq: number }[] | null;
+  /** The contributor contact — only this secret-gated read carries it (0024). */
+  contact?: string | null;
 };
 
 /**
@@ -235,6 +245,8 @@ function mergeDetail(payload: ReviewPayload, detail: SessionDetail | null): Revi
     }),
     track: detail.track ?? payload.track ?? [],
     tombstones: detail.tombstones ?? payload.tombstones ?? [],
+    // Contact rides on the detail read only; the anon review RPC never carries it.
+    contact: detail.contact ?? payload.contact ?? null,
   };
 }
 
@@ -371,6 +383,7 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     frameCount: num(payload.frameCount) ?? (payload.frames?.length ?? 0),
     capturedOn: payload.capturedOn ?? null,
     reviewedAt: payload.reviewedAt ?? null,
+    contact: payload.contact ?? null,
     jobs: {
       pending: num(jobs.pending) ?? 0,
       done: num(jobs.done) ?? 0,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ImageOff, Pencil, ScanLine, Users, X } from "lucide-react";
 import type { ScoreLayer, SegmentProperties } from "@/lib/segments";
 import {
@@ -9,6 +9,7 @@ import {
   parseCommunityReports,
   parseCvObservations,
 } from "@/lib/parse-feature-props";
+import { formatProvenanceDate } from "@/lib/cv-provenance";
 import {
   LAYER_ORDER,
   RUBRIC_ITEMS,
@@ -71,6 +72,7 @@ export default function SegmentDetail({
   const t = useTranslations("detail");
   const tl = useTranslations("layers");
   const tr = useTranslations("rubric");
+  const locale = useLocale();
 
   // Mobile bottom-sheet drag-to-dismiss. Attached only to the drag handle (which
   // is `md:hidden`), so the desktop popover is never draggable. A downward drag
@@ -324,14 +326,41 @@ export default function SegmentDetail({
                   : 0;
                 const confidence = asPercent(o.confidence);
                 const coverage = asPercent(o.coverage);
+                // Provenance the segment must answer at a glance (u-provenance):
+                // when it was walked and when the reading last changed (created_at
+                // moves on re-approval upsert, so it reads "last updated"). Both
+                // cross the maplibre boundary; the helper never throws. The
+                // contributor's contact is PII and is NEVER shown publicly (conductor
+                // privacy rule) — the public attribution is a generic "Community
+                // contributor"; contact lives only on the admin workbench.
+                const walked = formatProvenanceDate(o.captured_on, locale);
+                const updated = formatProvenanceDate(o.created_at, locale);
                 return (
                   <li key={o.id} className="px-3 py-2">
                     <p className="font-mono text-[10.5px] text-neutral-strong">
                       {t("cvObservationLabel")}
-                      {typeof o.captured_on === "string" && o.captured_on
-                        ? ` · ${o.captured_on.slice(0, 10)}`
-                        : ""}
                     </p>
+                    {/* Compact provenance: dates as friendly localized text (EN/ES),
+                        contact shown as given or an "Anonymous contributor" fallback,
+                        never the ip hash and never a mailto. */}
+                    <dl className="mt-1 flex flex-col gap-0.5 text-[11px] leading-snug text-neutral-strong">
+                      {walked ? (
+                        <div className="flex flex-wrap gap-x-1.5">
+                          <dt>{t("cvWalkedLabel")}</dt>
+                          <dd className="text-ink">{walked}</dd>
+                        </div>
+                      ) : null}
+                      {updated ? (
+                        <div className="flex flex-wrap gap-x-1.5">
+                          <dt>{t("cvUpdatedLabel")}</dt>
+                          <dd className="text-ink">{updated}</dd>
+                        </div>
+                      ) : null}
+                      <div className="flex flex-wrap gap-x-1.5">
+                        <dt>{t("cvSubmittedByLabel")}</dt>
+                        <dd className="text-ink">{t("cvSubmittedCommunity")}</dd>
+                      </div>
+                    </dl>
                     {/* Observed lens values. Mono numerals, no ramp dots: the
                         ramp is reserved for audited data, and these are not it. */}
                     <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
