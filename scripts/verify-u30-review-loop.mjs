@@ -243,7 +243,10 @@ async function main() {
     check("the CV segment opens on the map", hit !== null);
     const panel = page.locator(`section[role=dialog]`).first();
     const panelText = await panel.innerText();
-    check("SegmentDetail shows the CV chip", /Camera: not field-verified/.test(panelText));
+    check(
+      "SegmentDetail shows the CV chip",
+      /Approved camera observation · not yet field-audited/.test(panelText),
+    );
     check("and the camera observation section", /CAMERA OBSERVATIONS/i.test(panelText));
     check(
       "THE INVARIANT, visibly: the audited scores are untouched (73/74/71/72/15)",
