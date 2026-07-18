@@ -62,6 +62,13 @@ const DEMO_AUDITS_PATH = path.join(DATA_DIR, "demo-audits.json");
 // generate-demo-audits.mjs as source:"import" records. Committed (not the local
 // runtime community store), read on the same neutral-casing terms as community.
 const IMPORT_SEGMENTS_PATH = path.join(DATA_DIR, "canton-import-segments.json");
+// The frozen canton street network: all 1,457 segments (the 535 audited esc-sa
+// pilot plus the 922 unaudited esc-ce/esc-sr), each carrying a real `length_m`.
+// This is the SAME file map-matching resolves a capture session against
+// (lib/matching/baseline.ts, hmm.ts), which is exactly why cvCoveragePct is
+// measured here and nowhere else: an approved observation can land on any of the
+// 1,457, and only this file has a length for all of them.
+const NETWORK_SEGMENTS_PATH = path.join(DATA_DIR, "segments.geojson");
 
 /* ------------------------------------------------------------------ *
  * Static file readers (cached per process)
@@ -107,6 +114,13 @@ type DemoAuditsFile = {
 let demoCollectionCache: DemoCollection | undefined;
 let demoAuditsCache: DemoAuditsFile | undefined;
 let importSegmentsCache: CommunitySegment[] | undefined;
+let networkLengthsCache: NetworkLengths | undefined;
+
+/** Per-segment lengths for the whole canton network, plus their total. */
+type NetworkLengths = {
+  byId: Map<string, number>;
+  totalMeters: number;
+};
 
 /**
  * Guarantee the frozen SegmentProperties shape on a static feature. The
@@ -181,6 +195,61 @@ async function readDemoAudits(): Promise<DemoAuditsFile> {
     ) as DemoAuditsFile;
   }
   return demoAuditsCache;
+}
+
+/**
+ * Segment lengths for the whole canton network, keyed by id, plus the total that
+ * denominates cvCoveragePct. Cached per process.
+ *
+ * Read from `data/segments.geojson` rather than `demo-audits.json` deliberately:
+ * the audits file only knows the 535 audited pilot segments, so a capture session
+ * walked on any of the other 922 canton streets would contribute a length of zero
+ * and print 0% — reintroducing the exact "approved but still 0%" bug this is
+ * fixing. A length is geometry, not a score, so reading it is unaffected by
+ * whether demo scores are published.
+ *
+ * A missing or malformed file → no lengths and a zero total, which makes
+ * cvCoveragePct degrade to 0 rather than throw on the landing page.
+ */
+async function readNetworkLengths(): Promise<NetworkLengths> {
+  if (!networkLengthsCache) {
+    const byId = new Map<string, number>();
+    let totalMeters = 0;
+    try {
+      const parsed = JSON.parse(
+        await fs.readFile(NETWORK_SEGMENTS_PATH, "utf8"),
+      ) as SegmentCollection;
+      for (const f of parsed.features ?? []) {
+        const id = f.properties?.id;
+        const len = (f.properties as { length_m?: number } | undefined)?.length_m;
+        if (typeof id !== "string" || typeof len !== "number" || !(len > 0)) {
+          continue;
+        }
+        byId.set(id, len);
+        totalMeters += len;
+      }
+    } catch {
+      // Fall through to the empty map: coverage reads 0, the page still renders.
+    }
+    networkLengthsCache = { byId, totalMeters };
+  }
+  return networkLengthsCache;
+}
+
+/**
+ * Camera-observed coverage as a percent of the canton network, UNROUNDED.
+ *
+ * Each covered segment counts once regardless of how many observations or
+ * sessions landed on it, which is why the caller passes a Set of ids: two
+ * sessions walking the same street is not twice the coverage.
+ */
+async function computeCvCoveragePct(cvSegmentIds: Set<string>): Promise<number> {
+  if (cvSegmentIds.size === 0) return 0;
+  const { byId, totalMeters } = await readNetworkLengths();
+  if (!(totalMeters > 0)) return 0;
+  let covered = 0;
+  for (const id of cvSegmentIds) covered += byId.get(id) ?? 0;
+  return (covered / totalMeters) * 100;
 }
 
 /**
@@ -577,7 +646,11 @@ export async function getStats(): Promise<StreetStats> {
   const communitySegments = (await readCommunitySegments()).length;
   const cv = await getCvObservations();
   const cvSessionsReviewed = new Set(cv.map((o) => o.session_id)).size;
-  const cvSegments = new Set(cv.map((o) => o.segment_id)).size;
+  const cvSegmentIds = new Set(cv.map((o) => o.segment_id));
+  const cvSegments = cvSegmentIds.size;
+  // Computed on every path below, demo era on or off: it measures approved camera
+  // work, which is real whether or not any audited score is published.
+  const cvCoveragePct = await computeCvCoveragePct(cvSegmentIds);
 
   const live = await liveScoreRows();
   if (live && live.length > 0) {
@@ -596,6 +669,7 @@ export async function getStats(): Promise<StreetStats> {
       communitySegments,
       cvSessionsReviewed,
       cvSegments,
+      cvCoveragePct,
     };
   }
 
@@ -611,6 +685,7 @@ export async function getStats(): Promise<StreetStats> {
       communitySegments,
       cvSessionsReviewed,
       cvSegments,
+      cvCoveragePct,
     };
   }
 
@@ -629,5 +704,6 @@ export async function getStats(): Promise<StreetStats> {
     communitySegments,
     cvSessionsReviewed,
     cvSegments,
+    cvCoveragePct,
   };
 }
