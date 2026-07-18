@@ -20,6 +20,11 @@ import { fetchAllPages } from "./supabase-bounded";
 import { toPaintFeature } from "./map-payload";
 import { showDemoData } from "./demo-flag";
 import {
+  CV_OBSERVATION_SELECT,
+  CV_OBSERVATION_SELECT_PRE_0028,
+  isMissingAssessmentEsColumn,
+} from "./cv-observation-select";
+import {
   readCommunityReports,
   readCommunitySegments,
   readCvObservations,
