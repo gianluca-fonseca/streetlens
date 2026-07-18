@@ -31,7 +31,6 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, ".test-build-history");
-const DATA = path.join(ROOT, "data");
 const require = createRequire(import.meta.url);
 
 const LOCAL_FILE_NAMES = [
