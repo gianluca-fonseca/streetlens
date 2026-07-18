@@ -182,8 +182,8 @@
       "errorGeneric": "Could not save the review. Please try again.",
       "localNote": "No database configured. Reviews are staged locally for a post-database apply step.",
       "typeCapture": "Camera walk",
-      "captureReviewCta": "Review this walk",
-      "captureUnreadable": "This walk can no longer be read. Its session may have been deleted.",
+      "captureReviewCta": "Review this submission",
+      "captureUnreadable": "This submission can no longer be read. Its session may have been deleted.",
       "captureSegments": "Segments",
       "captureFrames": "Frames",
       "captureOverbudget": "Budget stopped",
@@ -233,7 +233,7 @@
     },
     "capture": {
       "title": "Review a camera walk",
-      "sessionHeading": "This walk",
+      "sessionHeading": "This submission",
       "statusLabel": "Status",
       "framesLabel": "Frames",
       "capturedLabel": "Walked on",
@@ -250,20 +250,20 @@
       "itemsHeading": "Per item",
       "itemFrames": "{count} frames",
       "filmstripHeading": "Frames",
-      "frameAlt": "Frame {seq} from this walk",
-      "noSegments": "This walk produced no usable readings. Nothing here can reach the map, so rejecting it is the honest close.",
+      "frameAlt": "Frame {seq} from this submission",
+      "noSegments": "This submission produced no usable readings. Nothing here can reach the map, so rejecting it is the honest close.",
       "unset": "—",
       "reasonLabel": "Reason",
-      "reasonPlaceholder": "Why are you approving or rejecting this walk?",
+      "reasonPlaceholder": "Why are you approving or rejecting this submission?",
       "reasonRequired": "A reason is required.",
       "approveSummary": "Approving {count} of {total} segments.",
       "approve": "Approve selected",
-      "rejectSession": "Reject the walk",
+      "rejectSession": "Reject the session",
       "working": "Saving…",
       "errorGeneric": "That did not save. Please try again.",
-      "alreadyApproved": "This walk has been approved.",
-      "alreadyRejected": "This walk has been rejected.",
-      "fixtureNote": "No database is configured, so this walk is fixture data. Decisions are recorded locally.",
+      "alreadyApproved": "This submission has been approved.",
+      "alreadyRejected": "This submission has been rejected.",
+      "fixtureNote": "No database is configured, so this submission is fixture data. Decisions are recorded locally.",
       "correctionsMade": "{count} corrections",
       "humanCorrected": "Human-corrected",
       "segmentDropped": "Dropped",
@@ -273,7 +273,7 @@
       "wasValue": "was {value}",
       "assessmentHeading": "Assessment",
       "assessmentModel": "Model-written · {model}",
-      "assessmentNote": "A model summary of the walk. Your chosen scores are the numbers that publish.",
+      "assessmentNote": "A model summary of the session. Your chosen scores are the numbers that publish.",
       "noAssessment": "No assessment available for this segment.",
       "assessmentStale": "Written before your corrections",
       "lensNotesHeading": "Per-lens notes",
@@ -285,8 +285,8 @@
       "useAdjustedAll": "Use adjusted for all",
       "inspectorTitle": "Frame {seq}",
       "inspectorHint": "Select a frame to see and correct its readings.",
-      "mapHeading": "The walk",
-      "mapLabel": "Map of the walk: GPS track, frame positions, and matched streets",
+      "mapHeading": "The session",
+      "mapLabel": "Map of the session: GPS track, frame positions, and matched streets",
       "unmatchedHeading": "{count} frames matched no street",
       "closeInspector": "Close the inspector",
       "unmatched": "Matched no street",
@@ -781,7 +781,7 @@
     "start": {
       "eyebrow": "RECORD A WALK",
       "title": "Walk a street. Record what is actually there.",
-      "lead": "Your phone keeps a frame every few metres and stamps it with GPS. A reviewer checks the walk before any of it becomes public data.",
+      "lead": "Your phone keeps a frame every few metres and stamps it with GPS. A reviewer checks the session before any of it becomes public data.",
       "howEyebrow": "HOW TO HOLD IT",
       "how1": "Portrait. Camera pointed forward down the sidewalk, not at the ground.",
       "how2": "Walk at a normal pace. A frame is kept about once a second and every six metres.",
@@ -805,12 +805,12 @@
       "distance": "Distance",
       "gps": "GPS",
       "gpsWaiting": "Waiting for a fix",
-      "gpsWarn": "Weak GPS. Fixes above {meters} m get dropped when your walk is matched.",
+      "gpsWarn": "Weak GPS. Fixes above {meters} m get dropped when your session is matched.",
       "gpsDenied": "Location is off, so frames cannot be placed and none are being kept.",
       "gpsUnavailable": "No GPS signal. This happens indoors and under heavy cover.",
       "stop": "Stop",
       "wakeFailed": "Your screen may sleep. Keep it awake yourself if you can.",
-      "notDurable": "This browser cannot save frames to disk. Do not reload or switch apps, or the walk is lost."
+      "notDurable": "This browser cannot save frames to disk. Do not reload or switch apps, or the session is lost."
     },
     "paused": {
       "title": "Recording stopped",
@@ -820,7 +820,7 @@
     },
     "review": {
       "eyebrow": "REVIEW",
-      "title": "Your walk",
+      "title": "Your session",
       "frames": "Frames kept",
       "distance": "Distance walked",
       "duration": "Duration",
@@ -831,13 +831,13 @@
       "noneDropped": "Nothing was dropped.",
       "capFrames": "Recording stopped on its own at the {count} frame limit.",
       "capDuration": "Recording stopped on its own at the {minutes} minute limit.",
-      "storageFull": "Recording stopped because storage filled up. The walk up to that point is safe.",
+      "storageFull": "Recording stopped because storage filled up. The session up to that point is safe.",
       "contactLabel": "Email (optional)",
-      "contactHint": "Only used if a reviewer needs to ask you something about this walk.",
+      "contactHint": "Only used if a reviewer needs to ask you something about this submission.",
       "consent": "Uploading means these frames become public data once a reviewer approves them.",
       "upload": "Upload walk",
       "discard": "Discard walk",
-      "discardConfirm": "Discard this walk? The frames are deleted from this device and cannot be recovered.",
+      "discardConfirm": "Discard this submission? The frames are deleted from this device and cannot be recovered.",
       "tooShort": "A walk needs at least one frame and two GPS fixes before it can be uploaded."
     },
     "upload": {
@@ -854,23 +854,23 @@
       "retry": "Retry upload",
       "detail": "Detail",
       "backend_not_live_title": "Uploads are not switched on yet",
-      "backend_not_live_body": "Your walk is saved on this device and nothing was lost. The part of the pipeline that receives walks is still being built. Come back later and it will still be here.",
+      "backend_not_live_body": "Your session is saved on this device and nothing was lost. The part of the pipeline that receives walks is still being built. Come back later and it will still be here.",
       "storage_not_configured_title": "Frame storage is not configured",
-      "storage_not_configured_body": "This build cannot reach the frame store. Your walk is saved on this device.",
+      "storage_not_configured_body": "This build cannot reach the frame store. Your session is saved on this device.",
       "offline_title": "No connection",
       "offline_body": "Your frames are safe on this device. Retry once you are back online.",
       "rate_limited_title": "Too many uploads from here",
-      "rate_limited_body": "This device uploaded recently. Your walk is saved. Try again later.",
-      "rejected_title": "The server would not take this walk",
-      "rejected_body": "Your walk is saved on this device. This usually means it fell outside the mapped area.",
+      "rate_limited_body": "This device uploaded recently. Your session is saved. Try again later.",
+      "rejected_title": "The server would not take this submission",
+      "rejected_body": "Your session is saved on this device. This usually means it fell outside the mapped area.",
       "unknown_title": "Upload failed",
       "unknown_body": "Your frames are safe on this device. You can retry."
     },
     "done": {
       "eyebrow": "SUBMITTED",
-      "title": "Your walk is in",
+      "title": "Your session is in",
       "body": "It is queued for matching and review. Frames become public data once a reviewer approves them.",
-      "statusLink": "Track this walk",
+      "statusLink": "Track this submission",
       "again": "Record another walk"
     },
     "recover": {
@@ -948,7 +948,7 @@
       "progress": "{kept} of {target} frames",
       "keepOpen": "Keep this screen open. Every frame is saved as it is read, so a reload picks up where it stopped rather than starting over.",
       "sparserTitle": "This video is long, so the frames are sampled more sparsely.",
-      "sparserBody": "One frame every {seconds} seconds instead of every second. The whole street is still covered end to end. Keeping one a second would hit the frame cap and cover only the first stretch of your walk.",
+      "sparserBody": "One frame every {seconds} seconds instead of every second. The whole street is still covered end to end. Keeping one a second would hit the frame cap and cover only the first stretch of your session.",
       "pathEyebrow": "DECODER",
       "path_webcodecs": "WebCodecs",
       "path_seek": "Video element",
@@ -1082,9 +1082,9 @@
         "description": "The processing status of a walk recorded with StreetLens."
       },
       "eyebrow": "WALK STATUS",
-      "title": "Your walk",
-      "body": "This page updates itself while your walk is processed. A person reviews every walk before any of it reaches the map, so none of this is instant.",
-      "loading": "Checking this walk.",
+      "title": "Your session",
+      "body": "This page updates itself while your session is processed. A person reviews every walk before any of it reaches the map, so none of this is instant.",
+      "loading": "Checking this submission.",
       "steps": {
         "received": "Frames received",
         "matched": "Matched to streets",
@@ -1097,26 +1097,26 @@
         "uploading": "Your frames are still arriving.",
         "matching": "Matching your frames to the streets you walked.",
         "extracting": "Reading your frames. This is the slow part, and it moves faster while this page is open.",
-        "cost_paused": "Reading is paused on this walk.",
-        "review_ready": "Your walk is waiting for a reviewer.",
-        "approved": "Approved. What your walk measured is public data now.",
-        "rejected": "A reviewer did not approve this walk, so none of it became public data.",
-        "failed": "This walk could not be processed."
+        "cost_paused": "Reading is paused on this submission.",
+        "review_ready": "Your session is waiting for a reviewer.",
+        "approved": "Approved. What your session measured is public data now.",
+        "rejected": "A reviewer did not approve this submission, so none of it became public data.",
+        "failed": "This submission could not be processed."
       },
       "framesRead": "{done} of {total} frames read",
-      "framesFailed": "Frames that could not be read: {count}. The rest of the walk still counts.",
+      "framesFailed": "Frames that could not be read: {count}. The rest of the session still counts.",
       "paused": {
         "title": "Reading is paused",
-        "body": "This walk reached its processing budget, so nothing more is being spent on it automatically. Somebody has to look at it and decide. Your frames are safe in the meantime."
+        "body": "This submission reached its processing budget, so nothing more is being spent on it automatically. Somebody has to look at it and decide. Your frames are safe in the meantime."
       },
       "failedNotice": {
-        "title": "This walk could not be processed",
-        "body": "Something in matching or reading went wrong, and we would rather say so than show you a number we do not trust. Nothing from this walk became public data."
+        "title": "This submission could not be processed",
+        "body": "Something in matching or reading went wrong, and we would rather say so than show you a number we do not trust. Nothing from this submission became public data."
       },
       "segmentsEyebrow": "STREETS MATCHED",
-      "segmentsLead": "Street segments matched so far: {count}. The scores stay provisional until a reviewer approves the walk.",
+      "segmentsLead": "Street segments matched so far: {count}. The scores stay provisional until a reviewer approves the session.",
       "segmentCoverage": "{percent}% covered",
-      "waitNote": "You can close this page. The walk keeps processing either way, and this link brings you back to it.",
+      "waitNote": "You can close this page. The session keeps processing either way, and this link brings you back to it.",
       "errors": {
         "not_found": {
           "title": "No walk at this link",
@@ -1128,15 +1128,15 @@
         },
         "unavailable": {
           "title": "Status is unreachable",
-          "body": "The service that tracks walks is not answering right now. Your walk is unaffected. This page keeps trying."
+          "body": "The service that tracks walks is not answering right now. Your session is unaffected. This page keeps trying."
         },
         "server_error": {
           "title": "Could not read the status",
-          "body": "Something went wrong on our side reading this walk. Your frames are unaffected. This page keeps trying."
+          "body": "Something went wrong on our side reading this submission. Your frames are unaffected. This page keeps trying."
         },
         "network": {
           "title": "No connection",
-          "body": "This page cannot reach StreetLens. Your walk keeps processing without it. This page keeps trying."
+          "body": "This page cannot reach StreetLens. Your session keeps processing without it. This page keeps trying."
         }
       },
       "sessionLabel": "SESSION",
