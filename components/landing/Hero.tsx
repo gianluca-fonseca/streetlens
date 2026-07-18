@@ -5,11 +5,13 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
+import { showDemoData } from "@/lib/demo-flag";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import AuditMap from "@/components/AuditMap";
 import Logo from "@/components/ui/Logo";
 import StatFigure from "@/components/ui/StatFigure";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { cn } from "@/components/ui/cn";
 import { AUTHOR_LINKEDIN, CITY_REQUEST_URL, CUSP_URL, GITHUB_URL } from "@/lib/links";
 
@@ -33,26 +35,29 @@ function Banner() {
   const t = useTranslations("landing.hero.banner");
   return (
     <div className="w-full border-b border-transparent bg-ink-display text-paper dark:border-hairline dark:bg-paper-white dark:text-ink">
-      <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-center gap-x-5 gap-y-1 px-[max(1rem,env(safe-area-inset-left))] py-2.5 text-center text-[13px] leading-snug sm:px-6">
-        <span className="inline-flex items-center gap-1.5">
-          {t("methodQuestion")}
-          <a
-            href="#method"
-            className="inline-flex items-center pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
+      <div className="mx-auto flex max-w-[1400px] items-center gap-x-4 px-[max(1rem,env(safe-area-inset-left))] py-2.5 text-[13px] leading-snug sm:px-6">
+        <span className="flex flex-1 flex-wrap items-center justify-center gap-x-5 gap-y-1 text-center">
+          <span className="inline-flex items-center gap-1.5">
+            {t("methodQuestion")}
+            <a
+              href="#method"
+              className="inline-flex items-center pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
+            >
+              {t("methodLink")}
+            </a>
+          </span>
+          <span aria-hidden="true" className="hidden text-ink-faint sm:inline">
+            ·
+          </span>
+          <Link
+            href="/map"
+            className="inline-flex items-center gap-1 pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
           >
-            {t("methodLink")}
-          </a>
+            {t("platform")}
+            <span aria-hidden="true">→</span>
+          </Link>
         </span>
-        <span aria-hidden="true" className="hidden text-ink-faint sm:inline">
-          ·
-        </span>
-        <Link
-          href="/map"
-          className="inline-flex items-center gap-1 pointer-coarse:min-h-[44px] font-medium underline decoration-accent decoration-2 underline-offset-[5px] transition-colors hover:decoration-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper dark:focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ink-display dark:focus-visible:ring-offset-paper-white"
-        >
-          {t("platform")}
-          <span aria-hidden="true">→</span>
-        </Link>
+        <ThemeSwitcher className="shrink-0" />
       </div>
     </div>
   );
@@ -462,9 +467,11 @@ export default function Hero({
                 delay={700}
               />
             </div>
-            <p className="px-1 text-center font-mono text-[11px] leading-snug text-ink-muted lg:px-0 lg:text-left">
-              {t("stats.demoFootnote")}
-            </p>
+            {showDemoData() && (
+              <p className="px-1 text-center font-mono text-[11px] leading-snug text-ink-muted lg:px-0 lg:text-left">
+                {t("stats.demoFootnote")}
+              </p>
+            )}
           </div>
 
           {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}
@@ -473,9 +480,11 @@ export default function Hero({
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
                 {t("segments.title")}
               </p>
-              <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
-                {t("segments.caveat")}
-              </p>
+              {showDemoData() && (
+                <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
+                  {t("segments.caveat")}
+                </p>
+              )}
             </div>
             <ul className="mt-3 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
               {worst.map((s) => (

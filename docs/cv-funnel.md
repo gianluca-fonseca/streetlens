@@ -357,6 +357,27 @@ A compact legend, one line each, mapping what a reviewer sees to what it means.
 | Numbered dots on the map | review map | Each frame at the position the pipeline recorded; grey means unmatched (off-network), dim means excluded, tombstoned means deleted, and the polyline is the GPS track (`components/admin/ReviewMap.tsx`). |
 | "not assessable" | anywhere a value shows | A null reading: the model could not see it. Distinct from a zero, and it never scores. |
 
+### Provenance a segment answers at a glance
+
+An approved camera observation carries three provenance facts, and the public
+popover (`components/SegmentDetail.tsx`) renders them as one compact block per
+observation: **walked** is `captured_on` (when the street was actually filmed,
+the session's `extracted_at`), and **last updated** is `created_at` (when the
+observation was approved). `created_at` is labelled "last updated" rather than
+"approved" because the observation id is derived (`cv-<session>-<segment>`), so a
+re-approval upserts the same row and moves `created_at` forward; it is shown once.
+Both dates render as friendly localized text (EN/ES), pinned to UTC so the same
+instant reads as the same calendar day everywhere (`lib/cv-provenance.ts`).
+
+The third fact, **who submitted it**, is deliberately generic in public: the
+popover attributes every observation to "Community contributor" and never shows
+the contributor's contact. That contact (`capture_sessions.contact`, often an
+email) is PII collected without publish consent, so no public read, RPC, or
+feature property carries it; the ip hash is never surfaced either. The contact is
+admin-only, reaching the review workbench header solely through the secret-gated
+`capture_session_review_detail` RPC (migration `0024`), so a reviewer sees who
+sent a walk while the public map stays anonymous.
+
 ## Three ways in, one way out
 
 There are three ways a street's condition enters StreetLens, and they converge
@@ -493,6 +514,10 @@ The live engine runs entirely on the phone. It is under
 `components/capture/engine/` and `components/capture/hooks/`. Its job is to keep
 only the frames worth uploading, and to survive iOS killing the tab.
 
+> For a plain-language walkthrough of the capture gates and the video-upload
+> path, see [keyframe-extraction.md](keyframe-extraction.md). The sections below
+> are the code-level reference.
+
 **Frame clock and visibility.** `useFrameClock.ts` drives one callback per
 decoded frame via `requestVideoFrameCallback`, falling back to
 `requestAnimationFrame` with a `currentTime` guard so the same frame is not
@@ -620,6 +645,10 @@ what lets bytes land. See the security model below for how the RLS check
 actually runs.
 
 ### Map matching
+
+> For why the HMM holds where naive nearest-segment snapping flips between
+> parallel streets, see [map-matching.md](map-matching.md). The section below is
+> the code-level reference.
 
 `lib/matching/index.ts` picks the active implementation; import from
 `lib/matching`, never from an implementation file. Today the active matcher is
@@ -1261,6 +1290,31 @@ RUN_LIVE_SMOKE=1 node --env-file=.env.local scripts/live-smoke-extraction.mjs
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key. | undefined |
 | `SUBMISSIONS_IP_SALT` | Salt for hashing contributor IPs. | `streetlens-dev-salt` |
 | `ADMIN_PASSWORD` | Admin login password (review UI). | undefined |
+| `NEXT_PUBLIC_SHOW_DEMO_DATA` | **Demo data switch.** Must equal exactly `"true"` to publish the generated pilot scores; anything else (including unset) hides them. | disabled (demo hidden) |
+
+#### The demo data switch (`NEXT_PUBLIC_SHOW_DEMO_DATA`)
+
+Real collection has started, so the generated mock pilot scores are hidden on
+the public site by default. The flag is read in exactly one place,
+`lib/demo-flag.ts` (`showDemoData()`), and consumed by the data adapter and the
+copy that caveats live counts.
+
+- **Off (default, unset or any value other than `"true"`).** The 535 esc-sa
+  pilot segments render as part of the neutral, unaudited canton network: no
+  score colors on the map, no scores in the detail popover, and the audited
+  stat figures (`segments`, `km`, `coveragePct`, `heroPct`) degrade to zero.
+  The map demo banner and every "demo figure/data" caveat on those counts
+  disappear, because there is nothing left to label. Real community and CV
+  observations (e.g. the approved `esc-sr-0793` camera pass) are unaffected and
+  are the only colored data.
+- **On (`NEXT_PUBLIC_SHOW_DEMO_DATA=true`).** Today's behavior returns verbatim:
+  the pilot scores, the demo banner, and all demo caveats.
+
+Nothing is deleted to hide the demo data: `scripts/generate-demo-audits.mjs`,
+`data/demo-segments.geojson`, and `data/demo-audits.json` stay in the repo, so
+flipping the flag on republishes the pilot with no regeneration. Coverage:
+`scripts/smoke-adapter.mjs` exercises both states (demo-on assertions run with
+the flag set; a demo-off scenario asserts the default hides every score).
 
 The bucket name is not an env var; it is the constant `streetlens-frames`
 (`CAPTURE_BUCKET` in `lib/capture/types.ts`), matching the bucket created in

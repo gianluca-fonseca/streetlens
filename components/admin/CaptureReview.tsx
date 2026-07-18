@@ -29,10 +29,13 @@ import {
   type RecomputedSegment,
 } from "@/lib/capture/review-overrides";
 import { LENS_KEYS, type LensKey } from "@/lib/capture/scoring";
+import { formatProvenanceDate, sanitizeContact } from "@/lib/cv-provenance";
 import type { RubricItemKey } from "@/lib/capture/types";
 import FrameInspector from "./FrameInspector";
 import FrameLightbox from "./FrameLightbox";
 import ReviewMap, { type MatchedGeometry } from "./ReviewMap";
+import ReplayPlayer, { ReplayButton, useReplay } from "./SessionReplay";
+import ExpandedMap from "./ExpandedMap";
 import styles from "@/components/ui/zen.module.css";
 
 const LENS_ORDER = LENS_KEYS;
@@ -62,6 +65,12 @@ export default function CaptureReview({
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  // Session replay (u3). Lifted here so the SAME playback drives both the
+  // frame-first player and the expanded map, and so the map's current-frame
+  // highlight rides the existing selection sync instead of a forked one.
+  const replay = useReplay();
+  const [mapExpanded, setMapExpanded] = useState(false);
 
   const dateFmt = useMemo(
     () => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }),
@@ -123,6 +132,35 @@ export default function CaptureReview({
 
   const hasMap =
     review.track.length > 0 || review.frames.some((f) => f.position !== null);
+
+  const frameBySeq = useMemo(
+    () => new Map(review.frames.map((f) => [f.seq, f])),
+    [review.frames],
+  );
+  const replayFrame =
+    replay.currentSeq === null ? null : frameBySeq.get(replay.currentSeq) ?? null;
+
+  // During playback the map's highlight follows the playhead through the SAME
+  // selection props manual selection uses; otherwise it follows the inspector.
+  const mapSelectedSeq = replay.active ? replay.currentSeq : selectedSeq;
+  const mapSelectedSegmentId = replay.active
+    ? replayFrame?.segmentId ?? null
+    : selectedSegmentId;
+
+  function handleMapSelect(seq: number) {
+    // A dot tap seeks the replay when one is running (two-way sync), else selects.
+    if (replay.active) {
+      replay.seekToSeq(seq);
+      return;
+    }
+    setSelectedSeq((s) => (s === seq ? null : seq));
+  }
+  function startWholeReplay() {
+    replay.start(review.frames.map((f) => f.seq));
+  }
+  function startSegmentReplay(segmentId: string) {
+    replay.start((framesBySegment.get(segmentId) ?? []).map((f) => f.seq));
+  }
 
   const inspectorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -330,14 +368,23 @@ export default function CaptureReview({
           </div>
           <div>
             <dt className="text-neutral-strong">{t("capturedLabel")}</dt>
-            <dd className="font-mono font-medium text-ink">
-              {review.capturedOn ? review.capturedOn.slice(0, 10) : t("unset")}
+            <dd className="font-medium text-ink">
+              {formatProvenanceDate(review.capturedOn, locale) ?? t("unset")}
             </dd>
           </div>
           <div>
             <dt className="text-neutral-strong">{t("tokensLabel")}</dt>
             <dd className="font-mono font-medium text-ink">
               {numFmt.format(review.tokens.inputTokens + review.tokens.outputTokens)}
+            </dd>
+          </div>
+          {/* The SAME "submitted by" fact the public popover shows, so reviewer and
+              public read one truth. Contact only reaches here via the secret-gated
+              detail RPC (0024); anonymous / fixture sessions fall back. Never a hash. */}
+          <div className="col-span-2 sm:col-span-2">
+            <dt className="text-neutral-strong">{t("submittedByLabel")}</dt>
+            <dd className="break-words font-medium text-ink">
+              {sanitizeContact(review.contact) ?? t("submittedAnonymous")}
             </dd>
           </div>
         </dl>
@@ -379,20 +426,39 @@ export default function CaptureReview({
 
       {hasMap ? (
         <section className={`${styles.plate} rounded-[8px] border border-border bg-surface-elevated p-3`}>
-          <h2 className="mb-2 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
-            {t("mapHeading")}
-          </h2>
+          <div className="mb-2 flex items-center gap-2">
+            <h2 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+              {t("mapHeading")}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setMapExpanded(true)}
+              aria-label={t("mapExpand")}
+              data-map-expand
+              className={`${styles.control} ml-auto inline-flex items-center gap-1.5 rounded-[4px] border border-border px-2 py-0.5 text-[11px] font-medium text-neutral-strong hover:text-ink`}
+            >
+              <Maximize2 size={12} strokeWidth={1.75} aria-hidden="true" />
+              {t("mapExpand")}
+            </button>
+          </div>
           <ReviewMap
             track={review.track}
             frames={review.frames}
             matchedGeometry={matchedGeometry}
             excludedSeqs={corrections.excluded}
             deletedSeqs={corrections.deleted}
-            selectedSeq={selectedSeq}
-            selectedSegmentId={selectedSegmentId}
-            onSelectFrame={(seq) => setSelectedSeq((s) => (s === seq ? null : seq))}
+            selectedSeq={mapSelectedSeq}
+            selectedSegmentId={mapSelectedSegmentId}
+            onSelectFrame={handleMapSelect}
+            autoFollow={replay.active}
           />
         </section>
+      ) : null}
+
+      {review.frames.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <ReplayButton label={t("replayAll")} onClick={startWholeReplay} />
+        </div>
       ) : null}
 
       <div className="lg:grid lg:grid-cols-[1fr_minmax(300px,360px)] lg:items-start lg:gap-4">
@@ -546,9 +612,16 @@ export default function CaptureReview({
 
                     {frames.length > 0 ? (
                       <div className="mt-2.5">
-                        <h3 className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
-                          {t("filmstripHeading")}
-                        </h3>
+                        <div className="mb-1.5 flex items-center gap-2">
+                          <h3 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
+                            {t("filmstripHeading")}
+                          </h3>
+                          <ReplayButton
+                            label={t("replaySegment")}
+                            onClick={() => startSegmentReplay(segmentId)}
+                            compact
+                          />
+                        </div>
                         <ul className="flex gap-1.5 overflow-x-auto pb-1">
                           {frames.map((f) => (
                             <li key={f.seq} className="shrink-0">
@@ -680,6 +753,33 @@ export default function CaptureReview({
           deleted={deletedSet}
           onSeqChange={setLightboxSeq}
           onClose={() => setLightboxSeq(null)}
+        />
+      ) : null}
+
+      {/* Session replay: one engine, two surfaces. The expanded map wins when open so
+          the two overlays never stack; playback survives the switch either way. */}
+      {mapExpanded && hasMap ? (
+        <ExpandedMap
+          track={review.track}
+          frames={review.frames}
+          matchedGeometry={matchedGeometry}
+          excludedSeqs={corrections.excluded}
+          deletedSeqs={corrections.deleted}
+          selectedSeq={mapSelectedSeq}
+          selectedSegmentId={mapSelectedSegmentId}
+          onSelectFrame={handleMapSelect}
+          replay={replay}
+          onStartReplay={startWholeReplay}
+          onViewFrames={() => setMapExpanded(false)}
+          onClose={() => setMapExpanded(false)}
+        />
+      ) : replay.active ? (
+        <ReplayPlayer
+          replay={replay}
+          frames={review.frames}
+          excluded={excludedSet}
+          deleted={deletedSet}
+          onViewOnMap={() => (hasMap ? setMapExpanded(true) : undefined)}
         />
       ) : null}
     </div>

@@ -75,13 +75,15 @@ Scores are grouped into four legend bins, and the legend is never color-only:
 | Fair | 40–59 |
 | Poor | 0–39 |
 
-The ramps, bins, and width channel live in `components/mapConfig.ts` and are treated as sealed: on the grayscale basemap the score ramp is deliberately the loudest color on screen. Community-contributed segments never borrow a score color. They render in a neutral dashed casing until a field audit verifies them.
+The ramps, bins, and width channel live in `components/mapConfig.ts` and are treated as sealed: on the grayscale basemap the score ramp is deliberately the loudest color on screen. Community-contributed segments never borrow a score color. They render in a neutral dashed casing until a field audit verifies them. The full scoring model, all 15 rubric items, and the sealed encoding are in [`docs/method.md`](docs/method.md).
 
 ---
 
 ## The CV data-collection funnel
 
 Alongside the manual audit flow, a contributor can film a street (live on the phone or by uploading a video) and have a vision model score the frames against the same rubric v0.1 a human auditor uses. Frames are placed on the street network by map matching, scored one call per frame, and rolled up into per-segment lens scores. The result is a **proposal, not data**: it enters the same review queue a manual contribution does, and nothing reaches the published map without a human approving it. To understand what every number means (the per-item confidence percentages, and the baseline versus adjusted scores a reviewer sees), read [How the model works, end to end](docs/cv-funnel.md#how-the-model-works-end-to-end). The full architecture, cost model, edge-case catalog, and ops runbook are in [`docs/cv-funnel.md`](docs/cv-funnel.md).
+
+Two stages have their own plain-language explainers: [how frames are chosen on the phone](docs/keyframe-extraction.md) and [how each frame is pinned to an exact street segment](docs/map-matching.md). The [documentation index](docs/README.md) lays out a reading path.
 
 ## Method
 
@@ -96,7 +98,7 @@ The path from a walked street to a public score is deliberately honest about wha
 3. **Rubric score.** 0 to 100 per lens, versioned, published with its formula.
 4. **Open map and data.** Public map, GeoJSON and CSV exports, sidewalk geometry contributed back to OpenStreetMap.
 
-Every audit trains the next one. The photos accumulate into a labeled-imagery corpus that, over time, is meant to train a computer-vision and machine-learning pipeline reading sidewalk condition straight from a photo, so future audits score faster than the last. Today a vision model can pre-score filmed streets through the [CV data-collection funnel](docs/cv-funnel.md), but its output is a proposal only: a person verifies every reading before it reaches the map. That loop, and the line between today and the roadmap, is Plate 3.
+Every audit trains the next one. The photos accumulate into a labeled-imagery corpus that, over time, is meant to train a computer-vision and machine-learning pipeline reading sidewalk condition straight from a photo, so future audits score faster than the last. Today a vision model can pre-score filmed streets through the [CV data-collection funnel](docs/cv-funnel.md), but its output is a proposal only: a person verifies every reading before it reaches the map. That loop, and the line between today and the roadmap, is Plate 3. The rubric items, the scoring formula, and the demo-versus-real line are laid out in [`docs/method.md`](docs/method.md).
 
 ---
 
@@ -199,21 +201,9 @@ Every choice below is pinned in `package.json` and verified against the code, wi
 | Cross-frame synthesis | `lib/extraction/synthesis.ts` | A second text-only call per segment reasons across frames and applies bounded, reasoned score adjustments the median cannot see. |
 | Cost breaker / budgets / kill switch | `lib/extraction/config.ts` | A derived per-frame input-token ceiling, a per-session budget, and a fail-closed `CV_EXTRACTION_ENABLED` switch stand between a pilot and a surprise invoice. |
 
-**Capture**
+**Capture and matching**
 
-| Piece | Choice | Why |
-|---|---|---|
-| Live recording | `getUserMedia` + `requestVideoFrameCallback` | Films while walking and samples about one frame per second, gated by GPS movement and filtered for blur and duplicates (`components/capture/engine/`). |
-| Durability | OPFS write-through + Wake Lock | Every kept frame is written to the Origin Private File System the instant it exists, and the screen lock is re-acquired on visibility change, so an iOS tab kill loses at most the frame in flight. |
-| Video upload | `WebCodecs` + `mp4box ^2.4.1` | Decodes an uploaded POV video locally with a streaming demux (4 MB chunks), with a `<video>` seek-decoder fallback when WebCodecs fails. |
-| Route input | GPX parsing | Phone videos carry no GPS track, so the contributor imports a GPX file or traces the route (`lib/capture/gpx.ts`). |
-
-**Matching**
-
-| Piece | Choice | Why |
-|---|---|---|
-| Map matching | Newson-Krumm HMM | A Hidden Markov Model pins each frame to an exact street segment and makes a jump to a parallel street expensive (`lib/matching/hmm.ts`). |
-| Spatial index | `rbush ^4.0.1` | Fast nearest-segment lookups over the canton-wide street graph (`lib/matching/graph.ts`). |
+On-device capture (`getUserMedia` + `requestVideoFrameCallback`, OPFS write-through for crash safety, Wake Lock) and local video decode (`WebCodecs` + `mp4box ^2.4.1`, GPX or traced routing) produce the frames, and a Newson-Krumm HMM (`rbush ^4.0.1` spatial index, `lib/matching/`) pins each frame to an exact street segment. Both stages get a full, code-verified walkthrough in [keyframe extraction](docs/keyframe-extraction.md) and [map matching](docs/map-matching.md).
 
 **Testing and hosting**
 
@@ -227,19 +217,18 @@ Every choice below is pinned in `package.json` and verified against the code, wi
 
 ## Engineering drawings
 
-Three drawing sheets, drawn in the project's zen instrument style, with real dimensions where a standard applies.
+Three drawing sheets in the project's zen instrument style: the street
+cross-section dimensioned to Ley 7600 (Plate 1), the scoring anatomy of one
+segment (Plate 2), and the method pipeline from a walked street to open data,
+with the model path drawn as a verified roadmap loop (Plate 3). The Ley 7600
+figures they carry are written out in the [Method](#method) section above and in
+[`docs/method.md`](docs/method.md).
 
-**Plate 1 · Street right-of-way cross-section.** The four lenses mapped onto the built section, dimensioned to Ley 7600 (Arts. 125–127).
-
-![Plate 1 · street cross-section](public/drawings/plate-1-cross-section.svg)
-
-**Plate 2 · Scoring anatomy.** One segment in plan: rubric observation points, the sealed ramp, the four bins, the width channel, and the neutral community casing.
-
-![Plate 2 · scoring anatomy](public/drawings/plate-2-scoring-anatomy.svg)
-
-**Plate 3 · Method pipeline.** From a walked street to open data today (solid), with the computer-vision and machine-learning path drawn as a roadmap loop that a person always verifies (dashed).
-
-![Plate 3 · method pipeline](public/drawings/plate-3-method-pipeline.svg)
+<div align="center">
+<a href="public/drawings/plate-1-cross-section.svg"><img src="public/drawings/plate-1-cross-section.svg" alt="Plate 1 · street right-of-way cross-section" width="32%"></a>
+<a href="public/drawings/plate-2-scoring-anatomy.svg"><img src="public/drawings/plate-2-scoring-anatomy.svg" alt="Plate 2 · scoring anatomy" width="32%"></a>
+<a href="public/drawings/plate-3-method-pipeline.svg"><img src="public/drawings/plate-3-method-pipeline.svg" alt="Plate 3 · method pipeline" width="32%"></a>
+</div>
 
 ---
 

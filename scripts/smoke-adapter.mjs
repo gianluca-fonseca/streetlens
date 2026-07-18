@@ -5,10 +5,13 @@
  * End-to-end smoke test of the static-fallback data adapter plus a contract
  * check of lib/segments.ts's frozen export surface (advisor rev 4).
  *
- * - Compiles lib/{types,supabase,segments}.ts to CJS in .smoke-build/ and
- *   exercises getSegments / getSegmentDetail / getStats with no Supabase env.
- * - Asserts every feature carries district, audited_at, all four score_*
- *   fields, and demo: true.
+ * - Compiles lib/{types,supabase,demo-flag,segments}.ts to CJS in .smoke-build/
+ *   and exercises getSegments / getSegmentDetail / getStats with no Supabase env.
+ * - With demo data ON (NEXT_PUBLIC_SHOW_DEMO_DATA=true): asserts every audited
+ *   feature carries district, audited_at, all five score_* fields, and demo:true.
+ * - With demo data OFF (the default): asserts the generated pilot scores are
+ *   hidden — the 535 esc-sa features re-cast as the neutral canton overlay and
+ *   the audited stat figures degrade to zero.
  * - Asserts the module's export names match the frozen list exactly:
  *   runtime exports via require(), type-only exports via source inspection.
  *
@@ -84,12 +87,18 @@ async function main() {
   execFileSync(
     "npx",
     [
-      "tsc", "lib/types.ts", "lib/supabase.ts", "lib/segments.ts",
+      "tsc", "lib/types.ts", "lib/supabase.ts", "lib/demo-flag.ts", "lib/segments.ts",
       "--outDir", BUILD_DIR, "--module", "commonjs", "--moduleResolution", "node",
       "--target", "es2019", "--esModuleInterop", "--skipLibCheck",
     ],
     { cwd: ROOT, stdio: "inherit" },
   );
+
+  // The demo-on assertions below are the legacy behavior, now gated behind the
+  // flag. Set it explicitly so this suite exercises the preserved demo path;
+  // showDemoData() reads process.env at call time, so a later delete flips it off
+  // for the demo-off scenario without reloading the module.
+  process.env.NEXT_PUBLIC_SHOW_DEMO_DATA = "true";
 
   const seg = require(path.join(BUILD_DIR, "segments.js"));
 
@@ -253,6 +262,41 @@ async function main() {
   } finally {
     await fs.rm(COMMUNITY_SEGMENTS_PATH, { force: true });
   }
+
+  // 4. Demo era OFF (the default): NEXT_PUBLIC_SHOW_DEMO_DATA unset must hide
+  // every generated pilot score. The 535 esc-sa features re-cast as the neutral
+  // unaudited network (source:"import", scores zeroed), so NO ramp/audited
+  // feature survives and the audited stat figures degrade to zero. Real
+  // community/CV data is unaffected (none present here → all zero counters).
+  console.log("demo data OFF (default):");
+  delete process.env.NEXT_PUBLIC_SHOW_DEMO_DATA;
+  const offCol = await seg.getSegments();
+  const offStats = await seg.getStats();
+  console.log(`  -> ${JSON.stringify(offStats)}`);
+  const offRamp = offCol.features.filter((f) => !f.properties.source);
+  const offFormerDemo = offCol.features.filter((f) => f.properties.source === "import");
+  check(
+    "collection size unchanged (535 pilot + canton overlay)",
+    offCol.features.length === AUDITED + importCount,
+    `(${offCol.features.length})`,
+  );
+  check("NO ramp/audited feature survives (nothing carries a demo score)", offRamp.length === 0, `(${offRamp.length})`);
+  let offBadScore = 0, offBadDemo = 0;
+  for (const f of offFormerDemo) {
+    const p = f.properties;
+    if (!SCORE_KEYS.every((k) => p[k] === 0)) offBadScore += 1;
+    if (p.demo !== false) offBadDemo += 1;
+  }
+  check("every visible feature carries NO score (all 0)", offBadScore === 0, offBadScore ? `(${offBadScore} bad)` : "");
+  check("no feature is flagged demo=true", offBadDemo === 0, offBadDemo ? `(${offBadDemo} bad)` : "");
+  check("stats.segments degrades to 0 (no audited data published)", offStats.segments === 0, `(${offStats.segments})`);
+  check("stats.km degrades to 0", offStats.km === 0, `(${offStats.km})`);
+  check("stats.coveragePct degrades to 0", offStats.coveragePct === 0, `(${offStats.coveragePct})`);
+  check("stats.heroPct degrades to 0", offStats.heroPct === 0, `(${offStats.heroPct})`);
+  check(
+    "real counters stay numeric (community/CV unaffected)",
+    ["communitySegments", "cvSessionsReviewed", "cvSegments"].every((k) => typeof offStats[k] === "number"),
+  );
 
   rmSync(BUILD_DIR, { recursive: true, force: true });
 

@@ -63,6 +63,10 @@ async function main() {
   delete process.env.NEXT_PUBLIC_SUPABASE_URL;
   delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   delete process.env.ADMIN_RPC_SECRET;
+  // These invariants are about the published audited baseline (community/CV adds
+  // never move the 535). That baseline only exists with demo data on, which is no
+  // longer the default; pin it on so this suite tests the audited path.
+  process.env.NEXT_PUBLIC_SHOW_DEMO_DATA = "true";
 
   rmSync(BUILD_DIR, { recursive: true, force: true });
   execFileSync(
