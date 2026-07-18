@@ -16,7 +16,7 @@ All three SECURITY-RELEVANT mandates shipped: bilingual camera assessments (EN+E
 | `21e99554d371146c3ad5856334dd2d191306f8a1` | feat(ui): show evidence strip on CV segments and commit drive evidence |
 | `772e4371ac385231598ade7d5af7b33365ae82e0` | test(privacy): align bucket-private assertion with 0028 upsert form |
 | `e022ae481253992afd65f32ca000687734f76b36` | docs(unit-quality-privacy): report PASS and mark CONTROL done |
-| `undefined` | docs(unit-quality-privacy): report PASS and mark CONTROL done |
+| `659394a0c44ee6dea6973cc101fd62e0f1b40074` | docs(unit-quality-privacy): include final report commit hash |
 
 
 ## Gates (verbatim)
