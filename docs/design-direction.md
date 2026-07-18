@@ -121,7 +121,9 @@ Phosphor or Lucide at one consistent stroke weight. Zero emoji in UI.
 
 ## Score ramps (SEALED — data meaning, never chrome)
 
-One active layer at a time, colorblind-safe, plus a line-WIDTH channel. Overall teal→amber→clay (`#0E7C66`→`#E8B84B`→`#C0472B`, high = good); Accessibility Cividis blue; Drainage Viridis blue-teal→dull yellow; Shade canopy green→pale bone; Bike sand→copper; community casing neutral grey dashed. Legend always visible with explicit value bins; never color-only encoding. These live in `mapConfig.ts` and its `scripts/render-map-images.mjs` mirror and MUST NOT change. On the grayscale-zen basemap they become the loudest color on the map, which is the intent.
+One active layer at a time, colorblind-safe, plus a line-WIDTH channel. **Rev 7** (the owner unsealed rev 2 in #28 because it read muddy and, worse, ignored the basemap it paints on: pale stops vanished on the light basemap and deep ones on the dark). Overall is the traffic light and keeps the mandated red low end, coral-red→burnt orange→emerald (`#F45E53`→`#CE4D02`→`#056E48`, high = good); Accessibility violet (`#CE63E9`→`#7629F1`); Drainage cyan→deep azure (`#0E9EAF`→`#0263A8`); Shade lime→deep canopy (`#729D0D`→`#07703F`); Bike pink→deep magenta (`#EF599A`→`#B20795`, off copper because a rust high end painted the BEST bike streets in alarm-red); community casing neutral grey dashed.
+
+Every stop is solved to a target luminance (0.278 / 0.183 / 0.118), not picked, so legibility on both basemaps and monotonic bad→good luminance are properties of the construction rather than of taste. Bad is the light end and good the dark end deliberately: saturated warm hues are naturally bright and cool ones naturally deep, so running with that keeps chroma maximal at both ends. Legend always visible with explicit value bins; never color-only encoding. These live in `mapConfig.ts` and its `scripts/render-map-images.mjs` mirror; they are **resealed at rev 7** and change only on another owner ruling. On the grayscale-zen basemap they are the loudest color on the map, which is the intent.
 
 ## Basemap (grayscale zen)
 
