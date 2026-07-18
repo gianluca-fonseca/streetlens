@@ -86,7 +86,9 @@
     "cvUnknown": "Ningún cuadro respaldó esta capa",
     "cvConfidenceLabel": "Confianza",
     "cvCoverageLabel": "Cobertura",
-    "cvFramesLabel": "Cuadros"
+    "cvFramesLabel": "Cuadros",
+    "cvAssessmentLabel": "Evaluación",
+    "cvAssessmentNote": "Escrito por el modelo de cámara, en inglés. No es una auditoría de campo."
   },
   "rubric": {
     "overall": {
@@ -269,6 +271,18 @@
       "resetSegment": "Restablecer tramo",
       "editScoreLabel": "Editar el puntaje de {lens}",
       "wasValue": "era {value}",
+      "assessmentHeading": "Evaluación",
+      "assessmentModel": "Escrito por el modelo · {model}",
+      "assessmentNote": "Un resumen del recorrido hecho por el modelo. Sus puntajes elegidos son los números que se publican.",
+      "noAssessment": "No hay evaluación disponible para este tramo.",
+      "assessmentStale": "Escrito antes de sus correcciones",
+      "lensNotesHeading": "Notas por dimensión",
+      "baselineLabel": "Base",
+      "adjustedLabel": "Ajustado",
+      "useBaseline": "Usar base",
+      "useAdjusted": "Usar ajustado",
+      "useBaselineAll": "Usar base en todo",
+      "useAdjustedAll": "Usar ajustado en todo",
       "inspectorTitle": "Cuadro {seq}",
       "inspectorHint": "Elegí un cuadro para ver y corregir sus lecturas.",
       "mapHeading": "La caminata",
