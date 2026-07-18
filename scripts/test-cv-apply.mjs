@@ -123,6 +123,8 @@ async function main() {
     // Provenance defaults: an untouched approval is pure CV.
     check("an untouched observation is not human_corrected", rows[0].human_corrected === false);
     check("an untouched observation carries an empty overrides record", JSON.stringify(rows[0].overrides) === "{}");
+    // Synthesis defaults: absent assessment is an honest null, never a fabricated object.
+    check("an observation with no assessment carries a null assessment", rows[0].assessment === null, JSON.stringify(rows[0].assessment));
   }
 
   /* ---------------- Approving two segments ---------------- */
@@ -226,13 +228,28 @@ async function main() {
       deletedSeqs: [],
       scores: { overall: 50 },
     };
+    // The synthesis the reviewer approved rides along with SEG_A. The chosen NUMBER
+    // (overall 50) is the reviewer's; the assessment is context for the popover.
+    const assessment = {
+      overall: "Walkable but the corner ramp is missing — the one real gap on this block.",
+      lenses: {
+        accessibility: "Continuous walk, no ramp at the junction.",
+        drainage: "No standing water seen.",
+        shade: "Partial midday canopy.",
+        bike: "No dedicated provision.",
+      },
+      adjustments: { accessibility: { delta: -6, reason: "Junction gap weighs the lens down." } },
+      adjustedScores: { overall: 50, accessibility: 35, drainage: null, shade: 58, bike: 30 },
+      model: "gpt-5",
+    };
     await applyApprovedCaptureSession({
       session_id: SESSION,
       submission_id: "sub-1",
       captured_on: "2026-07-15T16:20:00.000Z",
       observations: [
-        // SEG_A corrected by a reviewer; SEG_B left exactly as the model read it.
-        observation(SEG_A, { human_corrected: true, overrides, scores: { overall: 50, accessibility: 41, drainage: null, shade: 58, bike: 30 } }),
+        // SEG_A corrected by a reviewer and carrying a synthesis; SEG_B left exactly
+        // as the model read it, with no synthesis at all.
+        observation(SEG_A, { human_corrected: true, overrides, assessment, scores: { overall: 50, accessibility: 41, drainage: null, shade: 58, bike: 30 } }),
         observation(SEG_B),
       ],
     });
@@ -241,14 +258,24 @@ async function main() {
     const b = rows.find((r) => r.segment_id === SEG_B);
     check("the corrected segment persists human_corrected = true", a.human_corrected === true);
     check("the corrected segment persists the compact overrides record", JSON.stringify(a.overrides) === JSON.stringify(overrides));
+    check("the corrected segment persists its approved assessment verbatim", JSON.stringify(a.assessment) === JSON.stringify(assessment));
     check("the untouched segment stays pure CV (not human_corrected)", b.human_corrected === false);
     check("the untouched segment carries an empty overrides record", JSON.stringify(b.overrides) === "{}");
+    check("the segment with no synthesis persists a null assessment", b.assessment === null, JSON.stringify(b.assessment));
 
     const after = await getSegments();
     const segA = after.features.find((f) => f.properties.id === SEG_A);
     check(
       "human_corrected reaches the map feature for the marker",
       segA.properties.cv_observations[0].human_corrected === true,
+    );
+    check(
+      "the assessment overall text reaches the map feature for the popover",
+      segA.properties.cv_observations[0].assessment.overall === assessment.overall,
+    );
+    check(
+      "the reviewer's chosen number lands on the map, not the synthesis's adjustedScore",
+      segA.properties.cv_observations[0].scores.accessibility === 41,
     );
     // The invariant still holds even for a corrected approval.
     const auditedFieldsAfter = { ...segA.properties };
