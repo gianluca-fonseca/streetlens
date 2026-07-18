@@ -334,13 +334,13 @@ function main() {
   console.log("\nstale — an exclusion moves the baseline; the delta follows it and the text is flagged stale");
   {
     const frames = [frame(0, { value: 4 }), frame(1, { value: 1 }), frame(2, { value: 4 })];
-    const A = { "north-st": assessment({ overall: { delta: -5, reason: "junction gap" } }) };
+    const A = { "north-st": assessment({ accessibility: { delta: -5, reason: "junction gap" } }) };
     const corrections = corr({ excluded: [1] });
     const result = recomputeReview(frames, corrections, A);
     const ref = referenceRollups(frames, corrections); // fresh baseline: seq 1 gone
     const s = result.segments[0];
     check("the baseline after exclusion equals the reference math", eq(s.baselineScores, ref[0].scores));
-    check("adjusted overall = FRESH baseline + delta (never the stale adjustedScores)", s.adjustedScores.overall === clampScore(ref[0].scores.overall - 5));
+    check("adjusted accessibility = FRESH baseline + delta (never the stale adjustedScores)", s.adjustedScores.accessibility === clampScore(ref[0].scores.accessibility - 5));
     check("the explanation is marked stale once frames were corrected", s.assessmentStale === true);
     check("the segment is human-corrected by the exclusion", s.humanCorrected === true);
   }

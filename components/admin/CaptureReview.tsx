@@ -854,6 +854,7 @@ function SegmentAssessmentPanel({
 
   const chosenBaseline = new Set(baselineChoice);
   const adjustedLenses = LENS_ORDER.filter((lens) => {
+    if (lens === "overall") return false;
     const a = assessment.adjustments?.[lens];
     return a && typeof a.delta === "number" && Number.isFinite(a.delta);
   });
@@ -897,7 +898,10 @@ function SegmentAssessmentPanel({
       <ul className="mt-2.5 flex flex-col gap-1.5">
         {LENS_ORDER.map((lens) => {
           const explanation = lens === "overall" ? null : assessment.lenses?.[lens] ?? null;
-          const adj = adjustedLenses.includes(lens) ? assessment.adjustments![lens]! : null;
+          const adj =
+            lens !== "overall" && adjustedLenses.includes(lens)
+              ? assessment.adjustments?.[lens]
+              : null;
           if (!explanation && !adj) return null;
 
           const baseVal = seg?.baselineScores[lens] ?? null;
