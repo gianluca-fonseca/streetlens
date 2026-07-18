@@ -35,6 +35,26 @@ function eq(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+/** Clamp a score to 0..100 at two decimals, exactly as the recompute's adjustment does. */
+function clampScore(v) {
+  return Math.max(0, Math.min(100, Math.round(v * 100) / 100));
+}
+
+/**
+ * A segment synthesis with the given per-lens adjustments. `adjustedScores` are set
+ * DELIBERATELY WRONG (all 999) so a test that reads the recompute's adjusted value
+ * proves the delta rode the fresh baseline, never this stale object.
+ */
+function assessment(adjustments) {
+  return {
+    overall: "overall verdict text",
+    lenses: { accessibility: "a", drainage: "d", shade: "s", bike: "b" },
+    adjustments,
+    adjustedScores: { overall: 999, accessibility: 999, drainage: 999, shade: 999, bike: 999 },
+    model: "gpt-5",
+  };
+}
+
 function compile() {
   rmSync(BUILD_DIR, { recursive: true, force: true });
   mkdirSync(BUILD_DIR, { recursive: true });
@@ -271,6 +291,67 @@ function main() {
     const ref = referenceRollups(frames, corrections);
     check("curb_ramp override matches reference math", eq(result.segments[0].scores, ref[0].scores));
     check("curb_ramp median reflects the override (0)", result.segments[0].itemMedians.curb_ramp.value === 0);
+  }
+
+  /* ---------------- 10. Synthesis adjustment is the default proposal ---------------- */
+  console.log("\nsynthesis — the adjusted score is the default, and the delta rides the fresh baseline");
+  {
+    const frames = [frame(0, { value: 3 }), frame(1, { value: 3 })];
+    const A = { "north-st": assessment({ shade: { delta: -10, reason: "thin canopy" } }) };
+    const result = recomputeReview(frames, corr(), A);
+    const ref = referenceRollups(frames, corr());
+    const s = result.segments[0];
+    check("baselineScores equal the pure rollup math", eq(s.baselineScores, ref[0].scores));
+    check("adjusted shade = clamp(baseline + delta), not the stale adjustedScores", s.adjustedScores.shade === clampScore(ref[0].scores.shade - 10));
+    check("the chosen score defaults to the ADJUSTED value", s.scores.shade === s.adjustedScores.shade);
+    check("a lens with no adjustment keeps its baseline", s.scores.accessibility === s.baselineScores.accessibility);
+    check("the assessment is attached to the segment", s.assessment !== null && s.assessment.model === "gpt-5");
+    check("an unadjusted, uncorrected segment is not human-corrected", s.humanCorrected === false);
+    check("the explanation is not stale without corrections", s.assessmentStale === false);
+  }
+
+  /* ---------------- 11. Use-baseline opt-out, and manual still wins ---------------- */
+  console.log("\nuse-baseline — a one-tap opt-out reverts a lens to baseline; a manual edit still wins");
+  {
+    const frames = [frame(0, { value: 3 })];
+    const A = { "north-st": assessment({ shade: { delta: -10, reason: "r" }, drainage: { delta: 8, reason: "r" } }) };
+    const opted = recomputeReview(frames, corr({ baselineLenses: { "north-st": ["shade"] } }), A);
+    const s = opted.segments[0];
+    check("the opted-out lens returns to its baseline", s.scores.shade === s.baselineScores.shade);
+    check("a lens left alone keeps its adjustment", s.scores.drainage === s.adjustedScores.drainage);
+    check("the opt-out is recorded in the per-segment override record", eq(s.overrides.baselineLenses, ["shade"]));
+    check("a baseline opt-out marks the segment human-corrected", s.humanCorrected === true);
+
+    // Manual wins over the adjustment (and over the opt-out).
+    const manual = recomputeReview(frames, corr({ manualScores: { "north-st": { shade: 42 } } }), A);
+    check("a manual lens score wins over the synthesis adjustment", manual.segments[0].scores.shade === 42);
+    check("manualEdited is flagged", manual.segments[0].manualEdited === true);
+  }
+
+  /* ---------------- 12. Delta on the RECOMPUTED baseline after a correction ---------------- */
+  console.log("\nstale — an exclusion moves the baseline; the delta follows it and the text is flagged stale");
+  {
+    const frames = [frame(0, { value: 4 }), frame(1, { value: 1 }), frame(2, { value: 4 })];
+    const A = { "north-st": assessment({ overall: { delta: -5, reason: "junction gap" } }) };
+    const corrections = corr({ excluded: [1] });
+    const result = recomputeReview(frames, corrections, A);
+    const ref = referenceRollups(frames, corrections); // fresh baseline: seq 1 gone
+    const s = result.segments[0];
+    check("the baseline after exclusion equals the reference math", eq(s.baselineScores, ref[0].scores));
+    check("adjusted overall = FRESH baseline + delta (never the stale adjustedScores)", s.adjustedScores.overall === clampScore(ref[0].scores.overall - 5));
+    check("the explanation is marked stale once frames were corrected", s.assessmentStale === true);
+    check("the segment is human-corrected by the exclusion", s.humanCorrected === true);
+  }
+
+  /* ---------------- 13. No assessment ⇒ adjusted equals baseline (honest null) ---------------- */
+  console.log("\nno assessment — with none supplied, nothing is adjusted");
+  {
+    const frames = [frame(0, { value: 3 })];
+    const s = recomputeReview(frames, corr(), {}).segments[0];
+    check("adjusted equals baseline when no synthesis exists", eq(s.adjustedScores, s.baselineScores));
+    check("chosen equals baseline when no synthesis exists", eq(s.scores, s.baselineScores));
+    check("assessment is null", s.assessment === null);
+    check("assessment is never stale when there is none", s.assessmentStale === false);
   }
 
   console.log(`\n${failures.length ? `FAIL (${failures.length})` : "PASS"}`);

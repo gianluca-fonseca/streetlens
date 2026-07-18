@@ -83,6 +83,7 @@ function compile() {
         "../lib/extraction/config.ts",
         "../lib/extraction/prompt.ts",
         "../lib/extraction/schema.ts",
+        "../lib/extraction/synthesis.ts",
       ],
     }),
   );
@@ -155,6 +156,10 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
       storage_path: `captures/${SID}/frame-000${seq}.jpg`,
       segment_id: "north-st",
       near_junction: false,
+      // Give each frame a distinct position along the walk so synthesis has real
+      // distances to reason over (0022 surfaces these through list_observations).
+      lng: -84.15,
+      lat: 9.9 + seq * 0.0005,
     });
     jobs.set(frameId, { status: "pending", attempts: attempts[seq] ?? 0, error: null });
   }
@@ -168,6 +173,8 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
     emits: [],
     /** Ordered trace of emits and status writes, so ordering can be asserted. */
     events: [],
+    /** Assessments written by the synthesis drain stage (0022). */
+    assessments: [],
   };
 
   const db = {
@@ -237,20 +244,29 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
       return busy || state.sessionStatus !== "extracting" ? [] : [SID];
     },
     async listObservations() {
-      return state.observations.map((o) => ({
-        frame_id: o.frameId,
-        segment_id: "north-st",
-        model: o.model,
-        items: o.items,
-        usable: o.usable,
-        confidence: o.confidence,
-        escalated: o.escalated,
-        near_junction: false,
-        seq: 0,
-      }));
+      return state.observations.map((o) => {
+        const f = frames.get(o.frameId) ?? {};
+        return {
+          frame_id: o.frameId,
+          segment_id: f.segment_id ?? "north-st",
+          model: o.model,
+          items: o.items,
+          usable: o.usable,
+          confidence: o.confidence,
+          escalated: o.escalated,
+          near_junction: f.near_junction ?? false,
+          seq: f.seq ?? 0,
+          rationale: o.rationale ?? null,
+          lng: f.lng ?? null,
+          lat: f.lat ?? null,
+        };
+      });
     },
     async upsertRollup(r) {
       state.rollups.push(r);
+    },
+    async setSegmentAssessment(args) {
+      state.assessments.push(args);
     },
     async listFrames() {
       return [];
@@ -320,13 +336,52 @@ function ok(T, opts = {}) {
 }
 
 /* -------------------------------------------------------------- *
+ * Synthesis fakes (0022 drain stage)
+ * -------------------------------------------------------------- */
+
+/** A valid synthesis draft with no adjustments; overridable per lens. */
+function synthDraft(adjust = {}) {
+  const base = (delta = 0, reason = "") => ({ delta, reason });
+  return {
+    overall: "A nuanced whole-segment verdict.",
+    lenses: { accessibility: "a", drainage: "d", shade: "s", bike: "b" },
+    adjustments: {
+      accessibility: adjust.accessibility ?? base(),
+      drainage: adjust.drainage ?? base(),
+      shade: adjust.shade ?? base(),
+      bike: adjust.bike ?? base(),
+    },
+  };
+}
+
+const synthResponse = (obj, usage = { inputTokens: 200, outputTokens: 80, cachedTokens: 0 }) => ({
+  outcome: "completed",
+  text: JSON.stringify(obj),
+  detail: null,
+  usage,
+});
+
+/** A synthesis client that answers from a script, recording every call. */
+function makeSynthesis(responder) {
+  const calls = [];
+  return {
+    calls,
+    async synthesize(request) {
+      calls.push(request);
+      return responder(request, calls.length - 1);
+    },
+  };
+}
+
+/* -------------------------------------------------------------- *
  * Cases
  * -------------------------------------------------------------- */
 
 async function main() {
   compile();
   const T = require(path.join(BUILD_DIR, "capture", "types.js"));
-  const { pumpOnce } = require(path.join(BUILD_DIR, "capture", "pump.js"));
+  const { pumpOnce, rollupSession } = require(path.join(BUILD_DIR, "capture", "pump.js"));
+  const SCORING = require(path.join(BUILD_DIR, "capture", "scoring.js"));
   const { shouldEscalate, extractFrame } = require(path.join(BUILD_DIR, "extraction", "extract.js"));
   const { parseVisionPayload, buildRequestBody } = require(path.join(BUILD_DIR, "extraction", "client.js"));
   const { SYSTEM_PROMPT, systemPromptApproxTokens, staticRequestApproxTokens } = require(
@@ -369,6 +424,10 @@ async function main() {
       emitSubmission: emitter(db, opts.emitImpl),
       concurrency: 4,
       ...opts,
+      // Injected so the drain stage never reaches the real OpenAI client; the
+      // default answers benignly so cases that do not care about synthesis are
+      // unaffected, and synthesis-specific cases pass their own scripted client.
+      synthesis: opts.synthesis ?? makeSynthesis(() => synthResponse(synthDraft())),
     });
 
   /* ---------------- Happy path ---------------- */
@@ -1261,6 +1320,153 @@ async function main() {
       out.kind === "failed" && out.usage.inputTokens === 0 && /transport/.test(out.reason),
       out.reason,
     );
+  }
+
+  /* ---------------- Synthesis: the drain stage (0022) ---------------- */
+  console.log("\nsynthesis drain stage");
+  {
+    process.env.CV_EXTRACTION_ENABLED = "true";
+    // The model proposes a wild accessibility drop and a modest shade drop; the
+    // engine clamps, applies, and recomputes overall — all on the drain.
+    const db = makeDb({ frameCount: 3 });
+    const vision = makeVision(() => ok(T));
+    const synth = makeSynthesis(() =>
+      synthResponse(
+        synthDraft({
+          accessibility: { delta: 999, reason: "sidewalk disappears for 200 m" },
+          shade: { delta: -5, reason: "canopy thins out halfway" },
+        }),
+        { inputTokens: 512, outputTokens: 210, cachedTokens: 0 },
+      ),
+    );
+    await run(db, vision, { synthesis: synth, concurrency: 1 });
+
+    check(
+      "the session still rolled up and reached review_ready",
+      db.state.rollups.length === 1 && db.state.sessionStatus === "review_ready",
+      `status=${db.state.sessionStatus}`,
+    );
+    check("synthesis ran once and persisted an assessment", db.state.assessments.length === 1);
+
+    const a = db.state.assessments[0];
+    const baseAcc = db.state.rollups[0].scores.accessibility;
+    check(
+      "the wild delta is clamped to the +/-20 bound",
+      a.assessment.adjustments.accessibility.delta === 20,
+      `${a.assessment.adjustments.accessibility.delta}`,
+    );
+    check(
+      "adjustedScores = clamp(baseline + bounded delta)",
+      a.assessment.adjustedScores.accessibility ===
+        Math.round(Math.max(0, Math.min(100, baseAcc + 20)) * 100) / 100,
+      `${a.assessment.adjustedScores.accessibility} from base ${baseAcc}`,
+    );
+    const expectedOverall = SCORING.renormalizedOverall(
+      a.assessment.adjustedScores.accessibility,
+      a.assessment.adjustedScores.drainage,
+      a.assessment.adjustedScores.shade,
+    );
+    check(
+      "overall is recomputed from the adjusted lenses, not copied from the model",
+      Math.abs(a.assessment.adjustedScores.overall - Math.round(expectedOverall * 100) / 100) < 0.01,
+      `${a.assessment.adjustedScores.overall}`,
+    );
+    check(
+      "the synthesis spend is recorded on the write for the session ledger",
+      a.inputTokens === 512 && a.outputTokens === 210,
+      JSON.stringify({ i: a.inputTokens, o: a.outputTokens }),
+    );
+  }
+
+  {
+    // A lens whose baseline is null stays null: the model cannot invent a bike
+    // score for a street where no frame could assess cycling.
+    const db = makeDb({ frameCount: 2 });
+    const bikeNull = () => {
+      const it = items(T);
+      for (const k of ["bike_lane_present", "bike_separation", "bike_surface"]) {
+        it[k] = { value: null, confidence: 0.2 };
+      }
+      return JSON.stringify({
+        schemaVersion: "cv-v1",
+        items: it,
+        frameQuality: { usable: true, reason: null },
+        rationale: RATIONALE,
+      });
+    };
+    const vision = makeVision(() => ({ outcome: "completed", text: bikeNull(), detail: null, usage: USAGE(1200) }));
+    const synth = makeSynthesis(() =>
+      synthResponse(synthDraft({ bike: { delta: 15, reason: "great protected lane" } })),
+    );
+    await run(db, vision, { synthesis: synth, concurrency: 1 });
+
+    const a = db.state.assessments[0];
+    check(
+      "baseline bike is null when no frame could assess it",
+      db.state.rollups[0].scores.bike === null,
+      JSON.stringify(db.state.rollups[0].scores),
+    );
+    check("synthesis cannot invent a score for a null-baseline lens", a.assessment.adjustedScores.bike === null);
+    check("and no bike adjustment is recorded", a.assessment.adjustments.bike === undefined);
+  }
+
+  {
+    // A synthesis failure NEVER blocks the drain: the assessment stays null and
+    // the walk still reaches a reviewer, honestly labelled "no assessment".
+    const db = makeDb({ frameCount: 2 });
+    const vision = makeVision(() => ok(T));
+    const synth = makeSynthesis(() => ({ outcome: "refusal", text: null, detail: "no", usage: { inputTokens: 5, outputTokens: 0, cachedTokens: 0 } }));
+    await run(db, vision, { synthesis: synth, concurrency: 1 });
+    check("a synthesis refusal writes no assessment", db.state.assessments.length === 0);
+    check(
+      "the session still rolls up and reaches review_ready",
+      db.state.rollups.length === 1 && db.state.sessionStatus === "review_ready",
+    );
+    check("synthesis was attempted", synth.calls.length === 1);
+  }
+
+  {
+    // A synthesis client that throws does not stop the session either.
+    const db = makeDb({ frameCount: 1 });
+    const vision = makeVision(() => ok(T));
+    const throwing = {
+      async synthesize() {
+        throw new Error("boom");
+      },
+    };
+    await run(db, vision, { synthesis: throwing });
+    check(
+      "a synthesis throw leaves the session review_ready with no assessment",
+      db.state.sessionStatus === "review_ready" && db.state.assessments.length === 0,
+      `status=${db.state.sessionStatus}`,
+    );
+  }
+
+  {
+    // Kill switch: with extraction disabled the drain stage must not synthesise —
+    // no spend when the switch is off. rollupSession is driven directly because a
+    // disabled pump returns before it ever rolls up.
+    process.env.CV_EXTRACTION_ENABLED = "false";
+    const db = makeDb({ frameCount: 1 });
+    await db.completeJob({
+      frameId: "frame-0",
+      model: "gpt-5-nano",
+      items: items(T),
+      usable: true,
+      confidence: 0.9,
+      inputTokens: 1000,
+      outputTokens: 100,
+      escalated: false,
+      rationale: RATIONALE,
+    });
+    const synth = makeSynthesis(() => synthResponse(synthDraft()));
+    await rollupSession(db, SID, emitter(db), synth);
+    check("synthesis does not run while the kill switch is off", synth.calls.length === 0, `${synth.calls.length} calls`);
+    check(
+      "the rollup still lands and the session reaches review_ready",
+      db.state.rollups.length === 1 && db.state.sessionStatus === "review_ready",
+    );
+    process.env.CV_EXTRACTION_ENABLED = "true";
   }
 
   /* -------------------------------------------------------------- */

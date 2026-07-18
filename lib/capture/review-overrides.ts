@@ -46,6 +46,49 @@ export type FrameObservation = {
 };
 
 /**
+ * The segment synthesis, the frozen cross-lane contract (u2 seed, seal #1).
+ *
+ * A sibling lane's engine writes one of these per rollup entry on
+ * `capture_session_review` (its migration 0022); we consume it verbatim and code
+ * the workbench/recompute against a fixture until it lands. `null` (an absent
+ * entry) means no synthesis was produced — the workbench renders an honest
+ * "no assessment available" state.
+ *
+ * The synthesis is CONTEXT, never the number of record. Its per-lens `delta` is
+ * re-applied to the reviewer's freshly recomputed baseline (seal #2), so the
+ * `adjustedScores` here are the engine's own proposal on the ORIGINAL frames and
+ * are shown only for reference; the number that lands is recomputed, not read
+ * from this object.
+ */
+export type AssessmentAdjustment = {
+  /** Bounded nudge the engine proposes for this lens, in score points (may be negative). */
+  delta: number;
+  /** The engine's free-text justification for the nudge. */
+  reason: string;
+};
+
+export type SegmentAssessment = {
+  /** The overall, plain-language verdict a reviewer reads first. Model output, English. */
+  overall: string;
+  /** Per-lens explanations (the composite `overall` lens has no separate explanation). */
+  lenses: {
+    accessibility: string;
+    drainage: string;
+    shade: string;
+    bike: string;
+  };
+  /** Per-lens bounded adjustments the engine proposes, keyed by lens. */
+  adjustments: Partial<Record<LensKey, AssessmentAdjustment>>;
+  /** The engine's adjusted scores on the ORIGINAL baseline. Reference only; recomputed on the fresh baseline. */
+  adjustedScores: LensScores;
+  /** The model that produced the synthesis. */
+  model: string;
+};
+
+/** Per-segment synthesis, keyed by segment id. A missing/null entry means "no assessment". */
+export type SegmentAssessments = Record<string, SegmentAssessment | null>;
+
+/**
  * The minimal frame shape the recompute needs. The read model's richer
  * `ReviewFrame` (with url/position) is structurally a superset and passes straight in.
  */
@@ -74,6 +117,13 @@ export type ReviewCorrections = {
   deleted: number[];
   /** Per segment, lens scores the reviewer set by hand. These win over the recompute. */
   manualScores: Record<string, Partial<Record<LensKey, number | null>>>;
+  /**
+   * Per segment, the lenses where the reviewer tapped "use baseline" to decline the
+   * synthesis adjustment. The adjusted score is the DEFAULT proposal (seal #2), so
+   * an unlisted lens keeps its adjustment; a listed one reverts to the recomputed
+   * baseline. A manual score still wins over either.
+   */
+  baselineLenses: Record<string, LensKey[]>;
 };
 
 export const EMPTY_CORRECTIONS: ReviewCorrections = {
@@ -81,18 +131,33 @@ export const EMPTY_CORRECTIONS: ReviewCorrections = {
   excluded: [],
   deleted: [],
   manualScores: {},
+  baselineLenses: {},
 };
 
 /** One segment after correction, ready for the approve payload and the UI. */
 export type RecomputedSegment = {
   segmentId: string;
+  /** The numbers that LAND: the synthesis-adjusted baseline, with baseline opt-outs and manual edits applied. */
   scores: LensScores;
+  /** The pure recomputed rollup, before any synthesis adjustment or manual edit. Shown beside the adjusted values. */
+  baselineScores: LensScores;
+  /** The baseline with each proposed adjustment's clamped delta applied. The default proposal, before opt-outs/manual. */
+  adjustedScores: LensScores;
+  /** The synthesis for this segment, or null when none was produced. */
+  assessment: SegmentAssessment | null;
+  /**
+   * True when the reviewer excluded/deleted frames or overrode items on this
+   * segment, so the recomputed baseline no longer matches the frames the synthesis
+   * text was written about. The explanation gets a "written before your corrections"
+   * hint; the DELTAS still apply to the fresh baseline (seal #2).
+   */
+  assessmentStale: boolean;
   itemMedians: Record<string, ItemMedian>;
   coverage: number;
   confidence: number | null;
   /** Storage paths of the frames that still feed this segment (not excluded/deleted). */
   frameRefs: string[];
-  /** True when a reviewer touched this segment: an override, an exclusion, or a manual score. */
+  /** True when a reviewer touched this segment: an override, an exclusion, a manual score, or a baseline opt-out. */
   humanCorrected: boolean;
   /** The compact per-segment record of what changed, for the `overrides` jsonb. */
   overrides: SegmentOverrideRecord;
@@ -106,6 +171,8 @@ export type SegmentOverrideRecord = {
   excludedSeqs: number[];
   deletedSeqs: number[];
   scores: Partial<Record<LensKey, number | null>>;
+  /** Lenses where the reviewer declined the synthesis adjustment. Omitted when none. */
+  baselineLenses?: LensKey[];
 };
 
 export type RecomputeResult = {
@@ -117,6 +184,36 @@ export type RecomputeResult = {
 
 /** A confidence a human override asserts: the reviewer is certain, so it dominates. */
 const OVERRIDE_CONFIDENCE = 1;
+
+/** Keep an adjusted score inside the 0-100 band and to two decimals, like the rollup. */
+function clampScore(v: number): number {
+  return Math.max(0, Math.min(100, Math.round(v * 100) / 100));
+}
+
+/**
+ * The baseline with each proposed lens delta applied, clamped to 0-100.
+ *
+ * The delta rides the FRESH baseline, not the engine's `adjustedScores` (seal #2):
+ * after a reviewer excludes or overrides frames the baseline moves, and the honest
+ * adjusted value is that moved baseline plus the same delta. A lens the frames
+ * never measured (null baseline) cannot be adjusted — unknown is not a number to
+ * nudge — so it stays null.
+ */
+function computeAdjusted(
+  baseline: LensScores,
+  assessment: SegmentAssessment | null,
+): LensScores {
+  const out: LensScores = { ...baseline };
+  if (!assessment) return out;
+  for (const lens of LENS_KEYS) {
+    const adj = assessment.adjustments?.[lens];
+    const base = baseline[lens];
+    if (adj && typeof adj.delta === "number" && Number.isFinite(adj.delta) && base !== null) {
+      out[lens] = clampScore(base + adj.delta);
+    }
+  }
+  return out;
+}
 
 function isDeleted(frame: CorrectableFrame, corrections: ReviewCorrections): boolean {
   return frame.deleted || corrections.deleted.includes(frame.seq);
@@ -146,6 +243,7 @@ function applyItemOverrides(
 export function recomputeReview(
   frames: readonly CorrectableFrame[],
   corrections: ReviewCorrections,
+  assessments: SegmentAssessments = {},
 ): RecomputeResult {
   const excluded = new Set(corrections.excluded);
 
@@ -196,8 +294,20 @@ export function recomputeReview(
     .sort((a, b) => a.localeCompare(b));
 
   const segments: RecomputedSegment[] = rollups.map((r) => {
+    const assessment = assessments[r.segmentId] ?? null;
     const manual = corrections.manualScores[r.segmentId] ?? {};
-    const scores: LensScores = { ...r.scores };
+    const useBaseline = new Set(corrections.baselineLenses[r.segmentId] ?? []);
+
+    // Composition order (seal #2): the pure rollup baseline, then the synthesis
+    // adjustment (the DEFAULT), then a per-lens baseline opt-out, then a manual edit
+    // that wins over all of it.
+    const baselineScores: LensScores = { ...r.scores };
+    const adjustedScores = computeAdjusted(baselineScores, assessment);
+
+    const scores: LensScores = { ...adjustedScores };
+    for (const lens of LENS_KEYS) {
+      if (useBaseline.has(lens)) scores[lens] = baselineScores[lens];
+    }
     let manualEdited = false;
     for (const lens of LENS_KEYS) {
       if (Object.prototype.hasOwnProperty.call(manual, lens)) {
@@ -207,15 +317,28 @@ export function recomputeReview(
     }
 
     const overrides = buildSegmentOverrideRecord(r.segmentId, frames, corrections);
+    // The synthesis text was written about the frames the model saw. If the reviewer
+    // has since changed which frames or values feed the baseline, the explanation
+    // predates that; the deltas still ride the fresh baseline, but the prose is stale.
+    const assessmentStale =
+      assessment !== null &&
+      (overrides.excludedSeqs.length > 0 ||
+        overrides.deletedSeqs.length > 0 ||
+        Object.keys(overrides.items).length > 0);
     const humanCorrected =
       manualEdited ||
       overrides.excludedSeqs.length > 0 ||
       overrides.deletedSeqs.length > 0 ||
-      Object.keys(overrides.items).length > 0;
+      Object.keys(overrides.items).length > 0 ||
+      (overrides.baselineLenses?.length ?? 0) > 0;
 
     return {
       segmentId: r.segmentId,
       scores,
+      baselineScores,
+      adjustedScores,
+      assessment,
+      assessmentStale,
       itemMedians: r.itemMedians,
       coverage: r.coverage,
       confidence: r.confidence,
@@ -253,6 +376,13 @@ function buildSegmentOverrideRecord(
     .filter((seq) => seqToSegment.get(seq) === segmentId)
     .sort((a, b) => a - b);
   const scores = corrections.manualScores[segmentId] ?? {};
+  const baselineLenses = (corrections.baselineLenses[segmentId] ?? []).filter(
+    (lens): lens is LensKey => (LENS_KEYS as readonly string[]).includes(lens),
+  );
 
-  return { items, excludedSeqs, deletedSeqs, scores };
+  const record: SegmentOverrideRecord = { items, excludedSeqs, deletedSeqs, scores };
+  // Only carry the field when the reviewer actually declined an adjustment, so an
+  // untouched approval keeps its `{}`-shaped record byte-for-byte (0021 back-compat).
+  if (baselineLenses.length > 0) record.baselineLenses = baselineLenses;
+  return record;
 }

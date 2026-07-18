@@ -139,12 +139,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0021", files.some((f) => f.startsWith("0021")), files.join(" "));
+    check("found the full migration chain through 0023", files.some((f) => f.startsWith("0023")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -164,12 +164,20 @@ function main() {
       // capture_complete_job and reverts capture_session_review to its pre-rationale
       // body. 0020 re-applied afterward drops that stale overload and re-establishes
       // the review read WITH per-frame observations, which the assertions below rely on.
-      // 0021 last so its provenance columns and detail RPC survive every re-run.
+      // 0021 then 0023 last so the provenance columns, the detail RPC, and the
+      // assessment column + its apply extension all survive every re-run.
       psql(readFileSync(path.join(MIGRATIONS, "0020_observation_rationale.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0021_review_overrides.sql"), "utf8"));
-      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 are re-runnable (idempotent)", true);
+      // 0022 MUST be re-applied here: re-running 0015's chain above reverts
+      // capture_list_observations to its 9-column form and the review read to its
+      // pre-assessment body, so 0022 re-establishes the GPS/rationale columns and
+      // the per-segment assessment; 0023 last so the assessment column + its apply
+      // extension survive every re-run.
+      psql(readFileSync(path.join(MIGRATIONS, "0022_segment_synthesis.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0023_assessment_apply.sql"), "utf8"));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 are re-runnable (idempotent)", true);
     } catch (err) {
-      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
     }
 
     /* ---------------- Schema shape ---------------- */
@@ -487,6 +495,80 @@ function main() {
       psql(`select capture_session_status('${sid}'::uuid);`).includes("esc-sa-0001"),
     );
 
+    /* ---------------- 0022: segment synthesis assessment ---------------- */
+    {
+      check(
+        "capture_segment_rollups gains an assessment jsonb column",
+        psql(`select data_type from information_schema.columns
+                where table_name='capture_segment_rollups' and column_name='assessment';`).trim() === "jsonb",
+      );
+      check(
+        "capture_segment_rollups gains the two synthesis token columns",
+        psql(`select count(*) from information_schema.columns
+                where table_name='capture_segment_rollups'
+                  and column_name in ('synthesis_input_tokens','synthesis_output_tokens');`).trim() === "2",
+      );
+
+      // esc-sa-0001 already has a rollup row (written above); attach an assessment.
+      const assessment = JSON.stringify({
+        overall: "Sidewalk vanishes halfway along the block.",
+        lenses: { accessibility: "a", drainage: "d", shade: "s", bike: "b" },
+        adjustments: { accessibility: { delta: -12, reason: "sidewalk disappears for 200 m" } },
+        adjustedScores: { overall: 41, accessibility: 38, drainage: null, shade: 55, bike: null },
+        model: "gpt-5.4-mini",
+      });
+      psql(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001',
+              '${assessment}'::jsonb, 512, 210, 'test-secret');`);
+      check(
+        "capture_set_segment_assessment writes the assessment onto the rollup",
+        psql(`select assessment->>'model' from capture_segment_rollups
+                where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() === "gpt-5.4-mini",
+      );
+      check(
+        "and records the synthesis token spend for the ledger",
+        psql(`select (synthesis_input_tokens=512 and synthesis_output_tokens=210)::text
+                from capture_segment_rollups where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() === "true",
+      );
+      check(
+        "capture_set_segment_assessment is secret-gated",
+        (psqlExpectError(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001', '{}'::jsonb, 0, 0, 'nope');`) || "").includes("unauthorized"),
+      );
+      check(
+        "writing an assessment for an absent segment is a no-op, not an orphan row",
+        (() => {
+          psql(`select capture_set_segment_assessment('${sid}'::uuid, 'no-such-seg', '{}'::jsonb, 0, 0, 'test-secret');`);
+          return psql(`select count(*) from capture_segment_rollups
+                         where session_id='${sid}' and segment_id='no-such-seg';`).trim() === "0";
+        })(),
+      );
+
+      // The review read hangs the assessment off the rollup and sums synthesis spend.
+      const rv = JSON.parse(psql(`select capture_session_review('${sid}'::uuid, 'test-secret');`).trim());
+      const seg = (rv.rollups ?? []).find((r) => r.segmentId === "esc-sa-0001");
+      check(
+        "capture_session_review carries the per-segment assessment verbatim",
+        seg && seg.assessment && seg.assessment.model === "gpt-5.4-mini" &&
+          seg.assessment.adjustedScores.accessibility === 38,
+        JSON.stringify(seg && seg.assessment),
+      );
+      check(
+        "the review tokens block sums synthesis spend beside the vision spend",
+        rv.tokens.synthesisInputTokens === 512 && rv.tokens.synthesisOutputTokens === 210,
+        JSON.stringify(rv.tokens),
+      );
+
+      // capture_list_observations now returns each frame's rationale and GPS.
+      check(
+        "capture_list_observations returns the per-frame rationale (0022)",
+        psql(`select bool_or(rationale = 'Escalated read: clearly a two-lane street with intact gutters.')::text
+                from capture_list_observations('${sid}'::uuid, 'test-secret') where seq=0;`).trim() === "true",
+      );
+      check(
+        "capture_list_observations exposes lng/lat columns for synthesis distance",
+        psqlExpectError(`select lng, lat from capture_list_observations('${sid}'::uuid, 'test-secret') limit 1;`) === null,
+      );
+    }
+
     psql(`select capture_set_session_status('${sid}'::uuid, 'review_ready', 'test-secret');`);
     check(
       "capture_set_session_status stamps the lifecycle timestamp",
@@ -674,6 +756,66 @@ function main() {
       "a payload with no provenance fields defaults to human_corrected = false, overrides = {}",
       psql(`select human_corrected::text || '|' || (overrides = '{}'::jsonb)::text
               from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "false|true",
+    );
+
+    /* ---------------- 0023: segment synthesis (assessment) ---------------- */
+
+    // The row above was just re-applied with no assessment: it must read NULL, so a
+    // walk with no synthesis (or an un-upgraded caller) is honestly "no assessment".
+    check(
+      "a payload with no assessment leaves the column NULL",
+      psql(`select coalesce(assessment::text, 'NULL') from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "NULL",
+    );
+
+    // Re-approve seg-a carrying a synthesis: the whole object must round-trip, and
+    // the overall text (what the public popover shows) must land verbatim.
+    const withAssessment = JSON.stringify([
+      {
+        id: `cv-${cvSid}-seg-a`,
+        segment_id: "seg-a",
+        scores: { overall: 58, accessibility: 40, drainage: null, shade: 55, bike: null },
+        item_medians: { ramp_present: { value: 0.5, confidence: 0.8, frames: 2 } },
+        coverage: 0.5,
+        confidence: 0.6,
+        frame_refs: [`captures/${cvSid}/frame-0000.jpg`],
+        captured_on: "2026-07-16T10:00:00Z",
+        assessment: {
+          overall: "A generally walkable block; the missing curb ramp is the one real gap.",
+          lenses: {
+            accessibility: "Sidewalk continuous but no ramp at the north corner.",
+            drainage: "No standing water seen.",
+            shade: "Partial canopy at midday.",
+            bike: "No dedicated bike provision.",
+          },
+          adjustments: { accessibility: { delta: -6, reason: "Missing curb ramp weighs the lens down." } },
+          adjustedScores: { overall: 55, accessibility: 34, drainage: null, shade: 55, bike: null },
+          model: "gpt-5",
+        },
+      },
+    ]).replace(/'/g, "''");
+    psql(`select admin_apply_capture_session('test-secret', '${cvSid}'::uuid, '${cvSub}'::uuid, '${withAssessment}'::jsonb);`);
+    check(
+      "the assessment overall text round-trips verbatim",
+      psql(`select assessment->>'overall' from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() ===
+        "A generally walkable block; the missing curb ramp is the one real gap.",
+    );
+    check(
+      "the assessment's per-lens explanation and adjustment delta round-trip",
+      psql(`select ((assessment->'lenses'->>'accessibility' = 'Sidewalk continuous but no ramp at the north corner.')
+              and (assessment->'adjustments'->'accessibility'->>'delta' = '-6')
+              and (assessment->>'model' = 'gpt-5'))::text
+              from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "true",
+    );
+    check(
+      "the reviewer's chosen NUMBERS still land, not the synthesis's adjustedScores",
+      psql(`select score_accessibility::text from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "40.00",
+    );
+    // Backward compatibility: re-approving with no assessment resets it to NULL, so a
+    // later un-upgraded caller (or a walk whose synthesis was dropped) is honest.
+    psql(`select admin_apply_capture_session('test-secret', '${cvSid}'::uuid, '${cvSub}'::uuid, '${obs(["seg-a"])}'::jsonb);`);
+    check(
+      "re-approving with no assessment resets the column to NULL",
+      psql(`select coalesce(assessment::text, 'NULL') from community_cv_observations where id='cv-${cvSid}-seg-a';`).trim() === "NULL",
     );
 
     // Closing the review: session and queue row move together or not at all.

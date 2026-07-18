@@ -33,6 +33,28 @@ function asPercent(value: unknown): string | null {
 }
 
 /**
+ * The overall assessment sentence off a CV observation, or null. Defensive by
+ * design: `assessment` crosses the maplibre property boundary and may arrive as a
+ * string, a malformed object, or absent, so a bad shape must degrade to "no
+ * assessment", never throw under the popover (which has no error boundary).
+ */
+function cvOverall(assessment: unknown): string | null {
+  let a: unknown = assessment;
+  if (typeof a === "string") {
+    const s = a.trim();
+    if (!s || s === "null") return null;
+    try {
+      a = JSON.parse(s);
+    } catch {
+      return null;
+    }
+  }
+  if (!a || typeof a !== "object" || Array.isArray(a)) return null;
+  const overall = (a as { overall?: unknown }).overall;
+  return typeof overall === "string" && overall.trim() ? overall : null;
+}
+
+/**
  * Elevated detail panel shown when a segment is selected (popover elevation).
  * Per-layer scores, a per-item rubric breakdown for the active layer, and a
  * photo placeholder grid. Built from the clicked feature's props — no fetch.
@@ -345,6 +367,23 @@ export default function SegmentDetail({
                           A label sidesteps the grammatical number entirely. */}
                       {t("cvFramesLabel")} {frames}
                     </p>
+                    {/* The reviewer-approved synthesis (u2). Model output, in English:
+                        the localized labels frame it, the sentence itself is the
+                        model's. Numbers above are still the reviewer's; this is
+                        context. Read defensively — it crosses the maplibre boundary. */}
+                    {cvOverall(o.assessment) ? (
+                      <div className="mt-1.5 rounded-[6px] border border-dashed border-border-strong bg-surface-sunken px-2.5 py-1.5">
+                        <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-neutral-strong">
+                          {t("cvAssessmentLabel")}
+                        </p>
+                        <p className="mt-0.5 text-[12px] leading-snug text-ink">
+                          {cvOverall(o.assessment)}
+                        </p>
+                        <p className="mt-1 text-[9.5px] leading-snug text-neutral-strong">
+                          {t("cvAssessmentNote")}
+                        </p>
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}

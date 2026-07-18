@@ -77,6 +77,33 @@ export type CvItemMedian = {
 };
 
 /**
+ * The segment synthesis carried on an approved camera observation (u2).
+ *
+ * Structurally identical to `SegmentAssessment` in lib/capture/review-overrides.ts,
+ * and duplicated on purpose for the same reason as {@link CvItemMedian}: the map's
+ * data layer must not import the capture/extraction stack. It is model output
+ * (English), shown as visibly model-written on the public popover; the NUMBERS on
+ * the map are still the reviewer's chosen `scores`, never these.
+ */
+export type CvAssessment = {
+  /** The overall plain-language verdict. Model output; labeled as such on the map. */
+  overall: string;
+  /** Per-lens explanations (the composite `overall` lens has no separate explanation). */
+  lenses: {
+    accessibility: string;
+    drainage: string;
+    shade: string;
+    bike: string;
+  };
+  /** The engine's proposed bounded nudges, by lens. Kept for the record, not re-applied on the map. */
+  adjustments: Partial<Record<ScoreLayer, { delta: number; reason: string }>>;
+  /** The engine's adjusted scores on the original baseline. Reference only. */
+  adjustedScores: Record<ScoreLayer, number | null>;
+  /** The model that produced the synthesis. */
+  model: string;
+};
+
+/**
  * A camera observation of one segment from one approved capture session: the
  * THIRD community record kind, after segments and reports.
  *
@@ -120,6 +147,12 @@ export type CvObservation = {
    * layer, which only reads {@link human_corrected}; kept for an auditable record.
    */
   overrides?: Record<string, unknown>;
+  /**
+   * The segment synthesis the reviewer approved alongside the numbers (u2). The
+   * public popover shows {@link CvAssessment.overall}, labeled as model-written.
+   * Null/absent when the walk produced no synthesis for this segment.
+   */
+  assessment?: CvAssessment | null;
 };
 
 /**

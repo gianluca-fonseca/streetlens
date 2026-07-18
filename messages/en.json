@@ -86,7 +86,9 @@
     "cvUnknown": "No frame supported this lens",
     "cvConfidenceLabel": "Confidence",
     "cvCoverageLabel": "Coverage",
-    "cvFramesLabel": "Frames"
+    "cvFramesLabel": "Frames",
+    "cvAssessmentLabel": "Assessment",
+    "cvAssessmentNote": "Written by the camera model, in English. Not a field audit."
   },
   "rubric": {
     "overall": {
@@ -269,6 +271,18 @@
       "resetSegment": "Reset segment",
       "editScoreLabel": "Edit {lens} score",
       "wasValue": "was {value}",
+      "assessmentHeading": "Assessment",
+      "assessmentModel": "Model-written · {model}",
+      "assessmentNote": "A model summary of the walk. Your chosen scores are the numbers that publish.",
+      "noAssessment": "No assessment available for this segment.",
+      "assessmentStale": "Written before your corrections",
+      "lensNotesHeading": "Per-lens notes",
+      "baselineLabel": "Baseline",
+      "adjustedLabel": "Adjusted",
+      "useBaseline": "Use baseline",
+      "useAdjusted": "Use adjusted",
+      "useBaselineAll": "Use baseline for all",
+      "useAdjustedAll": "Use adjusted for all",
       "inspectorTitle": "Frame {seq}",
       "inspectorHint": "Select a frame to see and correct its readings.",
       "mapHeading": "The walk",

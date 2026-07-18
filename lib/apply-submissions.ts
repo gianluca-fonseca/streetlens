@@ -34,6 +34,7 @@ import type {
 import type {
   CommunityReport,
   CommunitySegment,
+  CvAssessment,
   CvItemMedian,
   CvObservation,
   ScoreLayer,
@@ -218,6 +219,8 @@ export type CvApplyObservation = {
   human_corrected?: boolean;
   /** Compact audit record of the reviewer's corrections for this segment (u2). */
   overrides?: Record<string, unknown>;
+  /** The segment synthesis approved alongside the numbers (u2). Null when none. */
+  assessment?: CvAssessment | null;
 };
 
 /** Input to the capture apply path: a session and the segments an admin approved. */
@@ -256,6 +259,7 @@ export function buildCvObservations(input: CvApplyInput): CvObservation[] {
     created_at: createdAt,
     human_corrected: o.human_corrected ?? false,
     overrides: o.overrides ?? {},
+    assessment: o.assessment ?? null,
   }));
 }
 

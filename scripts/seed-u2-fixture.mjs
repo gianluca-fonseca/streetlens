@@ -189,9 +189,67 @@ function main() {
       reviewedAt: null,
       jobs: { pending: 0, done: 6, failed: 1, overbudget: 0 },
       tokens: { inputTokens: 7100, outputTokens: 1020, observations: 7, escalated: 1 },
+      // Rollups are cosmetic (the page recomputes from frames), but each carries the
+      // segment SYNTHESIS the sibling engine writes (frozen contract, u2 seal #1), so
+      // the workbench, the baseline/adjusted toggle, and the stale-explanation hint
+      // can all be driven and screenshotted with no engine. SEG_A carries adjustments
+      // that bite; SEG_B is a clean block whose synthesis nudges nothing.
       rollups: [
-        { segmentId: SEG_A, scores: { overall: 55, accessibility: 44, drainage: 40, shade: 48, bike: 45 }, itemMedians: {}, coverage: 0.66, confidence: 0.64, escalated: 1 },
-        { segmentId: SEG_B, scores: { overall: 80, accessibility: 78, drainage: 70, shade: 82, bike: 60 }, itemMedians: {}, coverage: 0.5, confidence: 0.9, escalated: 0 },
+        {
+          segmentId: SEG_A,
+          scores: { overall: 55, accessibility: 44, drainage: 40, shade: 48, bike: 45 },
+          itemMedians: {},
+          coverage: 0.66,
+          confidence: 0.64,
+          escalated: 1,
+          assessment: {
+            overall:
+              "A serviceable block let down at the corner: the sidewalk runs continuously but the northern crossing has no curb ramp and faded markings, so a wheelchair user is stranded exactly where they need to cross. Surface is cracked in the mid-block stretch, and a gutter holds standing water after rain.",
+            lenses: {
+              accessibility:
+                "Continuous walk, but a missing curb ramp and faded crossing at the junction break the route for anyone who cannot step down.",
+              drainage:
+                "Standing water pooled at the gutter in one frame; a drain is present but appears undersized for the grade.",
+              shade:
+                "A thin canopy: a few young trees give partial midday shade, no continuous cover.",
+              bike:
+                "No dedicated provision; riders share a narrow lane with turning traffic near the corner.",
+            },
+            adjustments: {
+              accessibility: {
+                delta: -8,
+                reason: "The junction gap is more consequential than the mid-block readings alone suggest.",
+              },
+              drainage: {
+                delta: -5,
+                reason: "Confident standing-water evidence should weigh the lens down.",
+              },
+            },
+            adjustedScores: { overall: 51, accessibility: 36, drainage: 35, shade: 48, bike: 45 },
+            model: "gpt-5",
+          },
+        },
+        {
+          segmentId: SEG_B,
+          scores: { overall: 80, accessibility: 78, drainage: 70, shade: 82, bike: 60 },
+          itemMedians: {},
+          coverage: 0.5,
+          confidence: 0.9,
+          escalated: 0,
+          assessment: {
+            overall:
+              "A well-kept block: a wide, even sidewalk with good canopy and a present drain. Nothing here needs correcting; the camera and the rubric agree it reads well.",
+            lenses: {
+              accessibility: "Wide, continuous, level walk with no obstructions in view.",
+              drainage: "Drain present and the surface sheds cleanly; no pooling seen.",
+              shade: "Mature canopy gives near-continuous midday shade.",
+              bike: "Shared but low-stress; no separated lane.",
+            },
+            adjustments: {},
+            adjustedScores: { overall: 80, accessibility: 78, drainage: 70, shade: 82, bike: 60 },
+            model: "gpt-5-nano",
+          },
+        },
       ],
       frames,
       track,
