@@ -69,6 +69,7 @@ export default function ReviewMap({
   selectedSeq,
   selectedSegmentId,
   onSelectFrame,
+  variant = "panel",
 }: Readonly<{
   track: readonly FramePosition[];
   frames: readonly ReviewFrame[];
@@ -78,6 +79,8 @@ export default function ReviewMap({
   selectedSeq: number | null;
   selectedSegmentId: string | null;
   onSelectFrame: (seq: number) => void;
+  /** "panel" is the fixed-height card; "expanded" fills its container (full-viewport overlay). */
+  variant?: "panel" | "expanded";
 }>) {
   const t = useTranslations("admin.capture");
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -266,13 +269,20 @@ export default function ReviewMap({
     prevSegmentRef.current = selectedSegmentId;
   }, [selectedSegmentId]);
 
+  const expanded = variant === "expanded";
   return (
-    <div className="overflow-hidden rounded-[8px] border border-border">
+    <div
+      className={
+        expanded
+          ? "h-full w-full overflow-hidden"
+          : "overflow-hidden rounded-[8px] border border-border"
+      }
+    >
       <div
         ref={containerRef}
         role="application"
         aria-label={t("mapLabel")}
-        className="h-56 w-full sm:h-64"
+        className={expanded ? "h-full min-h-0 w-full" : "h-56 w-full sm:h-64"}
       />
     </div>
   );
