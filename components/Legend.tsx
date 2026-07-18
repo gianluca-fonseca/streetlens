@@ -7,6 +7,7 @@ import type { ScoreLayer } from "@/lib/segments";
 import {
   BINS,
   COMMUNITY_CASING,
+  CV_CASING,
   sampleRamp,
   widthForValue,
 } from "@/components/mapConfig";
@@ -24,10 +25,13 @@ import {
 export default function Legend({
   layer,
   communitySegments,
+  cvSegments,
 }: Readonly<{
   layer: ScoreLayer;
   /** Count of community/import segments in the current data; drives the extra entry. */
   communitySegments: number;
+  /** Count of camera-observed segments; drives the camera-observed entry. */
+  cvSegments: number;
 }>) {
   const t = useTranslations("legend");
   const tl = useTranslations("layers");
@@ -109,6 +113,29 @@ export default function Legend({
           </svg>
           <span className="text-[12px] font-medium text-ink">
             {t("community")}
+          </span>
+        </div>
+      )}
+
+      {cvSegments > 0 && (
+        <div className="mt-2.5 flex items-center gap-2.5 border-t border-border pt-2">
+          <svg
+            width={22}
+            height={CV_CASING.width}
+            className="shrink-0"
+            aria-hidden="true"
+          >
+            <line
+              x1={0}
+              y1={CV_CASING.width / 2}
+              x2={22}
+              y2={CV_CASING.width / 2}
+              stroke={CV_CASING.color}
+              strokeWidth={CV_CASING.width}
+            />
+          </svg>
+          <span className="text-[12px] font-medium text-ink">
+            {t("cameraObserved")}
           </span>
         </div>
       )}

@@ -69,6 +69,9 @@ const BASEMAP = {
     roadMinor: "#fcfcfc",
     building: "#ececec",
     boundary: "#e4e4e4",
+    label: "#3d3d3d",
+    labelMinor: "#6f6f6f",
+    labelHalo: "#fafafa",
   },
   dark: {
     land: "#0a0a0a",
@@ -79,6 +82,9 @@ const BASEMAP = {
     roadMinor: "#111111",
     building: "#181818",
     boundary: "#262626",
+    label: "#d8d8d8",
+    labelMinor: "#9c9c9c",
+    labelHalo: "#0a0a0a",
   },
 };
 

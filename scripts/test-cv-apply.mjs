@@ -151,9 +151,20 @@ async function main() {
       segA.properties.cv_observations[0].scores.drainage === null,
     );
 
+    // cv_count is CV-derived metadata (the map's filter primitive, u31), not an
+    // audited field — so it is excluded from THE INVARIANT alongside
+    // cv_observations. It is asserted here rather than merely discarded, so the
+    // exclusion cannot hide a drift between the count and the array.
+    check(
+      "cv_count mirrors cv_observations.length",
+      segA.properties.cv_count === segA.properties.cv_observations.length,
+      `(${segA.properties.cv_count})`,
+    );
+
     // THE INVARIANT.
     const auditedFieldsAfter = { ...segA.properties };
     delete auditedFieldsAfter.cv_observations;
+    delete auditedFieldsAfter.cv_count;
     check(
       "THE INVARIANT: the audited segment's own properties are untouched",
       JSON.stringify(auditedFieldsAfter) === auditedScoresBefore,
@@ -284,6 +295,7 @@ async function main() {
     // The invariant still holds even for a corrected approval.
     const auditedFieldsAfter = { ...segA.properties };
     delete auditedFieldsAfter.cv_observations;
+    delete auditedFieldsAfter.cv_count;
     check(
       "THE INVARIANT holds under correction: audited properties untouched",
       JSON.stringify(auditedFieldsAfter) === auditedScoresBefore,

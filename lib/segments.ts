@@ -478,6 +478,7 @@ function communitySegmentToFeature(
       community_report: cs.community_report,
       community_reports: reportsBySegment.get(cs.id) ?? [],
       cv_observations: cvBySegment.get(cs.id) ?? [],
+      cv_count: (cvBySegment.get(cs.id) ?? []).length,
     },
     geometry: { type: "LineString", coordinates: cs.coordinates },
   };
@@ -507,7 +508,9 @@ function attachCommunity(
       properties: {
         ...f.properties,
         ...(hasReports ? { community_reports: reports } : {}),
-        ...(hasCv ? { cv_observations: cv } : {}),
+        // cv_count travels with cv_observations so the map's camera-observed
+        // filter has a primitive to test (see SegmentProperties.cv_count).
+        ...(hasCv ? { cv_observations: cv, cv_count: cv.length } : {}),
       },
     };
   });

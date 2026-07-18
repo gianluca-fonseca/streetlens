@@ -126,6 +126,7 @@ export default function MapPanel({
         <Legend
           layer={activeLayer}
           communitySegments={stats.communitySegments}
+          cvSegments={stats.cvSegments}
         />
       </div>
     </section>

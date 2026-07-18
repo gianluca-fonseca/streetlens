@@ -54,6 +54,7 @@
     "title": "Leyenda",
     "scaleHint": "Más alto es mejor (0–100)",
     "community": "Comunitario (sin verificar)",
+    "cameraObserved": "Observado por cámara",
     "widthNote": "Las líneas más gruesas marcan los segmentos con menor puntaje.",
     "bins": {
       "poor": "Deficiente",
