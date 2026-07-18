@@ -11,9 +11,10 @@
  * in-memory fake instead of a live Postgres. The alternative — mocking the
  * supabase client's fluent builder — tests the mock, not the code.
  *
- * The privileged calls carry ADMIN_RPC_SECRET (the 0007/0013 pattern); the
- * public ones are authorized by the session uuid capability alone and pass no
- * secret, exactly as a browser would call them.
+ * The privileged calls carry ADMIN_RPC_SECRET (the 0007/0013/0025 pattern).
+ * Capture create/register/finalize also require the server secret (0025) —
+ * browsers reach them only through Next.js API routes. session_status stays
+ * uuid-capability scoped with no secret.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -137,7 +138,7 @@ export type SessionStatusPayload = {
  * ------------------------------------------------------------------ */
 
 export interface CaptureDb {
-  /* Public, uuid-capability scoped (0013) */
+  /* Server-secret gated (0025) — called only from Next.js routes */
   createSession(args: {
     mode: CaptureSessionMode;
     ipHash: string | null;
@@ -241,6 +242,7 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
         p_mode: mode,
         p_ip_hash: ipHash,
         p_contact: contact ?? null,
+        p_secret: adminSecret(),
       });
     },
 
@@ -258,14 +260,16 @@ export function createCaptureDb(client: SupabaseClient): CaptureDb {
       return rpc<number[]>("capture_register_frames", {
         p_session_id: sessionId,
         p_frames: payload,
+        p_secret: adminSecret(),
       });
     },
 
     async finalizeSession(sessionId, track, clockOffsetMs) {
       return rpc<string>("capture_finalize_session", {
         p_session_id: sessionId,
-        p_track: track.map((p) => ({ lng: p.lng, lat: p.lat })),
+        p_track: track.map((p) => ({ lng: p.lng, lat: p.lat, t: p.t, ...(p.accuracy !== undefined ? { accuracy: p.accuracy } : {}) })),
         p_clock_offset_ms: clockOffsetMs,
+        p_secret: adminSecret(),
       });
     },
 

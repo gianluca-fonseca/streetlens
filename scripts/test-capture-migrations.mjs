@@ -143,12 +143,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0023", files.some((f) => f.startsWith("0023")), files.join(" "));
+    check("found the full migration chain through 0025", files.some((f) => f.startsWith("0025")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -251,22 +251,43 @@ function main() {
       storagePolicies,
     );
 
-    /* ---------------- 0014: the type vocabulary ---------------- */
+    /* ---------------- 0014 + 0025: submissions ---------------- */
 
-    psql(`insert into submissions (type, payload) values ('cv_capture', '{"session_id":"x"}'::jsonb);`);
-    check("submissions accepts cv_capture", true);
-    psql(`insert into submissions (type, payload) values ('unknown', '{"rejected":"honeypot"}'::jsonb);`);
-    check("submissions accepts unknown (the honeypot landing place)", true);
+    const SECRET = "test-secret";
+    const seedSecret = () => {
+      psql(`insert into app_secrets (key, value)
+              values ('admin_rpc_secret', encode(digest('${SECRET}', 'sha256'), 'hex'))
+              on conflict (key) do update set value = excluded.value;`);
+    };
+    seedSecret();
+
     check(
-      "submissions still rejects a garbage type",
-      psqlExpectError(`insert into submissions (type, payload) values ('nonsense', '{}'::jsonb);`) !== null,
+      "anon INSERT on submissions is blocked (0025)",
+      psqlExpectError(`insert into submissions (type, payload) values ('add_segment', '{}'::jsonb);`) !== null,
     );
-    psql(`insert into submissions (type, payload) values ('add_segment', '{}'::jsonb);`);
-    check("the two original types still work (manual flow unchanged)", true);
 
+    const subId = psql(`
+      select submit_proposal('add_segment', '{}'::jsonb, 'pending', 'iphash-sub', false, '${SECRET}');
+    `).trim();
+    check("submit_proposal accepts add_segment with the server secret", /^[0-9a-f-]{36}$/.test(subId), subId);
+
+    psql(`
+      select submit_proposal('unknown', '{"rejected":"honeypot"}'::jsonb, 'rejected', 'iphash-bot', true, '${SECRET}');
+    `);
+    check("submit_proposal accepts unknown honeypot landings", true);
+
+    check(
+      "submit_proposal rejects a garbage type",
+      (psqlExpectError(`select submit_proposal('nonsense', '{}'::jsonb, 'pending', 'iphash-x', false, '${SECRET}');`) || "").includes("invalid type"),
+    );
+
+    check(
+      "submit_proposal without the secret is unauthorized",
+      (psqlExpectError(`select submit_proposal('add_segment', '{}'::jsonb, 'pending', 'iphash-x', false, 'wrong');`) || "").includes("unauthorized"),
+    );
     /* ---------------- RPCs: the public path ---------------- */
 
-    const sid = psql(`select capture_create_session('live', 'iphash-a', 'me@example.com');`).trim();
+    const sid = psql(`select capture_create_session('live', 'iphash-a', 'me@example.com', '${SECRET}');`).trim();
     check("capture_create_session returns a session uuid", /^[0-9a-f-]{36}$/.test(sid), sid);
     check(
       "a new session starts at pending_upload",
@@ -274,26 +295,26 @@ function main() {
     );
     check(
       "an invalid mode is rejected",
-      psqlExpectError(`select capture_create_session('telepathy', 'iphash-z');`) !== null,
+      psqlExpectError(`select capture_create_session('telepathy', 'iphash-z', null, '${SECRET}');`) !== null,
     );
 
     // Rate limit: 3/hour/IP, enforced in the DB (not just the in-memory bucket).
-    psql(`select capture_create_session('live', 'iphash-rl');`);
-    psql(`select capture_create_session('live', 'iphash-rl');`);
-    psql(`select capture_create_session('live', 'iphash-rl');`);
+    psql(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`);
+    psql(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`);
+    psql(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`);
     check(
       "a 4th session from one origin within the hour is rate_limited IN THE DATABASE",
-      (psqlExpectError(`select capture_create_session('live', 'iphash-rl');`) || "").includes("rate_limited"),
+      (psqlExpectError(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`) || "").includes("rate_limited"),
     );
     check(
       "the ceiling is per-origin: a different ip hash is unaffected",
-      /^[0-9a-f-]{36}$/.test(psql(`select capture_create_session('live', 'iphash-other');`).trim()),
+      /^[0-9a-f-]{36}$/.test(psql(`select capture_create_session('live', 'iphash-other', null, '${SECRET}');`).trim()),
     );
 
     const accepted = psql(`
       select capture_register_frames('${sid}'::uuid,
         '[{"seq":0,"t":1784000000000,"width":1920,"height":1080,"bytes":500000},
-          {"seq":1,"t":1784000001000,"width":1920,"height":1080,"bytes":500000}]'::jsonb);
+          {"seq":1,"t":1784000001000,"width":1920,"height":1080,"bytes":500000}]'::jsonb, '${SECRET}');
     `).trim();
     check("capture_register_frames returns the accepted seqs", accepted === "{0,1}", accepted);
     check(
@@ -307,9 +328,9 @@ function main() {
     );
     {
       // A client trying to smuggle its own path gets the derived one anyway.
-      const s2 = psql(`select capture_create_session('live', 'iphash-b');`).trim();
+      const s2 = psql(`select capture_create_session('live', 'iphash-b', null, '${SECRET}');`).trim();
       psql(`select capture_register_frames('${s2}'::uuid,
-        '[{"seq":0,"t":1784000000000,"width":10,"height":10,"bytes":10,"storagePath":"captures/evil/../../secret.jpg"}]'::jsonb);`);
+        '[{"seq":0,"t":1784000000000,"width":10,"height":10,"bytes":10,"storagePath":"captures/evil/../../secret.jpg"}]'::jsonb, '${SECRET}');`);
       check(
         "a client-supplied storagePath is ignored",
         psql(`select storage_path from capture_frames where session_id='${s2}' and seq=0;`).trim() ===
@@ -320,19 +341,19 @@ function main() {
       "re-registering the same seq is idempotent (retry-safe), not a duplicate",
       psql(`
         select capture_register_frames('${sid}'::uuid,
-          '[{"seq":0,"t":1784000000000,"width":1920,"height":1080,"bytes":500000}]'::jsonb);
+          '[{"seq":0,"t":1784000000000,"width":1920,"height":1080,"bytes":500000}]'::jsonb, '${SECRET}');
       `).trim() === "{0,1}" &&
         psql(`select count(*) from capture_frames where session_id='${sid}';`).trim() === "2",
     );
     check(
       "an oversized frame is rejected by the CHECK",
       psqlExpectError(`select capture_register_frames('${sid}'::uuid,
-        '[{"seq":5,"t":1784000000000,"width":1920,"height":1080,"bytes":9999999}]'::jsonb);`) !== null,
+        '[{"seq":5,"t":1784000000000,"width":1920,"height":1080,"bytes":9999999}]'::jsonb, '${SECRET}');`) !== null,
     );
     check(
       "seq >= 400 is rejected by the CHECK",
       psqlExpectError(`select capture_register_frames('${sid}'::uuid,
-        '[{"seq":400,"t":1784000000000,"width":1920,"height":1080,"bytes":100}]'::jsonb);`) !== null,
+        '[{"seq":400,"t":1784000000000,"width":1920,"height":1080,"bytes":100}]'::jsonb, '${SECRET}');`) !== null,
     );
 
     const status = psql(`select capture_session_status('${sid}'::uuid);`).trim();
@@ -349,7 +370,7 @@ function main() {
 
     const finalized = psql(`
       select capture_finalize_session('${sid}'::uuid,
-        '[{"lat":9.907,"lng":-84.152},{"lat":9.907,"lng":-84.150}]'::jsonb, 250);
+        '[{"lat":9.907,"lng":-84.152,"t":1784000000000},{"lat":9.907,"lng":-84.150,"t":1784000010000}]'::jsonb, 250, '${SECRET}');
     `).trim();
     check("capture_finalize_session hands the session to the matcher", finalized === "matching", finalized);
     check(
@@ -367,12 +388,26 @@ function main() {
     );
     check(
       "a finalized session cannot be finalized again (no track rewrite)",
-      psqlExpectError(`select capture_finalize_session('${sid}'::uuid, '[{"lat":9,"lng":-84},{"lat":9.1,"lng":-84.1}]'::jsonb, 0);`) !== null,
+      psqlExpectError(`select capture_finalize_session('${sid}'::uuid, '[{"lat":9,"lng":-84,"t":1},{"lat":9.1,"lng":-84.1,"t":2}]'::jsonb, 0, '${SECRET}');`) !== null,
     );
     check(
       "a finalized session no longer accepts frames",
       psqlExpectError(`select capture_register_frames('${sid}'::uuid,
-        '[{"seq":9,"t":1784000000000,"width":10,"height":10,"bytes":10}]'::jsonb);`) !== null,
+        '[{"seq":9,"t":1784000000000,"width":10,"height":10,"bytes":10}]'::jsonb, '${SECRET}');`) !== null,
+    );
+
+
+    check(
+      "capture_create_session without the secret is unauthorized",
+      (psqlExpectError(`select capture_create_session('live', 'iphash-nosec', null, 'wrong');`) || "").includes("unauthorized"),
+    );
+    check(
+      "capture_create_session with a null ip hash is rate_limited",
+      (psqlExpectError(`select capture_create_session('live', null, null, '${SECRET}');`) || "").includes("rate_limited"),
+    );
+    check(
+      "capture_finalize_session rejects an out-of-bbox track",
+      (psqlExpectError(`select capture_finalize_session('${sid}'::uuid, '[{"lat":0,"lng":0,"t":1},{"lat":1,"lng":1,"t":2}]'::jsonb, 0, '${SECRET}');`) || "").includes("invalid_track"),
     );
 
     /* ---------------- RPCs: the privileged path ---------------- */
@@ -385,9 +420,6 @@ function main() {
       "the secret gate holds even when app_secrets has no row yet",
       (psqlExpectError(`select * from capture_claim_jobs(5, null);`) || "").includes("unauthorized"),
     );
-
-    psql(`insert into app_secrets (key, value) values ('admin_rpc_secret', 'test-secret')
-            on conflict (key) do update set value = excluded.value;`);
 
     const claimed = psql(`select count(*) from capture_claim_jobs(5, 'test-secret');`).trim();
     check("capture_claim_jobs claims the pending jobs with the right secret", claimed === "2", claimed);
@@ -598,7 +630,7 @@ function main() {
     // and no SELECT policy, so the check has to live in here.
     // A contact on this session, so the apply can prove contact is published from
     // the SESSION (server-side, 0024) rather than from the observation payload.
-    const cvSid = psql(`select capture_create_session('live', 'iphash-cv', 'walker@example.org');`).trim();
+    const cvSid = psql(`select capture_create_session('live', 'iphash-cv', 'walker@example.org', '${SECRET}');`).trim();
     check(
       "capture_emit_submission is secret-gated",
       (psqlExpectError(`select capture_emit_submission('${cvSid}'::uuid, 'nope');`) || "").includes("unauthorized"),
@@ -870,7 +902,7 @@ function main() {
 
     // The session-scoped claim. This is what lets a contributor's status page
     // pump WITHOUT the admin secret, so its scoping is a security property.
-    const otherSid = psql(`select capture_create_session('live', 'iphash-other-cv');`).trim();
+    const otherSid = psql(`select capture_create_session('live', 'iphash-other-cv', null, '${SECRET}');`).trim();
     psql(`
       insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
       values ('${otherSid}'::uuid, 0, 'captures/${otherSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-z');
@@ -882,7 +914,7 @@ function main() {
       "capture_claim_jobs_for_session is secret-gated",
       (psqlExpectError(`select * from capture_claim_jobs_for_session('${otherSid}'::uuid, 5, 'nope');`) || "").includes("unauthorized"),
     );
-    const mineSid = psql(`select capture_create_session('live', 'iphash-mine-cv');`).trim();
+    const mineSid = psql(`select capture_create_session('live', 'iphash-mine-cv', null, '${SECRET}');`).trim();
     psql(`
       insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id)
       values ('${mineSid}'::uuid, 0, 'captures/${mineSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-y');
@@ -919,7 +951,7 @@ function main() {
     // An expansion later puts streets under it; reprocess re-matches the stored
     // track and re-queues only the frames that now land. This block builds that
     // session by hand — six frames in the states reprocess must tell apart.
-    const rpSid = psql(`select capture_create_session('live', 'iphash-reproc');`).trim();
+    const rpSid = psql(`select capture_create_session('live', 'iphash-reproc', null, '${SECRET}');`).trim();
     psql(`
       update capture_sessions
          set track = st_geogfromtext('SRID=4326;LINESTRING(-84.152 9.907, -84.150 9.907, -84.148 9.907)'),
@@ -1060,7 +1092,7 @@ function main() {
         '[{"seq":99,"segmentId":"seg-x"}]'::jsonb, 'test-secret');`) !== null,
     );
     {
-      const decided = psql(`select capture_create_session('live', 'iphash-decided');`).trim();
+      const decided = psql(`select capture_create_session('live', 'iphash-decided', null, '${SECRET}');`).trim();
       psql(`update capture_sessions set status='approved' where id='${decided}'::uuid;`);
       check(
         "reprocess refuses a decided (approved) session — history, not a retry target",
@@ -1083,7 +1115,7 @@ function main() {
     // A hand-built walk: two matched frames (one at a junction, one usable, one
     // not), one unmatched frame with no location. seq 0 carries two observations —
     // it escalated — so the detail read must report the STRONGER model's usable.
-    const dSid = psql(`select capture_create_session('live', 'iphash-del');`).trim();
+    const dSid = psql(`select capture_create_session('live', 'iphash-del', null, '${SECRET}');`).trim();
     psql(`
       insert into capture_frames (session_id, seq, storage_path, t, width, height, bytes, segment_id, near_junction, location) values
         ('${dSid}'::uuid, 0, 'captures/${dSid}/frame-0000.jpg', 1784000000000, 640, 480, 1000, 'seg-x', false,
@@ -1279,7 +1311,7 @@ function main() {
 
     // A live session must exist for this to prove anything — asserting "anon
     // sees 0 rows" against an empty table would pass with RLS switched off.
-    const secret = psql(`select capture_create_session('live', 'iphash-secret', 'private@example.com');`).trim();
+    const secret = psql(`select capture_create_session('live', 'iphash-secret', 'private@example.com', '${SECRET}');`).trim();
     check(
       "the owner CAN see the session (so the next check is not vacuous)",
       psql(`select count(*) from capture_sessions where id='${secret}';`).trim() === "1",

@@ -29,8 +29,16 @@ export function clientIpFromHeaders(headers: Headers): string | null {
  * One-way, salted SHA-256 of an IP. Returns `null` for a null IP so callers
  * can store `null` rather than a hash of the empty string.
  */
+function submissionsIpSalt(): string {
+  const salt = process.env.SUBMISSIONS_IP_SALT;
+  if (salt) return salt;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SUBMISSIONS_IP_SALT is required in production");
+  }
+  return "streetlens-dev-salt";
+}
+
 export function hashIp(ip: string | null): string | null {
   if (!ip) return null;
-  const salt = process.env.SUBMISSIONS_IP_SALT ?? "streetlens-dev-salt";
-  return createHash("sha256").update(`${salt}:${ip}`).digest("hex");
+  return createHash("sha256").update(`${submissionsIpSalt()}:${ip}`).digest("hex");
 }
