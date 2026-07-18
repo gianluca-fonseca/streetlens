@@ -10,6 +10,8 @@
 | `8e9ccb2` | feat(security): pass server secret to gated RPCs and fail-closed IP salt |
 | `e4e0147` | test(security): cover 0025 contracts and secret-gated RPC signatures |
 | `69d8108` | evidence(unit-security-core): browser-drive collect page and API gates |
+| `5009595` | docs(unit-security-core): report PASS and mark control done |
+| `602d4ac` | docs(capture): clarify 0025 server-secret gating in db module comment |
 
 ## Gate results
 
