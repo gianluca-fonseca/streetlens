@@ -68,6 +68,10 @@ function main() {
   try {
     sh("docker info");
   } catch {
+    if (process.env.CI === "true") {
+      console.error("FAIL — docker unavailable in CI; migration suite cannot run.");
+      process.exit(1);
+    }
     console.log("SKIP — docker unavailable; migrations unverified locally.");
     process.exit(0);
   }
