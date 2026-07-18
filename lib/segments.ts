@@ -17,6 +17,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getSupabaseClient } from "./supabase";
+import { fetchAllPages } from "./supabase-bounded";
+import { toPaintFeature } from "./map-payload";
 import { showDemoData } from "./demo-flag";
 import {
   readCommunityReports,
@@ -325,15 +327,31 @@ async function liveScoreRows(id?: string): Promise<ScoreRow[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
   try {
-    let query = client
-      .from("v_segment_scores")
-      .select(
-        "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade,score_bike",
-      );
-    if (id) query = query.eq("id", id);
-    const { data, error } = await query;
-    if (error || !data) return null;
-    return data as ScoreRow[];
+    if (id) {
+      const { data, error } = await client
+        .from("v_segment_scores")
+        .select(
+          "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade,score_bike",
+        )
+        .eq("id", id)
+        .range(0, 0);
+      if (error || !data) return null;
+      return data as ScoreRow[];
+    }
+    const rows = await fetchAllPages<ScoreRow>(
+      "v_segment_scores",
+      async (from, to) => {
+        const { data, error } = await client
+          .from("v_segment_scores")
+          .select(
+            "id,name,district,highway,length_m,demo,audited_at,geometry,score_overall,score_accessibility,score_drainage,score_shade,score_bike",
+          )
+          .range(from, to);
+        if (error || !data) return null;
+        return data as ScoreRow[];
+      },
+    );
+    return rows;
   } catch {
     return null;
   }
@@ -409,13 +427,21 @@ async function liveCvObservations(): Promise<CvObservation[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
   try {
-    const { data, error } = await client
-      .from("community_cv_observations")
-      .select(
-        "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
-      );
-    if (error || !data) return null;
-    return (data as CvObservationRow[]).map(rowToCvObservation);
+    const rows = await fetchAllPages<CvObservationRow>(
+      "community_cv_observations",
+      async (from, to) => {
+        const { data, error } = await client
+          .from("community_cv_observations")
+          .select(
+            "id,segment_id,session_id,score_overall,score_accessibility,score_drainage,score_shade,score_bike,item_medians,coverage,confidence,frame_refs,captured_on,submission_id,created_at,human_corrected,overrides,assessment",
+          )
+          .range(from, to);
+        if (error || !data) return null;
+        return data as CvObservationRow[];
+      },
+    );
+    if (!rows) return null;
+    return rows.map(rowToCvObservation);
   } catch {
     return null;
   }
@@ -546,12 +572,16 @@ export async function getSegments(): Promise<SegmentCollection> {
         ? demoFeatures
         : hideDemoScores(demoFeatures);
 
+  const fullFeatures = [
+    ...attachCommunity(officialFeatures, reportsBySegment, cvBySegment),
+    ...communityFeatures,
+  ];
+
+  // Paint-only wire: ids, casings, cv_count, canonical score stubs — no
+  // cv_observations blobs, session_id, frame_refs, or report bodies.
   return {
     type: "FeatureCollection",
-    features: [
-      ...attachCommunity(officialFeatures, reportsBySegment, cvBySegment),
-      ...communityFeatures,
-    ],
+    features: fullFeatures.map((f) => toPaintFeature(f, cvBySegment)),
   };
 }
 
