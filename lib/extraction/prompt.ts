@@ -37,7 +37,7 @@ import { observationResponseFormat } from "./schema";
  */
 const ITEM_GUIDANCE: Readonly<Record<RubricItemKey, string>> = {
   sidewalk_present:
-    "Is there a sidewalk (acera) on either side of the street — any built pedestrian way separated from the carriageway by a curb, kerb line, or level change? A painted line alone is not a sidewalk. A dirt or grass verge that people clearly walk on is NOT a sidewalk. 1 = at least one side has one, 0 = neither side does.",
+    "Is there a sidewalk (acera) on either side of the street — any built pedestrian way separated from the carriageway by a curb, kerb line, or level change? A painted line alone is not a sidewalk. A dirt or grass verge that people clearly walk on is NOT a sidewalk. From a vehicle / road-center vantage, look at BOTH edges: a raised walk, bollard line, or fenced pedestrian edge still counts. 1 = at least one side has one, 0 = neither side does.",
   sidewalk_width:
     "Effective clear width of the sidewalk — the width actually walkable, not the width poured. Ley 7600 requires 1.2 m. If there is no sidewalk, this is null, not 0. Anchors: 0 = under 0.6 m, a single person must turn sideways. 1 = 0.6-0.9 m, one person only. 2 = 0.9-1.2 m, one person comfortably, below the legal minimum. 3 = 1.2-1.5 m, meets Ley 7600, two people pass with care. 4 = over 1.5 m, two people pass freely or a wheelchair turns.",
   surface_condition:
@@ -146,6 +146,11 @@ export const SYSTEM_PROMPT: string = [
   `You are a street-infrastructure auditor scoring photographs of residential streets in San Antonio de Escazú, Costa Rica, against rubric v0.1.`,
   ``,
   `CONTEXT. These are Costa Rican residential streets: typically narrow, often with no sidewalk at all, frequently with an open concrete gutter (caño) at the edge, and with utility poles carrying both power and street lighting. A street with no sidewalk is ORDINARY here, not an anomaly — record it plainly and move on. Terrain is hilly, so drainage infrastructure matters and is often the only pedestrian-relevant edge treatment present. Do not judge these streets against a North American suburban template.`,
+  ``,
+  `VANTAGE. Captures may be filmed on foot (pedestrian eye height, sidewalk-adjacent) OR from a vehicle (dashcam / road-center, looking obliquely at both edges). When the viewpoint is vehicle or road-center:`,
+  `- Scan BOTH road edges carefully for raised sidewalks, curbs or kerbs, bollard-protected walkways, fence lines along a walkway, and any level change that separates a pedestrian way from the carriageway.`,
+  `- Score the street's pedestrian infrastructure for the rubric even when you see it only obliquely from the road center — a sidewalk that is plainly present at an edge is sidewalk_present = 1. Do NOT answer "no sidewalk visible" when a raised walk, curb line, bollards, or fenced pedestrian edge is in shot on either side.`,
+  `- You do not need to be standing on the sidewalk to score it. Grass or dirt verges still are NOT sidewalks; a painted line alone still is NOT a sidewalk.`,
   ``,
   `YOUR TASK. You are shown ONE frame from a capture run. Score all 15 rubric items below for the street in that frame, and say whether the frame is usable at all.`,
   ``,

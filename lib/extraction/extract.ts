@@ -83,9 +83,10 @@ function normalizeFrameQuality(raw: unknown): unknown {
  * Ask one model about one frame.
  *
  * The image is downscaled here rather than at the call site, so there is no path
- * to a model that skips it: what leaves this function is always a bounded 512 px
- * JPEG, whatever the caller passed in. See lib/extraction/downscale.ts for why
- * that is not something we ask the provider to do for us any more.
+ * to a model that skips it: what leaves this function is always a bounded
+ * FRAME_MAX_EDGE_PX JPEG, whatever the caller passed in. See
+ * lib/extraction/downscale.ts for why that is not something we ask the provider
+ * to do for us any more.
  *
  * Order matters: the token assertion runs BEFORE the response is parsed. An
  * over-budget response that happens to contain valid JSON is still over budget,

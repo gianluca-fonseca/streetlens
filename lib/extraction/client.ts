@@ -23,7 +23,7 @@ export type VisionRequest = {
   model: string;
   /**
    * The image to send, as extractFrame prepared it: a base64 JPEG data URL of
-   * the frame downscaled to 512 px, NOT the public storage URL. See
+   * the frame downscaled to FRAME_MAX_EDGE_PX, NOT the public storage URL. See
    * lib/extraction/downscale.ts — sending the original and asking for
    * `detail: "low"` is what stopped working.
    */
@@ -210,8 +210,8 @@ export function buildRequestBody(request: VisionRequest): Record<string, unknown
             image_url: request.imageUrl,
             // Belt, not braces. This hint has been measured being ignored (a
             // 200, a normal answer, full-resolution billing), so the braces are
-            // the 512 px image we send it with — and the breaker in extract.ts,
-            // which asserts what we were actually billed either way.
+            // the FRAME_MAX_EDGE_PX image we send it with — and the breaker in
+            // extract.ts, which asserts what we were actually billed either way.
             detail: "low",
           },
         ],
