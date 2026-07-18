@@ -115,7 +115,7 @@ async function loadRawFrameRefs(segmentId: string): Promise<string[][]> {
           return data ?? [];
         },
       );
-      return rows
+      return (rows ?? [])
         .map((r) => (Array.isArray(r.frame_refs) ? r.frame_refs : []))
         .filter((list) => list.length > 0);
     } catch {
