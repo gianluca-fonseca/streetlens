@@ -1261,6 +1261,31 @@ RUN_LIVE_SMOKE=1 node --env-file=.env.local scripts/live-smoke-extraction.mjs
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key. | undefined |
 | `SUBMISSIONS_IP_SALT` | Salt for hashing contributor IPs. | `streetlens-dev-salt` |
 | `ADMIN_PASSWORD` | Admin login password (review UI). | undefined |
+| `NEXT_PUBLIC_SHOW_DEMO_DATA` | **Demo data switch.** Must equal exactly `"true"` to publish the generated pilot scores; anything else (including unset) hides them. | disabled (demo hidden) |
+
+#### The demo data switch (`NEXT_PUBLIC_SHOW_DEMO_DATA`)
+
+Real collection has started, so the generated mock pilot scores are hidden on
+the public site by default. The flag is read in exactly one place,
+`lib/demo-flag.ts` (`showDemoData()`), and consumed by the data adapter and the
+copy that caveats live counts.
+
+- **Off (default, unset or any value other than `"true"`).** The 535 esc-sa
+  pilot segments render as part of the neutral, unaudited canton network: no
+  score colors on the map, no scores in the detail popover, and the audited
+  stat figures (`segments`, `km`, `coveragePct`, `heroPct`) degrade to zero.
+  The map demo banner and every "demo figure/data" caveat on those counts
+  disappear, because there is nothing left to label. Real community and CV
+  observations (e.g. the approved `esc-sr-0793` camera pass) are unaffected and
+  are the only colored data.
+- **On (`NEXT_PUBLIC_SHOW_DEMO_DATA=true`).** Today's behavior returns verbatim:
+  the pilot scores, the demo banner, and all demo caveats.
+
+Nothing is deleted to hide the demo data: `scripts/generate-demo-audits.mjs`,
+`data/demo-segments.geojson`, and `data/demo-audits.json` stay in the repo, so
+flipping the flag on republishes the pilot with no regeneration. Coverage:
+`scripts/smoke-adapter.mjs` exercises both states (demo-on assertions run with
+the flag set; a demo-off scenario asserts the default hides every score).
 
 The bucket name is not an env var; it is the constant `streetlens-frames`
 (`CAPTURE_BUCKET` in `lib/capture/types.ts`), matching the bucket created in
