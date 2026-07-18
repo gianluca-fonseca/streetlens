@@ -97,11 +97,23 @@
   --accent-strong: #ff8ec4;
   --accent-text: #ff8ec4;
 
-  /* Desktop glass over the map: near-opaque, and lifted to the shell's
-     own value so the popover composites to the same ladder the solid
-     mobile sheet uses. The old rgba(12,12,12,0.64) let dark basemap
-     through and dropped the effective surface below every ink here. */
-  --glass-bg: rgba(33, 33, 33, 0.90);
+  /* Desktop glass over the map. The alpha here is a CONTRAST value, not a
+     taste one, and the old rgba(12,12,12,0.64) was quietly the worst
+     offender on the panel: this app's basemap stays light in dark mode, so
+     0.64 alpha over it composited the "near-black" popover to roughly
+     #5c5c5c, a mid grey. Ink fitted to #141414 was therefore being read
+     against a surface eight steps lighter than the one it was computed
+     for, measuring nearer 2.5:1 than 4.5:1 in the browser. The panel was
+     failing its own contract on desktop and the arithmetic never showed
+     it, because the arithmetic never modelled the composite.
+
+     So the glass is pinned to land ON the ladder instead of wherever the
+     tiles happen to put it: over the brightest possible basemap (pure
+     white) this composites to 0.96x26 + 0.04x255 = #232323, one step off
+     the #212121 the ink is fitted to, holding the worst case at 6.83:1.
+     Blur and saturate still give the edges their material read; what goes
+     is only the see-through that was costing legibility. */
+  --glass-bg: rgba(26, 26, 26, 0.96);
   --glass-border: rgba(255, 255, 255, 0.14);
   --glass-chip-bg: rgba(42, 42, 42, 0.82);
   --glass-chip-border: rgba(255, 255, 255, 0.16);
