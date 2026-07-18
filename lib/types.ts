@@ -280,6 +280,16 @@ export type StreetStats = {
    * display layer floors it at "<0.1%" instead (see `formatCvCoveragePct`).
    */
   cvCoveragePct: number;
+  /**
+   * How segment/CV data was read for this request (0025). `degraded` is true when
+   * Supabase is configured but a live read failed and static/local data was used.
+   */
+  dataRead?: {
+    scoresSource: "live" | "static";
+    cvSource: "live" | "local";
+    degraded: boolean;
+    errors: string[];
+  };
 };
 
 /**

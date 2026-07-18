@@ -311,10 +311,9 @@ export function buildCvObservations(input: CvApplyInput): CvObservation[] {
  * a segment and re-approves must see it leave the map, which an upsert alone
  * would never do.
  *
- * Note the local store is not a fallback in the degraded sense — lib/segments.ts
- * reads community data from these files unconditionally, so this IS the path the
- * map sees today. The RPC keeps the live DB in step for when it becomes the
- * read path too.
+ * Note the local store is only used when Supabase is not configured. When
+ * ADMIN_RPC_SECRET and Supabase are set, RPC failure is a hard error — approval
+ * must not report success while the live DB never heard about it (0025).
  */
 export async function applyApprovedCaptureSession(
   input: CvApplyInput,
@@ -325,23 +324,22 @@ export async function applyApprovedCaptureSession(
   const secret = dbSecret();
   if (secret) {
     const client = getSupabaseClient();
-    try {
-      const { error } = await client!.rpc("admin_apply_capture_session", {
-        p_secret: secret,
-        p_session_id: input.session_id,
-        p_submission_id: input.submission_id,
-        p_observations: rows,
-      });
-      if (!error) {
-        // The DB write is authoritative; the local mirror is best-effort so a
-        // read-only serverless FS never fails an approval that already landed.
-        await mirrorCvLocally(input.session_id, ids, rows);
-        return { mode: "supabase", kind: "cv_observation", session_id: input.session_id, ids };
-      }
-      // fall through to local-only on RPC failure (0017 not yet applied)
-    } catch {
-      // fall through
+    if (!client) {
+      throw new Error("ADMIN_RPC_SECRET is set but Supabase is not configured");
     }
+    const { error } = await client.rpc("admin_apply_capture_session", {
+      p_secret: secret,
+      p_session_id: input.session_id,
+      p_submission_id: input.submission_id,
+      p_observations: rows,
+    });
+    if (error) {
+      throw new Error(`admin_apply_capture_session failed: ${error.message}`);
+    }
+    // The DB write is authoritative; the local mirror is best-effort so a
+    // read-only serverless FS never fails an approval that already landed.
+    await mirrorCvLocally(input.session_id, ids, rows);
+    return { mode: "supabase", kind: "cv_observation", session_id: input.session_id, ids };
   }
 
   // Local mode: these files ARE the store, so a write failure must surface rather

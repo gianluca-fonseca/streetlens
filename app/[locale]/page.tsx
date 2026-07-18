@@ -13,6 +13,7 @@ import RoadmapSection from "@/components/landing/RoadmapSection";
 import FaqSection from "@/components/landing/FaqSection";
 import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
+import DataDegradedBanner from "@/components/DataDegradedBanner";
 
 // ISR, same reason as the map: the landing's pilot stats include CV sessions/segments
 // reviewed (getStats), which move when an admin approves a session after deploy.
@@ -51,6 +52,7 @@ export default async function HomePage({
 
   return (
     <main className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
+      {stats.dataRead?.degraded ? <DataDegradedBanner /> : null}
       <Hero segments={segments} stats={stats} />
       <MissionSection />
       <MeasureSection />

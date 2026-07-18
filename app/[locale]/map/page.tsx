@@ -5,6 +5,7 @@ import { getSegments, getStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
 import AuditMap from "@/components/AuditMap";
 import DemoBanner from "@/components/DemoBanner";
+import DataDegradedBanner from "@/components/DataDegradedBanner";
 
 // ISR: the map is otherwise statically generated at build time, so a session an
 // admin approves post-deploy (its CV observation lands in Postgres via the review
@@ -41,9 +42,10 @@ export default async function MapPage({
 
   return (
     <>
+      {stats.dataRead?.degraded ? <DataDegradedBanner /> : null}
       {/* The honesty strip labels demo data; with demo off there is nothing to
           label (the network is neutral + real CV), so it disappears. */}
-      {showDemoData() && <DemoBanner />}
+      {showDemoData() && !stats.dataRead?.degraded ? <DemoBanner /> : null}
       <main className="relative min-h-0 flex-1 overflow-hidden">
         <AuditMap segments={segments} stats={stats} />
       </main>
