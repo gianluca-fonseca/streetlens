@@ -513,6 +513,20 @@ async function getCvObservations(): Promise<CvObservation[]> {
   return (await liveCvObservations()) ?? readCvObservations();
 }
 
+/**
+ * Public read of approved CV observations for open-data / civic brief packs.
+ * Callers MUST scrub (no session_id / frame_refs / contacts on the wire).
+ */
+export async function listApprovedCvObservations(): Promise<CvObservation[]> {
+  return getCvObservations();
+}
+
+/** Segment length_m map for open-data CSV/GeoJSON enrichment. */
+export async function getNetworkLengthsById(): Promise<Map<string, number>> {
+  const { byId } = await readNetworkLengths();
+  return byId;
+}
+
 /* ------------------------------------------------------------------ *
  * Community layer (contract v3, u7) — applied contributions merged into the
  * read path. Community/import segments carry NO rubric scores; they render with
