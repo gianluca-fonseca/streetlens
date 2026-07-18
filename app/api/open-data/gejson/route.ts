@@ -3,4 +3,18 @@
  * (brief typo preserved so the unit contract path resolves).
  */
 
-export { GET, runtime } from "../geojson/route";
+import { loadOpenDataGeoJson } from "@/lib/open-data-pack";
+
+export const runtime = "nodejs";
+
+export async function GET() {
+  const body = await loadOpenDataGeoJson();
+  return Response.json(body, {
+    status: 200,
+    headers: {
+      "content-type": "application/geo+json; charset=utf-8",
+      "cache-control": "public, s-maxage=300, stale-while-revalidate=900",
+      "content-disposition": 'attachment; filename="streetlens-open-data.geojson"',
+    },
+  });
+}
