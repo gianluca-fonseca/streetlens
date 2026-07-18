@@ -24,6 +24,10 @@ import { getSessionReview } from "@/lib/capture/review-store";
 import { applyApprovedCaptureSession } from "@/lib/apply-submissions";
 import { finalizeCaptureReview } from "@/lib/capture/review-actions";
 import {
+  getPendingCaptureSessionIds,
+  nextPendingSessionId,
+} from "@/lib/capture/pending-captures";
+import {
   recomputeReview,
   EMPTY_CORRECTIONS,
   type ReviewCorrections,
@@ -194,12 +198,17 @@ export async function POST(request: NextRequest) {
       reason,
     });
 
+    const pendingIds = await getPendingCaptureSessionIds();
+    const next_session_id = nextPendingSessionId(pendingIds, session_id);
+
     return NextResponse.json({
       ok: true,
       status: action === "approve" ? "approved" : "rejected",
       applied: chosen.length,
       corrected: chosen.filter((s) => s.humanCorrected).length,
       mode: closed.mode,
+      next_session_id,
+      queue_remaining: pendingIds.length,
     });
   } catch (err) {
     // Log before swallowing into an opaque server_error, so a prod failure (e.g. a
