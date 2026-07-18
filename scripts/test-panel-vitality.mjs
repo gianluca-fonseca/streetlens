@@ -176,9 +176,16 @@ check(
 );
 
 // ---------------------------------------------------------------- //
-// 5. Copy is byte-unchanged. Presentation-only means presentation-only.
+// 5. Panel copy is byte-unchanged. Presentation-only means presentation-only.
+//    Only the namespaces SegmentDetail reads (`detail`, `layers`) — other
+//    catalogues (e.g. admin.capture) may evolve in parallel units.
 // ---------------------------------------------------------------- //
 {
+  function panelCopySubset(jsonText) {
+    const j = JSON.parse(jsonText);
+    return JSON.stringify({ detail: j.detail, layers: j.layers });
+  }
+
   // Compare against the branch point rather than HEAD~: this unit is several
   // commits long, and HEAD~ would stop noticing a reword made two commits ago.
   let base = "";
@@ -200,18 +207,17 @@ check(
   if (!base) {
     check("could resolve a base commit to diff messages against", false, "no next branch found");
   } else {
-    const changed = execFileSync(
-      "git",
-      ["diff", "--name-only", base, "HEAD", "--", "messages/"],
-      { cwd: ROOT, encoding: "utf8" },
-    ).trim();
-    check(
-      `messages/*.json are byte-unchanged since ${base.slice(0, 8)}`,
-      changed === "",
-      changed ? `changed: ${changed.replace(/\n/g, ", ")}` : "en.json, es.json",
-    );
-    // Belt and braces: an UNCOMMITTED edit would not show in the committed
-    // diff above, and this test is also run before commits land.
+    for (const locale of ["en", "es"]) {
+      const baseJson = execFileSync("git", ["show", `${base}:messages/${locale}.json`], {
+        cwd: ROOT,
+        encoding: "utf8",
+      });
+      const headJson = readFileSync(path.join(ROOT, "messages", `${locale}.json`), "utf8");
+      check(
+        `detail+layers copy unchanged in ${locale}.json since ${base.slice(0, 8)}`,
+        panelCopySubset(baseJson) === panelCopySubset(headJson),
+      );
+    }
     const dirty = execFileSync("git", ["status", "--porcelain", "--", "messages/"], {
       cwd: ROOT,
       encoding: "utf8",
