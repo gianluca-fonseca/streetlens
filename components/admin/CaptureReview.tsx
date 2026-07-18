@@ -63,7 +63,9 @@ export default function CaptureReview({
   const [selectedSeq, setSelectedSeq] = useState<number | null>(null);
   const [lightboxSeq, setLightboxSeq] = useState<number | null>(null);
   const [reason, setReason] = useState("");
+  const [resumeReason, setResumeReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resumeBusy, setResumeBusy] = useState(false);
   const [error, setError] = useState("");
 
   // Session replay (u3). Lifted here so the SAME playback drives both the
@@ -321,6 +323,35 @@ export default function CaptureReview({
     }
   }
 
+  async function resumeExtraction() {
+    const trimmed = resumeReason.trim();
+    if (!trimmed) {
+      setError(t("resumeReasonRequired"));
+      return;
+    }
+    setResumeBusy(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/capture/resume", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          session_id: review.sessionId,
+          reason: trimmed,
+        }),
+      });
+      if (res.ok) {
+        router.refresh();
+        return;
+      }
+      setError(t("resumeError"));
+    } catch {
+      setError(t("resumeError"));
+    } finally {
+      setResumeBusy(false);
+    }
+  }
+
   const totalCorrections =
     Object.keys(corrections.itemOverrides).length +
     corrections.excluded.length +
@@ -350,6 +381,48 @@ export default function CaptureReview({
             {t(review.status === "approved" ? "alreadyApproved" : "alreadyRejected")}
             {review.reviewedAt ? ` · ${dateFmt.format(new Date(review.reviewedAt))}` : ""}
           </span>
+        </div>
+      ) : null}
+
+      {review.status === "cost_paused" ? (
+        <div
+          role="status"
+          className="flex flex-col gap-3 rounded-[8px] border border-amber/45 bg-amber/10 px-3.5 py-3 text-[13px] text-ink"
+        >
+          <div className="flex items-start gap-2">
+            <TriangleAlert size={16} strokeWidth={2} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="font-semibold">{t("pauseBannerTitle")}</p>
+              <p className="leading-relaxed text-neutral-strong">{t("pauseBannerBody")}</p>
+              {review.pauseReason ? (
+                <p className="font-mono text-[12px] text-ink">
+                  {t("pauseReasonLabel")}: {review.pauseReason}
+                </p>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <label className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-neutral-strong">
+                {t("resumeReasonLabel")}
+              </span>
+              <input
+                type="text"
+                value={resumeReason}
+                onChange={(e) => setResumeReason(e.target.value)}
+                placeholder={t("resumeReasonPlaceholder")}
+                className="rounded-[4px] border border-border bg-surface-base px-2.5 py-1.5 text-[13px] text-ink outline-none focus-visible:border-border-strong focus-visible:ring-1 focus-visible:ring-ink"
+              />
+            </label>
+            <button
+              type="button"
+              disabled={resumeBusy}
+              onClick={() => void resumeExtraction()}
+              className={`${styles.control} shrink-0 rounded-[4px] border border-border-strong bg-surface-sunken px-3 py-1.5 text-[13px] font-semibold text-ink hover:bg-surface-base disabled:opacity-50`}
+            >
+              {resumeBusy ? t("working") : t("resumeExtraction")}
+            </button>
+          </div>
         </div>
       ) : null}
 
