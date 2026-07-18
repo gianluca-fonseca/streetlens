@@ -167,9 +167,14 @@ function main() {
       // 0021 last so its provenance columns and detail RPC survive every re-run.
       psql(readFileSync(path.join(MIGRATIONS, "0020_observation_rationale.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0021_review_overrides.sql"), "utf8"));
-      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 are re-runnable (idempotent)", true);
+      // 0022 last, and it MUST be re-applied here: re-running 0015's chain above
+      // reverts capture_list_observations to its 9-column form and the review read
+      // to its pre-assessment body, so 0022 is what re-establishes the GPS/rationale
+      // columns and the per-segment assessment the assertions below depend on.
+      psql(readFileSync(path.join(MIGRATIONS, "0022_segment_synthesis.sql"), "utf8"));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 are re-runnable (idempotent)", true);
     } catch (err) {
-      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
+      check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
     }
 
     /* ---------------- Schema shape ---------------- */
@@ -486,6 +491,80 @@ function main() {
       "the rollup now surfaces in the public session status",
       psql(`select capture_session_status('${sid}'::uuid);`).includes("esc-sa-0001"),
     );
+
+    /* ---------------- 0022: segment synthesis assessment ---------------- */
+    {
+      check(
+        "capture_segment_rollups gains an assessment jsonb column",
+        psql(`select data_type from information_schema.columns
+                where table_name='capture_segment_rollups' and column_name='assessment';`).trim() === "jsonb",
+      );
+      check(
+        "capture_segment_rollups gains the two synthesis token columns",
+        psql(`select count(*) from information_schema.columns
+                where table_name='capture_segment_rollups'
+                  and column_name in ('synthesis_input_tokens','synthesis_output_tokens');`).trim() === "2",
+      );
+
+      // esc-sa-0001 already has a rollup row (written above); attach an assessment.
+      const assessment = JSON.stringify({
+        overall: "Sidewalk vanishes halfway along the block.",
+        lenses: { accessibility: "a", drainage: "d", shade: "s", bike: "b" },
+        adjustments: { accessibility: { delta: -12, reason: "sidewalk disappears for 200 m" } },
+        adjustedScores: { overall: 41, accessibility: 38, drainage: null, shade: 55, bike: null },
+        model: "gpt-5.4-mini",
+      });
+      psql(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001',
+              '${assessment}'::jsonb, 512, 210, 'test-secret');`);
+      check(
+        "capture_set_segment_assessment writes the assessment onto the rollup",
+        psql(`select assessment->>'model' from capture_segment_rollups
+                where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() === "gpt-5.4-mini",
+      );
+      check(
+        "and records the synthesis token spend for the ledger",
+        psql(`select (synthesis_input_tokens=512 and synthesis_output_tokens=210)::text
+                from capture_segment_rollups where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() === "true",
+      );
+      check(
+        "capture_set_segment_assessment is secret-gated",
+        (psqlExpectError(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001', '{}'::jsonb, 0, 0, 'nope');`) || "").includes("unauthorized"),
+      );
+      check(
+        "writing an assessment for an absent segment is a no-op, not an orphan row",
+        (() => {
+          psql(`select capture_set_segment_assessment('${sid}'::uuid, 'no-such-seg', '{}'::jsonb, 0, 0, 'test-secret');`);
+          return psql(`select count(*) from capture_segment_rollups
+                         where session_id='${sid}' and segment_id='no-such-seg';`).trim() === "0";
+        })(),
+      );
+
+      // The review read hangs the assessment off the rollup and sums synthesis spend.
+      const rv = JSON.parse(psql(`select capture_session_review('${sid}'::uuid, 'test-secret');`).trim());
+      const seg = (rv.rollups ?? []).find((r) => r.segmentId === "esc-sa-0001");
+      check(
+        "capture_session_review carries the per-segment assessment verbatim",
+        seg && seg.assessment && seg.assessment.model === "gpt-5.4-mini" &&
+          seg.assessment.adjustedScores.accessibility === 38,
+        JSON.stringify(seg && seg.assessment),
+      );
+      check(
+        "the review tokens block sums synthesis spend beside the vision spend",
+        rv.tokens.synthesisInputTokens === 512 && rv.tokens.synthesisOutputTokens === 210,
+        JSON.stringify(rv.tokens),
+      );
+
+      // capture_list_observations now returns each frame's rationale and GPS.
+      check(
+        "capture_list_observations returns the per-frame rationale (0022)",
+        psql(`select bool_or(rationale = 'Escalated read: clearly a two-lane street with intact gutters.')::text
+                from capture_list_observations('${sid}'::uuid, 'test-secret') where seq=0;`).trim() === "true",
+      );
+      check(
+        "capture_list_observations exposes lng/lat columns for synthesis distance",
+        psqlExpectError(`select lng, lat from capture_list_observations('${sid}'::uuid, 'test-secret') limit 1;`) === null,
+      );
+    }
 
     psql(`select capture_set_session_status('${sid}'::uuid, 'review_ready', 'test-secret');`);
     check(
