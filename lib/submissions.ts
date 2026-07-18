@@ -69,6 +69,8 @@ type RawRecord = {
   status?: unknown;
   created_at?: unknown;
   contact?: unknown;
+  reviewed_at?: unknown;
+  reviewer_note?: unknown;
 };
 
 type ReviewOverlay = Record<
@@ -110,6 +112,10 @@ type ReconciledSubmission = {
   /** Effective status: the review overlay wins, else the record's base status. */
   status: SubmissionStatus;
   created_at: string;
+  /** When the decision landed. Overlay wins over the raw row; null while pending. */
+  reviewed_at: string | null;
+  /** The reviewer's note for the decision. Overlay reason wins; null while pending. */
+  reviewer_note: string | null;
   contact: string | null;
   /** Parsed payload when valid; the raw payload otherwise. */
   payload: unknown;
@@ -197,6 +203,21 @@ function reconcileRecord(
   const review = overlay[raw.id];
   const status = review ? review.status : baseStatus;
 
+  // Decision metadata follows the same precedence as status: a local overlay
+  // entry (the review action taken in local mode) wins over whatever the raw row
+  // carried. On the supabase path the overlay is empty, so the RPC row's own
+  // reviewed_at/reviewer_note are used. A still-pending record has neither.
+  const reviewed_at = review
+    ? review.reviewed_at
+    : typeof raw.reviewed_at === "string"
+      ? raw.reviewed_at
+      : null;
+  const reviewer_note = review
+    ? review.reason
+    : typeof raw.reviewer_note === "string"
+      ? raw.reviewer_note
+      : null;
+
   const schema = PAYLOAD_SCHEMAS[raw.type];
   const parsed = schema?.safeParse(raw.payload);
 
@@ -208,6 +229,8 @@ function reconcileRecord(
       typeof raw.created_at === "string"
         ? raw.created_at
         : new Date(0).toISOString(),
+    reviewed_at,
+    reviewer_note,
     contact: typeof raw.contact === "string" ? raw.contact : null,
     payload: parsed?.success ? parsed.data : raw.payload,
     payloadValid: parsed?.success ?? false,
@@ -284,6 +307,62 @@ export async function getSubmissionCounts(): Promise<SubmissionCounts> {
     counts.total += 1;
   }
   return counts;
+}
+
+/**
+ * One row for the admin submission history: every submission ever, whatever its
+ * status. Unlike {@link QueueSubmission} this carries the decision metadata
+ * (`reviewed_at`, `reviewer_note`) and keeps `payloadValid` so the UI can render
+ * an unreadable/invalid row honestly rather than dropping it.
+ */
+export type HistorySubmission = {
+  id: string;
+  type: SubmissionType;
+  status: SubmissionStatus;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewer_note: string | null;
+  payload: unknown;
+  payloadValid: boolean;
+};
+
+/** The RPC caps at 200; the local/sample paths are capped here to match. */
+export const SUBMISSION_HISTORY_CAP = 200;
+
+/**
+ * The full submission history for the admin history view: every reconciled
+ * record (all statuses, all types, INCLUDING payload-invalid rows), newest
+ * first, capped at {@link SUBMISSION_HISTORY_CAP}. Built from the SAME reconciled
+ * source as {@link getSubmissionCounts}, so the tab counters and the rows agree
+ * (short of the cap, which the UI states). `total` is the pre-cap reconciled
+ * count, so the footer can say honestly when rows were trimmed.
+ */
+export async function getSubmissionHistory(): Promise<{
+  items: HistorySubmission[];
+  source: SubmissionSource;
+  total: number;
+  cap: number;
+}> {
+  const { items, source } = await getReconciledSubmissions();
+  const total = items.length;
+  const sorted = [...items].sort((a, b) =>
+    b.created_at.localeCompare(a.created_at),
+  );
+  return {
+    items: sorted.slice(0, SUBMISSION_HISTORY_CAP).map((i) => ({
+      id: i.id,
+      type: i.type,
+      status: i.status,
+      created_at: i.created_at,
+      reviewed_at: i.reviewed_at,
+      reviewer_note: i.reviewer_note,
+      payload: i.payload,
+      payloadValid: i.payloadValid,
+    })),
+    source,
+    total,
+    cap: SUBMISSION_HISTORY_CAP,
+  };
 }
 
 /* ------------------------------------------------------------------ *
