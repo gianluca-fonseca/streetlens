@@ -11,6 +11,9 @@
  * no `fs`.
  */
 
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
 const SESSION_VERSION = "v1";
 const SESSION_TTL_SECONDS = 12 * 60 * 60; // 12 hours
 
@@ -218,4 +221,18 @@ export function recordFailedAttempt(ip: string): void {
 /** Clear the rate-limit record for an IP (called on a successful login). */
 export function clearRateLimit(ip: string): void {
   attempts.delete(ip);
+}
+
+/**
+ * Re-verify the admin session cookie. Returns a 401 response when invalid,
+ * or `null` when the caller may proceed.
+ */
+export async function requireAdmin(
+  request: NextRequest,
+): Promise<NextResponse | null> {
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  if (!(await verifySessionToken(token))) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  return null;
 }

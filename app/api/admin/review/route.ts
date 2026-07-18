@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { reviewSubmission } from "@/lib/submissions";
 
 // Uses fs (local fallback) + Web Crypto (session verify): Node.js runtime.
@@ -13,10 +13,8 @@ export const runtime = "nodejs";
  * required for both actions.
  */
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  if (!(await verifySessionToken(token))) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
 
   let body: { id?: unknown; action?: unknown; reason?: unknown };
   try {

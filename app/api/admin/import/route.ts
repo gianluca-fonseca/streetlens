@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-auth";
 import { getSegments } from "@/lib/segments";
 import { applyImportFeatures } from "@/lib/apply-submissions";
 import type { ImportFeature } from "@/lib/schemas";
@@ -28,10 +28,8 @@ const MAX_FEATURES = 2000;
  * re-verified here independently of the proxy guard (proxy excludes /api).
  */
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  if (!(await verifySessionToken(token))) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
 
   let body: {
     action?: unknown;
