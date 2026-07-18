@@ -67,6 +67,30 @@ export default function Footer() {
           {t("tagline")}
         </p>
 
+        <nav
+          aria-label={t("insights")}
+          className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[12px] uppercase tracking-[0.08em]"
+        >
+          <Link
+            href="/insights"
+            className="inline-flex min-h-[44px] items-center rounded-[2px] text-ink-muted underline-offset-4 transition-colors hover:text-ink-display hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {t("insights")}
+          </Link>
+          <Link
+            href="/method"
+            className="inline-flex min-h-[44px] items-center rounded-[2px] text-ink-muted underline-offset-4 transition-colors hover:text-ink-display hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {t("method")}
+          </Link>
+          <Link
+            href="/rubric"
+            className="inline-flex min-h-[44px] items-center rounded-[2px] text-ink-muted underline-offset-4 transition-colors hover:text-ink-display hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {t("rubric")}
+          </Link>
+        </nav>
+
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[12px] uppercase tracking-[0.08em]">
           <a
             href={AUTHOR_LINKEDIN}

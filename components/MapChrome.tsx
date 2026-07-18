@@ -27,6 +27,12 @@ export default function MapChrome() {
       </span>
       <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
         <Link
+          href="/insights"
+          className="hidden min-h-[32px] pointer-coarse:min-h-[44px] items-center rounded-[2px] px-2 text-[12px] font-medium text-ink-muted underline decoration-accent decoration-2 underline-offset-[4px] transition-colors hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
+        >
+          {t("insights")}
+        </Link>
+        <Link
           href="/map?contribute=1"
           className="hidden min-h-[32px] pointer-coarse:min-h-[44px] items-center rounded-[2px] px-2 text-[12px] font-medium text-ink-muted underline decoration-accent decoration-2 underline-offset-[4px] transition-colors hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
         >

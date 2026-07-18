@@ -12,8 +12,8 @@ import type {
   SegmentCollection,
   SegmentFeature,
   SegmentProperties,
-} from "@/lib/types";
-import { LEY_7600_MIN_SCORE, SCORE_LAYERS } from "@/lib/types";
+} from "./types";
+import { LEY_7600_MIN_SCORE, SCORE_LAYERS } from "./types";
 
 /** Sealed legend bins — mirrors `BINS` in components/mapConfig.ts (no maplibre import). */
 const BINS = [
