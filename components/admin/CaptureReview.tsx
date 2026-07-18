@@ -18,10 +18,11 @@
  * "unset", never as a zero.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Camera, Check, FlaskConical, Maximize2, Pencil, RotateCcw, Sparkles, TriangleAlert, X } from "lucide-react";
+import { Camera, Check, FlaskConical, Keyboard, Maximize2, Pencil, RotateCcw, Sparkles, TriangleAlert, X } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import type { ReviewFrame, SessionReview, SegmentAssessment } from "@/lib/capture/review-store";
 import {
   recomputeReview,
@@ -31,6 +32,23 @@ import {
 import { LENS_KEYS, type LensKey } from "@/lib/capture/scoring";
 import { formatProvenanceDate, sanitizeContact } from "@/lib/cv-provenance";
 import type { RubricItemKey } from "@/lib/capture/types";
+import {
+  captureReviewErrorKey,
+  REASON_PRESET_KEYS,
+  frameDeleteErrorKey,
+} from "@/lib/capture/review-errors";
+import {
+  clearReviewDraft,
+  loadReviewDraft,
+  saveReviewDraft,
+} from "@/lib/capture/review-draft";
+import { captureQueuePosition, nextPendingSessionId } from "@/lib/capture/queue-position";
+import {
+  formatSegmentCaption,
+  formatSegmentDistrict,
+  formatSegmentTitle,
+  type SegmentMeta,
+} from "@/lib/capture/segment-label";
 import FrameInspector from "./FrameInspector";
 import FrameLightbox from "./FrameLightbox";
 import ReviewMap, { type MatchedGeometry } from "./ReviewMap";
@@ -53,20 +71,63 @@ function freshCorrections(): ReviewCorrections {
 export default function CaptureReview({
   review,
   matchedGeometry = [],
-}: Readonly<{ review: SessionReview; matchedGeometry?: MatchedGeometry[] }>) {
+  segmentMeta = [],
+  pendingCaptureSessionIds = [],
+}: Readonly<{
+  review: SessionReview;
+  matchedGeometry?: MatchedGeometry[];
+  segmentMeta?: SegmentMeta[];
+  pendingCaptureSessionIds?: string[];
+}>) {
   const t = useTranslations("admin.capture");
   const tl = useTranslations("layers");
   const locale = useLocale();
   const router = useRouter();
 
-  const [corrections, setCorrections] = useState<ReviewCorrections>(freshCorrections);
+  const segmentMetaMap = useMemo(
+    () => new Map(segmentMeta.map((m) => [m.id, m])),
+    [segmentMeta],
+  );
+
+  const queuePos = useMemo(
+    () => captureQueuePosition(pendingCaptureSessionIds, review.sessionId),
+    [pendingCaptureSessionIds, review.sessionId],
+  );
+  const nextSessionId = useMemo(
+    () => nextPendingSessionId(pendingCaptureSessionIds, review.sessionId),
+    [pendingCaptureSessionIds, review.sessionId],
+  );
+
+
+  const initialSegmentIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const f of review.frames) if (f.segmentId) ids.add(f.segmentId);
+    return [...ids].sort((a, b) => a.localeCompare(b));
+  }, [review.frames]);
+
+  const [corrections, setCorrections] = useState<ReviewCorrections>(() => {
+    if (typeof window === "undefined") return freshCorrections();
+    return loadReviewDraft(review.sessionId)?.corrections ?? freshCorrections();
+  });
   const [selectedSeq, setSelectedSeq] = useState<number | null>(null);
   const [lightboxSeq, setLightboxSeq] = useState<number | null>(null);
-  const [reason, setReason] = useState("");
+  const [reason, setReason] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return loadReviewDraft(review.sessionId)?.reason ?? "";
+  });
   const [resumeReason, setResumeReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [resumeBusy, setResumeBusy] = useState(false);
   const [error, setError] = useState("");
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [draftRestored] = useState(
+    () => typeof window !== "undefined" && loadReviewDraft(review.sessionId) !== null,
+  );
+
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
+  const approveRef = useRef<HTMLButtonElement>(null);
+  const rejectRef = useRef<HTMLButtonElement>(null);
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Session replay (u3). Lifted here so the SAME playback drives both the
   // frame-first player and the expanded map, and so the map's current-frame
@@ -121,7 +182,28 @@ export default function CaptureReview({
   );
 
   // Every segment starts ticked; a dropped one is filtered out at approve time.
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(segmentIds));
+  const [selected, setSelected] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set(initialSegmentIds);
+    const draft = loadReviewDraft(review.sessionId);
+    if (draft?.selected?.length) return new Set(draft.selected);
+    return new Set(initialSegmentIds);
+  });
+
+  // Debounced draft persistence — survives refresh and back-navigation.
+  useEffect(() => {
+    if (decided) return;
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      saveReviewDraft(review.sessionId, {
+        corrections,
+        reason,
+        selected: [...selected],
+      });
+    }, 400);
+    return () => {
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    };
+  }, [corrections, reason, selected, review.sessionId, decided]);
 
   const excludedSet = useMemo(() => new Set(corrections.excluded), [corrections]);
   const deletedSet = useMemo(() => new Set(corrections.deleted), [corrections]);
@@ -270,11 +352,34 @@ export default function CaptureReview({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ session_id: review.sessionId, seq }),
       });
-      if (!res.ok) throw new Error("delete failed");
+      if (!res.ok) {
+        setCorrections((prev) => ({ ...prev, deleted: prev.deleted.filter((s) => s !== seq) }));
+        setError(t(frameDeleteErrorKey(res)));
+        return;
+      }
     } catch {
       setCorrections((prev) => ({ ...prev, deleted: prev.deleted.filter((s) => s !== seq) }));
       setError(t("deleteError"));
     }
+  }
+
+  const selectAllSegments = useCallback(() => {
+    setSelected(new Set(segmentIds.filter((id) => !droppedIds.has(id))));
+  }, [segmentIds, droppedIds]);
+
+  const selectNoSegments = useCallback(() => {
+    setSelected(new Set());
+  }, []);
+
+  function invertSegmentSelection() {
+    setSelected((prev) => {
+      const next = new Set<string>();
+      for (const id of segmentIds) {
+        if (droppedIds.has(id)) continue;
+        if (!prev.has(id)) next.add(id);
+      }
+      return next;
+    });
   }
 
   function toggleApprove(segmentId: string) {
@@ -312,10 +417,18 @@ export default function CaptureReview({
         }),
       });
       if (res.ok) {
-        router.refresh();
+        clearReviewDraft(review.sessionId);
+        const body = (await res.json()) as { next_session_id?: string | null };
+        const nextId = body.next_session_id ?? null;
+        if (nextId) {
+          router.push(`/admin/capture/${nextId}`);
+          return;
+        }
+        router.push("/admin/queue");
         return;
       }
-      setError(t("errorGeneric"));
+      const errKey = await captureReviewErrorKey(res);
+      setError(t(errKey));
     } catch {
       setError(t("errorGeneric"));
     } finally {
@@ -359,6 +472,120 @@ export default function CaptureReview({
     Object.keys(corrections.manualScores).length +
     Object.keys(corrections.baselineLenses).length;
 
+  const orderedFrameSeqs = useMemo(
+    () => [...review.frames].sort((a, b) => a.seq - b.seq).map((f) => f.seq),
+    [review.frames],
+  );
+
+  const stepFrame = useCallback(
+    (delta: number) => {
+      if (orderedFrameSeqs.length === 0) return;
+      const cur = selectedSeq ?? orderedFrameSeqs[0];
+      const idx = orderedFrameSeqs.indexOf(cur);
+      const base = idx === -1 ? 0 : idx;
+      const next = orderedFrameSeqs[(base + delta + orderedFrameSeqs.length) % orderedFrameSeqs.length];
+      setSelectedSeq(next);
+    },
+    [orderedFrameSeqs, selectedSeq],
+  );
+
+  const overlayOpen = lightboxSeq !== null || mapExpanded || replay.active;
+
+  useEffect(() => {
+    if (decided || totalCorrections === 0) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [decided, totalCorrections]);
+
+  useEffect(() => {
+    if (decided || overlayOpen) return;
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+      if (e.key === "?" && !typing) {
+        e.preventDefault();
+        setShowShortcuts((s) => !s);
+        return;
+      }
+      if (showShortcuts && e.key === "Escape") {
+        e.preventDefault();
+        setShowShortcuts(false);
+        return;
+      }
+      if (typing) return;
+      if (e.key === "Escape") {
+        if (selectedSeq !== null) {
+          e.preventDefault();
+          setSelectedSeq(null);
+        }
+        return;
+      }
+      if (e.key === "j" || e.key === "ArrowRight") {
+        e.preventDefault();
+        stepFrame(1);
+        return;
+      }
+      if (e.key === "k" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        stepFrame(-1);
+        return;
+      }
+      if (e.key === "e" && selectedSeq !== null) {
+        e.preventDefault();
+        toggleExclude(selectedSeq);
+        return;
+      }
+      if (e.key === "x" && selectedSeq !== null) {
+        e.preventDefault();
+        setLightboxSeq(selectedSeq);
+        return;
+      }
+      if (e.key === "a") {
+        e.preventDefault();
+        reasonRef.current?.focus();
+        return;
+      }
+      if (e.key === "r") {
+        e.preventDefault();
+        rejectRef.current?.focus();
+        return;
+      }
+      if (e.shiftKey && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        selectAllSegments();
+        return;
+      }
+      if (e.shiftKey && e.key.toLowerCase() === "n") {
+        e.preventDefault();
+        selectNoSegments();
+        return;
+      }
+      const lensIdx = Number(e.key);
+      if (lensIdx >= 1 && lensIdx <= 5 && selectedSegmentId) {
+        const lens = LENS_ORDER[lensIdx - 1];
+        if (lens) {
+          e.preventDefault();
+          document.getElementById(`sc-${selectedSegmentId}-${lens}`)?.focus();
+        }
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [
+    decided,
+    overlayOpen,
+    showShortcuts,
+    selectedSeq,
+    selectedSegmentId,
+    stepFrame,
+    selectAllSegments,
+    selectNoSegments,
+  ]);
+
   return (
     <div className="flex flex-col gap-4">
       {review.source === "fixture" ? (
@@ -374,13 +601,39 @@ export default function CaptureReview({
       {decided ? (
         <div
           role="status"
-          className="flex items-center gap-2 rounded-[8px] border border-border bg-surface-sunken px-3.5 py-2 text-[12.5px] font-medium text-ink"
+          className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[8px] border border-border bg-surface-sunken px-3.5 py-2 text-[12.5px] font-medium text-ink"
         >
           <Check size={14} strokeWidth={1.75} className="shrink-0" aria-hidden="true" />
           <span>
             {t(review.status === "approved" ? "alreadyApproved" : "alreadyRejected")}
             {review.reviewedAt ? ` · ${dateFmt.format(new Date(review.reviewedAt))}` : ""}
           </span>
+          <span className="ml-auto flex flex-wrap items-center gap-2">
+            {nextSessionId ? (
+              <Link
+                href={`/admin/capture/${nextSessionId}`}
+                className={`${styles.controlSoft} inline-flex items-center gap-1.5 rounded-[4px] bg-ink-display px-2.5 py-1 text-[12px] font-semibold text-surface hover:opacity-90`}
+              >
+                {t("nextWalk")}
+              </Link>
+            ) : null}
+            <Link
+              href="/admin/queue"
+              className={`${styles.control} inline-flex items-center gap-1.5 rounded-[4px] border border-border px-2.5 py-1 text-[12px] font-medium text-neutral-strong hover:text-ink`}
+            >
+              {t("backToQueue")}
+            </Link>
+          </span>
+        </div>
+      ) : null}
+
+      {draftRestored && !decided ? (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-[8px] border border-pine/35 bg-pine/5 px-3.5 py-2 text-[12.5px] font-medium text-pine"
+        >
+          <RotateCcw size={14} strokeWidth={1.75} className="shrink-0" aria-hidden="true" />
+          <span>{t("draftRestored")}</span>
         </div>
       ) : null}
 
@@ -468,6 +721,28 @@ export default function CaptureReview({
           </dl>
 
           <ul className="flex flex-wrap items-center gap-1.5 lg:ml-auto">
+            {queuePos ? (
+              <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-neutral-strong">
+                {t("queuePosition", {
+                  position: queuePos.position,
+                  total: queuePos.total,
+                  remaining: queuePos.remaining,
+                })}
+              </li>
+            ) : null}
+            {!decided ? (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => setShowShortcuts((s) => !s)}
+                  aria-pressed={showShortcuts}
+                  className={`${styles.control} inline-flex items-center gap-1 rounded-[4px] border border-border px-2 py-0.5 text-[11px] font-medium text-neutral-strong hover:text-ink`}
+                >
+                  <Keyboard size={12} strokeWidth={1.75} aria-hidden="true" />
+                  {t("shortcutsToggle")}
+                </button>
+              </li>
+            ) : null}
             <li className="inline-flex items-center gap-1.5 rounded-[4px] border border-border bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-neutral-strong">
               {t("jobsDone", { count: review.jobs.done })}
             </li>
@@ -565,6 +840,9 @@ export default function CaptureReview({
                   frames.some((f) => corrections.itemOverrides[f.seq] || excludedSet.has(f.seq)) ||
                   Object.keys(manual).length > 0 ||
                   baselineChoice.length > 0;
+                const segMeta = segmentMetaMap.get(segmentId);
+                const segTitle = formatSegmentTitle(segMeta, segmentId);
+                const segDistrict = formatSegmentDistrict(segMeta);
 
                 return (
                   <li
@@ -583,7 +861,10 @@ export default function CaptureReview({
                           onChange={() => toggleApprove(segmentId)}
                           className="size-4 accent-ink-display"
                         />
-                        <span className="font-mono">{segmentId}</span>
+                        <span className="font-medium">{segTitle}</span>
+                        {segDistrict ? (
+                          <span className="text-[11px] font-normal text-neutral-strong">{segDistrict}</span>
+                        ) : null}
                       </label>
                       {corrected ? (
                         <span className="inline-flex items-center gap-1 rounded-[4px] border border-pine/45 bg-pine/10 px-2 py-0.5 text-[10.5px] font-medium text-pine">
@@ -720,6 +1001,7 @@ export default function CaptureReview({
                                 onExpand={() => setLightboxSeq(f.seq)}
                                 alt={t("frameAlt", { seq: f.seq })}
                                 expandLabel={t("enlargeFrame", { seq: f.seq })}
+                                excludedLabel={t("frameExcludedShort")}
                               />
                             </li>
                           ))}
@@ -750,6 +1032,7 @@ export default function CaptureReview({
                       onExpand={() => setLightboxSeq(f.seq)}
                       alt={t("frameAlt", { seq: f.seq })}
                       expandLabel={t("enlargeFrame", { seq: f.seq })}
+                      excludedLabel={t("frameExcludedShort")}
                     />
                   </li>
                 ))}
@@ -770,6 +1053,10 @@ export default function CaptureReview({
             <FrameInspector
               key={selectedFrame.seq}
               frame={selectedFrame}
+              segmentCaption={formatSegmentCaption(
+                selectedSegmentId ? segmentMetaMap.get(selectedSegmentId) : undefined,
+                selectedSegmentId,
+              )}
               overrides={corrections.itemOverrides[selectedFrame.seq]}
               excluded={excludedSet.has(selectedFrame.seq)}
               onOverrideItem={(key, value) => overrideItem(selectedFrame.seq, key, value)}
@@ -793,12 +1080,29 @@ export default function CaptureReview({
         // reach on phones, always in view on desktop) no matter how far the
         // segment column scrolls.
         <section className={`${styles.plate} sticky bottom-0 z-30 rounded-[8px] border border-border-strong bg-surface-elevated p-3.5`}>
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {REASON_PRESET_KEYS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setReason(t(key));
+                  setError("");
+                }}
+                className={`${styles.control} rounded-[4px] border border-border bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-neutral-strong hover:text-ink disabled:opacity-55`}
+              >
+                {t(key)}
+              </button>
+            ))}
+          </div>
           <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end sm:gap-3">
             <label className="flex min-w-0 flex-1 flex-col gap-1">
               <span className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
                 {t("reasonLabel")}
               </span>
               <textarea
+                ref={reasonRef}
                 rows={2}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -808,11 +1112,38 @@ export default function CaptureReview({
             </label>
 
             <div className="flex shrink-0 flex-col gap-1.5 sm:items-end">
-              <p className="text-[12px] text-neutral-strong">
-                {t("approveSummary", { count: approvableSelected.length, total: segmentIds.length })}
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-[12px] text-neutral-strong">
+                  {t("approveSummary", { count: approvableSelected.length, total: segmentIds.length })}
+                </p>
+                <button
+                  type="button"
+                  disabled={busy || decided}
+                  onClick={selectAllSegments}
+                  className={`${styles.control} text-[11px] font-medium text-neutral-strong hover:text-ink disabled:opacity-55`}
+                >
+                  {t("selectAll")}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy || decided}
+                  onClick={selectNoSegments}
+                  className={`${styles.control} text-[11px] font-medium text-neutral-strong hover:text-ink disabled:opacity-55`}
+                >
+                  {t("selectNone")}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy || decided}
+                  onClick={invertSegmentSelection}
+                  className={`${styles.control} text-[11px] font-medium text-neutral-strong hover:text-ink disabled:opacity-55`}
+                >
+                  {t("selectInvert")}
+                </button>
+              </div>
               <div className="flex items-center gap-2">
                 <button
+                  ref={approveRef}
                   type="button"
                   onClick={() => submit("approve")}
                   disabled={busy}
@@ -822,6 +1153,7 @@ export default function CaptureReview({
                   {busy ? t("working") : t("approve")}
                 </button>
                 <button
+                  ref={rejectRef}
                   type="button"
                   onClick={() => submit("reject")}
                   disabled={busy}
@@ -848,9 +1180,58 @@ export default function CaptureReview({
           seq={lightboxSeq}
           excluded={excludedSet}
           deleted={deletedSet}
+          segmentCaption={formatSegmentCaption(
+            frameBySeq.get(lightboxSeq)?.segmentId
+              ? segmentMetaMap.get(frameBySeq.get(lightboxSeq)!.segmentId!)
+              : undefined,
+            frameBySeq.get(lightboxSeq)?.segmentId ?? null,
+          )}
+          onToggleExclude={() => toggleExclude(lightboxSeq)}
           onSeqChange={setLightboxSeq}
           onClose={() => setLightboxSeq(null)}
         />
+      ) : null}
+
+      {showShortcuts && !overlayOpen ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("shortcutsTitle")}
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+          onClick={() => setShowShortcuts(false)}
+        >
+          <div
+            className="max-w-md rounded-[8px] border border-border bg-surface-elevated p-4 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-[13px] font-semibold text-ink">{t("shortcutsTitle")}</h3>
+            <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-[12px]">
+              <dt className="font-mono text-neutral-strong">j / k / ← / →</dt>
+              <dd className="text-ink">{t("shortcutStepFrames")}</dd>
+              <dt className="font-mono text-neutral-strong">e</dt>
+              <dd className="text-ink">{t("shortcutExclude")}</dd>
+              <dt className="font-mono text-neutral-strong">x</dt>
+              <dd className="text-ink">{t("shortcutLightbox")}</dd>
+              <dt className="font-mono text-neutral-strong">1–5</dt>
+              <dd className="text-ink">{t("shortcutLensFocus")}</dd>
+              <dt className="font-mono text-neutral-strong">Shift+A / Shift+N</dt>
+              <dd className="text-ink">{t("shortcutSelectAllNone")}</dd>
+              <dt className="font-mono text-neutral-strong">a / r</dt>
+              <dd className="text-ink">{t("shortcutDecision")}</dd>
+              <dt className="font-mono text-neutral-strong">Esc</dt>
+              <dd className="text-ink">{t("shortcutClose")}</dd>
+              <dt className="font-mono text-neutral-strong">?</dt>
+              <dd className="text-ink">{t("shortcutToggle")}</dd>
+            </dl>
+            <button
+              type="button"
+              onClick={() => setShowShortcuts(false)}
+              className={`${styles.control} mt-3 rounded-[4px] border border-border px-3 py-1 text-[12px] font-medium text-neutral-strong hover:text-ink`}
+            >
+              {t("shortcutsClose")}
+            </button>
+          </div>
+        </div>
       ) : null}
 
       {/* Session replay: one engine, two surfaces. The expanded map wins when open so
@@ -1056,6 +1437,7 @@ function FrameThumb({
   onExpand,
   alt,
   expandLabel,
+  excludedLabel,
 }: Readonly<{
   frame: ReviewFrame;
   excluded: boolean;
@@ -1066,6 +1448,7 @@ function FrameThumb({
   onExpand: () => void;
   alt: string;
   expandLabel: string;
+  excludedLabel: string;
 }>) {
   return (
     <div className="group relative size-[72px] w-[96px]">
@@ -1100,7 +1483,7 @@ function FrameThumb({
         )}
         {excluded && !deleted ? (
           <span className="absolute inset-x-0 bottom-0 bg-ink/70 py-0.5 text-center text-[8.5px] font-medium uppercase tracking-wide text-surface">
-            excl
+            {excludedLabel}
           </span>
         ) : null}
         {overridden && !excluded && !deleted ? (

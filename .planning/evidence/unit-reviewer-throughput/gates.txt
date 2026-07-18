@@ -1,0 +1,1326 @@
+=== npx tsc --noEmit ===
+PASS
+=== npm run lint ===
+
+> streetlens@0.1.0 lint
+> eslint
+
+PASS
+=== npm run build ===
+
+> streetlens@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/filippofonseca/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0011-harden-real-data/worktrees/unit-reviewer-throughput/package-lock.json
+   * /Users/filippofonseca/Developer/Projects/streetlens/package-lock.json
+
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.2s
+  Running TypeScript ...
+  Finished TypeScript in 5.3s ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/30) ...
+  Generating static pages using 9 workers (7/30) 
+  Generating static pages using 9 workers (14/30) 
+  Generating static pages using 9 workers (22/30) 
+✓ Generating static pages using 9 workers (30/30) in 460ms
+  Finalizing page optimization ...
+
+Route (app)                              Revalidate  Expire
+┌ ○ /_not-found
+├ ● /[locale]                                    5m      1y
+│ ├ /en                                          5m      1y
+│ └ /es                                          5m      1y
+├ ƒ /[locale]/admin
+├ ƒ /[locale]/admin/capture/[id]
+├ ƒ /[locale]/admin/history
+├ ƒ /[locale]/admin/import
+├ ● /[locale]/admin/login
+│ ├ /en/admin/login
+│ └ /es/admin/login
+├ ƒ /[locale]/admin/queue
+├ ● /[locale]/collect
+│ ├ /en/collect
+│ └ /es/collect
+├ ƒ /[locale]/collect/status/[id]
+├ ● /[locale]/map                                5m      1y
+│ ├ /en/map                                      5m      1y
+│ └ /es/map                                      5m      1y
+├ ƒ /api/admin/capture/frame
+├ ƒ /api/admin/capture/review
+├ ƒ /api/admin/import
+├ ƒ /api/admin/login
+├ ƒ /api/admin/logout
+├ ƒ /api/admin/review
+├ ƒ /api/capture/pump
+├ ƒ /api/capture/sessions
+├ ƒ /api/capture/sessions/[id]
+├ ƒ /api/capture/sessions/[id]/finalize
+├ ƒ /api/capture/sessions/[id]/frames
+├ ƒ /api/capture/sessions/[id]/pump
+├ ƒ /api/routing-network
+├ ƒ /api/submissions
+└ ○ /icon.svg
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+PASS
+=== scripts/test-apply-submissions.mjs ===
+  [ok ] baseline official (audited) count is 535 (535)
+  [ok ] baseline collection = 535 audited + canton overlay (1457)
+  [ok ] approve add ok
+  [ok ] approve update ok
+  [ok ] community segment appears in adapter output
+  [ok ] flagged source=community
+  [ok ] flagged verified=false
+  [ok ] NO fabricated scores (all score_* === 0)
+  [ok ] carries a community_report from the note
+  [ok ] geometry is a LineString
+  [ok ] update_segment attached a community report to the target
+  [ok ] report note is qualitative (not a score), carries the reason
+  [ok ] target segment keeps its rubric scores (no mutation)
+  -> stats {"segments":535,"km":76.84,"coveragePct":80.3,"heroPct":29,"communitySegments":1,"cvSessionsReviewed":0,"cvSegments":0,"cvCoveragePct":0}
+  [ok ] official segments still 535 (535)
+  [ok ] communitySegments counted separately (1) (1)
+  [ok ] community add excluded from the audited count (still 535 with no source) (535)
+  [ok ] collection = 535 audited + canton overlay + 1 community add (1458)
+
+APPLY-TEST PASS
+PASS
+=== scripts/test-canonical-observation.mjs ===
+
+canonical selection — latest walk wins
+  [ok ] latest captured_on is canonical
+  [ok ] input order does not matter
+  [ok ] captured_on outranks created_at (recent walk beats recent approval)
+
+tie-breaks — deterministic, never render-order dependent
+  [ok ] same captured_on → latest created_at wins
+  [ok ] fully tied → id tie-break is stable across input orders
+
+hostile input — junk must lose, never throw
+  [ok ] unparseable captured_on loses to a real one
+  [ok ] null captured_on loses to a real one
+  [ok ] all-junk list still returns a deterministic pick, not null
+  [ok ] empty list → null
+  [ok ] null input → null
+  [ok ] non-array input → null
+  [ok ] entries without a string id are skipped
+
+archive split — exhaustive, canonical excluded
+  [ok ] canonical is the latest walk
+  [ok ] archive holds every non-canonical observation (2)
+  [ok ] canonical is NOT in the archive
+  [ok ] archive is newest-first (c,a)
+  [ok ] nothing is dropped — canonical + archive covers the input
+
+no-toggle cases — zero or one observation
+  [ok ] single observation is canonical
+  [ok ] single observation → EMPTY archive (panel renders no toggle)
+  [ok ] empty list → null canonical
+  [ok ] empty list → empty archive
+  [ok ] null input → null canonical, empty archive
+
+PASS — canonical observation
+
+PASS
+=== scripts/test-canton-identity.mjs ===
+
+1. pilot (esc-sa-*) is frozen
+  [ok ] pilot segment count is 535 — got 535
+  [ok ] pilot ids match the frozen list exactly, in order
+  [ok ] pilot feature content hash is unchanged
+  [ok ] the first 535 features are exactly the pilot, in order
+
+2. new districts exist and never collide with the pilot
+  [ok ] Escazú centro (esc-ce-*) has segments — 93
+  [ok ] San Rafael (esc-sr-*) has segments — 829
+  [ok ] esc-ce-* all carry district_id esc-escazu
+  [ok ] esc-sr-* all carry district_id esc-san-rafael
+  [ok ] every canton feature keeps canton_id esc
+  [ok ] no duplicate segment ids across the whole canton — 1457 unique of 1457
+
+PASS — 0 failing check(s)
+PASS
+=== scripts/test-capture-gating.mjs ===
+  [ok ] haversine matches a known 1 km separation 999.6 m
+  [ok ] haversine of a point with itself is zero
+  [ok ] haversine is symmetric
+  [ok ] track distance sums pairwise legs 20.0 m
+  [ok ] track distance of a single fix is zero
+  [ok ] track distance of an empty track is zero
+  [ok ] distance formats metres under 1 km
+  [ok ] distance formats km at and above 1 km
+  [ok ] elapsed formats M:SS
+  [ok ] elapsed formats H:MM:SS past an hour
+  [ok ] toGray applies Rec.601 luma weights 76
+  [ok ] toGray preserves the full range: white to 255, black to 0 255
+  [ok ] toGray returns one byte per pixel
+  [ok ] frameDelta of identical frames is zero
+  [ok ] frameDelta with no previous frame is Infinity, so frame 1 always passes dedupe
+  [ok ] frameDelta of a 10-level shift is 10
+  [ok ] frameDelta guards a length mismatch instead of reading out of bounds
+  [ok ] laplacianVariance of a flat frame is zero
+  [ok ] laplacianVariance of a checkerboard is high 1040400
+  [ok ] laplacianVariance returns 0 for a frame with no interior
+  [ok ] fitDimensions never upscales a small sensor
+  [ok ] fitDimensions clamps the longest side and preserves aspect
+  [ok ] fitDimensions clamps portrait on its long side too
+  [ok ] first frame of a session is kept without motion gates
+  [ok ] a kept frame reports its blur score
+  [ok ] a frame with no GPS fix is dropped as no_fix
+  [ok ] a frame too soon after the last keep is dropped as cadence
+  [ok ] a frame exactly at the cadence threshold passes it
+  [ok ] a stationary phone is dropped as displacement even after the interval
+  [ok ] time alone does not keep a frame
+  [ok ] distance alone does not keep a frame
+  [ok ] cadence rejection never touches pixels 0 calls
+  [ok ] displacement rejection never touches pixels 0 calls
+  [ok ] a frame that clears the cheap gates does compute gray once
+  [ok ] an identical consecutive frame is dropped as duplicate
+  [ok ] a soft frame is dropped as blurry and still reports its score
+  [ok ] a vision-gate drop returns gray so the caller need not recompute it
+  [ok ] a cheap-gate drop returns no gray
+  [ok ] a session under both caps keeps running
+  [ok ] the frame cap stops the session
+  [ok ] the duration cap stops the session
+  [ok ] the frame cap is checked against the value passed in, not a local copy
+  [ok ] emptyDropCounts covers every declared reason with zero
+  [ok ] oversize is a declared reason even though the gate never returns it
+  [ok ] write_failed is a declared reason even though the gate never returns it
+  [ok ] no gate path can return a recorder-only reason
+  [ok ] a new manifest opens one segment
+  [ok ] a new manifest has no server session id yet
+  [ok ] closeSegment closes the open segment
+  [ok ] closeSegment does not mutate its input
+  [ok ] openSegment appends a new open segment after the closed one
+  [ok ] openSegment closes any still-open segment first
+  [ok ] totalDropped sums every reason
+  [ok ] a walk with frames and a two-fix track is recoverable
+  [ok ] a walk with no frames is not recoverable
+  [ok ] a walk with a one-fix track is not recoverable, matching finalize's floor
+  [ok ] an already-uploaded walk is not offered for recovery
+  [ok ] isSessionManifest accepts a real manifest
+  [ok ] isSessionManifest rejects a foreign version
+  [ok ] isSessionManifest rejects null
+  [ok ] isSessionManifest rejects a manifest missing a drop reason
+  [ok ] isSessionManifest rejects a truncated manifest
+
+PASS — recorder gating locked
+PASS
+=== scripts/test-capture-migrations.mjs ===
+SKIP — docker unavailable; migrations unverified locally.
+PASS
+=== scripts/test-capture-rollup.mjs ===
+
+normalization (mirrors generate-demo-audits.mjs itemResponse)
+  [ok ] boolean 1 -> 1
+  [ok ] boolean 0 -> 0
+  [ok ] percent 50 -> 0.5
+  [ok ] scale_0_4 3 -> 0.75
+  [ok ] scale_0_4 4 -> 1
+  [ok ] null stays null — 'not assessable' is not a zero
+
+overall composite (generate-demo-audits.mjs:206-208)
+  [ok ] accessibility = 100 100
+  [ok ] drainage = 50 50
+  [ok ] shade = 0 0
+  [ok ] overall = 0.45*acc + 0.30*drain + 0.25*shade = 60 60
+  [ok ] a lens with no assessable items is null, not 0 — 'could not see' is not 'is bad' null
+  [ok ] an unmeasured lens is excluded from overall, not scored as zero 80 (a zero-fill would give 36)
+  [ok ] nothing assessable anywhere -> every lens null {"overall":null,"accessibility":null,"drainage":null,"shade":null,"bike":null}
+
+confidence-weighted median
+  [ok ] a lone outlier does not move the median 0
+  [ok ] a confident read outweighs a hedged one 4
+  [ok ] no entries -> null
+  [ok ] zero-confidence entries are not evidence
+
+junction item routing (types.ts FrameAttribution.nearJunction)
+  [ok ] curb_ramp is read from the junction frame, which is the only one that can see it {"value":0,"confidence":0.95,"frames":1}
+  [ok ] sidewalk_width is read from the mid-block frame, not the corner shot {"value":4,"confidence":0.9,"frames":1}
+  [ok ] the junction frame does not contribute to mid-block items 1 frames
+  [ok ] crossing_safety is junction-sourced too 1
+
+escalated frames
+  [ok ] an escalated frame counts once, as the stronger model's answer {"value":4,"confidence":0.95,"frames":1}
+  [ok ] coverage counts the frame once 1
+
+unusable frames and coverage
+  [ok ] an unusable frame contributes no values 1
+  [ok ] coverage divides by frames ATTRIBUTED (1/4), so blur shows up as poor coverage 0.25
+  [ok ] the segment still scores from the frame that worked {"overall":77.19,"accessibility":81.25,"drainage":83.33,"shade":62.5,"bike":83.33}
+  [ok ] a segment with nothing readable scores null everywhere and coverage 0 {"c":0,"s":null}
+
+segment grouping
+  [ok ] one rollup per segment 2
+  [ok ] an unattributed frame rolls up to nothing — there is no segment to score
+  [ok ] segments score independently 100 vs 25
+
+track validation and interpolation
+  [ok ] a live track needs 10 fixes
+  [ok ] a 10-fix live track over 45 s is fine
+  [ok ] a sparse gpx import is accepted — it is not a live capture and must not be held to one
+  [ok ] fixes with error bars wider than the matcher's gate are dropped {"ok":false,"reason":"track_too_short_after_accuracy_filter","dropped":10}
+  [ok ] a fix that reports no accuracy is kept, not assumed bad
+  [ok ] a frame between two fixes interpolates {"lng":-84.15,"lat":9.90605}
+  [ok ] a frame before the track began has no location, rather than an invented one
+  [ok ] a frame after the track ended is null too
+  [ok ] an exact fix time returns that fix
+
+PASS — capture rollup + scoring
+PASS
+=== scripts/test-capture-route.mjs ===
+  [ok ] a timed GPX parses
+  [ok ] a timed GPX yields every trackpoint
+  [ok ] a fully timed GPX reports hasTimes
+  [ok ] lat and lon map onto lat/lng
+  [ok ] ele is parsed when present
+  [ok ] time is parsed to epoch ms UTC 1784210400000
+  [ok ] points come out in document order, unsorted
+  [ok ] a timed GPX carries no non-finite numbers
+  [ok ] an untimed GPX still parses
+  [ok ] an untimed GPX reports hasTimes false
+  [ok ] an untimed GPX keeps its geometry
+  [ok ] self-closing trkpt is read
+  [ok ] self-closing trkpt has no time, so hasTimes is false
+  [ok ] attribute order reversed and single quotes both read
+  [ok ] a partially timed GPX is demoted to untimed
+  [ok ] a demoted GPX carries no leftover timestamps
+  [ok ] an unparseable time makes the point untimed, not invalid
+  [ok ] an empty string is not_gpx
+  [ok ] arbitrary XML is not_gpx
+  [ok ] a GPX with no trackpoints is no_trackpoints
+  [ok ] latitude past the pole is malformed_coordinates
+  [ok ] longitude past the antimeridian is malformed_coordinates
+  [ok ] a non-numeric coordinate is malformed_coordinates
+  [ok ] a trkpt missing lon is malformed_coordinates
+  [ok ] one bad point rejects the whole file rather than silently cutting a corner
+  [ok ] pathLengthMeters matches a known 1 km separation 999.6 m
+  [ok ] pathLengthMeters sums pairwise legs
+  [ok ] pathLengthMeters of one vertex is zero
+  [ok ] pathLengthMeters of an empty path is zero
+  [ok ] every vertex gets a timestamp
+  [ok ] the first vertex lands exactly on startT
+  [ok ] the last vertex lands exactly on endT
+  [ok ] an evenly spaced midpoint lands on the midpoint time 10000 ms in
+  [ok ] times ascend strictly
+  [ok ] geometry is carried through untouched
+  [ok ] no accuracy is invented, so validateTrack keeps every fix
+  [ok ] distributed times carry no non-finite numbers
+  [ok ] the result is a valid trace track
+  [ok ] no fix is dropped by the accuracy filter
+  [ok ] an unevenly spaced vertex is timed by distance, not by index 8180.908180908568 ms of 10000
+  [ok ] an empty path distributes to an empty track
+  [ok ] a single vertex gets startT and comes back alone
+  [ok ] a single vertex is not a track, and validateTrack says so
+  [ok ] coincident vertices spread evenly by index rather than dividing by zero
+  [ok ] a zero-length path produces no NaN
+  [ok ] the even index spread hits the expected thirds 0, 10000, 20000, 30000
+  [ok ] endT before startT clamps the span to zero rather than running time backwards
+  [ok ] an inverted span produces no NaN
+  [ok ] a zero-span track still sorts and validates as a trace
+  [ok ] interpolateAt at the midpoint time returns the midpoint vertex 9.918790, -84.140800
+  [ok ] interpolateAt a quarter in lands on the path between vertices
+  [ok ] a frame shot before the video started is not placed
+  [ok ] a frame shot after the video ended is not placed
+  [ok ] positionAtFraction of an empty path is null
+  [ok ] fraction 0 is the first vertex
+  [ok ] fraction 1 is the last vertex
+  [ok ] fraction 0.5 is the midpoint of an evenly spaced path 9.91879
+  [ok ] fraction 0.5 measures by distance on an uneven path, so it sits early
+  [ok ] an overshooting fraction clamps to the end
+  [ok ] an undershooting fraction clamps to the start
+  [ok ] a NaN fraction reads as 0 rather than returning NaN
+  [ok ] a zero-length path returns its only place, not NaN
+  [ok ] a one-vertex path returns that vertex
+  [ok ] a timed GPX validates straight through as a gpx track
+  [ok ] an untimed GPX's geometry can be timed by the route maths instead
+
+PASS — GPX parse and route distribution locked
+PASS
+=== scripts/test-capture-schemas.mjs ===
+  [ok ] frame path is zero-padded to 4 digits captures/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frame-0007.jpg
+  [ok ] frame path pads the high end without truncating
+  [ok ] frame paths sort lexicographically in capture order
+  [ok ] negative seq throws rather than producing frame--001.jpg
+  [ok ] non-integer seq throws
+  [ok ] prefix matches the path's parent
+  [ok ] parsed 15 rubric keys out of generate-demo-audits.mjs got 15
+  [ok ] RUBRIC_ITEM_KEYS matches the generator exactly, in order 
+    gen: ["sidewalk_present","sidewalk_width","surface_condition","curb_ramp","obstruction_free","drain_present","standing_water","curb_gutter","canopy_cover","midday_shade","lighting","crossing_safety","bike_lane_present","bike_separation","bike_surface"]
+    lib: ["sidewalk_present","sidewalk_width","surface_condition","curb_ramp","obstruction_free","drain_present","standing_water","curb_gutter","canopy_cover","midday_shade","lighting","crossing_safety","bike_lane_present","bike_separation","bike_surface"]
+  [ok ] response types match the generator item-for-item 
+    gen: ["boolean","scale_0_4","scale_0_4","boolean","scale_0_4","boolean","scale_0_4","scale_0_4","percent","scale_0_4","scale_0_4","scale_0_4","boolean","scale_0_4","scale_0_4"]
+    lib: ["boolean","scale_0_4","scale_0_4","boolean","scale_0_4","boolean","scale_0_4","scale_0_4","percent","scale_0_4","scale_0_4","scale_0_4","boolean","scale_0_4","scale_0_4"]
+  [ok ] every key has a scoring lens
+  [ok ] canonical observation parses
+  [ok ] boolean true/false normalizes to 1/0 -> 1/0
+  [ok ] boolean item rejects 2
+  [ok ] scale_0_4 rejects 5
+  [ok ] scale_0_4 rejects a non-integer
+  [ok ] percent rejects 101
+  [ok ] percent accepts a fractional value
+  [ok ] null is accepted for every response type and stays null (never coerced to 0)
+  [ok ] confidence > 1 rejected
+  [ok ] a missing rubric item is rejected
+  [ok ] an invented rubric item is rejected
+  [ok ] wrong schemaVersion is rejected
+  [ok ] a missing per-frame rationale is rejected
+  [ok ] the rationale is trimmed and kept a trimmed note
+  [ok ] unusable frame with a reason parses
+  [ok ] observation drops model-asserted attribution (segmentId/nearJunction)
+  [ok ] a two-fix track parses
+  [ok ] a one-fix track is rejected
+  [ok ] seconds-since-epoch timestamp is rejected
+  [ok ] a fix outside Costa Rica is rejected
+  [ok ] finalize defaults clockOffsetMs to 0
+  [ok ] finalize rejects an implausible clock offset (> 1h)
+  [ok ] finalize rejects an unknown track source
+  [ok ] a valid frame batch parses
+  [ok ] a client-chosen storagePath is rejected
+  [ok ] a path belonging to ANOTHER session is rejected
+  [ok ] a duplicate seq within the batch is rejected
+  [ok ] an oversized frame is rejected at the schema, not the bucket
+  [ok ] seq >= maxFrames is rejected
+  [ok ] an empty batch is rejected
+  [ok ] a session request parses
+  [ok ] honeypot content is rejected by the schema
+  [ok ] an unknown mode is rejected
+  [ok ] maxFrameBytes stays in step with the bucket file_size_limit (2 MiB)
+  [ok ] every declared status is accepted
+  [ok ] an unknown status is rejected
+  [ok ] uploadable statuses are a subset of all statuses
+
+PASS — capture contracts locked
+PASS
+=== scripts/test-cv-apply.mjs ===
+  [ok ] baseline: the demo collection is 535 audited segments (535)
+
+builders
+  [ok ] id derives from session + segment (so re-approving upserts) cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0001
+  [ok ] source is cv
+  [ok ] captured_on is the WALK date, not the approval date
+  [ok ] a null lens stays null (unknown is not zero) {"overall":62.5,"accessibility":41,"drainage":null,"shade":58,"bike":30}
+  [ok ] an untouched observation is not human_corrected
+  [ok ] an untouched observation carries an empty overrides record
+  [ok ] an observation with no assessment carries a null assessment null
+
+approve two segments
+  [ok ] applied locally {"mode":"local","kind":"cv_observation","session_id":"3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b","ids":["cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0001","cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0002"]}
+  [ok ] two observations landed ["cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0001","cv-3f7a1c92-5b6d-4e8f-9a0b-1c2d3e4f5a6b-esc-sa-0002"]
+  [ok ] the audited segment now carries cv_observations
+  [ok ] and its cv_observation keeps the null lens as null
+  [ok ] cv_count mirrors cv_observations.length (1)
+  [ok ] THE INVARIANT: the audited segment's own properties are untouched 
+    before: {"id":"esc-sa-0001","name":"Calle 130","district":"San Antonio","score_overall":73,"score_accessibility":74,"score_drainage":71,"score_shade":72,"score_bike":15,"audited_at":"2026-07-10","demo":true}
+    after:  {"id":"esc-sa-0001","name":"Calle 130","district":"San Antonio","score_overall":73,"score_accessibility":74,"score_drainage":71,"score_shade":72,"score_bike":15,"audited_at":"2026-07-10","demo":true}
+  [ok ] a segment the walk never saw carries no cv_observations
+  [ok ] stats.segments is STILL 535 (a camera pass is not an audit) (535)
+  [ok ] cvSessionsReviewed counts the session (1)
+  [ok ] cvSegments counts the covered segments (2)
+  [ok ] communitySegments is unaffected (0)
+  [ok ] km/coverage/hero are untouched by CV {"km":76.84,"coveragePct":80.3,"heroPct":29}
+  [ok ] the collection gained NO features (CV attaches, it does not add segments) (1457 vs 1457)
+
+re-approve the same set
+  [ok ] still exactly two rows (upsert, not duplicate) (2)
+  [ok ] and the counts did not drift
+
+re-approve with one segment unticked
+  [ok ] the retracted segment is gone from the store ["esc-sa-0001"]
+  [ok ] and it no longer carries cv_observations on the map
+  [ok ] while the still-ticked segment keeps its observation
+  [ok ] cvSegments follows the retraction (1)
+  [ok ] stats.segments is STILL 535 (535)
+
+approve a corrected segment alongside a pure-CV one
+  [ok ] the corrected segment persists human_corrected = true
+  [ok ] the corrected segment persists the compact overrides record
+  [ok ] the corrected segment persists its approved assessment verbatim
+  [ok ] the untouched segment stays pure CV (not human_corrected)
+  [ok ] the untouched segment carries an empty overrides record
+  [ok ] the segment with no synthesis persists a null assessment null
+  [ok ] human_corrected reaches the map feature for the marker
+  [ok ] the assessment overall text reaches the map feature for the popover
+  [ok ] the reviewer's chosen number lands on the map, not the synthesis's adjustedScore
+  [ok ] THE INVARIANT holds under correction: audited properties untouched
+
+approve nothing (a full retraction)
+  [ok ] the store is empty for that session (0)
+  [ok ] the CV counts go back to zero
+  [ok ] and the audited dataset is exactly where it started
+
+PASS — CV apply attaches, upserts, retracts, and never touches an audit
+PASS
+=== scripts/test-cv-provenance.mjs ===
+  [ok ] EN date is long + localized July 15, 2026
+  [ok ] ES date is long + localized 15 de julio de 2026
+  [ok ] date is pinned to UTC (no local-zone day drift) July 16, 2026
+  [ok ] bad dates -> null, no throw [null,null,null,null,null,null]
+  [ok ] email contact shown as given
+  [ok ] named contact shown as given
+  [ok ] whitespace collapsed + trimmed "ana solis"
+  [ok ] no contact -> null, no throw [null,null,null,null,null,null]
+  [ok ] oversized contact is capped len=80
+
+PASS — cv-provenance formatting is locale-stable and junk-tolerant
+PASS
+=== scripts/test-extraction-worker.mjs ===
+
+happy path
+  [ok ] 3 frames claimed, 3 done, 0 failed, 0 remaining {"claimed":3,"done":3,"failed":0,"remaining":0}
+  [ok ] one model call per frame got 3
+  [ok ] three observations written
+  [ok ] observation records the model and token usage
+  [ok ] the model's per-frame rationale flows through to the write path "Narrow paved residential street, no sidewalk either side; open gutter at the right edge; scattered canopy overhead."
+  [ok ] session rolled up and marked review_ready status=review_ready rollups=1
+  [ok ] rollup carries lens scores {"overall":75.94,"accessibility":81.25,"drainage":83.33,"shade":57.5,"bike":83.33}
+  [ok ] session filed into the review queue exactly once (u30) ["0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e"]
+  [ok ] filed BEFORE the review_ready latch (u30) ["emit:0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e","status:review_ready"]
+
+queue emit failure leaves the session retryable
+[capture] rollup failed for 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e: queue unavailable
+  [ok ] a failed emit does NOT flip the session to review_ready status=extracting
+  [ok ] the emit was attempted attempts=1
+  [ok ] no review_ready was ever written []
+  [ok ] the next pump re-files it and lands review_ready status=review_ready emits=2 claimed=0
+
+cost breaker
+[capture] session 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e cost_paused: frame billed 30000 input tokens, over a ceiling of 6216 = ~5016 static request (prompt + schema) + 1200 image budget
+  [ok ] no observation is written for an over-budget frame
+  [ok ] the tripping job is failed_overbudget failed_overbudget
+  [ok ] the session is cost_paused cost_paused
+  [ok ] every frame is reported failed {"claimed":3,"done":0,"failed":3,"remaining":2}
+  [ok ] the breaker stops the session after the first frame, it does not keep paying 1 model calls
+  [ok ] the untouched frames go back to pending, not failed
+  [ok ] the breaker message shows what the ceiling is made of, not a bare number input_tokens=30000 exceeds the per-frame ceiling of 6216 = ~5016 static request (prompt + schema) + 1200 image budget
+
+cost breaker precedence
+[capture] session 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e cost_paused: frame billed 6217 input tokens, over a ceiling of 6216 = ~5016 static request (prompt + schema) + 1200 image budget
+  [ok ] a perfectly valid answer one token over the ceiling is still rejected
+  [ok ] a frame exactly at the ceiling is accepted — the guard is >, not >=
+
+prompt-aware ceiling
+  [ok ] the ceiling is derived from the measured request, not hardcoded 6216 vs ~5016 + 1200
+  [ok ] it clears the whole static request, which a correct call always pays
+  [ok ] the strict schema is counted, not just the prompt — it is ~1900 billed tokens static ~5016 vs prompt ~2973
+  [ok ] an image billed an order of magnitude over its ~470 tokens still trips it static + 4700 = 9716 vs 6216
+  [ok ] the composition is spelled out for whoever finds the paused session 6216 = ~5016 static request (prompt + schema) + 1200 image budget
+  [ok ] CV_INPUT_TOKEN_CEILING overrides it, and says so 999 (CV_INPUT_TOKEN_CEILING override)
+  [ok ] an empty override falls back to the derived ceiling
+  [ok ] a junk override does not disable the breaker
+
+frame downscale
+  [ok ] the model is sent inline JPEG bytes, not the storage URL data:image/jpeg;base64,/9j/2wBDAAoHBwgHB
+  [ok ] the storage URL is never what reaches the model
+  [ok ] the image is downscaled to 512 px on the longest side 512x355 (fixture is 960x666)
+  [ok ] aspect ratio is preserved — the model sees the street, not a squash 1.442
+  [ok ] the bounded image cannot cost more than the image budget, hint or no hint 192 patches ~= 473 tokens vs a 1200 budget
+  [ok ] an escalated frame is fetched and shrunk once, not twice 2 model calls, 1 fetch(es)
+  [ok ] both models are asked about the same downscaled bytes
+  [ok ] a frame that cannot be fetched fails the attempt without paying a model image_prepare: 404 gone
+  [ok ] a data: URL is decoded directly and downscaled the same way 512x355
+  [ok ] the downscaled frame is a fraction of the original's bytes 52 KB vs 218 KB
+
+escalation
+  [ok ] a low-confidence frame escalates to the stronger model 1 escalated
+  [ok ] the escalated row carries the STRONGER model's rationale, not the cheap one's "Stronger model: clearly a two-lane street with an intact gutter on both edges."
+  [ok ] escalation is capped at 10% of session frames 1 escalated of 10 frames
+  [ok ] past the cap the cheap model's answer is kept rather than dropped 10 observations
+  [ok ] a confident frame does not escalate
+  [ok ] an unusable frame does not escalate — the truck is really in the way 3 calls
+
+refusal and incomplete
+  [ok ] a refusal is a failed attempt, requeued below the attempts cap pending: refusal: I can't help with that.
+  [ok ] a refusal writes no observation
+  [ok ] a truncated response is a failed attempt with the reason recorded incomplete: max_output_tokens
+  [ok ] unparsable output fails the attempt rather than throwing json_parse: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+  [ok ] an out-of-range value is rejected even though strict json_schema 'guaranteed' it schema: [{"origin":"number","code":"too_big","maximum":4,"inclusive":true,"path":["items","sidewalk_width","value"],"message":"Too big: expected number to be <=4"}]
+  [ok ] a response missing the rationale is rejected, not stored blank schema: [{"expected":"string","code":"invalid_type","path":["rationale"],"message":"Invalid input: expected string, received undefined"}]
+
+attempts cap
+  [ok ] the third failed attempt is terminal, not requeued forever failed
+  [ok ] a job past the attempts cap is failed without paying a model 0 calls
+
+concurrent pump safety
+  [ok ] two concurrent pumps never process the same frame twice 8 calls over 8 distinct frames
+  [ok ] between them they claim every job exactly once 8 + 0
+  [ok ] all 8 frames end done
+  [ok ] the session is rolled up exactly once ["review_ready"]
+
+kill switch
+  [ok ] the switch off means no claim and no spend, with work left waiting {"claimed":0,"done":0,"failed":0,"remaining":3}
+  [ok ] an unset switch fails closed
+
+per-session budget
+  [ok ] CV_SESSION_TOKENS_PER_FRAME sets the per-frame allowance 3000
+  [ok ] unset, the allowance is derived from the ceiling plus the escalation cap
+[capture] session 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e cost_paused: session budget exhausted (5000/3000 input tokens)
+  [ok ] a session under the per-frame ceiling still gets caught by its own budget status=cost_paused spent=5000/3000
+  [ok ] the overrun is caught on the LAST frame too, not silently passed as review_ready ["cost_paused"]
+  [ok ] frames already paid for keep their data — the spend is sunk either way 2 observations
+  [ok ] a normal session finishes without tripping the budget status=review_ready
+
+request shape and prompt caching
+  [ok ] detail:low still rides along as belt-and-braces, even though it is ignored
+  [ok ] the image the caller prepared goes through verbatim
+  [ok ] the cacheable prefix rides in instructions, not the per-frame turn
+  [ok ] structured output is strict
+  [ok ] the schema demands exactly the 15 rubric items
+  [ok ] the schema requires a per-frame rationale string alongside the items ["schemaVersion","items","frameQuality","rationale"]
+  [ok ] the prefix is byte-identical across frames, or caching never engages
+  [ok ] the prefix clears the 1024-token floor prompt caching needs ~2973 tokens
+
+response sorting
+  [ok ] a refusal is recognised as a refusal, not a parse failure
+  [ok ] a refusal still reports its usage — it was billed
+  [ok ] truncation is distinguished from refusal
+  [ok ] a good answer yields its text and cached-token count
+
+frameQuality reason (wire null vs schema optional)
+  [ok ] a usable frame reporting reason:null validates
+  [ok ] an unusable frame keeps its reason and is recorded, not dropped
+
+escalation predicate
+  [ok ] a hedged item on a usable frame escalates
+  [ok ] a confident frame does not
+  [ok ] a low-confidence NULL does not escalate — that is an honest 'cannot see it'
+
+retry policy
+  [ok ] an ordinary 429 is retried and can succeed 3 attempts
+  [ok ] insufficient_quota fails fast instead of backing off three times 1 attempt(s)
+  [ok ] a 400 is our bug and is not retried 1 attempt(s)
+
+request parameters
+  [ok ] no temperature — gpt-5 reasoning models 400 the whole request on it ["model","instructions","input","text","store"]
+
+transport failure
+  [ok ] a transport failure is a failed attempt reporting no spend transport: ECONNRESET
+
+synthesis drain stage
+  [ok ] the session still rolled up and reached review_ready status=review_ready
+  [ok ] synthesis ran once and persisted an assessment
+  [ok ] the wild delta is clamped to the +/-20 bound 20
+  [ok ] adjustedScores = clamp(baseline + bounded delta) 100 from base 81.25
+  [ok ] overall is recomputed from the adjusted lenses, not copied from the model 83.12
+  [ok ] the synthesis spend is recorded on the write for the session ledger {"i":512,"o":210}
+  [ok ] baseline bike is null when no frame could assess it {"overall":75.94,"accessibility":81.25,"drainage":83.33,"shade":57.5,"bike":null}
+  [ok ] synthesis cannot invent a score for a null-baseline lens
+  [ok ] and no bike adjustment is recorded
+[capture] synthesis failed for 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/north-st: refusal: no
+  [ok ] a synthesis refusal writes no assessment
+  [ok ] the session still rolls up and reaches review_ready
+  [ok ] synthesis was attempted
+[capture] synthesis failed for 0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/north-st: transport: boom
+  [ok ] a synthesis throw leaves the session review_ready with no assessment status=review_ready
+  [ok ] synthesis does not run while the kill switch is off 0 calls
+  [ok ] the rollup still lands and the session reaches review_ready
+
+PASS — extraction worker
+PASS
+=== scripts/test-honeypot-type.mjs ===
+  [ok ] a honeypotted cv_capture is filed as cv_capture, NOT add_segment (the bug) got type=cv_capture
+  [ok ] it is still rejected with 400
+  [ok ] it is still recorded as rejected + honeypot_tripped
+  [ok ] a honeypotted update_segment is still update_segment got update_segment
+  [ok ] a honeypotted add_segment is still add_segment got add_segment
+  [ok ] an unrecognized type is filed as `unknown`, not mislabelled add_segment got unknown
+  [ok ] the raw submitted type is kept in the payload for forensics {"rejected":"honeypot","submitted_type":"wat"}
+  [ok ] an unrecognized type still yields 400, never a 500
+  [ok ] a 5000-char type does not reach the type column
+  [ok ] the forensic copy is truncated (never an unbounded attacker string) len=64
+  [ok ] still a 400
+  [ok ] a non-string type is filed as unknown got unknown
+  [ok ] a non-string type records no forensic string {"rejected":"honeypot"}
+  [ok ] a missing type is filed as unknown got unknown
+  [ok ] the rejected payload still records the honeypot reason {"rejected":"honeypot"}
+  [ok ] the source ip is hashed, never raw
+  [ok ] a clean add_segment still returns 201 got 201
+  [ok ] a clean add_segment still persists as pending
+  [ok ] a clean add_segment is not flagged
+  [ok ] an invalid payload still returns 400
+  [ok ] a clean cv_capture is still rejected (no envelope schema yet — later unit) got 400
+
+PASS — honeypot preserves the submitted type
+PASS
+=== scripts/test-i18n-parity.mjs ===
+en leaf keys: 945
+es leaf keys: 945
+only in en: 0 []
+only in es: 0 []
+leaf-type mismatch: 0 []
+lightbox keys present both sides: 8/8 []
+
+PARITY: OK (identical key sets)
+PASS
+=== scripts/test-import-dryrun.mjs ===
+  [ok ] GeoJSON parsed 4 features (4)
+  -> summary {"total":4,"valid":2,"invalid":1,"duplicate":1,"outOfBounds":1}
+  [ok ] summary.total = 4
+  [ok ] summary.valid = 2 (2)
+  [ok ] summary.invalid = 1 (1)
+  [ok ] summary.duplicate = 1 (1)
+  [ok ] summary.outOfBounds = 1 (1)
+  [ok ] row 0 valid, no issues
+  [ok ] row 1 valid + bbox issue
+  [ok ] row 2 invalid + schema issue
+  [ok ] row 3 duplicate + duplicate issue
+  [ok ] commit-eligible features = valid rows only (2)
+  [ok ] CSV parsed 2 rows (2)
+  [ok ] CSV row 0 valid
+  [ok ] CSV row 1 invalid (bad highway)
+  [ok ] garbage file → parseFile null
+  [ok ] ZERO side effects (no community file written)
+
+DRYRUN-TEST PASS
+PASS
+=== scripts/test-map-cv-visibility.mjs ===
+
+routing — which casing draws each feature
+  [ok ] import + camera observations → CV casing
+  [ok ] import + camera observations → NOT neutral casing
+  [ok ] import + camera observations → not the score ramp
+  [ok ] import, zero observations → neutral casing (unchanged)
+  [ok ] import, zero observations → no CV casing
+  [ok ] import, cv_count absent → neutral casing (unchanged)
+  [ok ] import, cv_count absent → no CV casing
+  [ok ] community + observations → CV casing, not neutral
+  [ok ] audited + observations → score ramp still draws it
+  [ok ] audited + observations → CV casing also draws it (halo)
+  [ok ] audited + observations → never the neutral casing
+  [ok ] audited, no observations → ramp only
+
+no double-draw — the neutral and CV casings are disjoint
+  [ok ] never both neutral and CV: {"source":"import","cv_count":1}
+  [ok ] never both neutral and CV: {"source":"import","cv_count":0}
+  [ok ] never both neutral and CV: {"source":"community","cv_count":5}
+  [ok ] never both neutral and CV: {"source":"community"}
+
+visual distinctness — the accent cannot collide
+  [ok ] CV light accent is not a score-ramp colour #f0268c
+  [ok ] CV light accent is not the neutral casing colour #f0268c
+  [ok ] CV dark accent is not a score-ramp colour #ff77b8
+  [ok ] CV dark accent is not the neutral casing colour #ff77b8
+  [ok ] CV casing is wider than the neutral casing 5 > 3
+  [ok ] CV casing is solid (no dash array), unlike the provisional neutral dash
+
+zoomed-out visibility — the width floor holds
+  [ok ] width at far zoom holds the floor 3.5
+  [ok ] width at the floor zoom equals minWidth 3.5
+  [ok ] width at full zoom equals the full width 5
+  [ok ] floor is thick enough to stay visible small 3.5
+  [ok ] selected is the thickest state
+
+PASS — camera-observed segments route to their own casing
+
+(node:4630) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0011-harden-real-data/worktrees/unit-reviewer-throughput/components/mapConfig.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0011-harden-real-data/worktrees/unit-reviewer-throughput/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS
+=== scripts/test-matching-baseline.mjs ===
+  [ok ] a clean pass yields exactly one traversal of the right street got ["north-st"]
+  [ok ] traversal spans the full track time 1784000000000..1784000009000
+  [ok ] traversal length is the real ground distance (~219 m, +/-5%) got 219.1 m
+  [ok ] a fully matched track has no unmatched spans
+  [ok ] routeLine is a LineString with one position per fix
+  [ok ] a track beyond the gate matches nothing
+  [ok ] an unmatched track reports one unmatched span, not an error [{"tStart":1784000000000,"tEnd":1784000009000}]
+  [ok ] routeLine falls back to raw fixes when nothing snaps
+  [ok ] a ~22 m offset fix matches under the default 30 m gate
+  [ok ] the same fix is unmatched under a 10 m gate
+  [ok ] a single-fix flicker does not become its own traversal got ["north-st"]
+  [ok ] the pass re-merges across the flicker instead of splitting in two
+  [ok ] minRunFixes:1 disables smoothing and the flicker DOES split the pass got 3 traversals
+  [ok ] two passes yield two traversals in chronological order got ["north-st","south-st"]
+  [ok ] an out-and-back on one street stays two traversals got 1 (baseline has no direction model; documented weakness)
+  [ok ] out-of-order fixes are sorted, not trusted (one clean traversal) 1 traversals, 1784000000000..1784000009000
+  [ok ] an empty track returns an empty result rather than throwing
+  [ok ] fixes sharing one timestamp do not hang or throw 1 traversals
+  [ok ] no candidate segments -> everything unmatched, no throw
+  [ok ] frames captured during a pass land on that traversal got [0,1,2]
+  [ok ] frames at the street's ends are flagged nearJunction got [0,2]
+  [ok ] a mid-block frame is NOT nearJunction
+  [ok ] nearJunctionSeqs is a subset of frameSeqs
+  [ok ] attributeFrames returns an entry for EVERY frame
+  [ok ] a matched mid-block frame maps to its segment, nearJunction false {"segmentId":"north-st","nearJunction":false}
+  [ok ] a junction frame maps to its segment, nearJunction true {"segmentId":"north-st","nearJunction":true}
+  [ok ] a frame outside every traversal is present with segmentId null (never dropped) {"segmentId":null,"nearJunction":false}
+  [ok ] junctionRadiusM:200 pulls even the mid-block frame into nearJunction
+  [ok ] the nearJunction test measures from the frame's interpolated position
+  [ok ] matching without frames leaves frameSeqs empty, not undefined
+  [ok ] attributeFrames on a frameless match still lists the frames
+  [ok ] data/segments.geojson metadata.bbox is still LAT-first (Overpass order) [9.886664,-84.186221,9.97244,-84.121212]
+  [ok ] the baseline never reads metadata.bbox (it computes bboxes from geometry)
+  [ok ] the default segment source loads and matches a real segment matched esc-sa-0001 (expected around esc-sa-0001)
+
+PASS — matching contract holds
+PASS
+=== scripts/test-matching-canton.mjs ===
+  [ok ] fixture esc-ce-0040 is present in the canton network
+[canton] network carries 1457 segments; 93 in Escazú centro
+
+1. noisy straight walk down esc-ce-0040 (Calle 35), 8 m Gaussian noise
+  [ok ] the walk yields exactly one traversal — got ["esc-ce-0040"]
+  [ok ] ...matched to the centro street actually walked — got esc-ce-0040
+  [ok ] every matched segment is in Escazú centro (no cross-district flip) — got ["esc-ce-0040"]
+  [ok ] traversal length is close to the distance walked (+/-15%) — got 145.8 m of ~133 m
+  [ok ] a fully matched centro walk reports no unmatched spans
+  [ok ] routeLine is a LineString on the canton network
+
+2. matching stays deterministic over the larger canton network
+  [ok ] same input, same output twice
+
+PASS — 0 failing check(s)
+PASS
+=== scripts/test-matching-hmm.mjs ===
+
+1. straight walk down one street, 8 m Gaussian noise
+  [ok ] a noisy straight walk yields exactly one traversal — got ["esc-sa-0170"]
+  [ok ] ...of the street actually walked — got esc-sa-0170
+  [ok ] traversal length is close to the 170 m walked (+/-15%) — got 155.1 m
+  [ok ] a fully matched track reports no unmatched spans
+  [ok ] routeLine is a LineString on the network
+
+2. parallel streets 12-18 m apart: HMM holds, baseline flips
+  [ok ] the HMM stays on the street walked and never flips to the parallel one — got ["esc-sa-0451"]
+  [ok ] the HMM does not shatter the pass into multiple traversals — got 1
+  [ok ] the naive baseline DOES flip onto the parallel street (proves the fixture is hard) — baseline got ["esc-sa-0196","esc-sa-0450","esc-sa-0451","esc-sa-0450","esc-sa-0451","esc-sa-0196","esc-sa-0451","esc-sa-0196","esc-sa-0451","esc-sa-0196","esc-sa-0451","esc-sa-0196","esc-sa-0276","esc-sa-0451"]
+
+3. L-shaped walk through a junction
+  [ok ] an L-shaped walk yields two traversals — got ["esc-sa-0090","esc-sa-0291"]
+  [ok ] ...in the order they were walked — got ["esc-sa-0090","esc-sa-0291"]
+  [ok ] traversals are chronological
+  [ok ] frames at the shared junction are flagged nearJunction — got 22 / 25
+  [ok ] nearJunctionSeqs is always a subset of frameSeqs
+  [ok ] every flagged frame is genuinely near a junction of its own segment (<=35 m incl. GPS noise) — worst flagged frame is 31.1 m from its nearest junction
+  [ok ] mid-block frames are NOT flagged (the flag means something)
+  [ok ] attributeFrames returns an entry for EVERY frame
+
+4. mid-track 60 s GPS dropout
+  [ok ] a dropout does not throw
+  [ok ] the walk either side of the hole is still matched to the right street — got ["esc-sa-0170","esc-sa-0170"]
+  [ok ] the dropout splits the track into two sub-trajectories rather than one bridged pass — got 2 traversals
+  [ok ] the hole is reported as an unmatched span, not silently bridged — [{"tStart":1784000042000,"tEnd":1784000102000}]
+
+5. track entirely off-network
+  [ok ] an off-network track matches nothing — got []
+  [ok ] an off-network track reports one full unmatched span, not an error — [{"tStart":1784000000000,"tEnd":1784000019000}]
+  [ok ] routeLine falls back to the raw fixes
+
+6. per-frame attribution along the L walk
+  [ok ] mid-block frames on both arms were attributed — 110 / 70
+  [ok ] no mid-block frame is attributed to the wrong arm — 0 wrong
+  [ok ] every frame has an entry, and frames on the route are non-null — 215/215 attributed
+
+7. out-and-back on one street
+  [ok ] an out-and-back on one street is TWO traversals, not one merged span — got 2
+  [ok ] ...both on the street walked — got ["esc-sa-0170","esc-sa-0170"]
+  [ok ] ...split at the turnaround, not at an arbitrary point — first pass ends 1s from the real turnaround
+  [ok ] each leg measures roughly the 170 m walked (+/-20%) — got 173 / 176 m
+  [ok ] ...while a one-way walk with MORE noise stays a single traversal — got 1
+
+8. contract edge cases
+  [ok ] an empty track returns an empty result rather than throwing
+  [ok ] no candidate segments -> everything unmatched, no throw
+  [ok ] fixes sharing one timestamp do not hang or throw — 1 traversals
+  [ok ] out-of-order fixes are sorted, not trusted — 1 traversals
+  [ok ] fixes with accuracy worse than the floor are dropped, leaving one unmatched span — 0 traversals, 1 spans
+  [ok ] matching is deterministic across calls
+
+PASS — 0 failing check(s)
+PASS
+=== scripts/test-mp4box-contract.mjs ===
+  [ok ] createFile(true) keeps the sample bytes discardMdatData=false
+  [ok ] createFile(false) would silently discard them discardMdatData=true
+  [ok ] the default is the discarding one so the argument is never optional for us
+  [ok ] ISOFile.appendBuffer exists
+  [ok ] ISOFile.flush exists
+  [ok ] ISOFile.start exists
+  [ok ] ISOFile.setExtractionOptions exists
+  [ok ] ISOFile.releaseUsedSamples exists
+  [ok ] ISOFile.getTrackById exists
+  [ok ] MP4BoxBuffer.fromArrayBuffer carries the fileStart
+  [ok ] a non-video file does not crash the parser
+  [ok ] a non-video file yields no moov
+
+PASS — mp4box still behaves the way video-demux.ts assumes
+PASS
+=== scripts/test-panel-vitality.mjs ===
+  [ok ] panel.module.css authors a prefers-reduced-motion: reduce block
+  [ok ] at least one class animates (the test can actually fail) meterFill, gaugeFill, settle
+  [ok ] every animated class has a reduced-motion variant meterFill, gaugeFill, settle
+  [ok ] meter and gauge fills cancel their animation outright under reduced motion
+  [ok ] and hold no residual transform (the bar is at full width, not scaled)
+  [ok ] the settle keeps an opacity-only arrival rather than being stripped
+  [ok ] no literal duration in the panel exceeds the 300ms budget
+  [ok ] animations use the motion tokens rather than ad-hoc durations
+  [ok ] stagger offsets stay inside one gesture (≤200ms) delays: 0, 60, 120, 180ms
+  [ok ] the three provenance chips each take a distinct register
+  [ok ] chipCommunity keeps its icon and its text label alongside the colour
+  [ok ] chipCv keeps its icon and its text label alongside the colour
+  [ok ] chipCorrected keeps its icon and its text label alongside the colour
+  [ok ] meters are decorative in the a11y tree (the numeral already says it)
+  [ok ] an unestablished lens gets an empty dashed track, never a 0% fill
+  [ok ] the panel takes its ink from scoreColor, not from raw ramp hexes
+  [ok ] detail+layers copy unchanged in en.json since bed92e2c
+  [ok ] detail+layers copy unchanged in es.json since bed92e2c
+  [ok ] and have no uncommitted edits either
+
+PASS — reduced motion authored, colour never sole channel, copy untouched.
+PASS
+=== scripts/test-parse-feature-props.mjs ===
+  [ok ] object report passthrough {"id":"rep-obj","segment_id":"esc-sa-0163","note":"note rep-obj","submission_id":null,"created_at":"2026-07-15T02:00:00.000Z"}
+  [ok ] stringified report parsed {"id":"rep-str","segment_id":"esc-sa-0163","note":"note rep-str","submission_id":null,"created_at":"2026-07-15T02:00:00.000Z"}
+  [ok ] stringified [] -> empty array
+  [ok ] stringified array with entries parsed [{"id":"rep-a","segment_id":"esc-sa-0163","note":"note rep-a","submission_id":null,"created_at":"2026-07-15T02:00:00.000Z"},{"id":"rep-b","segment_id":"esc-sa-0163","note":"note rep-b","submission_id":null,"created_at":"2026-07-15T02:00:00.000Z"}]
+  [ok ] malformed JSON -> safe defaults, no throw single=null list=[]
+  [ok ] report missing created_at kept as valid {"id":"rep-nodate","segment_id":"esc-sa-0163","note":"note rep-nodate","submission_id":null}
+  [ok ] parseFeatureProps normalizes stringified fields {"id":"rep-embed","segment_id":"esc-sa-0163","note":"note rep-embed","submission_id":null,"created_at":"2026-07-15T02:00:00.000Z"}
+  [ok ] null and junk collapse to safe defaults
+
+PASS: all parse-feature-props checks green
+PASS
+=== scripts/test-provenance-visibility.mjs ===
+provenance messages format in EN and ES
+  [ok ] en: provenance block exists
+  [ok ] en: cv(1 street, 2 sessions) carries both counts "1 street camera-observed (2 sessions reviewed) · pending field verification"
+  [ok ] en: cv(3 streets, 1 session) carries both counts "3 streets camera-observed (1 session reviewed) · pending field verification"
+  [ok ] en: cv singular and plural differ
+  [ok ] en: community(1) vs community(4) differ ["1 community contribution · unverified","4 community contributions · unverified"]
+  [ok ] en: cv leaves no raw ICU "1 street camera-observed (2 sessions reviewed) · pending field verification"
+  [ok ] en: community leaves no raw ICU "1 community contribution · unverified"
+  [ok ] es: provenance block exists
+  [ok ] es: cv(1 street, 2 sessions) carries both counts "1 calle observada por cámara (2 sesiones revisadas) · pendiente de verificación en campo"
+  [ok ] es: cv(3 streets, 1 session) carries both counts "3 calles observadas por cámara (1 sesión revisada) · pendiente de verificación en campo"
+  [ok ] es: cv singular and plural differ
+  [ok ] es: community(1) vs community(4) differ ["1 aporte comunitario · sin verificar","4 aportes comunitarios · sin verificar"]
+  [ok ] es: cv leaves no raw ICU "1 calle observada por cámara (2 sesiones revisadas) · pendiente de verificación en campo"
+  [ok ] es: community leaves no raw ICU "1 aporte comunitario · sin verificar"
+
+every audited-stats surface renders <ProvenanceNote>
+  [ok ] components/landing/Hero.tsx renders <ProvenanceNote
+  [ok ] components/landing/PilotSection.tsx renders <ProvenanceNote
+  [ok ] components/MapPanel.tsx renders <ProvenanceNote
+
+ProvenanceNote gates on the unaudited counters only
+  [ok ] cv line gated on cvSegments > 0
+  [ok ] community line gated on communitySegments > 0
+  [ok ] renders nothing when both counters are zero
+  [ok ] does not read the sealed audited figure stats.heroPct
+  [ok ] does not read the sealed audited figure stats.coveragePct
+  [ok ] does not read the sealed audited figure stats.segments
+  [ok ] does not read the sealed audited figure stats.km
+  [ok ] does read the unaudited stats.cvCoveragePct
+
+camera-observed coverage formats without ever rounding away
+  [ok ] tiny nonzero floors to <0.1% (never 0.0%) "<0.1%"
+  [ok ] tiny nonzero never renders a bare zero "<0.1%"
+  [ok ] just under the floor still floors
+  [ok ] exactly at the floor renders as a real value
+  [ok ] normal value renders one decimal "2.3%"
+  [ok ] normal value rounds to one decimal "12.3%"
+  [ok ] zero yields no percentage fragment null
+  [ok ] negative yields no percentage fragment null
+  [ok ] NaN yields no percentage fragment null
+  [ok ] undefined yields no percentage fragment null
+  [ok ] null yields no percentage fragment null
+  [ok ] a string yields no percentage fragment null
+  [ok ] es uses a comma decimal separator "2,3%"
+  [ok ] es floors with a comma too "<0,1%"
+
+the cvWithCoverage message carries the percentage, EN and ES
+  [ok ] en: cvWithCoverage exists
+  [ok ] en: carries counts and the percentage "1 street camera-observed (2 sessions reviewed) · <0.1% of network · pending field verification"
+  [ok ] en: leaves no raw ICU "1 street camera-observed (2 sessions reviewed) · <0.1% of network · pending field verification"
+  [ok ] es: cvWithCoverage exists
+  [ok ] es: carries counts and the percentage "1 calle observada por cámara (2 sesiones revisadas) · <0.1% de la red · pendiente de verificación en campo"
+  [ok ] es: leaves no raw ICU "1 calle observada por cámara (2 sesiones revisadas) · <0.1% de la red · pendiente de verificación en campo"
+
+ProvenanceNote wires the percentage through the floor rule
+  [ok ] uses formatCvCoveragePct
+  [ok ] imports it from the pure module
+  [ok ] renders cvWithCoverage when a percentage exists
+  [ok ] falls back to the count-only cv line otherwise
+
+getStats returns cvCoveragePct on every path
+  [ok ] every getStats return carrying cvSegments also carries cvCoveragePct cvSegments=3 cvCoveragePct=3
+  [ok ] three return paths covered (live, demo-off, static) got 3
+  [ok ] coverage is measured against the whole canton network
+
+PASS — the unaudited counters render on every stats surface, EN and ES
+PASS
+=== scripts/test-rate-limit-namespaces.mjs ===
+  [ok ] submissions still allows 5 per minute
+  [ok ] the 6th submission in a minute is blocked (unchanged) yyyyyn
+  [ok ] a blocked caller gets a Retry-After hint
+  [ok ] a null key is never rate-limited (no derivable IP)
+  [ok ] capture allows 3 per hour
+  [ok ] the 4th capture session in an hour is blocked yyyn
+  [ok ] capture is exhausted for this origin
+  [ok ] the SAME origin can still post a text submission (namespaces are isolated)
+  [ok ] submissions is exhausted for this origin
+  [ok ] the SAME origin can still open a capture session
+  [ok ] the ceiling is per-origin: another IP is unaffected
+  [ok ] capture is blocked immediately after the 3rd
+  [ok ] still blocked 20 minutes later (one token needs 20 min at 3/hour)
+  [ok ] a token is back after 21 minutes
+  [ok ] a full hour restores the whole allowance
+
+PASS — rate-limit namespaces isolated, submissions unchanged
+PASS
+=== scripts/test-reprocess-core.mjs ===
+
+1. haversine
+  [ok ] ~1.1 km for 0.01 deg of longitude — 1095 m
+  [ok ] zero distance for the same point
+
+2. buildTrackFromSession
+  [ok ] one point per track vertex — 5
+  [ok ] lng/lat are preserved verbatim
+  [ok ] every point carries a finite time
+  [ok ] times are non-decreasing (monotonic along the track)
+  [ok ] first vertex sits at the frame span start — 1784000000000 vs 1784000000000
+  [ok ] last vertex sits at the frame span end — 1784000020000 vs 1784000020000
+  [ok ] an evenly-spaced middle vertex lands near the span midpoint — 1784000010000 vs ~1784000010000
+
+3. buildTrackFromSession edges
+  [ok ] no track => empty (script treats as no-op)
+  [ok ] no frames => empty (no time anchor)
+  [ok ] null inputs do not throw
+  [ok ] a single frame gives every vertex the same time
+  [ok ] a zero-length track collapses time to the span start
+
+4. summarizeAttribution
+  [ok ] total counts every frame — 5
+  [ok ] attributed counts only placed frames — 3
+  [ok ] unmatched counts null AND absent frames — 2
+  [ok ] per-segment tallies are right — {"esc-sa-0001":2,"esc-sa-0002":1}
+  [ok ] a null-segment frame never appears in bySegment
+
+5. buildAttributionPayload
+  [ok ] one entry per frame, in order
+  [ok ] a matched frame carries its segment and junction flag
+  [ok ] an absent frame is null / not-near-junction, not dropped
+  [ok ] a null-segment frame is kept as null
+
+6. loadSegments
+  [ok ] only LineStrings with a string id survive — ["esc-sa-0001"]
+  [ok ] coordinates are carried through
+
+PASS — 0 failing check(s)
+PASS
+=== scripts/test-review-overrides.mjs ===
+
+identity — recompute with no corrections equals computeRollups
+  [ok ] one segment survives
+  [ok ] scores match computeRollups {"overall":78.88,"accessibility":85,"drainage":83.33,"shade":62.5,"bike":83.33}
+  [ok ] itemMedians match
+  [ok ] coverage matches
+  [ok ] confidence matches
+  [ok ] frameRefs list every surviving attributed frame
+  [ok ] no drops
+  [ok ] not marked human-corrected
+
+item override — value swap recomputes through computeRollups
+  [ok ] overridden score equals reference math
+  [ok ] accessibility dropped vs unedited
+  [ok ] human-corrected flag set
+  [ok ] override recorded in per-segment record
+
+null override — 'not assessable' drops the item, not scores it zero
+  [ok ] null override matches reference
+  [ok ] canopy_cover median is null after override
+
+exclude — a frame leaves scoring immediately
+  [ok ] excluded recompute equals reference
+  [ok ] frameRefs no longer include the excluded frame
+  [ok ] excluded seq recorded
+  [ok ] human-corrected set by exclusion
+
+segment drop — excluding every frame removes the segment from the proposal
+  [ok ] segment b dropped
+  [ok ] only segment a survives
+
+delete — a deleted frame never scores, and a pre-tombstoned frame is honored
+  [ok ] delete-by-correction matches reference
+  [ok ] delete-by-tombstone matches delete-by-correction
+  [ok ] deleted seq recorded
+
+manual score — a hand-set lens score wins over the recomputed one
+  [ok ] overall is the manual value
+  [ok ] manualEdited flagged
+  [ok ] other lenses untouched by the manual overall
+  [ok ] manual score recorded
+
+manual null — a reviewer can set a lens to 'no reading'
+  [ok ] bike cleared to null
+  [ok ] manualEdited flagged for a null edit
+
+junction — a junction-frame override reaches curb_ramp, a mid-block one does not
+  [ok ] curb_ramp override matches reference math
+  [ok ] curb_ramp median reflects the override (0)
+
+synthesis — the adjusted score is the default, and the delta rides the fresh baseline
+  [ok ] baselineScores equal the pure rollup math
+  [ok ] adjusted shade = clamp(baseline + delta), not the stale adjustedScores
+  [ok ] the chosen score defaults to the ADJUSTED value
+  [ok ] a lens with no adjustment keeps its baseline
+  [ok ] the assessment is attached to the segment
+  [ok ] an unadjusted, uncorrected segment is not human-corrected
+  [ok ] the explanation is not stale without corrections
+
+use-baseline — a one-tap opt-out reverts a lens to baseline; a manual edit still wins
+  [ok ] the opted-out lens returns to its baseline
+  [ok ] a lens left alone keeps its adjustment
+  [ok ] the opt-out is recorded in the per-segment override record
+  [ok ] a baseline opt-out marks the segment human-corrected
+  [ok ] a manual lens score wins over the synthesis adjustment
+  [ok ] manualEdited is flagged
+
+stale — an exclusion moves the baseline; the delta follows it and the text is flagged stale
+  [ok ] the baseline after exclusion equals the reference math
+  [ok ] adjusted overall = FRESH baseline + delta (never the stale adjustedScores)
+  [ok ] the explanation is marked stale once frames were corrected
+  [ok ] the segment is human-corrected by the exclusion
+
+no assessment — with none supplied, nothing is adjusted
+  [ok ] adjusted equals baseline when no synthesis exists
+  [ok ] chosen equals baseline when no synthesis exists
+  [ok ] assessment is null
+  [ok ] assessment is never stale when there is none
+
+overall composite — accepted synthesis adjustments recompute overall from the FINAL lenses
+  [ok ] drainage/shade took the synthesis adjustment {"drainage":63.33,"shade":77.5}
+  [ok ] stored overall equals the composite of the FINAL lenses got 74.94, composite 74.94
+  [ok ] overall actually moved off the baseline (not the stale composite) overall 74.94 vs baseline 77.19
+  [ok ] no manual edit was involved
+
+overall manual — a hand-set overall beats the recomputed composite
+  [ok ] manual overall wins over the composite
+  [ok ] the constituent adjustment still landed
+
+PASS
+PASS
+=== scripts/test-review-throughput.mjs ===
+review-throughput helpers
+  [ok ] next after middle
+  [ok ] next at end
+  [ok ] next when current gone
+  [ok ] queue position
+  [ok ] queue position missing
+  [ok ] segment title with name
+  [ok ] segment caption with district
+  [ok ] street summary overflow
+  [ok ] draft key scoped
+  [ok ] reason presets count
+  [ok ] 409 maps to not reviewable
+  [ok ] 422 dropped
+  [ok ] 401 unauthorized
+  [ok ] delete 401
+
+PASS
+PASS
+=== scripts/test-score-color.mjs ===
+  [ok ] the sealed RAMP is byte-identical (scoreColor derives, never modifies)
+  [ok ] contrastRatio(black, white) === 21 21.0000
+  [ok ] contrastRatio(x, x) === 1 1.0000
+  [ok ] every score ink clears AA 4.5:1 in both themes (5 layers × 101 values)
+       worst light: #427a50 (drainage@43) 4.50:1 on #f1f1f1
+       worst dark:  #cf5933 (overall@5) 4.50:1 on #141414
+  [ok ] also clears AA on the non-governing surface in both themes
+  [ok ] hue is preserved through the adjustment (≤2/255 chroma displacement) worst 1.432/255 at drainage@2 light #c2c03d→#737124 (0.62°)
+  [ok ] readableInk leaves an already-compliant colour alone #8A4B2D
+  [ok ] adjusted ink lands near the AA threshold, not slammed to b/w (≤6:1) overall@54 light 4.56:1
+  [ok ] meterWidth clamps high 100%
+  [ok ] meterWidth clamps low 0%
+  [ok ] meterWidth rejects junk 0%
+  [ok ] meterWidth rejects NaN 0%
+
+PASS — score ink clears AA in both themes and the map ramp is untouched.
+PASS
+=== scripts/test-submission-counts.mjs ===
+  -> counts {"pending":1,"approved":1,"rejected":1,"total":3}
+  [ok ] pending = 1 (1)
+  [ok ] approved = 1 (1)
+  [ok ] rejected = 1 (invalid-payload file-rejected record COUNTED) (1)
+  [ok ] total = 3 (every record counted) (3)
+  [ok ] buckets sum to total (no drift)
+  [ok ] pending queue has the valid pending item
+  [ok ] pending queue EXCLUDES the rejected/invalid record
+  [ok ] renderable set excludes the invalid-payload record (payload can't render)
+  [ok ] yet counts still tallied it — proving counts != renderable set (renderable 2)
+
+COUNTS-TEST PASS
+PASS
+=== scripts/test-submission-history.mjs ===
+  -> source=local total=4 cap=200 rows=4
+  [ok ] source is local (local)
+  [ok ] every record returned (total=4) (4)
+  [ok ] cap is 200 (200)
+  [ok ] rows length matches total (nothing dropped) (4)
+  [ok ] history row count equals counts.total (rows 4 vs total 4)
+  [ok ] newest-first order ["h-overlay-reject","h-approved-row","h-pending","h-invalid"]
+  [ok ] overlay status wins (rejected) (rejected)
+  [ok ] overlay reviewed_at wins (2026-07-14T09:00:00.000Z)
+  [ok ] overlay reason -> reviewer_note (Duplicado de un tramo existente.)
+  [ok ] row reviewed_at used when no overlay (2026-07-12T09:00:00.000Z)
+  [ok ] row reviewer_note used when no overlay (Approved from the row.)
+  [ok ] pending reviewed_at is null (null)
+  [ok ] pending reviewer_note is null (null)
+  [ok ] invalid record present
+  [ok ] invalid record status rejected (rejected)
+  [ok ] invalid record payloadValid=false (false)
+
+HISTORY-TEST PASS
+PASS
+=== scripts/test-synthesis.mjs ===
+
+haversine distance
+  [ok ] 0.001 deg latitude is ~111 m 111.2 m
+  [ok ] distance to self is zero
+
+evidence encodes cross-frame continuity (the crosswalk gap)
+  [ok ] the evidence names the segment
+  [ok ] the baseline scores the model may adjust are stated
+  [ok ] each frame carries its distance along the walk   #3 @300.2m (+77.8m) | sidewalk_present=1@0.9 sidewalk_width=3@0.9 surface_condition=3@0.9 obstruction_free=3@0.9 drain_present=1@0.9 standing_water=3@0.9 curb_gutter=3@0.9 canopy_cover=50@0.9 midday_shade=3@0.9 lighting=3@0.9 bike_lane_present=1@0.9 bike_separation=3@0.9 bike_surface=3@0.9 :: note
+  [ok ] frames appear in traversal order
+  [ok ] the junction frame is flagged as a junction
+  [ok ] a continuity line is emitted for crossing_safety (it changed along the walk)   crossing_safety: present #0 (0-0m, 0m) -> unknown #1-#3 (111.2-300.2m, 189m)
+  [ok ] the continuity line encodes the crosswalk THEN the long gap   crossing_safety: present #0 (0-0m, 0m) -> unknown #1-#3 (111.2-300.2m, 189m)
+  [ok ] the gap carries the distance it spans, so the model can weight it   crossing_safety: present #0 (0-0m, 0m) -> unknown #1-#3 (111.2-300.2m, 189m)
+  [ok ] an item that never changes gets no continuity line
+
+evidence tolerates unplaced frames
+  [ok ] an unplaced frame is shown with an unknown position, not dropped
+  [ok ] placed frames still accumulate distance around it
+
+applyAssessment bounds and recompute
+  [ok ] a delta beyond the bound is clamped, not applied whole 20
+  [ok ] adjustedScores = clamp(baseline + bounded delta) 90
+  [ok ] a negative wild delta clamps the other way too
+  [ok ] a lens with a null baseline stays null
+  [ok ] and records no adjustment for it
+  [ok ] an adjustment with no reason does not apply
+  [ok ] and is not recorded as an adjustment
+  [ok ] overall is recomputed with the 0.45/0.30/0.25 formula, not copied 58.5 vs 58.5
+  [ok ] moving the lenses moves overall off the baseline 58.5
+  [ok ] the model's prose fields survive verbatim
+  [ok ] the model id is stamped
+  [ok ] CV_SYNTHESIS_MAX_ADJUST overrides the bound
+  [ok ] the tighter bound is enforced
+
+synthesizeSegment outcomes
+  [ok ] a valid answer yields kind=ok ok
+  [ok ] the bounded adjustment is applied end to end
+  [ok ] usage is reported for the ledger
+  [ok ] the request is text-only, carrying the evidence and the strict format
+  [ok ] a refusal is a clean failure, not a throw refusal: no
+  [ok ] a malformed draft is rejected by the zod mirror schema: [{"expected":"object","code":"invalid_type","path":["lenses"],"message":"Invalid input: expected object, received undefined"},{"expected":"object","code":"invalid_type","path":["adjustments"],"message":"Invalid input: expected object, received undefined"}]
+  [ok ] unparsable output fails rather than throwing json_parse: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+  [ok ] a transport throw is caught as a failure reporting no spend transport: ECONNRESET
+
+strict response format
+  [ok ] structured output is strict
+  [ok ] it demands overall, lenses, and adjustments
+  [ok ] adjustments requires all four adjustable lenses
+  [ok ] each adjustment demands a delta and a reason
+  [ok ] no temperature — the reasoning models reject it
+  [ok ] the system prompt rides in instructions
+  [ok ] the strict format is passed through
+
+PASS — segment synthesis engine
+PASS
+=== scripts/test-upload-client.mjs ===
+  [ok ] uploadCapture returns the session id and final status {"sessionId":"0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e","status":"matching","uploadedSeqs":[0,1,2]}
+  [ok ] every frame is uploaded [0,1,2]
+  [ok ] the call order is create -> register -> finalize ["POST /api/capture/sessions","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/finalize"]
+  [ok ] frames are uploaded BEFORE finalize (the one-way door closes last)
+  [ok ] the session request sends mode, an empty honeypot and contact {"mode":"video","honeypot":"","contact":"me@example.com"}
+  [ok ] finalize carries the track, its source and the clock offset {"track":[{"lat":9.907,"lng":-84.152,"t":1784000000000},{"lat":9.907,"lng":-84.15,"t":1784000009000}],"source":"trace","clockOffsetMs":-1500}
+  [ok ] a transient 503 is retried until it succeeds
+  [ok ] it took 3 attempts 3
+  [ok ] fetch rejecting outright (offline) is retried
+  [ok ] a 429 is retried (the server asked us to slow down, not to stop)
+  [ok ] a 400 is NOT retried 1 attempts
+  [ok ] the 400 surfaces as a CaptureUploadError carrying the status CaptureUploadError/400
+  [ok ] retries are bounded by maxRetries 2 attempts
+  [ok ] a permanently failing call eventually throws
+  [ok ] a flaky frame upload is retried too 3 attempts
+  [ok ] resuming re-uploads ONLY the frames the server acknowledged [3,4]
+  [ok ] resuming does not open a second session ["POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/finalize"]
+  [ok ] the resumed run still finalizes
+  [ok ] a frame already in storage counts as done
+  [ok ] concurrency is bounded (never exceeds the limit) peak 4
+  [ok ] concurrency is actually used (not serial) peak 4
+  [ok ] progress reports every phase in order, ending done creating_session -> registering_frames -> uploading_frames -> uploading_frames -> uploading_frames -> uploading_frames -> finalizing -> done
+  [ok ] progress counts climb to the frame total [0,0,0,1,2,3,3,3]
+  [ok ] aborting stops the run AbortError
+  [ok ] an aborted run never finalizes ["POST /api/capture/sessions","POST /api/capture/sessions/0b8a9a1e-0e6e-4c9a-9f0d-9a1f2b3c4d5e/frames"]
+  [ok ] getSessionStatus reads the progress shape {"status":"uploading","frameCount":2,"jobs":{"pending":2,"done":0,"failed":0}}
+  [ok ] the default fetch is bound, so a browser would not reject it
+
+PASS — upload client survives the failure paths
+PASS
+=== scripts/test-video-plan.mjs ===
+  [ok ] a 60 s video samples at 1 fps got 1000
+  [ok ] a 60 s video plans 60 frames got 60
+  [ok ] a 60 s video is not marked sparser
+  [ok ] a video exactly at the cap stays at 1 fps interval 1000 sparser false
+  [ok ] a video exactly at the cap plans exactly the cap got 400
+  [ok ] no duration ever plans past the frame cap
+  [ok ] a 20 min video is marked sparser
+  [ok ] a 20 min video stretches past 1 s got 3000
+  [ok ] a 20 min video still covers the whole walk last target 1198500 of 1200000
+  [ok ] a 5 s video yields 5 targets got 5
+  [ok ] targets sit mid-interval, not on the second boundary got 500, 1500
+  [ok ] targets are strictly ascending
+  [ok ] no target falls outside the video
+  [ok ] no target is NaN
+  [ok ] a zero-length video plans nothing
+  [ok ] a sub-second video still gets its one frame got 1
+  [ok ] a negative duration plans nothing rather than throwing
+  [ok ] an Infinity duration does not produce NaN targetFrames 0
+  [ok ] a NaN duration does not produce NaN got 0
+  [ok ] an injected cap is honoured got 2
+  [ok ] an injected cap marks sparser
+  [ok ] an identity matrix is upright got 0
+  [ok ] a portrait iPhone matrix reads 90 got 90
+  [ok ] an upside-down matrix reads 180 got 180
+  [ok ] the other quarter turn reads 270 got 270
+  [ok ] fixed-point scale does not matter
+  [ok ] an Int32Array matrix works
+  [ok ] a missing matrix is upright, not a throw
+  [ok ] a null matrix is upright
+  [ok ] a truncated matrix is upright
+  [ok ] an all-zero matrix is upright
+  [ok ] a NaN matrix is upright
+  [ok ] an off-axis matrix is left alone rather than snapped
+  [ok ] every rotation is one of the four legal values
+
+PASS — the plan never exceeds the cap, never truncates a walk, and knows which way is up
+PASS
+=== node scripts/test-i18n-parity.mjs ===
+en leaf keys: 945
+es leaf keys: 945
+only in en: 0 []
+only in es: 0 []
+leaf-type mismatch: 0 []
+lightbox keys present both sides: 8/8 []
+
+PARITY: OK (identical key sets)
+PASS

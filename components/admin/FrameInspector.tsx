@@ -45,6 +45,7 @@ function formatModelValue(
 
 export default function FrameInspector({
   frame,
+  segmentCaption,
   overrides,
   excluded,
   onOverrideItem,
@@ -55,6 +56,7 @@ export default function FrameInspector({
   onClose,
 }: Readonly<{
   frame: ReviewFrame;
+  segmentCaption?: string;
   overrides: ItemOverrides | undefined;
   excluded: boolean;
   onOverrideItem: (key: RubricItemKey, value: number | null | undefined) => void;
@@ -105,8 +107,8 @@ export default function FrameInspector({
       </div>
 
       <div className="flex flex-wrap items-center gap-2 text-[11px]">
-        <span className="font-mono text-neutral-strong">
-          {frame.segmentId ?? t("unmatched")}
+        <span className="font-medium text-ink">
+          {segmentCaption || frame.segmentId || t("unmatched")}
         </span>
         {obs ? (
           <span className="inline-flex items-center gap-1 rounded-[4px] border border-border bg-surface-sunken px-1.5 py-0.5 font-mono text-neutral-strong">
