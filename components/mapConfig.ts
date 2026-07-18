@@ -238,21 +238,28 @@ export const COMMUNITY_LAYER_FILTER = [
 
 /**
  * CV casing width: zoom-interpolated with a floor, and thicker when selected.
- * The selected step is flat across zoom so the selection cue never disappears.
+ *
+ * The zoom `interpolate` MUST be the outermost expression — MapLibre rejects a
+ * zoom curve nested inside a `case`, and `addLayer` throws outright rather than
+ * degrading, which silently costs you the whole layer. So the selected/base
+ * choice lives inside each zoom stop instead of wrapping them.
  */
-export const cvWidthExpression = [
-  "case",
-  ["boolean", ["feature-state", "selected"], false],
-  CV_CASING.widthSelected,
+const cvSelectedWidth = (base: number) =>
   [
-    "interpolate",
-    ["linear"],
-    ["zoom"],
-    CV_CASING.minWidthZoom,
-    CV_CASING.minWidth,
-    CV_CASING.fullWidthZoom,
-    CV_CASING.width,
-  ],
+    "case",
+    ["boolean", ["feature-state", "selected"], false],
+    CV_CASING.widthSelected,
+    base,
+  ] as unknown as ExpressionSpecification;
+
+export const cvWidthExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  CV_CASING.minWidthZoom,
+  cvSelectedWidth(CV_CASING.minWidth),
+  CV_CASING.fullWidthZoom,
+  cvSelectedWidth(CV_CASING.width),
 ] as unknown as ExpressionSpecification;
 
 /** Community casing width, thicker when this feature is selected. */

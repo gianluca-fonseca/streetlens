@@ -36,7 +36,7 @@ const {
   cvWidthExpression,
 } = await import(path.join(ROOT, "components/mapConfig.ts"));
 
-const { featureFilter, createExpression } = await import(
+const { featureFilter, createPropertyExpression } = await import(
   "@maplibre/maplibre-gl-style-spec"
 );
 
@@ -151,12 +151,13 @@ console.log("\nvisual distinctness — the accent cannot collide");
 
 console.log("\nzoomed-out visibility — the width floor holds");
 {
-  // createExpression (not createPropertyExpression): line-width genuinely does
-  // support feature-state, but the stricter property-expression validator
-  // rejects it as a "data expression" under these parameters.
-  const expr = createExpression(cvWidthExpression, {
+  // createPropertyExpression with line-width's REAL spec, not the permissive
+  // createExpression. This is the validator addLayer effectively applies, and
+  // it is the only one that catches a zoom curve nested inside a `case` —
+  // which MapLibre rejects outright, throwing away the entire layer.
+  const expr = createPropertyExpression(cvWidthExpression, {
     type: "number",
-    property: true,
+    "property-type": "data-driven",
     expression: { interpolated: true, parameters: ["zoom", "feature-state"] },
   });
   if (expr.result === "error") {
