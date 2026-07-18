@@ -1,0 +1,234 @@
+/*
+ * Segment detail panel — colour, meters, and motion (u33).
+ *
+ * Why a CSS module and not Tailwind utilities: nearly everything here needs a
+ * value that Tailwind cannot express. Score ink is computed per value in TS and
+ * has to resolve DIFFERENTLY per theme, and this app themes with a CLASS on
+ * <html> rather than a media query, so an inline style cannot branch on it. The
+ * pattern throughout: the component sets `--sd-ink` / `--sd-ink-dark` inline,
+ * and these rules choose between them.
+ *
+ * Motion budget is ≤300ms everywhere and every animation has an authored
+ * reduced-motion variant at the bottom of this file. app/globals.css already
+ * clamps animation-duration globally under `prefers-reduced-motion: reduce`,
+ * but relying on that alone would leave the meters mid-fill in some engines,
+ * so the reduced state here is written out explicitly and asserted by
+ * scripts/test-panel-vitality.mjs.
+ */
+
+/* ---------------------------------------------------------------- *
+ * Score ink — the map's hue, luminance-fitted to the panel surface.
+ * See components/scoreColor.ts for why the raw ramp hex is not used.
+ * ---------------------------------------------------------------- */
+
+.scoreInk {
+  color: var(--sd-ink);
+}
+:global(html.dark) .scoreInk {
+  color: var(--sd-ink-dark);
+}
+
+/* ---------------------------------------------------------------- *
+ * Meters. A 3px rule under each score: the bar IS the magnitude, so
+ * Accessibility 87.5 towers over Bike 16.67 without reading a digit.
+ *
+ * The fill's width is its true percentage (set inline) and the reveal
+ * animates transform, never width — so nothing reflows as it fills and
+ * the panel's height is identical on frame 1 and frame 60.
+ * ---------------------------------------------------------------- */
+
+.meterTrack {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sd-ink);
+  transform-origin: left center;
+  animation: sdMeter var(--dur-slow) var(--ease-out-soft) both;
+}
+:global(html.dark) .meterFill {
+  background: var(--sd-ink-dark);
+}
+
+@keyframes sdMeter {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* A meter for a lens the camera never established. No fill, no claim —
+   a dashed empty track, matching the "—" the numeral shows. */
+.meterUnset {
+  height: 3px;
+  border-radius: 999px;
+  border: 1px dashed var(--border-strong);
+  opacity: 0.6;
+}
+
+/* ---------------------------------------------------------------- *
+ * Provenance chips. Previously three identical grey pills; now each
+ * kind owns a register, so the sort of evidence behind a segment is
+ * legible before you read a word of it.
+ * ---------------------------------------------------------------- */
+
+.chip {
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+
+/* Approved camera observation → the sealed flash-pink CV register, the same
+   accent the map paints an observed street's casing with. Panel and map read
+   as one family. */
+.chipCv {
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent-text);
+}
+.chipCv:hover {
+  border-color: color-mix(in srgb, var(--accent) 62%, transparent);
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+}
+
+/* Community, pending field verification → amber. A deliberately different
+   family from the CV pink: this is a claim awaiting an audit, not evidence. */
+.chipCommunity {
+  border-color: color-mix(in srgb, var(--amber) 45%, transparent);
+  background: color-mix(in srgb, var(--amber) 9%, transparent);
+  color: var(--amber);
+}
+.chipCommunity:hover {
+  border-color: color-mix(in srgb, var(--amber) 65%, transparent);
+  background: color-mix(in srgb, var(--amber) 14%, transparent);
+}
+
+/* Reviewer-corrected → stays quiet on purpose. It is a footnote on the CV
+   chip, not a third kind of provenance, so it gets weight without hue. */
+.chipCorrected {
+  border-color: var(--border-strong);
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+.chipCorrected:hover {
+  border-color: var(--ink);
+}
+
+/* ---------------------------------------------------------------- *
+ * Camera-observation family. The section, its canonical card, and the
+ * assessment block all carry a low-alpha CV accent so camera evidence
+ * is visually one thing — and one thing with the map's pink casing.
+ * ---------------------------------------------------------------- */
+
+.cvSection {
+  border-left: 2px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  padding-left: 0.625rem;
+}
+
+/* The canonical card — what the street IS today. Tinted and accented; the
+   archived cards deliberately get neither, which is the whole visual argument
+   for why one of them is the answer and the others are history. */
+.cvCanonical {
+  border-left: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+
+/* Heading tick — a short accent rule before CAMERA OBSERVATIONS. */
+.cvHeadingTick::before {
+  content: "";
+  display: inline-block;
+  width: 0.75rem;
+  height: 2px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  background: var(--accent);
+}
+
+/* The model speaking. Accent border and label; body prose stays plain ink so
+   the sentence is read, not decoded. */
+.assessment {
+  border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.assessmentLabel {
+  color: var(--accent-text);
+}
+
+/* ---------------------------------------------------------------- *
+ * Confidence / coverage. Was a run of text; now two short meters, so
+ * "65% confident, 100% covered" is a shape before it is a number.
+ * These are quality-of-evidence, NOT scores — hence neutral ink, never
+ * a ramp colour, which would imply a street quality they do not carry.
+ * ---------------------------------------------------------------- */
+
+.gaugeFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--neutral-strong);
+  transform-origin: left center;
+  animation: sdMeter var(--dur-slow) var(--ease-out-soft) both;
+}
+
+/* ---------------------------------------------------------------- *
+ * Motion. Content settles in on open, staggered by block; the archive
+ * settles when disclosed. 8px of travel, one-shot, ≤300ms.
+ * ---------------------------------------------------------------- */
+
+.settle {
+  animation: sdSettle var(--dur-base) var(--ease-out-soft) both;
+  animation-delay: var(--sd-delay, 0ms);
+}
+
+@keyframes sdSettle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Reduced motion. Authored, not blanket-stripped: arrival still reads
+ * as a short fade (vestibular-safe), but nothing travels and no meter
+ * animates — every bar is at its true width on the first painted frame.
+ * ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .meterFill,
+  .gaugeFill {
+    animation: none;
+    transform: none;
+  }
+  .settle {
+    animation: sdFade 150ms both;
+    animation-delay: 0ms;
+    transform: none;
+  }
+  .chip,
+  .chipCv,
+  .chipCommunity,
+  .chipCorrected {
+    transition: none;
+  }
+}
+
+@keyframes sdFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
