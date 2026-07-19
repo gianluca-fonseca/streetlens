@@ -13,7 +13,10 @@
 | `c6b58b1` | chore(dialogue): drop unused vars in context assembly |
 | `354873e` | test(dialogue): browser evidence on :3590 plus lint fixes |
 | `e9b70fb` | docs(dialogue): REPORT + CONTROL done for bgsd-0015 unit |
-| `c01aa94`+ | CONTROL/gitignore finalization (this close-out) |
+| `c01aa94` | docs(dialogue): record final commit hashes on CONTROL |
+| `e6bc97a` | chore(dialogue): gitignore dialogue fixture and finalize CONTROL |
+| `1ffa8d2` | docs(dialogue): append close-out hash to CONTROL |
+| `402b10d` | docs(dialogue): sync REPORT commit table with CONTROL |
 
 ## Gates (verbatim)
 
