@@ -30,13 +30,16 @@ begin
          and claimed_at < now() - interval '10 minutes'
     ),
     'stuck_extracting_sessions', (
-      select count(distinct s.id)::integer
-        from capture_sessions s
-        join capture_frames f on f.session_id = s.id
-        join capture_frame_jobs j on j.frame_id = f.id
-       where s.status = 'extracting'
-         and j.status in ('pending', 'running')
-         and coalesce(s.updated_at, s.created_at) < now() - interval '2 hours'
+      select count(*)::integer from (
+        select s.id
+          from capture_sessions s
+          join capture_frames f on f.session_id = s.id
+          join capture_frame_jobs j on j.frame_id = f.id
+         where s.status = 'extracting'
+           and j.status in ('pending', 'running')
+         group by s.id, s.created_at
+        having coalesce(max(j.updated_at), s.created_at) < now() - interval '2 hours'
+      ) stuck
     ),
     'failed_jobs', (
       select count(*)::integer from capture_frame_jobs
