@@ -1,25 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { ScoreLayer, StreetStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
+import {
+  defaultMapPanelCollapsed,
+  readMapPanelCollapsed,
+  writeMapPanelCollapsed,
+} from "@/lib/map-panel-storage";
 import LayerSwitcher from "@/components/LayerSwitcher";
 import Legend from "@/components/Legend";
 import ProvenanceNote from "@/components/ProvenanceNote";
 import styles from "@/components/ui/zen.module.css";
+import panelStyles from "@/components/ui/map-panel.module.css";
 
 /**
  * Floating primary map panel (the only 12px-radius surface, top elevation).
  * Holds the layer switcher, the legend, one live hero stat, and the mono
  * coverage figures. Data density is a feature.
  *
- * On phones the panel is COMPACT by default: it shows only the headline stat and
- * the layer switcher so the map stays visible, with a chevron to reveal the full
- * stats + legend. Desktop is unchanged — the toggle is `md:hidden` and the
- * collapsible blocks carry `md:block`, so the sealed layout never sees the
- * collapsed state.
+ * Collapsible on every viewport: the chevron hides the stats grid + legend while
+ * keeping the headline %, provenance lines, and layer switcher visible (the
+ * phone provenance-visibility contract). Collapsed state is remembered for the
+ * visit via sessionStorage.
  */
 export default function MapPanel({
   stats,
@@ -31,8 +36,24 @@ export default function MapPanel({
   onSelectLayer: (layer: ScoreLayer) => void;
 }>) {
   const t = useTranslations("panel");
-  const [open, setOpen] = useState(false);
-  const bodyClass = open ? "block" : "hidden md:block";
+  const [expanded, setExpanded] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
+
+  useLayoutEffect(() => {
+    const stored = readMapPanelCollapsed();
+    // Hydrate visit-scoped collapse from sessionStorage after SSR.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- storage read on mount
+    setExpanded(stored === null ? !defaultMapPanelCollapsed() : !stored);
+    setHydrated(true);
+  }, []);
+
+  const toggle = () => {
+    setExpanded((prev) => {
+      const next = !prev;
+      writeMapPanelCollapsed(!next);
+      return next;
+    });
+  };
 
   const figures: { key: string; value: string; label: string }[] = [
     {
@@ -54,6 +75,8 @@ export default function MapPanel({
 
   return (
     <section
+      data-map-panel
+      data-panel-hydrated={hydrated ? "true" : "false"}
       aria-label={t("eyebrow")}
       className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 rounded-[12px] p-4`}
     >
@@ -70,63 +93,80 @@ export default function MapPanel({
           </div>
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-label={open ? t("collapse") : t("expand")}
-            className="-mr-1 -mt-1 shrink-0 rounded-[4px] p-1.5 text-neutral-strong transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink md:hidden"
+            onClick={toggle}
+            aria-expanded={expanded}
+            aria-controls="map-panel-collapsible"
+            aria-label={expanded ? t("collapse") : t("expand")}
+            className="-mr-1 -mt-1 shrink-0 rounded-[4px] p-1.5 text-neutral-strong transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <ChevronDown
               size={18}
               strokeWidth={2}
               aria-hidden="true"
-              className={[
-                "transition-transform",
-                open ? "rotate-180" : "",
-              ].join(" ")}
+              data-expanded={expanded ? "true" : "false"}
+              className={panelStyles.chevron}
             />
           </button>
         </div>
-        <div className={bodyClass}>
-          <p className="mt-1.5 font-display text-[0.95rem] leading-snug text-ink">
-            {t("heroStat", { pct: stats.heroPct })}
-          </p>
-          {showDemoData() && (
-            <p className="mt-1 text-[11px] text-neutral-strong">
-              {t("heroDemoNote")}
+        <div
+          id="map-panel-collapsible"
+          data-expanded={expanded ? "true" : "false"}
+          className={panelStyles.collapsible}
+        >
+          <div className={panelStyles.collapsibleInner}>
+            <p className="mt-1.5 font-display text-[0.95rem] leading-snug text-ink">
+              {t("heroStat", { pct: stats.heroPct })}
             </p>
-          )}
+            {showDemoData() && (
+              <p className="mt-1 text-[11px] text-neutral-strong">
+                {t("heroDemoNote")}
+              </p>
+            )}
+          </div>
         </div>
       </header>
 
-      <dl className={`${open ? "grid" : "hidden md:grid"} grid-cols-3 gap-2 border-y border-border py-3`}>
-        {figures.map((f) => (
-          <div key={f.key} className="flex flex-col gap-0.5">
-            <dt className="sr-only">{f.label}</dt>
-            <dd className="font-mono text-[1.1rem] font-medium leading-none text-ink">
-              {f.value}
-            </dd>
-            <span
-              aria-hidden="true"
-              className="text-[10.5px] leading-tight text-neutral-strong"
-            >
-              {f.label}
-            </span>
-          </div>
-        ))}
-      </dl>
+      <div
+        data-expanded={expanded ? "true" : "false"}
+        className={panelStyles.collapsible}
+      >
+        <div className={panelStyles.collapsibleInner}>
+          <dl className="grid grid-cols-3 gap-2 border-y border-border py-3">
+            {figures.map((f) => (
+              <div key={f.key} className="flex flex-col gap-0.5">
+                <dt className="sr-only">{f.label}</dt>
+                <dd className="font-mono text-[1.1rem] font-medium leading-none text-ink">
+                  {f.value}
+                </dd>
+                <span
+                  aria-hidden="true"
+                  className="text-[10.5px] leading-tight text-neutral-strong"
+                >
+                  {f.label}
+                </span>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
 
       {/* Outside the collapsible block on purpose: when the audited figures are
           zero these counters are the only live data on the map, and burying them
-          behind the phone chevron is how "still 0%" read as breakage. */}
+          behind the chevron is how "still 0%" read as breakage. */}
       <ProvenanceNote stats={stats} tone="panel" className="-mt-1" />
 
       <LayerSwitcher active={activeLayer} onSelect={onSelectLayer} />
 
-      <div className={bodyClass}>
-        <Legend
-          layer={activeLayer}
-          communitySegments={stats.communitySegments}
-        />
+      <div
+        data-expanded={expanded ? "true" : "false"}
+        className={panelStyles.collapsible}
+      >
+        <div className={panelStyles.collapsibleInner}>
+          <Legend
+            layer={activeLayer}
+            communitySegments={stats.communitySegments}
+          />
+        </div>
       </div>
     </section>
   );
