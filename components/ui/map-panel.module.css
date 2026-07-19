@@ -1,0 +1,34 @@
+/*
+ * map-panel.module.css — collapsible aside body (bgsd-0016).
+ * Grid 0fr/1fr keeps height animation smooth without guessing max-height.
+ * Duration stays ≤300ms; motion is disabled under prefers-reduced-motion.
+ */
+
+.collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms ease;
+}
+
+.collapsible[data-expanded="true"] {
+  grid-template-rows: 1fr;
+}
+
+.collapsibleInner {
+  overflow: hidden;
+}
+
+.chevron {
+  transition: transform 280ms ease;
+}
+
+.chevron[data-expanded="true"] {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collapsible,
+  .chevron {
+    transition: none;
+  }
+}

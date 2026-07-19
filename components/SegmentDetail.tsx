@@ -464,11 +464,31 @@ export default function SegmentDetail({
   // stands now, so a correction on a superseded reading must not still flag it.
   const hasHumanCorrected = canonical?.human_corrected === true;
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const dialogRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  useEffect(() => {
+    dialogRef.current?.focus();
+  }, [segment.id]);
 
   return (
     <section
+      ref={dialogRef}
+      data-segment-detail
       role="dialog"
+      aria-modal="true"
       aria-label={segment.name}
+      tabIndex={-1}
       style={dragY ? { transform: `translateY(${dragY}px)` } : undefined}
       className={[
         // Phone: SOLID bottom sheet (edge-anchored, reads better solid — dossier
