@@ -462,6 +462,23 @@
       "rerunSuccess": "Análisis actualizado ({input} entrada / {output} salida tokens).",
       "rerunError": "No se pudo volver a analizar. Intentalo de nuevo.",
       "rerunDisabled": "La extracción está desactivada — habilita CV_EXTRACTION_ENABLED para volver a analizar.",
+      "dialogue": {
+        "title": "Discutir con el modelo",
+        "hint": "Cita fotogramas como #14 o #1-9. Conversa primero, o recalcula directamente.",
+        "empty": "Sin mensajes aún. Describe qué interpretó mal el modelo.",
+        "you": "Tú",
+        "model": "Modelo",
+        "recomputeTag": "recalcular",
+        "frameRefs": "Referencias de fotogramas",
+        "inputLabel": "Mensaje al modelo",
+        "placeholder": "p. ej. SÍ hay acera en todo el tramo — ver #3 y #14.",
+        "converse": "Conversar",
+        "recompute": "Recalcular evaluación y puntajes",
+        "keyboardHint": "Enter = Conversar · ⌘Enter = Recalcular",
+        "working": "Pensando…",
+        "error": "Falló la llamada de diálogo. Inténtalo de nuevo.",
+        "extractionDisabled": "La extracción está desactivada — habilita CV_EXTRACTION_ENABLED para conversar."
+      },
       "cancel": "Cancelar",
       "status": {
         "pending_upload": "Esperando la subida",

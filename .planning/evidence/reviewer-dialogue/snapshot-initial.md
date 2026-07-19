@@ -1,0 +1,379 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img [ref=e6]
+          - text: StreetLens Admin
+        - navigation "StreetLens Admin" [ref=e9]:
+          - link "Overview" [ref=e10] [cursor=pointer]:
+            - /url: /en/admin
+            - img [ref=e11]
+            - text: Overview
+          - link "Verification queue" [ref=e16] [cursor=pointer]:
+            - /url: /en/admin/queue
+            - img [ref=e17]
+            - text: Verification queue
+          - link "History" [ref=e20] [cursor=pointer]:
+            - /url: /en/admin/history
+            - img [ref=e21]
+            - text: History
+          - link "Bulk import" [ref=e25] [cursor=pointer]:
+            - /url: /en/admin/import
+            - img [ref=e26]
+            - text: Bulk import
+          - link "Pipeline ops" [ref=e29] [cursor=pointer]:
+            - /url: /en/admin/ops
+            - img [ref=e30]
+            - text: Pipeline ops
+        - generic [ref=e32]:
+          - radiogroup "Theme" [ref=e33]:
+            - radio "Light" [ref=e34]:
+              - img [ref=e35]
+            - radio "System" [checked] [ref=e41]:
+              - img [ref=e42]
+            - radio "Dark" [ref=e44]:
+              - img [ref=e45]
+          - link "es" [ref=e47] [cursor=pointer]:
+            - /url: /es/admin/queue
+          - link "Public map" [ref=e48] [cursor=pointer]:
+            - /url: /en/map
+            - img [ref=e49]
+            - text: Public map
+          - button "Log out" [ref=e51]:
+            - img [ref=e52]
+            - text: Log out
+    - main [ref=e55]:
+      - generic [ref=e56]:
+        - heading "Review a camera walk" [level=1] [ref=e57]
+        - paragraph [ref=e58]: 9c2e6a71-4f38-4a1b-b7d0-2e5a1c9f3b84
+      - generic [ref=e59]:
+        - status [ref=e60]:
+          - img [ref=e61]
+          - generic [ref=e63]: No database is configured, so this submission is fixture data. Decisions are recorded locally.
+        - generic [ref=e64]:
+          - paragraph [ref=e65]: Re-run map matching
+          - paragraph [ref=e66]: Some frames matched no street when this walk was first processed. If the street network has grown since then, re-matching may place them on a segment.
+          - generic [ref=e67]:
+            - button "Preview match" [ref=e68]
+            - button "Re-run matching" [ref=e69]
+        - generic [ref=e71]:
+          - heading "This submission" [level=2] [ref=e72]
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - term [ref=e75]: Status
+              - definition [ref=e76]: Ready for review
+            - generic [ref=e77]:
+              - term [ref=e78]: Frames
+              - definition [ref=e79]: "7"
+            - generic [ref=e80]:
+              - term [ref=e81]: Walked on
+              - definition [ref=e82]: July 16, 2026
+            - generic [ref=e83]:
+              - term [ref=e84]: Tokens
+              - definition [ref=e85]: 8,120
+            - generic [ref=e86]:
+              - term [ref=e87]: Submitted by
+              - definition [ref=e88]: Anonymous contributor
+          - list [ref=e89]:
+            - listitem [ref=e90]: Walk 1 of 1 · 0 left after this
+            - listitem [ref=e91]:
+              - button "Shortcuts" [ref=e92]:
+                - img [ref=e93]
+                - text: Shortcuts
+            - listitem [ref=e95]: 6 extracted
+            - listitem [ref=e96]:
+              - img [ref=e97]
+              - text: 1 failed
+            - listitem [ref=e100]: 1 escalated
+            - listitem [ref=e101]: 1 frames matched no street
+        - generic [ref=e102]:
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - generic [ref=e105]:
+                - heading "The session" [level=2] [ref=e106]
+                - button "Expand map" [ref=e107]:
+                  - img [ref=e108]
+                  - text: Expand map
+              - 'application "Map of the session: GPS track, frame positions, and matched streets" [ref=e114]':
+                - region "Map" [ref=e430]
+                - generic [ref=e431]:
+                  - generic [ref=e433]:
+                    - button "Zoom in"
+                    - button "Zoom out"
+                  - group [ref=e435]:
+                    - generic "Toggle attribution" [ref=e436]
+                    - generic [ref=e437]:
+                      - link "OpenFreeMap" [ref=e438] [cursor=pointer]:
+                        - /url: https://openfreemap.org
+                      - link "© OpenMapTiles" [ref=e439] [cursor=pointer]:
+                        - /url: https://www.openmaptiles.org/
+                      - text: Data from
+                      - link "OpenStreetMap" [ref=e440] [cursor=pointer]:
+                        - /url: https://www.openstreetmap.org/copyright
+            - button "Play session" [ref=e116]:
+              - img [ref=e117]
+              - text: Play session
+            - list [ref=e119]:
+              - listitem [ref=e120]:
+                - generic [ref=e121]:
+                  - generic [ref=e122]:
+                    - checkbox "Calle 130 · esc-sa-0001 San Antonio" [checked] [ref=e123]
+                    - generic [ref=e124]: Calle 130 · esc-sa-0001
+                    - generic [ref=e125]: San Antonio
+                  - generic [ref=e126]:
+                    - img [ref=e127]
+                    - text: Camera reading
+                - generic [ref=e130]:
+                  - generic [ref=e131]:
+                    - generic [ref=e132]:
+                      - img [ref=e133]
+                      - text: Assessment
+                    - generic [ref=e136]: Model-written · gpt-5
+                    - button "Use baseline for all" [ref=e137]:
+                      - img [ref=e138]
+                      - text: Use baseline for all
+                  - paragraph [ref=e141]: "A serviceable block let down at the corner: the sidewalk runs continuously but the northern crossing has no curb ramp and faded markings, so a wheelchair user is stranded exactly where they need to cross. Surface is cracked in the mid-block stretch, and a gutter holds standing water after rain."
+                  - paragraph [ref=e142]: A model summary of the session. Your chosen scores are the numbers that publish.
+                  - list [ref=e143]:
+                    - listitem [ref=e144]:
+                      - generic [ref=e145]:
+                        - generic [ref=e146]: Accessibility
+                        - generic [ref=e147]:
+                          - generic [ref=e148]: Baseline 15
+                          - generic [ref=e149]: →
+                          - generic [ref=e150]: Adjusted 7
+                          - generic [ref=e151]: "-8"
+                        - button "Use baseline" [ref=e152]
+                      - paragraph [ref=e153]: Continuous walk, but a missing curb ramp and faded crossing at the junction break the route for anyone who cannot step down.
+                    - listitem [ref=e154]:
+                      - generic [ref=e155]:
+                        - generic [ref=e156]: Drainage
+                        - generic [ref=e157]:
+                          - generic [ref=e158]: Baseline 17
+                          - generic [ref=e159]: →
+                          - generic [ref=e160]: Adjusted 12
+                          - generic [ref=e161]: "-5"
+                        - button "Use baseline" [ref=e162]
+                      - paragraph [ref=e163]: Standing water pooled at the gutter in one frame; a drain is present but appears undersized for the grade.
+                    - listitem [ref=e164]:
+                      - generic [ref=e166]: Shade
+                      - paragraph [ref=e167]: "A thin canopy: a few young trees give partial midday shade, no continuous cover."
+                    - listitem [ref=e168]:
+                      - generic [ref=e170]: Bike
+                      - paragraph [ref=e171]: No dedicated provision; riders share a narrow lane with turning traffic near the corner.
+                - region "Argue with the model" [ref=e172]:
+                  - generic [ref=e173]:
+                    - generic [ref=e174]:
+                      - img [ref=e175]
+                      - text: Argue with the model
+                    - generic [ref=e177]: "Cite frames as #14 or #1-9. Converse first, or recompute directly."
+                  - paragraph [ref=e179]: No messages yet. Describe what the model got wrong.
+                  - generic [ref=e180]: Message to the model
+                  - textbox "Message to the model" [ref=e181]:
+                    - /placeholder: "e.g. There IS a sidewalk present throughout — see #3 and #14."
+                  - generic [ref=e182]:
+                    - button "Converse" [disabled] [ref=e183]
+                    - button "Recompute assessment & scores" [disabled] [ref=e184]:
+                      - img [ref=e185]
+                      - text: Recompute assessment & scores
+                    - generic [ref=e188]: Enter = Converse · ⌘Enter = Recompute
+                - list [ref=e189]:
+                  - listitem [ref=e190]:
+                    - paragraph [ref=e191]: Overall
+                    - generic [ref=e192]: Edit Overall score
+                    - spinbutton "Edit Overall score" [ref=e193]: "12"
+                    - paragraph [ref=e194]: was 17
+                  - listitem [ref=e195]:
+                    - paragraph [ref=e196]: Accessibility
+                    - generic [ref=e197]: Edit Accessibility score
+                    - spinbutton "Edit Accessibility score" [ref=e198]: "7"
+                    - paragraph [ref=e199]: was 15
+                  - listitem [ref=e200]:
+                    - paragraph [ref=e201]: Drainage
+                    - generic [ref=e202]: Edit Drainage score
+                    - spinbutton "Edit Drainage score" [ref=e203]: "12"
+                    - paragraph [ref=e204]: was 17
+                  - listitem [ref=e205]:
+                    - paragraph [ref=e206]: Shade
+                    - generic [ref=e207]: Edit Shade score
+                    - spinbutton "Edit Shade score" [ref=e208]: "23"
+                  - listitem [ref=e209]:
+                    - paragraph [ref=e210]: Bike
+                    - generic [ref=e211]: Edit Bike score
+                    - spinbutton "Edit Bike score" [ref=e212]: "17"
+                - generic [ref=e213]:
+                  - generic [ref=e214]:
+                    - term [ref=e215]: Confidence
+                    - definition [ref=e216]: 67%
+                  - generic [ref=e217]:
+                    - term [ref=e218]: Coverage
+                    - definition [ref=e219]: 75%
+                  - generic [ref=e220]:
+                    - term [ref=e221]: Frames
+                    - definition [ref=e222]: "4"
+                - generic [ref=e223]:
+                  - generic [ref=e224]:
+                    - heading "Frames" [level=3] [ref=e225]
+                    - button "Play segment" [ref=e226]:
+                      - img [ref=e227]
+                      - text: Play segment
+                  - list [ref=e229]:
+                    - listitem [ref=e230]:
+                      - generic [ref=e231]:
+                        - button "Frame 0 from this submission" [ref=e232]:
+                          - img "Frame 0 from this submission" [ref=e233]
+                        - button "Enlarge frame 0" [ref=e234]:
+                          - img [ref=e235]
+                    - listitem [ref=e240]:
+                      - generic [ref=e241]:
+                        - button "Frame 1 from this submission" [ref=e242]:
+                          - img "Frame 1 from this submission" [ref=e243]
+                        - button "Enlarge frame 1" [ref=e244]:
+                          - img [ref=e245]
+                    - listitem [ref=e250]:
+                      - generic [ref=e251]:
+                        - button "Frame 2 from this submission" [ref=e252]:
+                          - img "Frame 2 from this submission" [ref=e253]
+                        - button "Enlarge frame 2" [ref=e254]:
+                          - img [ref=e255]
+                    - listitem [ref=e260]:
+                      - generic [ref=e261]:
+                        - button "Frame 6 from this submission" [ref=e262]:
+                          - img "Frame 6 from this submission" [ref=e263]
+                        - button "Enlarge frame 6" [ref=e264]:
+                          - img [ref=e265]
+              - listitem [ref=e270]:
+                - generic [ref=e271]:
+                  - generic [ref=e272]:
+                    - checkbox "Calle 130 · esc-sa-0002 San Antonio" [checked] [ref=e273]
+                    - generic [ref=e274]: Calle 130 · esc-sa-0002
+                    - generic [ref=e275]: San Antonio
+                  - generic [ref=e276]:
+                    - img [ref=e277]
+                    - text: Camera reading
+                - generic [ref=e280]:
+                  - generic [ref=e281]:
+                    - generic [ref=e282]:
+                      - img [ref=e283]
+                      - text: Assessment
+                    - generic [ref=e286]: Model-written · gpt-5-nano
+                  - paragraph [ref=e287]: "A well-kept block: a wide, even sidewalk with good canopy and a present drain. Nothing here needs correcting; the camera and the rubric agree it reads well."
+                  - paragraph [ref=e288]: A model summary of the session. Your chosen scores are the numbers that publish.
+                  - list [ref=e289]:
+                    - listitem [ref=e290]:
+                      - generic [ref=e292]: Accessibility
+                      - paragraph [ref=e293]: Wide, continuous, level walk with no obstructions in view.
+                    - listitem [ref=e294]:
+                      - generic [ref=e296]: Drainage
+                      - paragraph [ref=e297]: Drain present and the surface sheds cleanly; no pooling seen.
+                    - listitem [ref=e298]:
+                      - generic [ref=e300]: Shade
+                      - paragraph [ref=e301]: Mature canopy gives near-continuous midday shade.
+                    - listitem [ref=e302]:
+                      - generic [ref=e304]: Bike
+                      - paragraph [ref=e305]: Shared but low-stress; no separated lane.
+                - region "Argue with the model" [ref=e306]:
+                  - generic [ref=e307]:
+                    - generic [ref=e308]:
+                      - img [ref=e309]
+                      - text: Argue with the model
+                    - generic [ref=e311]: "Cite frames as #14 or #1-9. Converse first, or recompute directly."
+                  - paragraph [ref=e313]: No messages yet. Describe what the model got wrong.
+                  - generic [ref=e314]: Message to the model
+                  - textbox "Message to the model" [ref=e315]:
+                    - /placeholder: "e.g. There IS a sidewalk present throughout — see #3 and #14."
+                  - generic [ref=e316]:
+                    - button "Converse" [disabled] [ref=e317]
+                    - button "Recompute assessment & scores" [disabled] [ref=e318]:
+                      - img [ref=e319]
+                      - text: Recompute assessment & scores
+                    - generic [ref=e322]: Enter = Converse · ⌘Enter = Recompute
+                - list [ref=e323]:
+                  - listitem [ref=e324]:
+                    - paragraph [ref=e325]: Overall
+                    - generic [ref=e326]: Edit Overall score
+                    - spinbutton "Edit Overall score" [ref=e327]: "82"
+                  - listitem [ref=e328]:
+                    - paragraph [ref=e329]: Accessibility
+                    - generic [ref=e330]: Edit Accessibility score
+                    - spinbutton "Edit Accessibility score" [ref=e331]: "81"
+                  - listitem [ref=e332]:
+                    - paragraph [ref=e333]: Drainage
+                    - generic [ref=e334]: Edit Drainage score
+                    - spinbutton "Edit Drainage score" [ref=e335]: "83"
+                  - listitem [ref=e336]:
+                    - paragraph [ref=e337]: Shade
+                    - generic [ref=e338]: Edit Shade score
+                    - spinbutton "Edit Shade score" [ref=e339]: "80"
+                  - listitem [ref=e340]:
+                    - paragraph [ref=e341]: Bike
+                    - generic [ref=e342]: Edit Bike score
+                    - spinbutton "Edit Bike score" [ref=e343]: "83"
+                - generic [ref=e344]:
+                  - generic [ref=e345]:
+                    - term [ref=e346]: Confidence
+                    - definition [ref=e347]: 80%
+                  - generic [ref=e348]:
+                    - term [ref=e349]: Coverage
+                    - definition [ref=e350]: 100%
+                  - generic [ref=e351]:
+                    - term [ref=e352]: Frames
+                    - definition [ref=e353]: "2"
+                - generic [ref=e354]:
+                  - generic [ref=e355]:
+                    - heading "Frames" [level=3] [ref=e356]
+                    - button "Play segment" [ref=e357]:
+                      - img [ref=e358]
+                      - text: Play segment
+                  - list [ref=e360]:
+                    - listitem [ref=e361]:
+                      - generic [ref=e362]:
+                        - button "Frame 3 from this submission" [ref=e363]:
+                          - img "Frame 3 from this submission" [ref=e364]
+                        - button "Enlarge frame 3" [ref=e365]:
+                          - img [ref=e366]
+                    - listitem [ref=e371]:
+                      - generic [ref=e372]:
+                        - button "Frame 4 from this submission" [ref=e373]:
+                          - img "Frame 4 from this submission" [ref=e374]
+                        - button "Enlarge frame 4" [ref=e375]:
+                          - img [ref=e376]
+            - generic [ref=e381]:
+              - heading "1 frames matched no street" [level=3] [ref=e382]
+              - list [ref=e383]:
+                - listitem [ref=e384]:
+                  - generic [ref=e385]:
+                    - button "Frame 5 from this submission" [ref=e386]:
+                      - img "Frame 5 from this submission" [ref=e387]
+                    - button "Enlarge frame 5" [ref=e388]:
+                      - img [ref=e389]
+          - complementary [ref=e394]:
+            - paragraph [ref=e395]: Select a frame to see and correct its readings.
+        - generic [ref=e396]:
+          - generic [ref=e397]:
+            - button "Looks good — approve as proposed" [ref=e398]
+            - button "Excluded blurry frames" [ref=e399]
+            - button "Corrected curb ramps" [ref=e400]
+            - button "Overbudget — partial approve" [ref=e401]
+          - generic [ref=e402]:
+            - generic [ref=e403]:
+              - generic [ref=e404]: Reason
+              - textbox "Reason" [ref=e405]:
+                - /placeholder: Why are you approving or rejecting this submission?
+            - generic [ref=e406]:
+              - generic [ref=e407]:
+                - paragraph [ref=e408]: Approving 2 of 2 segments.
+                - button "Select all" [ref=e409]
+                - button "Select none" [ref=e410]
+                - button "Invert" [ref=e411]
+              - generic [ref=e412]:
+                - button "Approve selected" [ref=e413]:
+                  - img [ref=e414]
+                  - text: Approve selected
+                - button "Reject the session" [ref=e416]:
+                  - img [ref=e417]
+                  - text: Reject the session
+  - button "Open Next.js Dev Tools" [ref=e425] [cursor=pointer]:
+    - img [ref=e426]
+  - alert [ref=e441]

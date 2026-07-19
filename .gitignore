@@ -79,6 +79,7 @@ data/pending-submissions.local.json
 # scripts/seed-u30-fixture.mjs)
 /data/capture-review.local.json
 /data/capture-review-overlay.local.json
+/data/capture-review-dialogues.local.json
 /data/community-cv-observations.local.json
 /public/u30-fixture-frame.jpg
 # u2 review overrides: the fixture frame is copied from scripts/fixtures at seed
