@@ -84,6 +84,7 @@ function compile() {
         "../lib/extraction/prompt.ts",
         "../lib/extraction/schema.ts",
         "../lib/extraction/synthesis.ts",
+        "../lib/extraction/vantage.ts",
       ],
     }),
   );
@@ -146,13 +147,20 @@ const USAGE = (input = 1200, output = 300) => ({
  * the in-process equivalent of FOR UPDATE SKIP LOCKED, and it is what the
  * concurrency case actually tests.
  */
-function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
+function makeDb({ frameCount = 3, status = "extracting", attempts = {}, vantage = "pedestrian" } = {}) {
   const jobs = new Map();
   const frames = new Map();
+  // Pedestrian: ~1.4 m/s over ~50 m. Vehicle: ~10 m/s over the same path.
+  const pathM = 50;
+  const speedMps = vantage === "vehicle" ? 10 : 1.4;
+  const spanMs = Math.round((pathM / speedMps) * 1000);
+  const t0 = 1_784_000_000_000;
   for (let seq = 0; seq < frameCount; seq++) {
     const frameId = `frame-${seq}`;
     frames.set(frameId, {
+      id: frameId,
       seq,
+      t: t0 + Math.round((seq / Math.max(1, frameCount - 1)) * spanMs),
       storage_path: `captures/${SID}/frame-000${seq}.jpg`,
       segment_id: "north-st",
       near_junction: false,
@@ -272,7 +280,26 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
       state.assessments.push(args);
     },
     async listFrames() {
-      return [];
+      return [...frames.values()].map((f) => ({
+        id: f.id,
+        seq: f.seq,
+        t: f.t,
+        storage_path: f.storage_path,
+        segment_id: f.segment_id,
+        near_junction: f.near_junction,
+      }));
+    },
+    async sessionTrack() {
+      // Two verts ~50 m apart on a N–S line (matches makeDb pathM).
+      return {
+        status: state.sessionStatus,
+        mode: "live",
+        frameCount,
+        track: [
+          { lng: -84.15, lat: 9.9 },
+          { lng: -84.15, lat: 9.9 + pathM / 111_320 },
+        ],
+      };
     },
     async attributeFrames() {
       return 0;
@@ -298,7 +325,7 @@ function makeDb({ frameCount = 3, status = "extracting", attempts = {} } = {}) {
  *
  * Faked HERE and no higher: everything above it (the resize, the JPEG encode,
  * the data URL) is the real code path, so a test that says "the model was sent
- * 512 px" means it.
+ * FRAME_MAX_EDGE_PX" means it.
  */
 function makeFixtureFetch() {
   const bytes = readFileSync(FIXTURE);
@@ -391,13 +418,24 @@ async function main() {
     path.join(BUILD_DIR, "extraction", "prompt.js"),
   );
   const { downscaleFrame, FRAME_MAX_EDGE_PX } = require(path.join(BUILD_DIR, "extraction", "downscale.js"));
-  const { inputTokenCeiling, describeInputTokenCeiling, IMAGE_TOKEN_BUDGET, sessionTokenBudget } =
-    require(path.join(BUILD_DIR, "extraction", "config.js"));
+  const {
+    inputTokenCeiling,
+    describeInputTokenCeiling,
+    IMAGE_TOKEN_BUDGET,
+    sessionTokenBudget,
+    primaryVisionModel,
+    vehiclePrimaryModel,
+  } = require(path.join(BUILD_DIR, "extraction", "config.js"));
+  const {
+    classifyCaptureVantage,
+    VEHICLE_SPEED_THRESHOLD_MPS,
+  } = require(path.join(BUILD_DIR, "extraction", "vantage.js"));
   const sharp = require("sharp");
 
   process.env.CV_EXTRACTION_ENABLED = "true";
   process.env.OPENAI_VISION_MODEL = "gpt-5-nano";
   process.env.OPENAI_VISION_ESCALATION_MODEL = "gpt-5.4-mini";
+  delete process.env.CV_VEHICLE_PRIMARY_MODEL;
 
   const CEILING = inputTokenCeiling();
 
@@ -674,8 +712,8 @@ async function main() {
       `${(meta.width / meta.height).toFixed(3)}`,
     );
 
-    // ~256 patches at 512 px. This is the bound that holds even when detail:low
-    // is ignored, which is the entire point of doing the resize ourselves.
+    // Patch count at FRAME_MAX_EDGE_PX. This is the bound that holds even when
+    // detail:low is ignored, which is the entire point of doing the resize ourselves.
     const patches = Math.ceil(meta.width / 32) * Math.ceil(meta.height / 32);
     check(
       "the bounded image cannot cost more than the image budget, hint or no hint",
@@ -740,7 +778,7 @@ async function main() {
     );
     check(
       "the downscaled frame is a fraction of the original's bytes",
-      out.length < asDataUrl.length / 4,
+      out.length < asDataUrl.length / 2,
       `${Math.round(out.length / 1024)} KB vs ${Math.round(asDataUrl.length / 1024)} KB`,
     );
   }
@@ -778,6 +816,68 @@ async function main() {
       db.state.observations.length === 10,
       `${db.state.observations.length} observations`,
     );
+  }
+
+  /* ---------------- Vehicle vantage routing ---------------- */
+  console.log("\nvehicle vantage routing");
+  {
+    check(
+      "median inter-fix speed classifies a drive as vehicle",
+      classifyCaptureVantage([
+        { lng: -84.15, lat: 9.9, t: 0 },
+        { lng: -84.15, lat: 9.9 + 40 / 111_320, t: 4000 }, // 10 m/s
+      ]) === "vehicle",
+    );
+    check(
+      "a walking pace stays pedestrian",
+      classifyCaptureVantage([
+        { lng: -84.15, lat: 9.9, t: 0 },
+        { lng: -84.15, lat: 9.9 + 7 / 111_320, t: 5000 }, // 1.4 m/s
+      ]) === "pedestrian",
+    );
+    check(
+      `the vehicle threshold is ${VEHICLE_SPEED_THRESHOLD_MPS} m/s`,
+      VEHICLE_SPEED_THRESHOLD_MPS === 3,
+    );
+    check(
+      "vehicle primary defaults to the escalation model",
+      vehiclePrimaryModel() === "gpt-5.4-mini" && primaryVisionModel("vehicle") === "gpt-5.4-mini",
+    );
+    check(
+      "pedestrian primary stays on the cheap tier",
+      primaryVisionModel("pedestrian") === "gpt-5-nano",
+    );
+    check(
+      "vehicle session budget drops the 10% escalation overhead",
+      sessionTokenBudget(1, "vehicle") === CEILING &&
+        sessionTokenBudget(1, "pedestrian") === Math.ceil(CEILING * 1.1),
+      `vehicle=${sessionTokenBudget(1, "vehicle")} ped=${sessionTokenBudget(1, "pedestrian")}`,
+    );
+
+    const db = makeDb({ frameCount: 3, vantage: "vehicle" });
+    const vision = makeVision(() =>
+      // If the ladder wrongly fires nano first, this would still answer — but
+      // we assert the model id on the observation and the call list.
+      ok(T, { confidence: 0.2 }),
+    );
+    await run(db, vision, { concurrency: 1 });
+    check(
+      "a vehicle-speed session uses the escalation model as PRIMARY",
+      vision.calls.length === 3 && vision.calls.every((c) => c.model === "gpt-5.4-mini"),
+      vision.calls.map((c) => c.model).join(","),
+    );
+    check(
+      "vehicle sessions do not escalate further (mini is already primary)",
+      db.state.observations.every((o) => !o.escalated) &&
+        db.state.observations.every((o) => o.model === "gpt-5.4-mini"),
+    );
+
+    process.env.CV_VEHICLE_PRIMARY_MODEL = "gpt-custom-vehicle";
+    check(
+      "CV_VEHICLE_PRIMARY_MODEL overrides the vehicle primary",
+      vehiclePrimaryModel() === "gpt-custom-vehicle",
+    );
+    delete process.env.CV_VEHICLE_PRIMARY_MODEL;
   }
 
   {

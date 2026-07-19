@@ -7,20 +7,21 @@
  * nothing to catch. That is a recurring provider regression, not a one-off, and
  * the cost model cannot rest on a hint someone else honours at their discretion.
  *
- * So we stop asking. The bytes we send ARE small: max 512 px on the longest
- * side, JPEG q70. At that size a betrayal is bounded — ~256 patches, ~630 tokens
- * at nano's 2.46x multiplier — instead of unbounded. `detail: "low"` still rides
- * along in the request as belt-and-braces; this is the braces.
+ * So we stop asking. The bytes we send ARE small: max 768 px on the longest
+ * side, JPEG q70. At that size a betrayal is bounded — ~576 patches, ~1,420
+ * tokens at nano's 2.46x multiplier — instead of unbounded. `detail: "low"`
+ * still rides along in the request as belt-and-braces; this is the braces.
  *
- * The frames are captured for human review at full resolution and stay that way
- * in storage. This downscale is for the model's eyes only, and 512 px is what a
- * low-detail call was always meant to see anyway.
+ * 768 (up from 512) is the acuity floor for vehicle / road-center vantage:
+ * raised sidewalks, bollards, and curb lines at the frame edge need the extra
+ * pixels. The frames stay full-resolution in storage for human review; this
+ * downscale is for the model's eyes only.
  */
 
 import sharp from "sharp";
 
 /** Longest side, in pixels, of what the model is sent. */
-export const FRAME_MAX_EDGE_PX = 512;
+export const FRAME_MAX_EDGE_PX = 768;
 
 /** JPEG quality of the downscaled frame. Enough for a rubric, not for a print. */
 export const FRAME_JPEG_QUALITY = 70;

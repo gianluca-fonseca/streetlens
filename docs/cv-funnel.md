@@ -119,17 +119,18 @@ line, showing a null as "not assessable", never as 0
 
 ### 2. Image economics, in two sentences
 
-Every frame is re-encoded server-side to a longest edge of 512 px before it is
+Every frame is re-encoded server-side to a longest edge of 768 px before it is
 sent, so the model never sees the full-resolution image and cannot bill for
 pixels it was not handed (`lib/extraction/downscale.ts`); the large, constant
 part of each request (a byte-identical system prompt and the strict schema) is
 sent as a cacheable prefix, so after the first frame the provider charges its
 reduced cached-input rate for most of the request
 (`lib/extraction/prompt.ts`, the "Prompt caching" note in the Extraction
-section below). The cheap model runs first and a frame escalates to the stronger
-one only when it is genuinely unsure (section 3b). The real measured token
-counts and how they convert to money live in the **Cost model** section further
-down; this section is only about where the numbers come from, not what they are.
+section below). Pedestrian sessions run the cheap model first and escalate on
+genuine uncertainty; vehicle-speed sessions use the stronger model as primary
+(section 3b). The real measured token counts and how they convert to money live
+in the **Cost model** section further down; this section is only about where
+the numbers come from, not what they are.
 
 ### 3. Where confidence actually does work
 
@@ -152,18 +153,25 @@ total confidence. Ties fall to the lower (more conservative) value.
 > means one confidently-wrong outlier cannot move the result, and the confidence
 > weighting means a 40%-sure dissent counts for less than a 90%-sure agreement.
 
-**(b) It triggers escalation, and the escalated answer wins.** After the cheap
-model (`gpt-5-nano`) scores a frame, the worker escalates that one frame to the
-stronger model (`gpt-5.4-mini`) when the frame is `usable` AND at least one item
-came back with a non-null value below `ESCALATION_CONFIDENCE_THRESHOLD` (0.35)
-(`lib/extraction/config.ts`, and the Extraction section's "Model and
-escalation"). A low-confidence *null* does not escalate: an honest "cannot see"
-is not the same as a hedged guess. Escalation reuses the already-downscaled
-512 px image, is capped at `floor(frameCount * 0.1)` per session so poor light
-cannot silently reprice the whole walk at the expensive model, and when it runs,
-the stronger model's answer is the one that counts. In the rollup a frame that
-escalated has two observation rows and only the escalated one votes, so a single
-frame never votes twice (`lib/capture/rollup.ts`, "One vote per frame").
+**(b) It triggers escalation, and the escalated answer wins.** On pedestrian
+sessions, after the cheap model (`gpt-5-nano`) scores a frame, the worker
+escalates that one frame to the stronger model (`gpt-5.4-mini`) when the frame
+is `usable` AND at least one item came back with a non-null value below
+`ESCALATION_CONFIDENCE_THRESHOLD` (0.35) (`lib/extraction/config.ts`, and the
+Extraction section's "Model and escalation"). A low-confidence *null* does not
+escalate: an honest "cannot see" is not the same as a hedged guess. Escalation
+reuses the already-downscaled 768 px image, is capped at
+`floor(frameCount * 0.1)` per session so poor light cannot silently reprice the
+whole walk at the expensive model, and when it runs, the stronger model's answer
+is the one that counts. In the rollup a frame that escalated has two observation
+rows and only the escalated one votes, so a single frame never votes twice
+(`lib/capture/rollup.ts`, "One vote per frame").
+
+Vehicle-speed sessions (median inter-fix track speed > ~3 m/s) skip the
+nano-first ladder entirely: `gpt-5.4-mini` (or `CV_VEHICLE_PRIMARY_MODEL`) is
+the primary extractor, because oblique road-center sidewalk reads need the
+stronger model. The 10% escalation overhead is superseded for those sessions —
+see the Cost model section.
 
 **(c) It tells the reviewer where to look.** A wrong value at low confidence is
 the model flagging itself: it already told you it was unsure, and the rollup
@@ -732,14 +740,24 @@ The extraction worker (`lib/extraction/`) scores each frame with one API call.
 It talks to the OpenAI **Responses API** over raw `fetch` (no SDK), at
 `https://api.openai.com/v1/responses`.
 
-**Model and escalation.** The workhorse is `gpt-5-nano` (`OPENAI_VISION_MODEL`).
-A frame escalates to the stronger `gpt-5.4-mini`
+**Model and escalation.** Pedestrian sessions use `gpt-5-nano`
+(`OPENAI_VISION_MODEL`) first. A frame escalates to the stronger `gpt-5.4-mini`
 (`OPENAI_VISION_ESCALATION_MODEL`) only when the frame is `usable` AND at least
 one item came back with a non-null value at confidence below 0.35. A
 low-confidence but null item (an honest "cannot see") does not escalate.
-Escalation reuses the already-downscaled 512 px image (no re-fetch), a failed
+Escalation reuses the already-downscaled 768 px image (no re-fetch), a failed
 escalation keeps the cheap model's answer, and escalations are capped at
 `floor(frameCount * 0.1)` (minimum 1) per session.
+
+**Vehicle vantage.** When the pump loads a session it reconstructs a timed track
+from stored geometry + frame capture times (`lib/extraction/vantage.ts`) and
+takes the median inter-fix speed. Above ~3 m/s the session is treated as
+vehicle capture: `gpt-5.4-mini` (override with `CV_VEHICLE_PRIMARY_MODEL`) runs
+as PRIMARY for every frame, and the nano→mini ladder stays off. Pedestrian
+sessions keep the nano-first path. The system prompt is vantage-aware for both
+modes (scan both road edges for raised sidewalks / curbs / bollards from
+road-center) but stays byte-identical across frames so prompt caching still
+hits.
 
 **One call, all 15 items, strict schema.** The request asks for every rubric
 item at once, as OpenAI structured outputs (`{ type: "json_schema", strict: true
@@ -775,7 +793,7 @@ sized to clear OpenAI's ~1024-token caching floor, and cache hits are read back
 from `usage.input_tokens_details.cached_tokens`.
 
 **Downscale, server-side.** `downscale.ts` re-encodes each frame to a longest
-edge of 512 px at JPEG quality 70 with `sharp`, baking EXIF orientation first,
+edge of 768 px at JPEG quality 70 with `sharp`, baking EXIF orientation first,
 and sends it as an inline base64 data URL. The full-resolution frame stays in
 storage for human review; the model never sees it. This exists because a
 provider that ignores the `detail: "low"` hint and bills full resolution returns
@@ -1172,7 +1190,7 @@ The honest section. What actually happens at each hazard, and where.
   anything else (including unset) disables extraction, fail-closed. Finalize
   still matches and enqueues while it is off, so flipping it on drains the
   backlog.
-- **detail:low billing regression.** The guard is the server-side 512 px
+- **detail:low billing regression.** The guard is the server-side 768 px
   downscale plus the per-frame input-token ceiling checked on *every* response
   (including refusals and truncations, which are still billed) before the answer
   is even parsed. An over-budget response that happens to contain good JSON is
@@ -1230,33 +1248,46 @@ Decomposed:
 | Strict JSON response schema | ~1,898 | Billed like any input; ~40% of the static request. |
 | User instruction | ~20 | Constant. |
 | **Static request** | **~4,480** (cached) | The cache hit after the first call. |
-| 512 px downscaled image | ~139 | Full-res 960x666 would have been ~1,052 (a ~7x cut, and now bounded). |
-| **Per frame, total input** | **~4,619** | |
+| 768 px downscaled image | ~313 (est.) | Area scales ×2.25 vs the prior 512 px / ~139 measured image tokens. |
+| **Per frame, total input** | **~4,800 (est.)** | Static prefix + larger image. |
 
 The per-frame ceiling is derived, not flat: `inputTokenCeiling() =
-staticRequestApproxTokens() + IMAGE_TOKEN_BUDGET (1200)`, roughly 5,800 tokens
+staticRequestApproxTokens() + IMAGE_TOKEN_BUDGET (2700)`, roughly 7,700+ tokens
 with the current prompt and schema. It is measured from prompt + schema + user
 turn so editing either file cannot silently break the breaker. (An earlier flat
 2,600 ceiling sat below the floor of a correct call and fired on every valid
 request; that regression is why the ceiling is now computed.)
 
-**Per session (input tokens):**
+**Per-frame image cost delta (512 → 768).** Image tokens scale with area,
+`(768/512)² = 2.25×`. Holding the cached static prefix fixed, the marginal
+uncached image line roughly goes from ~139 → ~313 tokens per frame on nano
+(~+$0.00001 at $0.05/1M uncached — tiny next to the cached prefix). The real
+leverage of 768 is acuity on vehicle vantage, not the dollar delta on nano.
 
-| Frames | Total input tokens | Of which cached | Uncached (billed at full rate) |
-| --- | --- | --- | --- |
-| 150 | ~692,850 | ~672,000 | ~20,850 (first frame's full static prefix, then ~139/frame image) |
-| 400 | ~1,847,600 | ~1,792,000 | ~55,600 |
+**Per session (input tokens, pedestrian / nano-first):**
 
-The dominant term is the cached static prefix, billed at the provider's reduced
-cached-input rate; the marginal cost of one more frame is essentially the ~139
-image tokens plus output. To convert to dollars, multiply cached and uncached
-input tokens by the provider's respective published rates for the model.
+| Frames | Allowance formula | Note |
+| --- | --- | --- |
+| N | `N * ceil(ceiling * 1.1)` | 10% escalation overhead baked in |
 
-**Escalation overhead.** Up to `floor(frames * 0.1)` frames (15 at 150 frames,
-40 at 400) trigger a *second* full call on `gpt-5.4-mini`, reusing the same
-512 px image, so each adds roughly another ~4,619 input tokens at the pricier
-model's rate, plus its output. That is the ceiling on escalation cost; most
-sessions escalate less.
+**Per session (vehicle / mini-as-primary):**
+
+| Frames | Allowance formula | Note |
+| --- | --- | --- |
+| N | `N * ceiling` | 10% escalation math superseded — every frame already bills the primary |
+
+The dominant term is still the cached static prefix, billed at the provider's
+reduced cached-input rate; the marginal cost of one more frame is essentially
+the image tokens plus output. To convert to dollars, multiply cached and
+uncached input tokens by the provider's respective published rates for the
+model.
+
+**Escalation overhead (pedestrian only).** Up to `floor(frames * 0.1)` frames
+(15 at 150 frames, 40 at 400) trigger a *second* full call on `gpt-5.4-mini`,
+reusing the same 768 px image, so each adds roughly another full input bill at
+the pricier model's rate, plus its output. That is the ceiling on escalation
+cost; most sessions escalate less. Vehicle sessions pay mini once per frame and
+do not escalate further.
 
 **Not yet evidenced.** The live smoke got the real *input* billing but could not
 complete an end-to-end extraction: the funded key hit an account quota
@@ -1279,13 +1310,14 @@ RUN_LIVE_SMOKE=1 node --env-file=.env.local scripts/live-smoke-extraction.mjs
 | `ADMIN_RPC_SECRET` | Privileged secret for the global pump and every worker/review RPC; matched against `app_secrets.admin_rpc_secret`. | none (fail-closed) |
 | `CRON_SECRET` | Alternate bearer the global pump accepts (what Vercel Cron sends). | none |
 | `OPENAI_API_KEY` | Vision model API key. | undefined |
-| `OPENAI_VISION_MODEL` | Workhorse extraction model. | `gpt-5-nano` |
-| `OPENAI_VISION_ESCALATION_MODEL` | Stronger model used only on escalation. | `gpt-5.4-mini` |
+| `OPENAI_VISION_MODEL` | Workhorse extraction model (pedestrian primary). | `gpt-5-nano` |
+| `OPENAI_VISION_ESCALATION_MODEL` | Stronger model used on pedestrian escalation (and as the default vehicle primary). | `gpt-5.4-mini` |
+| `CV_VEHICLE_PRIMARY_MODEL` | Primary extractor for vehicle-speed sessions. | the escalation model |
 | `OPENAI_SYNTHESIS_MODEL` | Text model for the per-segment synthesis. | the escalation model |
 | `CV_SYNTHESIS_MAX_ADJUST` | Most a synthesis may move any one lens score, in points, up or down. | `20` |
 | `CV_EXTRACTION_ENABLED` | **Kill switch.** Must equal exactly `"true"` to enable; anything else disables (fail-closed). It gates synthesis too. | disabled |
-| `CV_INPUT_TOKEN_CEILING` | Overrides the per-frame input-token ceiling (the breaker). | derived (`staticRequestApproxTokens() + 1200`) |
-| `CV_SESSION_TOKENS_PER_FRAME` | Overrides the per-frame slice of the session budget. | derived (`ceil(ceiling * 1.1)`) |
+| `CV_INPUT_TOKEN_CEILING` | Overrides the per-frame input-token ceiling (the breaker). | derived (`staticRequestApproxTokens() + 2700`) |
+| `CV_SESSION_TOKENS_PER_FRAME` | Overrides the per-frame slice of the session budget. | derived (pedestrian: `ceil(ceiling * 1.1)`; vehicle: `ceiling`) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase base URL; also builds public frame URLs (throws if unset when building a URL). | undefined |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key. | undefined |
 | `SUBMISSIONS_IP_SALT` | Salt for hashing contributor IPs. | `streetlens-dev-salt` |
@@ -1421,7 +1453,7 @@ Run these directly with node; none need a live database.
 | `scripts/test-upload-client.mjs` | retry, resume, concurrency, abort |
 | `scripts/test-rate-limit-namespaces.mjs` | capture ceiling, namespace isolation |
 | `scripts/test-honeypot-type.mjs` | the honeypot preserves the submitted type |
-| `scripts/test-extraction-worker.mjs` | the pump against a mocked OpenAI: breaker, budget, escalation, refusals, concurrent pumps, attempts cap, kill switch |
+| `scripts/test-extraction-worker.mjs` | the pump against a mocked OpenAI: breaker, budget, escalation, vehicle vantage routing, refusals, concurrent pumps, attempts cap, kill switch |
 | `scripts/test-capture-rollup.mjs` | items to lens scores, junction routing, weighted medians, coverage |
 | `scripts/test-cv-apply.mjs` | approval writes CV rows (with reviewer-override provenance) and leaves audited scores byte-identical |
 | `scripts/test-review-overrides.mjs` | the reviewer-correction recompute equals the real rollup math, and exclusion, deletion, null overrides, junction routing, segment drop, and manual-score wins |
@@ -1430,6 +1462,25 @@ Run these directly with node; none need a live database.
 `CaptureDb` whose claim mutates synchronously before yielding, the in-process
 equivalent of `FOR UPDATE SKIP LOCKED`. A looser fake would let the concurrency
 case pass while proving nothing.
+
+### Extraction eval harness (operator-run)
+
+`scripts/eval-extraction.mjs` / `npm run eval:extraction` runs the real
+extraction prompt against the labeled fixture set in
+`scripts/fixtures/extraction-eval.json` and prints per-item agreement. It spends
+OpenAI tokens and is **not** part of `npm test`.
+
+```
+npm run eval:extraction
+EVAL_OUT=.planning/evidence/unit-vision-acuity/eval-after.json npm run eval:extraction
+EVAL_MODEL=gpt-5.4-mini npm run eval:extraction
+EVAL_LABELS=path/to/local-labels.json npm run eval:extraction
+```
+
+Labels are committed JSON (plus optional local label files). The harness never
+calls the live database. Merge reviewer-override frames by copying images into
+`scripts/fixtures/` and extending the labels file — do not point tests at
+production storage.
 
 ### The live smoke
 

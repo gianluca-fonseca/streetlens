@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node scripts/run-tests.mjs",
+    "eval:extraction": "node --env-file=.env.local scripts/eval-extraction.mjs",
     "render:maps": "node scripts/render-map-images.mjs"
   },
   "dependencies": {
