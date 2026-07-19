@@ -362,7 +362,6 @@ export function assembleDialogueContext(
   ].join("\n");
 
   const fixedHead = [rollupBlock, "", spatialBlock, "", evidenceBlock].join("\n");
-  const fixedTokens = estimateTokens(fixedHead);
 
   let turns = [...args.transcript];
   let truncatedTurns = 0;
