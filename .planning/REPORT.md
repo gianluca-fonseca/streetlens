@@ -12,6 +12,8 @@
 | `485f081` | feat(dialogue): persist chat, wire workbench UI and API |
 | `c6b58b1` | chore(dialogue): drop unused vars in context assembly |
 | `354873e` | test(dialogue): browser evidence on :3590 plus lint fixes |
+| `e9b70fb` | docs(dialogue): REPORT + CONTROL done for bgsd-0015 unit |
+| `c01aa94`+ | CONTROL/gitignore finalization (this close-out) |
 
 ## Gates (verbatim)
 
