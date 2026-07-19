@@ -16,6 +16,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSessionReview } from "@/lib/capture/review-store";
+import { listReviewDialoguesBySegment } from "@/lib/capture/dialogue-store";
 import { getPendingCaptureSessionIds } from "@/lib/capture/pending-captures";
 import { getSegments } from "@/lib/segments";
 import AdminHeader from "@/components/admin/AdminHeader";
@@ -72,6 +73,13 @@ export default async function AdminCaptureReviewPage({
 
   const pendingCaptureSessionIds = await getPendingCaptureSessionIds();
 
+  let initialDialogues: Awaited<ReturnType<typeof listReviewDialoguesBySegment>> = {};
+  try {
+    initialDialogues = await listReviewDialoguesBySegment(id);
+  } catch {
+    initialDialogues = {};
+  }
+
   return (
     <>
       <AdminHeader locale={locale} active="queue" />
@@ -90,6 +98,7 @@ export default async function AdminCaptureReviewPage({
           matchedGeometry={matchedGeometry}
           segmentMeta={segmentMeta}
           pendingCaptureSessionIds={pendingCaptureSessionIds}
+          initialDialogues={initialDialogues}
         />
       </main>
     </>

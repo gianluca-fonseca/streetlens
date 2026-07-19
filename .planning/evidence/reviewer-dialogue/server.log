@@ -1,0 +1,21 @@
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3590
+- Network:       http://192.168.100.188:3590
+- Environments: .env.local
+✓ Ready in 324ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/filippofonseca/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0015-reviewer-dialogue/worktrees/unit-reviewer-dialogue/package-lock.json
+   * /Users/filippofonseca/Developer/Projects/streetlens/package-lock.json
+
+
+ GET /en/admin/login 200 in 2.1s (next.js: 1812ms, proxy.ts: 99ms, generate-params: 338ms, application-code: 180ms)
+ POST /api/admin/login 200 in 136ms (next.js: 124ms, application-code: 11ms)
+ GET /en/admin 200 in 833ms (next.js: 748ms, proxy.ts: 5ms, generate-params: 362ms, application-code: 80ms)
+ GET /en/admin 200 in 51ms (next.js: 5ms, proxy.ts: 12ms, generate-params: 1358µs, application-code: 34ms)
+ GET /en/admin/capture/9c2e6a71-4f38-4a1b-b7d0-2e5a1c9f3b84 200 in 1597ms (next.js: 1160ms, proxy.ts: 2ms, application-code: 435ms)
+ POST /api/admin/capture/dialogue 200 in 4.0s (next.js: 252ms, application-code: 3.8s)
+ POST /api/admin/capture/dialogue 200 in 5.7s (next.js: 1673µs, application-code: 5.6s)

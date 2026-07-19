@@ -1,0 +1,32 @@
+bgsd-0015 reviewer-dialogue — browser drive on :3590 (fixture mode)
+====================================================================
+
+Reproduce
+---------
+  node scripts/seed-u2-fixture.mjs --force
+  OPENAI_API_KEY=… ADMIN_PASSWORD=streetlens-u2 \
+    NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= ADMIN_RPC_SECRET= \
+    CV_EXTRACTION_ENABLED=true npx next dev -p 3590
+  Login /en/admin/login → /en/admin/capture/9c2e6a71-4f38-4a1b-b7d0-2e5a1c9f3b84
+
+Evidence captures
+-----------------
+1. 01-workbench-with-chat.png — segment cards show "Argue with the model" chat
+   panel with Converse / Recompute assessment & scores.
+2. 02-pills-in-draft.png — typing "#1 and #2" renders clickable frame pills.
+3. 03-converse-reply.png — live gpt-5.4-mini (synthesis model) converse reply
+   understood the sidewalk correction and suggested readiness to recompute.
+4. 04-after-recompute.png — after clarifying answer + Recompute:
+     accessibility 7 → 23, overall 12 → 21
+     assessment prose rewritten ("continuous sidewalk throughout")
+     Human-corrected badge lit; chat shows recompute-tagged assistant turn.
+
+Live OpenAI spend (sparing, <\$1)
+--------------------------------
+  1× converse + 1× recompute text-only calls on gpt-5.4-mini (default synthesis
+  model). Rough upper bound ≪ \$0.10 given ~4–8k input tokens and short bilingual
+  output. Exact billed usage not scraped from the provider console in this drive;
+  ledger fields written on recompute via setSegmentAssessment when a CaptureDb
+  is present (fixture mode returns tokens in the API JSON only).
+
+Console: no app errors during dialogue; Next.js dev tooling warnings only.

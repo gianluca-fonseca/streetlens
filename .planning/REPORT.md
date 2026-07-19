@@ -1,61 +1,107 @@
-# unit-ci-green — REPORT
+# unit-reviewer-dialogue — REPORT (bgsd-0015)
 
 ## Verdict
 
-**PASS** — CI is genuinely green. Verified on PR #35; green run linked below.
-
-## Root cause
-
-Every CI run on `main`/`next` since the workflow shipped died in ~20s at **`npm ci`**, before any gate ran:
-
-```
-npm error `npm ci` can only install packages when your package.json and package-lock.json are in sync.
-npm error Missing: @swc/helpers@0.5.23 from lock file
-```
-
-The lockfile had been regenerated with **npm 11 (Node 24)** locally, which tolerates the drift. **GitHub Actions used Node 20 / npm 10**, which rejects it. This was the sole blocker on historical runs (run `29667375625`).
-
-After fixing the lockfile, a second class of failures appeared only under Node 20:
-
-| Suite | Failure on Node 20 |
-|-------|-------------------|
-| `test-canonical-observation.mjs` | `ERR_UNKNOWN_FILE_EXTENSION` importing `.ts` directly |
-| `test-map-cv-visibility.mjs` | same |
-| `test-pipeline-truth.mjs` | Supabase client requires `ws` polyfill (no native WebSocket) |
-
-These pass on **Node 22+** (native TypeScript stripping + WebSocket), matching local dev. Build did **not** need real Supabase secrets — only placeholder `NEXT_PUBLIC_*` for honest inlining.
-
-**Not the cause:** missing repo secrets, Docker unavailability (migration suite passed on ubuntu-latest once install succeeded).
+**PASS** — Reviewer can chat with the synthesis model per segment, cite frames as `#N` / `#N-M` pills, converse (with clarifying questions), and recompute assessment EN+ES + lens scores with human corrections as ground truth. Migration 0036 filed (conductor applies). Gates green. Live browser evidence on :3590 with two real text-only OpenAI calls (≪ \$1).
 
 ## Commits
 
 | Hash | Message |
 |------|---------|
-| `cfdf4ac` | fix(deps): sync package-lock.json for Node 20 npm ci |
-| `422030b` | ci: add safe public placeholder env for build and tests |
-| `c01fcb6` | ci: use Node 22 for native TypeScript and WebSocket |
+| `04b8700` | feat(dialogue): add text-only guided chat engine core |
+| `485f081` | feat(dialogue): persist chat, wire workbench UI and API |
+| `c6b58b1` | chore(dialogue): drop unused vars in context assembly |
+| `354873e` | test(dialogue): browser evidence on :3590 plus lint fixes |
+| `e9b70fb` | docs(dialogue): REPORT + CONTROL done for bgsd-0015 unit |
+| `c01aa94` | docs(dialogue): record final commit hashes on CONTROL |
+| `e6bc97a` | chore(dialogue): gitignore dialogue fixture and finalize CONTROL |
+| `1ffa8d2` | docs(dialogue): append close-out hash to CONTROL |
+| `402b10d` | docs(dialogue): sync REPORT commit table with CONTROL |
 
-## Green CI run
-
-https://github.com/gianluca-fonseca/streetlens/actions/runs/29668370435
-
-PR: https://github.com/gianluca-fonseca/streetlens/pull/35
-
-All workflow steps passed: `npm ci` → `tsc` → `lint` → `build` → `npm test` (50/50 suites, including `test-capture-migrations.mjs` with Docker).
-
-## Gates (local, verbatim)
+## Gates (verbatim)
 
 ```
-npx tsc --noEmit: PASS (exit 0)
-npm run lint: PASS (exit 0; 1 pre-existing warning in SegmentDetail.tsx)
-npm run build: PASS (exit 0)
-npm test: PASS (50/50 suites)
-node scripts/test-i18n-parity.mjs: PASS — PARITY: OK (identical key sets)
+=== npx tsc --noEmit ===
+(exit 0 — clean)
+
+=== npm run lint ===
+> streetlens@0.1.0 lint
+> eslint
+… SegmentDetail.tsx pre-existing warning only (cvOverallAssessment unused)
+✖ 1 problem (0 errors, 1 warning)
+(exit 0)
+
+=== npm run build ===
+✓ Compiled successfully
+✓ Generating static pages (54/54)
+Route includes ƒ /api/admin/capture/dialogue
+(exit 0)
+
+=== npm test (seed clean first) ===
+51/51 passed
+including [PASS] test-guided-dialogue.mjs
+
+=== node scripts/test-i18n-parity.mjs ===
+en leaf keys: 1396
+es leaf keys: 1396
+only in en: 0 []
+only in es: 0 []
+PARITY: OK (identical key sets)
+(exit 0)
 ```
+
+Full gate scrapes: `.planning/evidence/reviewer-dialogue/GATES.txt` (and this session’s prior full `npm test` / `npm run build` logs).
+
+## Prompt design summary
+
+**Converse** (`converseSystemPrompt`): text-only; rollup + spatial block + cited-frame evidence + transcript; ask clarifying questions when unsure; set `suggest_recompute` when ready. Never rewrites scores.
+
+**Recompute** (`recomputeSystemPrompt`): same context; reviewer messages are ground truth; rewrite EN+ES assessment (synthesis schema) + lens deltas with reasons citing the correction / `#N`; may exceed autonomous ±20; overall never model-set — `renormalizedOverall` (0.45/0.30/0.25, bike separate) in `applyGuidedAssessment`.
+
+**Spatial block** (owner extension): assembled fresh every call — segment identity, traversal anchors, neighbors from `buildGraph`, per-cited-frame %/metres along geometry. Never persisted as standing model state.
+
+## Token-budget math
+
+| Piece | Policy |
+|-------|--------|
+| Cap | `DIALOGUE_INPUT_TOKEN_CAP = 8000` (~chars/4) |
+| Always keep | rollup + spatial + referenced-frame evidence |
+| Truncate first | oldest transcript turns |
+| Last resort | trim evidence lines / hard-slice |
+| Models | `synthesisModel()` → `gpt-5.4-mini` (text-only Responses API; no vision) |
+| Ledger | recompute writes usage into `capture_segment_rollups.synthesis_*_tokens` via `setSegmentAssessment` (same seam as re-run analysis); converse returns usage in API JSON |
+
+Unit test locks: 80 long turns → under 8k with truncatedTurns > 0; lower 2500 cap still keeps rollup+spatial.
+
+## Evidence
+
+`.planning/evidence/reviewer-dialogue/`
+
+| File | What it shows |
+|------|----------------|
+| `01-workbench-with-chat.png` | Chat panel on segment cards |
+| `02-pills-in-draft.png` | `#1` / `#2` pills while drafting |
+| `03-converse-reply.png` | Live model understood sidewalk correction |
+| `04-after-recompute.png` | Scores+assessment updated; Human-corrected |
+| `playwright-drive.txt` | Reproduce steps + before/after numbers |
+| `server.log` | Two `POST /api/admin/capture/dialogue 200` |
+| `snapshot-initial.md` | a11y tree with dual send buttons |
+
+Live drive (fixture mode :3590): accessibility **7 → 23**, overall **12 → 21**; assessment rewritten to continuous sidewalk; 4 persisted dialogue messages (2 recompute-tagged).
+
+**OpenAI spend:** 1 converse + 1 recompute, text-only mini. Estimated ≪ \$0.10 (well under \$1 cap).
+
+## Assumptions
+
+1. Migration **0036** is file-only; conductor applies to live DB (live DB sacred).
+2. Worktree migrations stop at 0033; next number is **0036** per brief (no inventing 0034/0035).
+3. Map `SegmentProperties` lacks `highway`/`length_m`; spatial length is derived from geometry haversine.
+4. Dialogue list is a **sibling RPC** (`capture_list_review_dialogues`), not inlined into `capture_session_review` (avoids colliding with the large review RPC).
+5. Converse does not overwrite synthesis ledger tokens; recompute does (same absolute write pattern as re-run synthesis).
+6. Fixture mode (empty Supabase URL) used for browser evidence; OpenAI key from `.env.local`.
 
 ## Deviations
 
-- **Node version:** workflow bumped from Node 20 → **22** (not a gate weakening — tests already relied on Node 22+ features; Node 20 could not run three suites honestly).
-- **CI trigger:** workflow only fires on `push`/`pull_request` to `main`/`next`; verification used **PR #35 → next** (branch push alone does not trigger CI).
-- **No repo secrets added** — placeholders are inline workflow `env` only.
-- **Skipped tests:** none in CI. Live-smoke scripts (`live-*.mjs`) are outside `npm test` by design and remain gated behind `RUN_LIVE_SMOKE` / credentials.
+1. `bgsd-unit.json` in the worktree still describes an older docs unit; **brief.md is authoritative** for this lane.
+2. Token spend on converse is returned in the HTTP response but not folded into rollup columns (avoids clobbering prior synthesis spend with a small chat call).
+3. Pre-existing lint warning in `SegmentDetail.tsx` left untouched (out of scope).
