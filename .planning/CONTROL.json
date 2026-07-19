@@ -1,1 +1,16 @@
-{"status":"done"}
+{
+  "status": "done",
+  "unit_id": "unit-reviewer-dialogue",
+  "run_id": "bgsd-0015-reviewer-dialogue",
+  "verdict": "PASS",
+  "commits": [
+    "04b8700",
+    "485f081",
+    "c6b58b1",
+    "354873e"
+  ],
+  "report": ".planning/REPORT.md",
+  "evidence": ".planning/evidence/reviewer-dialogue/",
+  "migration": "supabase/migrations/0036_review_dialogues.sql",
+  "notes": "Conductor must apply 0036; live DB not touched by this unit."
+}
