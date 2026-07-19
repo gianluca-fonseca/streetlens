@@ -71,6 +71,7 @@ function compile() {
       files: [
         "../lib/extraction/downscale.ts",
         "../lib/capture/pump.ts",
+        "../lib/capture/continuity.ts",
         "../lib/capture/rollup.ts",
         "../lib/capture/scoring.ts",
         "../lib/capture/db.ts",

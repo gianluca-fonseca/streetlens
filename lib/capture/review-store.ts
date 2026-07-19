@@ -43,6 +43,9 @@ export type ReviewItemMedian = {
   value: number | null;
   confidence: number | null;
   frames: number;
+  /** Continuity-inferred provenance from the rollup baseline (honest marker). */
+  inferred?: boolean;
+  inferredFrames?: number;
 };
 
 /** One segment of a walk, with everything an admin needs to judge it. */

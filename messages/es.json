@@ -442,6 +442,7 @@
       "boolNo": "No",
       "overrideItemLabel": "Corregir la lectura de {item}",
       "overrideModel": "Modelo",
+      "inferredFromNeighbors": "Inferido de vecinos",
       "excludeFrame": "Excluir",
       "includeFrame": "Incluir de nuevo",
       "resetFrame": "Restablecer cuadro",

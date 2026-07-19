@@ -424,6 +424,7 @@ export async function rollupSession(
 
   const observations: RollupObservation[] = rows.map((r) => ({
     frameId: r.frame_id,
+    seq: r.seq,
     segmentId: r.segment_id,
     model: r.model,
     items: r.items,

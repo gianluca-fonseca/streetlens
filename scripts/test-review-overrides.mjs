@@ -75,6 +75,7 @@ function compile() {
         paths: { "@/*": ["./*"] },
       },
       files: [
+        "../lib/capture/continuity.ts",
         "../lib/capture/review-overrides.ts",
         "../lib/capture/rollup.ts",
         "../lib/capture/scoring.ts",
@@ -138,6 +139,7 @@ function toObs(f, itemOverridesBySeq) {
   }
   return {
     frameId: String(f.seq),
+    seq: f.seq,
     segmentId: f.segmentId,
     model: f.observation.model,
     items: itemsCopy,

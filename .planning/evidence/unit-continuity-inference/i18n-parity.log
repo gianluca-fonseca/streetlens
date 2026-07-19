@@ -1,0 +1,8 @@
+en leaf keys: 1381
+es leaf keys: 1381
+only in en: 0 []
+only in es: 0 []
+leaf-type mismatch: 0 []
+lightbox keys present both sides: 8/8 []
+
+PARITY: OK (identical key sets)

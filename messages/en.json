@@ -442,6 +442,7 @@
       "boolNo": "No",
       "overrideItemLabel": "Override the {item} reading",
       "overrideModel": "Model",
+      "inferredFromNeighbors": "Inferred from neighbors",
       "excludeFrame": "Exclude",
       "includeFrame": "Include again",
       "resetFrame": "Reset frame",
