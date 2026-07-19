@@ -6,6 +6,17 @@ on:
   pull_request:
     branches: [main, next]
 
+# Safe public placeholders — never real secrets. Lets `next build` inline
+# NEXT_PUBLIC_* without provisioning repo secrets for CI.
+env:
+  CI: true
+  NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+  NEXT_PUBLIC_MUNICIPALITY_ID: ci-municipality
+  NEXT_PUBLIC_MUNICIPALITY_NAME_EN: CI Municipality
+  NEXT_PUBLIC_MUNICIPALITY_NAME_ES: Municipio CI
+  NEXT_PUBLIC_PROJECT_NAME: StreetLens CI
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -26,5 +37,3 @@ jobs:
       - run: npm run build
 
       - run: npm test
-        env:
-          CI: true
