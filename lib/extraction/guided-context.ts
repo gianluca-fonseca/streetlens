@@ -327,7 +327,6 @@ export function assembleDialogueContext(
   const cap = args.tokenCap ?? DIALOGUE_INPUT_TOKEN_CAP;
   const knownSeqs = args.frames.map((f) => f.seq);
   const refs = referencedSeqs(args.latestUserMessage, knownSeqs);
-  const refSet = new Set(refs);
 
   const frameBySeq = new Map(args.frames.map((f) => [f.seq, f]));
   const posBySeq = new Map(args.spatial.referencedPositions.map((p) => [p.seq, p]));

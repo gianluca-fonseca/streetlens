@@ -55,6 +55,9 @@ import FrameLightbox from "./FrameLightbox";
 import ReviewMap, { type MatchedGeometry } from "./ReviewMap";
 import ReplayPlayer, { ReplayButton, useReplay } from "./SessionReplay";
 import ExpandedMap from "./ExpandedMap";
+import ReviewDialoguePanel from "./ReviewDialoguePanel";
+import type { ReviewDialogueMessage } from "@/lib/capture/dialogue-store";
+import type { SegmentAssessmentEs } from "@/lib/capture/schemas";
 import styles from "@/components/ui/zen.module.css";
 
 const LENS_ORDER = LENS_KEYS;
@@ -74,11 +77,14 @@ export default function CaptureReview({
   matchedGeometry = [],
   segmentMeta = [],
   pendingCaptureSessionIds = [],
+  initialDialogues = {},
 }: Readonly<{
   review: SessionReview;
   matchedGeometry?: MatchedGeometry[];
   segmentMeta?: SegmentMeta[];
   pendingCaptureSessionIds?: string[];
+  /** Persisted chat by segment id (survives refresh). */
+  initialDialogues?: Record<string, ReviewDialogueMessage[]>;
 }>) {
   const t = useTranslations("admin.capture");
   const tl = useTranslations("layers");
@@ -123,6 +129,10 @@ export default function CaptureReview({
   const [reprocessMsg, setReprocessMsg] = useState<string | null>(null);
   const [rerunBusySegment, setRerunBusySegment] = useState<string | null>(null);
   const [assessments, setAssessments] = useState(review.assessments);
+  const [assessmentsEs, setAssessmentsEs] = useState(review.assessmentsEs);
+  const [dialogues, setDialogues] = useState(initialDialogues);
+  // Keep ES companions in sync for approve-time freshness if the page remounts mid-edit.
+  void assessmentsEs;
   const [error, setError] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [draftRestored] = useState(
@@ -598,6 +608,36 @@ export default function CaptureReview({
       setError(t("rerunError"));
     } finally {
       setRerunBusySegment(null);
+    }
+  }
+
+  function onDialogueSuccess(
+    segmentId: string,
+    payload: {
+      assessment: SegmentAssessment | null;
+      assessmentEs: SegmentAssessmentEs | null;
+      manualScores: Partial<Record<LensKey, number | null>> | null;
+      messages: ReviewDialogueMessage[];
+    },
+  ) {
+    setDialogues((prev) => ({ ...prev, [segmentId]: payload.messages }));
+    if (payload.assessment) {
+      setAssessments((prev) => ({ ...prev, [segmentId]: payload.assessment }));
+    }
+    if (payload.assessmentEs) {
+      setAssessmentsEs((prev) => ({ ...prev, [segmentId]: payload.assessmentEs }));
+    }
+    if (payload.manualScores && Object.keys(payload.manualScores).length > 0) {
+      setCorrections((prev) => ({
+        ...prev,
+        manualScores: {
+          ...prev.manualScores,
+          [segmentId]: {
+            ...(prev.manualScores[segmentId] ?? {}),
+            ...payload.manualScores,
+          },
+        },
+      }));
     }
   }
 
@@ -1077,6 +1117,19 @@ export default function CaptureReview({
                           onToggleLens={(lens) => toggleBaselineLens(segmentId, lens)}
                           onSetBaselineAll={(lenses) => setSegmentBaseline(segmentId, lenses)}
                         />
+
+                        {!dropped && !decided ? (
+                          <ReviewDialoguePanel
+                            sessionId={review.sessionId}
+                            segmentId={segmentId}
+                            knownSeqs={frames.map((f) => f.seq)}
+                            corrections={corrections}
+                            initialMessages={dialogues[segmentId] ?? []}
+                            disabled={busy}
+                            onSelectFrame={(seq) => setSelectedSeq(seq)}
+                            onSuccess={(payload) => onDialogueSuccess(segmentId, payload)}
+                          />
+                        ) : null}
 
                         <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
                           {LENS_ORDER.map((lens) => {

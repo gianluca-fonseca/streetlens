@@ -462,6 +462,23 @@
       "rerunSuccess": "Analysis updated ({input} in / {output} out tokens).",
       "rerunError": "Could not re-run analysis. Please try again.",
       "rerunDisabled": "Extraction is disabled — enable CV_EXTRACTION_ENABLED to re-run analysis.",
+      "dialogue": {
+        "title": "Argue with the model",
+        "hint": "Cite frames as #14 or #1-9. Converse first, or recompute directly.",
+        "empty": "No messages yet. Describe what the model got wrong.",
+        "you": "You",
+        "model": "Model",
+        "recomputeTag": "recompute",
+        "frameRefs": "Frame references",
+        "inputLabel": "Message to the model",
+        "placeholder": "e.g. There IS a sidewalk present throughout — see #3 and #14.",
+        "converse": "Converse",
+        "recompute": "Recompute assessment & scores",
+        "keyboardHint": "Enter = Converse · ⌘Enter = Recompute",
+        "working": "Thinking…",
+        "error": "The dialogue call failed. Please try again.",
+        "extractionDisabled": "Extraction is disabled — enable CV_EXTRACTION_ENABLED to chat."
+      },
       "cancel": "Cancel",
       "status": {
         "pending_upload": "Waiting to upload",
