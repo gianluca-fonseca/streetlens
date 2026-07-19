@@ -143,12 +143,12 @@ function main() {
     /* ---------------- Apply the chain ---------------- */
 
     const files = readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql")).sort();
-    check("found the full migration chain through 0027", files.some((f) => f.startsWith("0027")), files.join(" "));
+    check("found the full migration chain through 0033", files.some((f) => f.startsWith("0033")), files.join(" "));
 
     for (const file of files) {
       try {
         psql(readFileSync(path.join(MIGRATIONS, file), "utf8"));
-        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025") || file.startsWith("0026") || file.startsWith("0027")) {
+        if (file.startsWith("0013") || file.startsWith("0014") || file.startsWith("0017") || file.startsWith("0019") || file.startsWith("0020") || file.startsWith("0021") || file.startsWith("0022") || file.startsWith("0023") || file.startsWith("0025") || file.startsWith("0026") || file.startsWith("0027") || file.startsWith("0028") || file.startsWith("0029") || file.startsWith("0030") || file.startsWith("0032") || file.startsWith("0033")) {
           check(`${file} applies cleanly`, true);
         }
       } catch (err) {
@@ -191,6 +191,18 @@ function main() {
       psql(readFileSync(path.join(MIGRATIONS, "0025_pipeline_truth.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0026_security_core.sql"), "utf8"));
       psql(readFileSync(path.join(MIGRATIONS, "0027_compose_pipeline_security.sql"), "utf8"));
+      // 0028 last-but-one: re-running 0013 above flips streetlens-frames back to
+      // public and drops the evidence SELECT / assessment_es wiring. Re-apply so
+      // the privacy and bilingual schema the checks below assert actually stick.
+      psql(readFileSync(path.join(MIGRATIONS, "0028_quality_privacy.sql"), "utf8"));
+      // 0029 truly last: ops views read the post-0028 schema.
+      psql(readFileSync(path.join(MIGRATIONS, "0029_ops_deck.sql"), "utf8"));
+      // 0030 then 0032 after 0026's re-run restored the strict validator:
+      // vehicle capture and glitch tolerance stay in force.
+      psql(readFileSync(path.join(MIGRATIONS, "0030_vehicle_capture.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0031_testing_rate_relief.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0032_glitch_tolerant_track.sql"), "utf8"));
+      psql(readFileSync(path.join(MIGRATIONS, "0033_frame_mime_relax.sql"), "utf8"));
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", true);
     } catch (err) {
       check("0013 + 0014 + 0017 + 0019 + 0020 + 0021 + 0022 + 0023 + 0024 are re-runnable (idempotent)", false, String(err.stderr || err.message).slice(0, 800));
@@ -243,19 +255,30 @@ function main() {
 
     /* ---------------- Storage ---------------- */
 
-    const bucket = psql(`
-      select public::text || '|' || file_size_limit::text || '|' || array_to_string(allowed_mime_types, ',')
+    const bucketPrivate = psql(`
+      select (not public)::text from storage.buckets where id='streetlens-frames';
+    `).trim();
+    const bucketMeta = psql(`
+      select file_size_limit::text || '|' || coalesce(array_to_string(allowed_mime_types, ','), 'any')
         from storage.buckets where id='streetlens-frames';
     `).trim();
-    check("the frames bucket is public-read, 2 MB, jpeg-only", bucket === "true|2097152|image/jpeg", bucket);
+    check(
+      // 0033: the mime allowlist is gone (OPFS blobs upload as octet-stream);
+      // privacy (0028) and the 2 MiB cap are what this bucket still asserts.
+      "the frames bucket is private, 2 MB, mime-unrestricted (0028+0033)",
+      (bucketPrivate === "t" || bucketPrivate === "true") && bucketMeta === "2097152|any",
+      `${bucketPrivate}|${bucketMeta}`,
+    );
 
     const storagePolicies = psql(`
-      select policyname || ':' || cmd from pg_policies
-       where schemaname='storage' and tablename='objects' order by 1;
+      select string_agg(policyname || ':' || cmd, ',' order by policyname)
+        from pg_policies
+       where schemaname='storage' and tablename='objects'
+         and policyname like 'capture_frames%';
     `).trim();
     check(
-      "storage has exactly one INSERT policy and no update/delete policy",
-      storagePolicies === "capture_frames_anon_insert:INSERT",
+      "storage has INSERT + evidence SELECT, and no update/delete policy (0028)",
+      storagePolicies === "capture_frames_anon_insert:INSERT,capture_frames_evidence_select:SELECT",
       storagePolicies,
     );
 
@@ -307,11 +330,10 @@ function main() {
     );
 
     // Rate limit: 3/hour/IP, enforced in the DB (not just the in-memory bucket).
-    psql(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`);
-    psql(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`);
-    psql(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`);
+    // 0031 testing-era ceiling: 30/hour. Seed 30 sessions from one origin.
+    psql(`do $$ begin for i in 1..30 loop perform capture_create_session('live', 'iphash-rl', null, '${SECRET}'); end loop; end $$;`);
     check(
-      "a 4th session from one origin within the hour is rate_limited IN THE DATABASE",
+      "a 31st session from one origin within the hour is rate_limited IN THE DATABASE (0031)",
       (psqlExpectError(`select capture_create_session('live', 'iphash-rl', null, '${SECRET}');`) || "").includes("rate_limited"),
     );
     check(
@@ -566,7 +588,7 @@ function main() {
         model: "gpt-5.4-mini",
       });
       psql(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001',
-              '${assessment}'::jsonb, 512, 210, 'test-secret');`);
+              '${assessment}'::jsonb, 512, 210, 'test-secret', null::jsonb);`);
       check(
         "capture_set_segment_assessment writes the assessment onto the rollup",
         psql(`select assessment->>'model' from capture_segment_rollups
@@ -577,14 +599,26 @@ function main() {
         psql(`select (synthesis_input_tokens=512 and synthesis_output_tokens=210)::text
                 from capture_segment_rollups where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() === "true",
       );
+      const assessmentEs = JSON.stringify({
+        overall: "La acera desaparece a mitad de cuadra.",
+        lenses: { accessibility: "a", drainage: "d", shade: "s", bike: "b" },
+      });
+      psql(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001',
+              '${assessment}'::jsonb, 512, 210, 'test-secret', '${assessmentEs}'::jsonb);`);
+      check(
+        "capture_set_segment_assessment writes assessment_es alongside EN",
+        psql(`select assessment_es->>'overall' from capture_segment_rollups
+                where session_id='${sid}' and segment_id='esc-sa-0001';`).trim() ===
+          "La acera desaparece a mitad de cuadra.",
+      );
       check(
         "capture_set_segment_assessment is secret-gated",
-        (psqlExpectError(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001', '{}'::jsonb, 0, 0, 'nope');`) || "").includes("unauthorized"),
+        (psqlExpectError(`select capture_set_segment_assessment('${sid}'::uuid, 'esc-sa-0001', '{}'::jsonb, 0, 0, 'nope', null::jsonb);`) || "").includes("unauthorized"),
       );
       check(
         "writing an assessment for an absent segment is a no-op, not an orphan row",
         (() => {
-          psql(`select capture_set_segment_assessment('${sid}'::uuid, 'no-such-seg', '{}'::jsonb, 0, 0, 'test-secret');`);
+          psql(`select capture_set_segment_assessment('${sid}'::uuid, 'no-such-seg', '{}'::jsonb, 0, 0, 'test-secret', null::jsonb);`);
           return psql(`select count(*) from capture_segment_rollups
                          where session_id='${sid}' and segment_id='no-such-seg';`).trim() === "0";
         })(),

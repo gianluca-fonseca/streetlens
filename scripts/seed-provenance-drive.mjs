@@ -47,7 +47,14 @@ function cvAssessment(overall) {
   };
 }
 
-function observation(sessionId, capturedOn, frames, scores, assessment) {
+function cvAssessmentEs(overall) {
+  return {
+    overall,
+    lenses: { accessibility: "", drainage: "", shade: "", bike: "" },
+  };
+}
+
+function observation(sessionId, capturedOn, frames, scores, assessment, assessmentEs) {
   return {
     id: `cv-${sessionId}-${SEGMENT}`,
     segment_id: SEGMENT,
@@ -69,6 +76,7 @@ function observation(sessionId, capturedOn, frames, scores, assessment) {
     human_corrected: false,
     overrides: {},
     assessment,
+    assessment_es: assessmentEs ?? null,
   };
 }
 
@@ -113,6 +121,9 @@ function main() {
           cvAssessment(
             "Broken sidewalk on the north side with a missing curb ramp at the corner.",
           ),
+          cvAssessmentEs(
+            "Acera rota en el lado norte con una rampa de acera faltante en la esquina.",
+          ),
         ),
         observation(
           SESSION_B,
@@ -121,6 +132,9 @@ function main() {
           { overall: 71, accessibility: 68, drainage: 74, shade: 58, bike: 45 },
           cvAssessment(
             "Sidewalk has been repaved since the earlier pass and the corner now has a curb ramp.",
+          ),
+          cvAssessmentEs(
+            "La acera fue repavimentada desde el recorrido anterior y la esquina ahora tiene rampa.",
           ),
         ),
       ],

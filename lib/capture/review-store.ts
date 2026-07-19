@@ -21,10 +21,15 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { segmentAssessmentSchema, type SegmentAssessment } from "@/lib/assessment";
+import {
+  segmentAssessmentSchema,
+  segmentAssessmentEsSchema,
+  type SegmentAssessment,
+  type SegmentAssessmentEs,
+} from "@/lib/assessment";
 import { getDataDir } from "@/lib/data-dir";
 import { getSupabaseClient } from "@/lib/supabase";
-import { publicFrameUrl } from "./storage";
+import { trySignedFrameUrl } from "./storage";
 import { readCaptureReviewOverlay, readCaptureTombstones } from "./review-actions";
 import type { CaptureSessionStatus } from "./types";
 import type { FrameObservation, SegmentAssessments } from "./review-overrides";
@@ -38,6 +43,9 @@ export type ReviewItemMedian = {
   value: number | null;
   confidence: number | null;
   frames: number;
+  /** Continuity-inferred provenance from the rollup baseline (honest marker). */
+  inferred?: boolean;
+  inferredFrames?: number;
 };
 
 /** One segment of a walk, with everything an admin needs to judge it. */
@@ -127,6 +135,8 @@ export type SessionReview = {
    * workbench reads the prose.
    */
   assessments: SegmentAssessments;
+  /** Spanish prose companions keyed by segment id (0028). */
+  assessmentsEs: Record<string, SegmentAssessmentEs | null>;
   /**
    * Every frame of the walk in seq order, attributed or not, deleted or not. The
    * segment cards read the grouped {@link ReviewSegment.frames}; the map panel and
@@ -185,6 +195,8 @@ type ReviewPayload = {
      * `capture_session_review`). Nullable/absent when no synthesis was produced.
      */
     assessment?: SegmentAssessment | null;
+    /** Spanish prose companion from migration 0028. */
+    assessmentEs?: SegmentAssessmentEs | null;
   }[];
   frames: {
     seq: number;
@@ -262,16 +274,9 @@ function mergeDetail(payload: ReviewPayload, detail: SessionDetail | null): Revi
   };
 }
 
-/** Build a public frame URL, tolerating an unconfigured deployment. */
-function frameUrl(storagePath: string): string | null {
-  try {
-    return publicFrameUrl(storagePath);
-  } catch {
-    // publicFrameUrl throws without NEXT_PUBLIC_SUPABASE_URL. That is correct for
-    // the extraction path (a relative URL would fail at the model provider) but
-    // must not take the review page down; the filmstrip degrades to a placeholder.
-    return null;
-  }
+/** Build a signed frame URL, tolerating an unconfigured deployment. */
+async function frameUrl(storagePath: string): Promise<string | null> {
+  return trySignedFrameUrl(storagePath, { privileged: true });
 }
 
 /** Numbers arrive from postgres numerics as strings; coerce without inventing. */
@@ -281,17 +286,18 @@ function num(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionReview {
+async function toReview(payload: ReviewPayload, source: "live" | "fixture"): Promise<SessionReview> {
   const tombstoned = new Set((payload.tombstones ?? []).map((t) => t.seq));
 
   const framesBySegment = new Map<string, ReviewFrame[]>();
   const allFrames: ReviewFrame[] = [];
   let unattributed = 0;
   for (const f of payload.frames ?? []) {
+    const url = f.url ?? (await frameUrl(f.storagePath));
     const frame: ReviewFrame = {
       seq: f.seq,
       storagePath: f.storagePath,
-      url: f.url ?? frameUrl(f.storagePath),
+      url,
       segmentId: f.segmentId ?? null,
       nearJunction: f.nearJunction ?? false,
       usable: f.usable ?? true,
@@ -334,10 +340,13 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
   // shape must not throw on the server-rendered review page, exactly as the map's
   // parse-feature-props guards the public popover.
   const assessments: SegmentAssessments = {};
+  const assessmentsEs: Record<string, SegmentAssessmentEs | null> = {};
   for (const r of payload.rollups ?? []) {
     const parsed = segmentAssessmentSchema.safeParse(r.assessment);
     const a = parsed.success ? parsed.data : null;
     if (a) assessments[r.segmentId] = a;
+    const parsedEs = segmentAssessmentEsSchema.safeParse(r.assessmentEs);
+    if (parsedEs.success) assessmentsEs[r.segmentId] = parsedEs.data;
   }
 
   const jobs = payload.jobs ?? { pending: 0, done: 0, failed: 0, overbudget: 0 };
@@ -365,6 +374,7 @@ function toReview(payload: ReviewPayload, source: "live" | "fixture"): SessionRe
     },
     segments,
     assessments,
+    assessmentsEs,
     frames: allFrames,
     track: (payload.track ?? []).filter(
       (p): p is FramePosition =>
@@ -419,7 +429,7 @@ export async function getSessionReview(
           p_session_id: sessionId,
           p_secret: secret,
         });
-        return toReview(mergeDetail(data as ReviewPayload, detail as SessionDetail | null), "live");
+        return await toReview(mergeDetail(data as ReviewPayload, detail as SessionDetail | null), "live");
       }
     } catch {
       // fall through to the fixture
@@ -454,7 +464,7 @@ export async function getSessionReview(
       }
     : withDecision;
 
-  return toReview(withTombstones, "fixture");
+  return await toReview(withTombstones, "fixture");
 }
 
 /** Session ids present in the fixture. Empty in a live deployment. */

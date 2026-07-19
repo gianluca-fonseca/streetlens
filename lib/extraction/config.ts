@@ -7,6 +7,7 @@
  */
 
 import { staticRequestApproxTokens } from "./prompt";
+import type { CaptureVantage } from "./vantage";
 
 /* ------------------------------------------------------------------ *
  * Models
@@ -20,6 +21,20 @@ export function visionModel(): string {
 /** Asked again only when the workhorse abstains. See ESCALATION_* below. */
 export function escalationModel(): string {
   return process.env.OPENAI_VISION_ESCALATION_MODEL || "gpt-5.4-mini";
+}
+
+/**
+ * Primary model for vehicle-speed sessions. Defaults to the escalation model
+ * (gpt-5.4-mini): nano is not up to oblique road-center sidewalk reads.
+ * `CV_VEHICLE_PRIMARY_MODEL` overrides it independently of the pedestrian ladder.
+ */
+export function vehiclePrimaryModel(): string {
+  return process.env.CV_VEHICLE_PRIMARY_MODEL || escalationModel();
+}
+
+/** Which model opens the extraction call for this session's vantage. */
+export function primaryVisionModel(vantage: CaptureVantage): string {
+  return vantage === "vehicle" ? vehiclePrimaryModel() : visionModel();
 }
 
 /**
@@ -58,16 +73,23 @@ export function extractionEnabled(): boolean {
 /**
  * What one frame's image is allowed to cost, on top of the prompt.
  *
- * lib/extraction/downscale.ts sends at most a 512 px JPEG: ~192 patches ~= 470
- * tokens at gpt-5-nano's 2.46x multiplier, measured. 1200 is ~2.5x that, which
- * absorbs a different model's multiplier and the ~10% the static estimate
- * overshoots by, while still catching a provider that bills an order of
- * magnitude more than the pixels it was handed.
+ * lib/extraction/downscale.ts sends at most a 768 px JPEG. Patch math at the
+ * 32 px tile size: a 768×512 frame is 24×16 = 384 patches; a square 768 is
+ * 24×24 = 576. At gpt-5-nano's ~2.46× multiplier that is ~945–1,420 image
+ * tokens. 2700 is ~2.5× the high end — same headroom ratio the old 512 px /
+ * 1200 budget used (~192 patches × 2.46 ≈ 470; 1200 ≈ 2.55×) — absorbing a
+ * different model's multiplier and the ~10% the static estimate overshoots by,
+ * while still catching a provider that bills an order of magnitude more than
+ * the pixels it was handed.
+ *
+ * Cost delta vs 512 px (image tokens only, uncached): area scales by
+ * (768/512)² = 2.25×, so expect ~2.25× the image-token line on the bill. The
+ * cached static prefix is unchanged in role (still byte-stable across frames).
  *
  * Note what this budget no longer has to survive: a 4K frame billed at full
  * resolution. Nobody can bill us for pixels we did not send.
  */
-export const IMAGE_TOKEN_BUDGET = 1200;
+export const IMAGE_TOKEN_BUDGET = 2700;
 
 /**
  * Hard per-frame input-token ceiling. Exceeding it fails the job and pauses the
@@ -110,22 +132,32 @@ export function describeInputTokenCeiling(): string {
  * this, and a session that blows through it is paused rather than allowed to
  * keep spending.
  *
- * Derived from the per-frame ceiling plus the escalation cap, because those two
- * together are what a healthy session can legitimately reach: no frame may bill
- * above the ceiling, and at most ESCALATION_MAX_FRACTION of them are asked
- * twice. A session past this has drifted in a way no single frame's ceiling
- * could see, which is the whole reason the session guard exists alongside it.
+ * Pedestrian sessions (nano-first ladder): derived from the per-frame ceiling
+ * plus the escalation cap — no frame may bill above the ceiling, and at most
+ * ESCALATION_MAX_FRACTION of them are asked twice:
+ *   perFrame = ceil(inputTokenCeiling() * (1 + ESCALATION_MAX_FRACTION))
+ *   session  = frames * perFrame
  *
- * `CV_SESSION_TOKENS_PER_FRAME` overrides it.
+ * Vehicle sessions (mini-as-primary): the 10% escalation overhead is
+ * superseded — every frame already runs the stronger primary, and the ladder
+ * does not escalate further. Ceiling formula:
+ *   perFrame = inputTokenCeiling()
+ *   session  = frames * perFrame
+ *
+ * `CV_SESSION_TOKENS_PER_FRAME` overrides either path.
  */
-export function sessionInputTokensPerFrame(): number {
+export function sessionInputTokensPerFrame(vantage: CaptureVantage = "pedestrian"): number {
   const override = Number(process.env.CV_SESSION_TOKENS_PER_FRAME);
   if (Number.isFinite(override) && override > 0) return Math.floor(override);
+  if (vantage === "vehicle") return inputTokenCeiling();
   return Math.ceil(inputTokenCeiling() * (1 + ESCALATION_MAX_FRACTION));
 }
 
-export function sessionTokenBudget(frameCount: number): number {
-  return Math.max(1, frameCount) * sessionInputTokensPerFrame();
+export function sessionTokenBudget(
+  frameCount: number,
+  vantage: CaptureVantage = "pedestrian",
+): number {
+  return Math.max(1, frameCount) * sessionInputTokensPerFrame(vantage);
 }
 
 /* ------------------------------------------------------------------ *
@@ -169,6 +201,17 @@ export function synthesisMaxAdjust(): number {
   const override = Number(process.env.CV_SYNTHESIS_MAX_ADJUST);
   if (Number.isFinite(override) && override >= 0) return override;
   return 20;
+}
+
+/**
+ * Hard ceiling on synthesis output tokens. Bilingual prose (EN+ES) roughly
+ * doubles the write budget; this keeps a runaway model from burning the
+ * session on one segment. `CV_SYNTHESIS_MAX_OUTPUT_TOKENS` overrides.
+ */
+export function synthesisMaxOutputTokens(): number {
+  const override = Number(process.env.CV_SYNTHESIS_MAX_OUTPUT_TOKENS);
+  if (Number.isFinite(override) && override > 0) return Math.floor(override);
+  return 1800;
 }
 
 /* ------------------------------------------------------------------ *

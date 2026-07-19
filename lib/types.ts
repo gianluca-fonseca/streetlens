@@ -84,9 +84,9 @@ export type CvItemMedian = {
  * visibly model-written on the public popover; the NUMBERS on the map are still
  * the reviewer's chosen `scores`, never these.
  */
-import type { CvAssessment } from "./assessment";
+import type { CvAssessment, CvAssessmentEs } from "./assessment";
 
-export type { CvAssessment } from "./assessment";
+export type { CvAssessment, CvAssessmentEs } from "./assessment";
 
 /**
  * A camera observation of one segment from one approved capture session: the
@@ -138,6 +138,11 @@ export type CvObservation = {
    * Null/absent when the walk produced no synthesis for this segment.
    */
   assessment?: CvAssessment | null;
+  /**
+   * Spanish prose companion to {@link assessment} (0028). Public surfaces prefer
+   * this when the viewer locale is `es`; fall back to assessment when missing.
+   */
+  assessment_es?: CvAssessmentEs | null;
 };
 
 /**

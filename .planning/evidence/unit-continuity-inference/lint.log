@@ -1,0 +1,10 @@
+
+> streetlens@0.1.0 lint
+> eslint
+
+
+/Users/filippofonseca/Developer/Projects/streetlens/.bgsd/runs/bgsd-0013-frontier-wave/worktrees/unit-continuity-inference/components/SegmentDetail.tsx
+  14:53  warning  'cvOverallAssessment' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)
+

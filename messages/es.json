@@ -25,7 +25,8 @@
   "mapChrome": {
     "home": "Inicio de StreetLens",
     "tagline": "Instrumento de calles de Escazú",
-    "contribute": "Contribuir una calle"
+    "contribute": "Contribuir una calle",
+    "insights": "Indicadores"
   },
   "map": {
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
@@ -99,6 +100,8 @@
     "breakdownHeading": "Desglose de la rúbrica",
     "photosHeading": "Fotos",
     "photoPlaceholder": "Foto pendiente del trabajo de campo",
+    "photoHeld": "Fotogramas de cámara en revisión",
+    "photoUnavailable": "Evidencia fotográfica no disponible",
     "demoNote": "Auditoría de demostración. Los datos de campo reales reemplazan este corredor, tramo por tramo, desde agosto de 2026.",
     "close": "Cerrar el panel de detalle",
     "communityPending": "Aporte de la comunidad · pendiente de verificación de campo",
@@ -122,7 +125,7 @@
     "cvCoverageLabel": "Cobertura",
     "cvFramesLabel": "Cuadros",
     "cvAssessmentLabel": "Evaluación",
-    "cvAssessmentNote": "Escrito por el modelo de cámara, en inglés. No es una auditoría de campo."
+    "cvAssessmentNote": "Escrito por el modelo de cámara. Se muestra en inglés si falta el español. No es una auditoría de campo."
   },
   "rubric": {
     "overall": {
@@ -158,6 +161,7 @@
       "queue": "Cola de verificación",
       "history": "Historial",
       "import": "Importación masiva",
+      "ops": "Operaciones",
       "logout": "Cerrar sesión",
       "publicMap": "Mapa público"
     },
@@ -189,6 +193,15 @@
       "colSegments": "Segmentos",
       "colAvg": "Promedio general",
       "demoNote": "Conjunto de datos de demostración sobre geometría real de OSM. Ninguna cifra es una medición real hasta que inicie la recolección de campo."
+    },
+    "qrPosters": {
+      "title": "Carteles QR",
+      "subtitle": "Genere un cartel bilingüe imprimible para un tramo. Los enlaces profundos abren /collect con src=qr y el id del punto.",
+      "spotLabel": "Id del tramo",
+      "spotHint": "p. ej. esc-sa-0001 — debe existir en la red de calles.",
+      "originLabel": "Origen del sitio (para la URL del QR)",
+      "generate": "Abrir cartel imprimible",
+      "scriptHint": "CLI: node scripts/generate-qr-poster.mjs --spot <id> --origin <url>"
     },
     "queue": {
       "title": "Cola de verificación",
@@ -429,6 +442,7 @@
       "boolNo": "No",
       "overrideItemLabel": "Corregir la lectura de {item}",
       "overrideModel": "Modelo",
+      "inferredFromNeighbors": "Inferido de vecinos",
       "excludeFrame": "Excluir",
       "includeFrame": "Incluir de nuevo",
       "resetFrame": "Restablecer cuadro",
@@ -436,6 +450,18 @@
       "deleteConfirm": "Esto elimina la imagen del cuadro de forma permanente.",
       "deleteConfirmYes": "Eliminarlo",
       "deleteError": "No se pudo eliminar ese cuadro. Intentalo de nuevo.",
+      "reprocessHeading": "Volver a emparejar con el mapa",
+      "reprocessBody": "Algunos cuadros no coincidieron con ninguna calle cuando se procesó esta caminata. Si la red vial creció desde entonces, volver a emparejar puede ubicarlos en un segmento.",
+      "reprocessPreviewBtn": "Vista previa",
+      "reprocessCommitBtn": "Volver a emparejar",
+      "reprocessConfirm": "¿Volver a emparejar esta sesión con el mapa? Los cuadros que ahora coincidan se volverán a encolar para extracción.",
+      "reprocessPreviewResult": "Vista previa: {attributed} de {total} cuadros se ubicarían en un segmento.",
+      "reprocessCommitResult": "Se reemparejaron {reprocessed} cuadros; {requeued} reencolados para extracción.",
+      "reprocessError": "No se pudo volver a emparejar. Intentalo de nuevo.",
+      "rerunAnalysis": "Volver a analizar",
+      "rerunSuccess": "Análisis actualizado ({input} entrada / {output} salida tokens).",
+      "rerunError": "No se pudo volver a analizar. Intentalo de nuevo.",
+      "rerunDisabled": "La extracción está desactivada — habilita CV_EXTRACTION_ENABLED para volver a analizar.",
       "cancel": "Cancelar",
       "status": {
         "pending_upload": "Esperando la subida",
@@ -443,6 +469,62 @@
         "matching": "Emparejando con las calles",
         "extracting": "Leyendo cuadros",
         "cost_paused": "Pausada: presupuesto",
+        "review_ready": "Lista para revisión",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "failed": "Fallida"
+      }
+    },
+    "ops": {
+      "title": "Operaciones del pipeline",
+      "subtitle": "Gasto de tokens, margen de presupuesto y salud de la flota en sesiones de captura.",
+      "localNote": "No hay base de datos configurada. Las métricas de operaciones requieren una conexión activa a Supabase.",
+      "tile": {
+        "costPaused": "Pausadas por costo",
+        "stuckJobs": "Trabajos atascados",
+        "failedJobs": "Trabajos fallidos",
+        "pendingJobs": "Trabajos pendientes"
+      },
+      "spendHeading": "Gasto de tokens",
+      "extractionTokens": "Tokens de extracción",
+      "synthesisTokens": "Tokens de síntesis",
+      "escalationRate": "Tasa de escalamiento",
+      "sessionsHeading": "Sesiones recientes",
+      "modelQualityHeading": "Calidad del modelo (correcciones humanas)",
+      "trendHeading": "Tasa de corrección por mes",
+      "noModelData": "Aún no hay observaciones aprobadas.",
+      "colModel": "Modelo",
+      "colObservations": "Observaciones",
+      "colCorrected": "Corregidas",
+      "colCorrectionRate": "Tasa de corrección",
+      "colTopOverrides": "Principales ajustes",
+      "colSession": "Sesión",
+      "colStatus": "Estado",
+      "colFrames": "Cuadros",
+      "colTokens": "Tokens",
+      "colEscalated": "Escalados",
+      "colActions": "Acciones",
+      "colDay": "Día",
+      "colExtraction": "Extracción",
+      "colSynthesis": "Síntesis",
+      "none": "—",
+      "resume": "Reanudar extracción",
+      "resumeReasonPlaceholder": "¿Por qué la reanudás?",
+      "resumeReasonRequired": "Se requiere un motivo de reanudación.",
+      "resumeSuccess": "Reanudada — {count} trabajos reencolados.",
+      "reprocessPreviewBtn": "Vista previa de reemparejamiento",
+      "reprocessCommit": "Volver a emparejar",
+      "reprocessConfirm": "¿Volver a emparejar esta sesión con el mapa?",
+      "reprocessPreview": "Vista previa: {attributed}/{total} cuadros coincidirían.",
+      "reprocessSuccess": "Se reemparejaron {reprocessed}; {requeued} reencolados.",
+      "actionError": "La acción falló. Intentalo de nuevo.",
+      "openReview": "Abrir revisión",
+      "status": {
+        "pending_upload": "Esperando carga",
+        "uploading": "Cargando",
+        "matching": "Emparejando",
+        "extracting": "Extrayendo",
+        "cost_paused": "Pausada por costo",
         "review_ready": "Lista para revisión",
         "approved": "Aprobada",
         "rejected": "Rechazada",
@@ -601,7 +683,8 @@
       "banner": {
         "methodQuestion": "¿Cómo funciona StreetLens?",
         "methodLink": "Método",
-        "platform": "Abrir la plataforma"
+        "platform": "Abrir la plataforma",
+        "insightsLink": "Indicadores"
       },
       "segments": {
         "title": "Calles con menor puntuación",
@@ -609,7 +692,8 @@
         "activate": "Abrir {name} en la plataforma",
         "cvTitle": "Observadas recientemente con cámara",
         "cvBadge": "CV",
-        "empty": "Todavía no hay observaciones de cámara publicadas. Grabá una caminata o añadí una calle desde el mapa."
+        "empty": "Todavía no hay observaciones de cámara publicadas. Grabá una caminata o añadí una calle desde el mapa.",
+        "cvWorstTitle": "Peores puntuaciones de cámara"
       },
       "stats": {
         "failLabel": "Incumplen la Ley 7600",
@@ -786,7 +870,9 @@
           "source": "En vivo hoy: propuestas de cámara en el mapa, revisadas por una persona. Las auditorías de campo siguen siendo la fuente de verdad publicada.",
           "alt": "Diagrama del método: las auditorías de campo fluyen hacia datos abiertos hoy, con un bucle de hoja de ruta en línea discontinua donde un modelo de visión por computadora y aprendizaje automático puntúa calles y una persona siempre verifica el resultado."
         }
-      }
+      },
+      "fullMethod": "Leer el método completo",
+      "fullRubric": "Ver rúbrica v0.1"
     },
     "grounding": {
       "eyebrow": "Referencias",
@@ -889,7 +975,8 @@
       "heading": "Mide lo que la ciudad olvidó medir.",
       "support": "Abrí el mapa en vivo, o añadí una calle que conozcas. Cada puntuación viene con su fórmula.",
       "explore": "Explorar el mapa en vivo",
-      "contribute": "Contribuir una calle"
+      "contribute": "Contribuir una calle",
+      "insights": "Abrir indicadores"
     },
     "footer": {
       "tagline": "Un instrumento de campo abierto para la calle. Ahora midiendo Escazú, Costa Rica.",
@@ -899,7 +986,10 @@
       "madeBy": "Hecho con ❤️ por <name>Gianluca Fonseca</name>",
       "localeLabel": "Idioma",
       "openData": "Geometría de calles de OpenStreetMap, bajo ODbL 1.0. Las puntuaciones son datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
-      "built": "Un proyecto de CUSP, el Colectivo para el Urbanismo y el Progreso Sostenible."
+      "built": "Un proyecto de CUSP, el Colectivo para el Urbanismo y el Progreso Sostenible.",
+      "insights": "Indicadores",
+      "method": "Método",
+      "rubric": "Rúbrica"
     }
   },
   "collect": {
@@ -1271,6 +1361,475 @@
       },
       "sessionLabel": "SESIÓN",
       "backToMap": "Volver al mapa"
+    },
+    "qr": {
+      "eyebrow": "BIENVENIDA",
+      "title": "Ayude a medir {municipality}",
+      "lead": "Escaneó un código en la calle. StreetLens convierte una caminata corta en datos públicos sobre la acera — después de que un revisor humano lo revise.",
+      "loadingSpot": "Cargando esta calle…",
+      "spotUnknown": "No pudimos cargar los detalles de este punto, pero igual puede grabar una caminata aquí.",
+      "howEyebrow": "QUÉ HACER",
+      "how1": "Sostenga el teléfono en vertical, cámara hacia adelante por la acera.",
+      "how2": "Camine a paso normal por una cuadra o más.",
+      "how3": "Revise y suba al terminar — nada sale del teléfono hasta que usted lo confirme.",
+      "privacy": "No grabe personas de cerca ni dentro de propiedad privada.",
+      "cta": "Empezar — muéstreme cómo"
+    },
+    "mission": {
+      "eyebrow": "SU CALLE",
+      "title": "Camine {street}",
+      "lead": "Este código del poste apunta a {district}. Camine la acera frente a usted y emparejaremos sus fotogramas con esta calle."
+    },
+    "coach": {
+      "gps_poor": "La precisión del GPS es baja — salga al exterior si puede y manténgase en la línea de la acera.",
+      "moving_fast": "Puede ir demasiado rápido — baje a paso de caminata para que los fotogramas queden nítidos.",
+      "too_dark": "La escena se ve oscura — busque mejor luz o limpie el lente si está sucio.",
+      "stationary": "El teléfono casi no se movió — siga caminando; se guardan fotogramas cada pocos metros."
+    },
+    "myWalks": {
+      "eyebrow": "MIS CAMINATAS",
+      "lead": "Guardado solo en este dispositivo. Toque para abrir el estado.",
+      "unnamedWalk": "Caminata en revisión",
+      "meta": "{frames} fotogramas · {distance} · {duration}",
+      "status": {
+        "pending_upload": "Subiendo",
+        "uploading": "Subiendo",
+        "matching": "Emparejando",
+        "extracting": "Leyendo",
+        "cost_paused": "Pausada",
+        "review_ready": "En revisión",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "failed": "Fallida"
+      }
+    },
+    "gate": {
+      "eyebrow": "¿LISTO PARA ENVIAR?",
+      "lead": "Una revisión rápida antes de que la caminata salga de este dispositivo.",
+      "coverageEstimate": "Corredor aproximado cubierto: ~{meters} m",
+      "ready": "Se ve listo — puede subir cuando esté conforme.",
+      "blocked": "Esta caminata aún no se puede subir — vea las indicaciones arriba.",
+      "items": {
+        "frames": {
+          "label": "Fotogramas guardados",
+          "hints": {
+            "frames_none": "No se guardó ningún fotograma. Camine más e intente de nuevo.",
+            "frames_low": "Muy pocos fotogramas — camine un tramo más largo para mejor cobertura."
+          }
+        },
+        "fixes": {
+          "label": "Fijaciones GPS",
+          "hints": {
+            "fixes_low": "No hay suficientes fijaciones GPS — active la ubicación y camine al exterior."
+          }
+        },
+        "duration": {
+          "label": "Duración (min)",
+          "hints": {
+            "duration_short": "Caminata muy corta — considere cubrir más de la cuadra."
+          }
+        },
+        "track_length": {
+          "label": "Longitud del recorrido (m)",
+          "hints": {
+            "track_short": "El recorrido GPS es corto — camine más a lo largo de la calle."
+          }
+        },
+        "gps_quality": {
+          "label": "Precisión GPS (m)",
+          "hints": {
+            "gps_poor": "GPS débil — fijaciones por encima de 25 m pueden descartarse al emparejar.",
+            "gps_unknown": "Sin datos de precisión aún — espere una fijación GPS antes de subir."
+          }
+        },
+        "drop_ratio": {
+          "label": "Fotogramas descartados",
+          "hints": {
+            "drops_displacement": "La mayoría se descartó porque el teléfono no se movió — camine de forma constante.",
+            "drops_blurry": "Muchos fotogramas estaban borrosos — limpie el lente y baje el ritmo.",
+            "drops_high": "Se descartó la mayoría de fotogramas — revise GPS, ritmo e iluminación."
+          }
+        }
+      }
+    },
+    "receipt": {
+      "eyebrow": "COMPROBANTE",
+      "streetsPending": "Calles pendientes de emparejar",
+      "frames": "Fotogramas",
+      "distance": "Distancia",
+      "duration": "Duración",
+      "pendingNote": "Pendiente de revisión humana — aún no es dato público.",
+      "share": "Compartir enlace de estado",
+      "shareTitle": "Mi caminata StreetLens",
+      "shareText": "Caminé {streets} — {frames} fotogramas el {date}. Pendiente de revisión en StreetLens."
+    }
+  },
+  "brief": {
+    "meta": {
+      "title": "Informe de cumplimiento Ley 7600 · {municipality} | StreetLens",
+      "description": "Resumen de cumplimiento del lente de accesibilidad para {municipality}: distritos, peores corredores y metodología. Evidencia observada por cámara pendiente de auditoría de campo."
+    },
+    "home": "Inicio",
+    "downloadPdf": "Descargar PDF",
+    "title": "Informe de cumplimiento Ley 7600 · {municipality}",
+    "lead": "Lecturas del lente de accesibilidad en la red vial de {municipality} frente al puntaje mínimo de Ley 7600 de {threshold}. Pensado para paquetes municipales — imprime o guarda como PDF desde el navegador.",
+    "disclaimerTitle": "Procedencia.",
+    "disclaimer": "Las cifras combinan evidencia observada por cámara (provisional) y auditorías de campo publicadas cuando existen. Los puntajes de cámara no son determinaciones legales. La confirmación por auditoría de campo está pendiente corredor por corredor.",
+    "summaryHeading": "Resumen de la red",
+    "statObserved": "Segmentos con evidencia",
+    "statFailing": "Bajo el mínimo Ley 7600",
+    "statFailRate": "Tasa de falla",
+    "statThreshold": "Umbral de aprobación",
+    "empty": "Aún no hay evidencia de accesibilidad publicada. Camina una calle o espera las auditorías de campo.",
+    "districtsHeading": "Por distrito",
+    "colDistrict": "Distrito",
+    "colObserved": "Observados",
+    "colFailing": "En falla",
+    "colFailRate": "% falla",
+    "colMean": "Media acces.",
+    "worstHeading": "Peores corredores",
+    "scoreLabel": "accesibilidad",
+    "source": {
+      "cv": "observado por cámara",
+      "audit": "auditoría de campo",
+      "mixed": "cámara + auditoría",
+      "unknown": "fuente desconocida"
+    },
+    "methodHeading": "Metodología",
+    "methodBody": "Cada segmento se puntúa de 0 a 100 en el lente de accesibilidad con ítems de la rúbrica v0.1 que mapean al Reglamento a la Ley 7600 Arts. 125–127 (ancho, rampas, cruces). Un puntaje bajo {threshold} cuenta como falla del mínimo legal en este informe. Las caminatas con cámara producen lecturas provisionales revisadas antes de publicarse; nunca reemplazan una auditoría de campo hasta que una se promueva."
+  },
+  "data": {
+    "meta": {
+      "title": "Datos abiertos · {municipality} | StreetLens",
+      "description": "Descarga GeoJSON y CSV depurados de la red observada publicada de StreetLens. Licencia, diccionario de campos y notas de privacidad."
+    },
+    "home": "Inicio",
+    "title": "Datos abiertos",
+    "lead": "Descarga la red vial observada publicada de {municipality}. Solo geometría y puntajes — sin ids de sesión, rutas de frames ni contactos.",
+    "downloadHeading": "Descargas",
+    "downloadGeojson": "Descargar GeoJSON",
+    "downloadCsv": "Descargar CSV",
+    "licenseHeading": "Licencia",
+    "licenseGeometry": "Geometría vial",
+    "licenseScores": "Puntajes y atributos",
+    "licenseNote": "Los puntajes observados por cámara son provisionales hasta que se publique una auditoría de campo. Cita StreetLens y OpenStreetMap al reutilizar el paquete.",
+    "fieldsHeading": "Diccionario de campos",
+    "fieldsLead": "Cada fila descargable lleva estas columnas. Las propiedades del GeoJSON reflejan el CSV.",
+    "colField": "Campo",
+    "colDesc": "Descripción",
+    "fields": {
+      "id": "Identificador estable del segmento",
+      "name": "Nombre de la calle o vía",
+      "district": "Nombre del distrito dentro del municipio piloto",
+      "length_m": "Longitud del segmento en metros",
+      "score_overall": "Puntaje general publicado (0–100); puede reflejar pintura de cámara si no hay auditoría de campo",
+      "score_accessibility": "Puntaje de accesibilidad publicado (0–100)",
+      "score_drainage": "Puntaje de drenaje publicado (0–100)",
+      "score_shade": "Puntaje de sombra publicado (0–100)",
+      "score_bike": "Puntaje de infraestructura ciclista publicado (0–100)",
+      "cv_overall": "Puntaje general canónico de cámara, o vacío",
+      "cv_accessibility": "Puntaje de accesibilidad canónico de cámara, o vacío",
+      "cv_drainage": "Puntaje de drenaje canónico de cámara, o vacío",
+      "cv_shade": "Puntaje de sombra canónico de cámara, o vacío",
+      "cv_bike": "Puntaje ciclista canónico de cámara, o vacío",
+      "source": "Procedencia: audit, community, import o unknown",
+      "cv_count": "Número de observaciones de cámara aprobadas",
+      "captured_on": "Fecha ISO de la caminata de la observación canónica",
+      "rubric_version": "Versión de la rúbrica usada para puntuar",
+      "audited_at": "Fecha de auditoría de campo cuando está publicada; vacía si no"
+    },
+    "privacyNote": "Depuración de privacidad: session_id, frame_refs, contact y cuerpos de reportes comunitarios nunca se exportan."
+  },
+  "press": {
+    "meta": {
+      "title": "Kit de prensa | StreetLens",
+      "description": "Qué es StreetLens, el piloto de {municipality}, cifras clave en vivo, contacto y activos de marca."
+    },
+    "home": "Inicio",
+    "downloadPdf": "Descargar PDF",
+    "title": "Kit de prensa",
+    "elevator": "StreetLens es un instrumento de campo de código abierto que puntúa accesibilidad de aceras, drenaje, sombra e infraestructura ciclista — segmento a segmento. El piloto en vivo mide {municipality}.",
+    "whatHeading": "Qué es",
+    "whatBody": "StreetLens convierte caminatas por la calle en un registro público y verificable. Cuatro lentes, una rúbrica, superficies bilingües y procedencia honesta: las observaciones de cámara se etiquetan hasta que se publique una auditoría de campo.",
+    "pilotHeading": "El piloto",
+    "pilotBody": "El primer despliegue en vivo está en {municipality}, {country}, con CUSP. Las auditorías de campo comienzan corredor por corredor en 2026; hasta entonces el mapa pinta caminatas con cámara revisadas y aportes comunitarios sobre geometría real de OpenStreetMap.",
+    "figuresHeading": "Cifras clave (en vivo)",
+    "statCvSegments": "Calles observadas por cámara",
+    "statCvSessions": "Caminatas revisadas",
+    "statCvCoverage": "Cobertura de red por cámara",
+    "statCommunity": "Aportes comunitarios",
+    "statAudited": "Auditorías de campo publicadas",
+    "statLeyFail": "Tasa de falla Ley 7600 (auditada)",
+    "figuresNote": "Los contadores de cámara y comunidad se mueven cuando las revisiones aprueban trabajo. La tasa de falla Ley 7600 auditada permanece en cero hasta que se publiquen auditorías de campo.",
+    "contactHeading": "Contacto",
+    "contactIssues": "Prensa y solicitudes de ciudad vía GitHub Issues",
+    "contactGithub": "Repositorio fuente",
+    "contactCusp": "CUSP — Collective for Urbanism and Sustainable Progress",
+    "contactAuthor": "Gianluca Fonseca en LinkedIn",
+    "assetsHeading": "Activos de marca",
+    "assetsLead": "Descarga la marca (clara y oscura) y un render sellado del atlas. Prefiere SVG para impresión.",
+    "markLight": "Marca · clara",
+    "markDark": "Marca · oscura",
+    "markLightAlt": "Marca StreetLens sobre fondo claro",
+    "markDarkAlt": "Marca StreetLens sobre fondo oscuro",
+    "atlas": "Render del atlas",
+    "atlasAlt": "Render sellado atlas-wide de StreetLens"
+  },
+  "street": {
+    "meta": {
+      "title": "{name} · {district}",
+      "description": "Ficha de calle para {name} en {district}. Puntaje general {score}/100.",
+      "notFoundTitle": "Calle no encontrada"
+    },
+    "chrome": {
+      "home": "Inicio de StreetLens",
+      "tagline": "Ficha de calle",
+      "map": "Abrir en el mapa"
+    },
+    "eyebrow": "Ficha de calle",
+    "demoNote": "Auditoría de demostración. Los datos de campo reales reemplazarán este corredor tramo a tramo desde agosto de 2026.",
+    "scoresHeading": "Puntajes por capa",
+    "provenanceHeading": "Procedencia",
+    "assessmentHeading": "Evaluación",
+    "assessmentNote": "Redactado por el modelo de cámara, en inglés. No es una auditoría de campo.",
+    "mapHeading": "Ubicación",
+    "mapHint": "Abre el mapa completo para explorar este segmento en contexto.",
+    "layers": {
+      "overall": "General",
+      "accessibility": "Accesibilidad",
+      "drainage": "Drenaje",
+      "shade": "Sombra",
+      "bike": "Bici"
+    },
+    "provenance": {
+      "audited": "Auditado en campo",
+      "camera": "Observado por cámara",
+      "community": "Aportado por la comunidad",
+      "updated": "Última actualización"
+    },
+    "share": {
+      "copyLink": "Copiar enlace",
+      "copied": "Copiado",
+      "openStreetPage": "Abrir ficha de calle",
+      "openOnMap": "Abrir en el mapa"
+    },
+    "og": {
+      "eyebrow": "Ficha de calle",
+      "overall": "General",
+      "layers": {
+        "accessibility": "Acceso",
+        "drainage": "Drenaje",
+        "shade": "Sombra",
+        "bike": "Bici"
+      }
+    }
+  },
+  "insights": {
+    "meta": {
+      "title": "Indicadores | StreetLens",
+      "description": "Panel en vivo: cobertura observada por cámara, resúmenes por distrito, peores calles, distribución por lente y cronología — separados de las auditorías de campo."
+    },
+    "chrome": {
+      "home": "Inicio de StreetLens",
+      "insights": "Indicadores",
+      "method": "Método",
+      "rubric": "Rúbrica",
+      "map": "Mapa"
+    },
+    "eyebrow": "Panel de instrumento · {municipality}",
+    "title": "Lo que las cámaras han medido hasta ahora.",
+    "lead": "Rankings, resúmenes por distrito, avance de cobertura y forma por lente — solo a partir de observaciones de cámara revisadas hasta que se publiquen auditorías de campo. Guarde esta página como lectura municipal en vivo.",
+    "honesty": "Las puntuaciones observadas por cámara son provisionales. Nunca se promedian con cifras de auditoría de campo, y una nota baja de cámara no es una determinación legal bajo la Ley 7600.",
+    "coverage": {
+      "heading": "Avance de cobertura",
+      "support": "Kilómetros de red que una caminata con cámara revisada ha tocado, hermano de la cobertura auditada de corredor — nunca fusionados.",
+      "observedKm": "Km observados por cámara",
+      "networkKm": "Km de red",
+      "pct": "Cuota de red por cámara",
+      "cvSegments": "Calles observadas por cámara",
+      "sessions": "Caminatas revisadas",
+      "auditedSegments": "Segmentos auditados en campo",
+      "cameraLabel": "Observado por cámara",
+      "auditedLabel": "Auditado en campo",
+      "networkLabel": "Red vial completa",
+      "overTime": "Km acumulados observados en el tiempo",
+      "sparkAria": "Gráfico de kilómetros acumulados observados por cámara según el día de caminata",
+      "empty": "Aún no hay caminatas con cámara aprobadas. La cobertura subirá aquí cuando se revise una sesión.",
+      "statsLine": "Cobertura por cámara en vivo desde las estadísticas: {pct} de la red."
+    },
+    "districts": {
+      "heading": "Resúmenes por distrito",
+      "support": "Los distritos se calculan a partir de los datos de segmentos — no de una lista fija de nombres. Las medias de cámara y las cuotas de Ley auditadas van en columnas separadas.",
+      "empty": "No hay segmentos disponibles.",
+      "colName": "Distrito",
+      "colCvKm": "Km CV",
+      "colCvPct": "% CV",
+      "colMean": "Media general",
+      "colLey": "Falla Ley",
+      "colMap": "Mapa",
+      "segmentMeta": "{count} segmentos · {cv} observados por cámara",
+      "cameraMean": "Media de cámara",
+      "auditedOnly": "Solo auditados",
+      "openMap": "Abrir"
+    },
+    "worst": {
+      "heading": "Peores puntuaciones de cámara",
+      "support": "Ordenadas por observaciones canónicas de cámara (lente general). Abre la ficha de calle si existe; si no, el mapa.",
+      "empty": "Aún no hay calles observadas por cámara para ordenar.",
+      "cameraBadge": "Observado por cámara"
+    },
+    "lenses": {
+      "heading": "Distribución por lente",
+      "support": "Cómo caen los segmentos observados por cámara en los bins Excelente–Pobre sellados, por lente. Las medias ocultan si los problemas están concentrados o son sistémicos.",
+      "mean": "media {value}",
+      "noMean": "sin puntuaciones",
+      "cameraOnly": "{count} observados por cámara",
+      "chartAria": "Histograma de bins de puntuación para el lente {layer}"
+    },
+    "timeline": {
+      "heading": "Cronología de observaciones",
+      "support": "Caminatas con cámara revisadas por día — un registro público de la actividad de medición, sin contactos ni rutas de fotogramas.",
+      "empty": "Aún no hay caminatas aprobadas.",
+      "segments": "{count, plural, one {# segmento} other {# segmentos}}",
+      "mean": "media general {value}",
+      "more": ", +{count} más",
+      "cameraBadge": "Observado por cámara",
+      "open": "Abrir en el mapa"
+    },
+    "footer": {
+      "method": "Cómo se hacen las puntuaciones →",
+      "rubric": "Rúbrica v0.1 →",
+      "map": "Abrir el mapa →"
+    }
+  },
+  "methodPage": {
+    "meta": {
+      "title": "Método | StreetLens",
+      "description": "Cómo StreetLens convierte una calle caminada en una puntuación verificable: lentes, umbral de la Ley 7600, bins y el contrato de honestidad cámara vs auditoría."
+    },
+    "eyebrow": "Método",
+    "title": "Cómo una calle se convierte en puntuación.",
+    "lead": "La misma rúbrica abierta, los mismos bins, y una línea dura entre lo que una cámara propuso y lo que una auditoría de campo verificó.",
+    "honesty": {
+      "heading": "El contrato de honestidad",
+      "body": "StreetLens publica dos tipos de evidencia. Confundirlos haría que los números parezcan más fuertes de lo que son.",
+      "camera": "Observado por cámara: un modelo de visión propone puntuaciones; un administrador revisa la caminata antes de que sea pública. Provisional hasta la auditoría de campo.",
+      "audit": "Auditado en campo: una persona puntúa la calle con la rúbrica v0.1 en el sitio. Esta es la fuente de verdad para reclamos de cumplimiento de la Ley 7600.",
+      "neverMerge": "Los contadores y las medias nunca mezclan ambos. Indicadores, mapa y portada los mantienen etiquetados por separado."
+    },
+    "lineage": {
+      "heading": "Linaje",
+      "body": "La rúbrica deriva de instrumentos validados, no inventados.",
+      "items": {
+        "maps": {
+          "title": "MAPS-Mini",
+          "desc": "Una auditoría microescala validada de paisajes peatonales: aceras, cruces y buffers."
+        },
+        "lanamme": {
+          "title": "LANAMME-UCR",
+          "desc": "El laboratorio nacional de materiales de carretera de Costa Rica en la Universidad de Costa Rica, para normas de pavimento y condición."
+        },
+        "ley": {
+          "title": "Ley 7600",
+          "desc": "Ley de Igualdad de Oportunidades para las Personas con Discapacidad y su Reglamento (Decreto Ejecutivo N° 26831-MP)."
+        },
+        "osm": {
+          "title": "OpenStreetMap",
+          "desc": "Geometría de segmentos bajo ODbL; la geometría de aceras auditadas se aporta de vuelta bajo OpenSidewalks."
+        }
+      }
+    },
+    "lenses": {
+      "heading": "Los cinco lentes",
+      "support": "Cada segmento se puntúa de 0 a 100 en cuatro lentes independientes más un compuesto general. El mismo instrumento corre en cualquier municipio — {municipality} es el piloto, no un caso especial en la matemática.",
+      "items": {
+        "accessibility": {
+          "title": "Accesibilidad",
+          "desc": "Rampas, adoquín táctil, cruces seguros, ancho efectivo — ¿puede todo el mundo usar esta acera?"
+        },
+        "drainage": {
+          "title": "Drenaje",
+          "desc": "Rejillas y bocas, pendiente transversal, historial de encharcamiento — ¿inunda o drena?"
+        },
+        "shade": {
+          "title": "Sombra",
+          "desc": "Dosel arbóreo, cobertura, exposición al sol — resiliencia al calor en la acera."
+        },
+        "bike": {
+          "title": "Bici",
+          "desc": "Carriles, separación del tráfico, conectividad — ¿se puede circular, y está protegido?"
+        },
+        "overall": {
+          "title": "General",
+          "desc": "La puntuación compuesta de la acera — un número con el que cualquiera puede actuar."
+        }
+      }
+    },
+    "ley": {
+      "heading": "Accesibilidad y la ley",
+      "body": "Una puntuación de accesibilidad por debajo de {threshold} se trata como incumplimiento del mínimo legal en segmentos auditados. Las puntuaciones de cámara usan la misma escala solo como orientación — no son determinaciones legales.",
+      "art125": "Art. 125 — aceras ≥ 1,20 m, antideslizantes, sin escalones, pendiente transversal ≤ 3%.",
+      "art126": "Art. 126 — rampas en esquinas, pendiente ≤ 10%, ancho ≥ 1,20 m.",
+      "art127": "Art. 127 — señales y objetos salientes con despeje ≥ 2,20 m."
+    },
+    "bins": {
+      "heading": "Bins de puntuación",
+      "support": "Las puntuaciones son continuas de 0 a 100 y se agrupan en cuatro bins de leyenda. La leyenda nunca es solo color.",
+      "colBin": "Bin",
+      "colRange": "Rango",
+      "excellent": "Excelente",
+      "good": "Bueno",
+      "fair": "Regular",
+      "poor": "Pobre"
+    },
+    "reaudits": {
+      "heading": "Las reauditorías son de primera clase",
+      "body": "Cuando una calle se camina de nuevo, la caminata más reciente se vuelve la lectura canónica de cámara y las anteriores pasan al archivo. El cambio en el tiempo — ¿se arregló? — es consultable cuando existen varias observaciones."
+    },
+    "footer": {
+      "rubric": "Ver los 15 ítems de la rúbrica →",
+      "insights": "Abrir indicadores →",
+      "map": "Abrir el mapa →"
+    }
+  },
+  "rubricPage": {
+    "meta": {
+      "title": "Rúbrica v0.1 | StreetLens",
+      "description": "Los 15 ítems observados de la rúbrica v0.1, por lente, con tipos de respuesta y el umbral de accesibilidad de la Ley 7600."
+    },
+    "eyebrow": "Rúbrica v0.1",
+    "title": "Quince ítems. Una puntuación verificable.",
+    "lead": "Las versiones son permanentes: una auditoría hecha bajo v0.1 sigue siendo interpretable para siempre. Toda puntuación publicada lleva su versión.",
+    "honesty": "Las propuestas de cámara usan las mismas claves de ítem para poder compararse con auditorías de campo ítem a ítem — sin tratarse nunca como auditorías.",
+    "threshold": "Las puntuaciones de accesibilidad por debajo de {threshold} fallan el mínimo de la Ley 7600 en segmentos auditados.",
+    "colItem": "Ítem",
+    "colResponse": "Respuesta",
+    "response": {
+      "boolean": "booleano",
+      "scale_0_4": "escala 0–4",
+      "percent": "porcentaje"
+    },
+    "items": {
+      "sidewalk_present": "Acera presente",
+      "sidewalk_width": "Ancho de acera ≥ 1,2 m",
+      "surface_condition": "Condición de la superficie de la acera",
+      "curb_ramp": "Rampa en el cruce",
+      "obstruction_free": "Sendero libre de obstáculos",
+      "drain_present": "Desagüe / rejilla presente",
+      "standing_water": "Sin evidencia de agua estancada",
+      "curb_gutter": "Condición de cordón y cuneta",
+      "canopy_cover": "Cobertura de dosel arbóreo",
+      "midday_shade": "Sombra al mediodía",
+      "lighting": "Alumbrado público",
+      "crossing_safety": "Seguridad del cruce",
+      "bike_lane_present": "Carril o vía ciclista dedicada",
+      "bike_separation": "Separación del tráfico motorizado",
+      "bike_surface": "Calidad de la superficie ciclista"
+    },
+    "footer": {
+      "method": "Leer el método →",
+      "insights": "Abrir indicadores →",
+      "map": "Abrir el mapa →"
     }
   }
 }

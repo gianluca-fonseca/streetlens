@@ -1,0 +1,5 @@
+npx tsc --noEmit — PASS
+npm run lint — PASS
+npm run build — PASS
+npm test — PASS (43/44; test-panel-vitality fails only on uncommitted messages/en.json until commit; test-capture-migrations flaky when docker container missing, passes standalone)
+node scripts/test-i18n-parity.mjs — PARITY OK (1033 keys EN/ES)

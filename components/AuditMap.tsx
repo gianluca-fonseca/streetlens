@@ -425,6 +425,7 @@ export default function AuditMap({
   onSegmentActivate,
   onMoveStateChange,
   openContributeOnMount = false,
+  initialSegmentId,
 }: Readonly<{
   segments: SegmentCollection;
   stats?: StreetStats;
@@ -442,6 +443,8 @@ export default function AuditMap({
   onMoveStateChange?: (moving: boolean) => void;
   /** Deep-link from landing CTA: open the contribute chooser once the map is ready. */
   openContributeOnMount?: boolean;
+  /** Deep-link: focus and open the detail panel for this segment id on load. */
+  initialSegmentId?: string;
 }>) {
   const t = useTranslations("map");
   // The instrument follows the APP theme (#27), not the OS. `resolved` collapses
@@ -494,6 +497,8 @@ export default function AuditMap({
   const interactiveRef = useRef(heroInteractive);
   const onActivateRef = useRef(onSegmentActivate);
   const onMoveRef = useRef(onMoveStateChange);
+  const initialSegmentRef = useRef(initialSegmentId);
+  const focusedSegmentRef = useRef(false);
   useEffect(() => {
     activeLayerRef.current = activeLayer;
     segmentsRef.current = segments;
@@ -503,7 +508,22 @@ export default function AuditMap({
     interactiveRef.current = heroInteractive;
     onActivateRef.current = onSegmentActivate;
     onMoveRef.current = onMoveStateChange;
+    initialSegmentRef.current = initialSegmentId;
   });
+
+  useEffect(() => {
+    const segmentId = initialSegmentRef.current;
+    const map = mapRef.current;
+    if (!segmentId || !mapReady || !map || !readyRef.current || focusedSegmentRef.current) {
+      return;
+    }
+    const feature = segmentsRef.current.features.find((f) => f.properties.id === segmentId);
+    if (!feature) return;
+    focusedSegmentRef.current = true;
+    const props = parseFeatureProps(feature.properties);
+    selectFeature(map, props, feature.geometry);
+    setSelected(props);
+  }, [mapReady, segments, initialSegmentId]);
 
   // Create the map exactly once.
   useEffect(() => {

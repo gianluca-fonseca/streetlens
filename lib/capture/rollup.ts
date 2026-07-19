@@ -20,6 +20,11 @@ import {
   normalizeItemValue,
   type LensScores,
 } from "./scoring";
+import {
+  CONTINUOUS_INFRASTRUCTURE_ITEMS,
+  smoothContinuityReadings,
+  type ContinuityReading,
+} from "./continuity";
 
 /**
  * The items read from junction frames rather than mid-block ones.
@@ -43,6 +48,8 @@ export const JUNCTION_ITEMS: ReadonlySet<RubricItemKey> = new Set<RubricItemKey>
 /** One observation as the rollup needs it. Mirrors the 0015 list RPC's shape. */
 export type RollupObservation = {
   frameId: string;
+  /** Capture sequence within the session — orders the traversal for continuity. */
+  seq: number;
   segmentId: string | null;
   model: string;
   items: Record<RubricItemKey, CaptureObservationItem>;
@@ -57,6 +64,13 @@ export type ItemMedian = {
   confidence: number | null;
   /** Frames that contributed a non-null value. */
   frames: number;
+  /**
+   * True when continuity smoothing reclassified at least one contributing
+   * reading as inferred-present (honest provenance for the workbench).
+   */
+  inferred?: boolean;
+  /** Count of frames whose reading for this item was continuity-inferred. */
+  inferredFrames?: number;
 };
 
 export type SegmentRollup = {
@@ -118,38 +132,63 @@ export function computeRollups(observations: readonly RollupObservation[]): Segm
     const itemConfidences: number[] = [];
     const contributingFrames = new Set<string>();
 
+    // Traversal order within the segment (by seq) — continuity runs are bounded
+    // by segment change because we already bucketed by segmentId above.
+    const usableOrdered = [...usable].sort(
+      (a, b) => a.seq - b.seq || a.frameId.localeCompare(b.frameId),
+    );
+
     for (const key of RUBRIC_ITEM_KEYS) {
       // Per-item frame selection — see JUNCTION_ITEMS above.
       const wantJunction = JUNCTION_ITEMS.has(key);
-      const sources = usable.filter((o) => o.nearJunction === wantJunction);
+      const sources = usableOrdered.filter((o) => o.nearJunction === wantJunction);
 
-      const entries: { value: number; confidence: number; frameId: string }[] = [];
+      const rawReadings: ContinuityReading[] = [];
       for (const obs of sources) {
         const item = obs.items?.[key];
         if (!item || item.value === null || item.value === undefined) continue;
         if (!Number.isFinite(item.value)) continue;
-        entries.push({
+        rawReadings.push({
+          seq: obs.seq,
+          frameId: obs.frameId,
           value: item.value,
           confidence: item.confidence,
-          frameId: obs.frameId,
         });
       }
 
-      if (entries.length === 0) {
+      if (rawReadings.length === 0) {
         itemMedians[key] = { value: null, confidence: null, frames: 0 };
         normalized[key] = null;
         continue;
       }
 
+      // Continuity smoothing only for continuous infrastructure; other items
+      // pass through unchanged (smoothContinuityReadings is a no-op for them).
+      const smoothed = CONTINUOUS_INFRASTRUCTURE_ITEMS.has(key)
+        ? smoothContinuityReadings(key, rawReadings)
+        : rawReadings.map((r) => ({ ...r, inferred: false as const }));
+
+      const entries = smoothed.map((r) => ({
+        value: r.value,
+        confidence: r.confidence,
+        frameId: r.frameId,
+      }));
+      const inferredFrames = smoothed.filter((r) => r.inferred).length;
+
       const median = confidenceWeightedMedian(entries);
       const meanConfidence =
         entries.reduce((sum, e) => sum + e.confidence, 0) / entries.length;
 
-      itemMedians[key] = {
+      const medianEntry: ItemMedian = {
         value: median,
         confidence: Math.round(meanConfidence * 1000) / 1000,
         frames: entries.length,
       };
+      if (inferredFrames > 0) {
+        medianEntry.inferred = true;
+        medianEntry.inferredFrames = inferredFrames;
+      }
+      itemMedians[key] = medianEntry;
       normalized[key] = normalizeItemValue(key, median);
 
       if (median !== null) {

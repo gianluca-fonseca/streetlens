@@ -1,0 +1,5 @@
+npx tsc --noEmit: PASS
+npm run lint: PASS
+npm run build: PASS
+npm test (after seed-provenance-drive --clean): PASS (42/42)
+node scripts/test-i18n-parity.mjs: PASS

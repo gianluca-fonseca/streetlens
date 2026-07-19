@@ -27,7 +27,7 @@ import {
   ESCALATION_MAX_FRACTION,
   extractionEnabled,
   sessionTokenBudget,
-  visionModel,
+  primaryVisionModel,
   escalationModel,
 } from "@/lib/extraction/config";
 import {
@@ -44,9 +44,14 @@ import {
   type SynthesisClient,
   type SynthesisFrame,
 } from "@/lib/extraction/synthesis";
+import {
+  classifyCaptureVantage,
+  timedTrackFromVertsAndFrames,
+  type CaptureVantage,
+} from "@/lib/extraction/vantage";
 import type { CaptureDb, ClaimedJob, ObservationRow } from "./db";
 import { getCaptureDb } from "./db";
-import { publicFrameUrl } from "./storage";
+import { signedFrameUrl } from "./storage";
 import { computeRollups, type RollupObservation, type SegmentRollup } from "./rollup";
 import { emitCaptureSubmission } from "@/lib/submissions-sink";
 import type { PumpResponse } from "./schemas";
@@ -57,7 +62,7 @@ export type PumpDeps = {
   /** The text model that writes the per-segment synthesis. Injectable for tests. */
   synthesis?: SynthesisClient;
   /** Injectable so tests can assert URL construction without Supabase env. */
-  frameUrl?: (storagePath: string) => string;
+  frameUrl?: (storagePath: string) => string | Promise<string>;
   /** Injectable so tests drive the real downscale without fetching anything. */
   prepareImage?: ImagePreparer;
   /** Injectable so tests assert the queue emit without writing a real queue file. */
@@ -78,6 +83,8 @@ type SessionState = {
   escalationCap: number;
   escalated: number;
   paused: boolean;
+  /** Vehicle sessions run mini as primary and skip the nano→mini ladder. */
+  vantage: CaptureVantage;
 };
 
 function emptyResult(remaining: number): PumpResponse {
@@ -103,7 +110,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
 
   const vision = deps?.vision ?? createOpenAiVisionClient();
   const synthesis = deps?.synthesis ?? createOpenAiSynthesisClient();
-  const frameUrl = deps?.frameUrl ?? publicFrameUrl;
+  const frameUrl = deps?.frameUrl ?? ((path: string) => signedFrameUrl(path, { privileged: true }));
   const prepareImage = deps?.prepareImage ?? downscaleFrame;
   const emitSubmission = deps?.emitSubmission ?? emitCaptureSubmission;
   const batch = deps?.limit ?? PUMP_BATCH_SIZE;
@@ -126,16 +133,35 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
     const existing = sessions.get(sessionId);
     if (existing) return existing;
     const loading = (async (): Promise<SessionState> => {
-      const [status, usage] = await Promise.all([
+      const [status, usage, trackPayload, frames] = await Promise.all([
         db.sessionStatus(sessionId),
         db.sessionTokenUsage(sessionId),
+        db.sessionTrack(sessionId).catch(() => null),
+        db.listFrames(sessionId).catch(() => []),
       ]);
+
+      // Timed track: prefer reconstructing vertex times from frame capture
+      // times (geometry alone survives finalize). Empty / untimed → pedestrian.
+      const timed =
+        trackPayload && trackPayload.track.length >= 2 && frames.length > 0
+          ? timedTrackFromVertsAndFrames(trackPayload.track, frames)
+          : [];
+      const vantage = classifyCaptureVantage(timed);
+
+      // Vehicle: mini is already primary — the 10% nano→mini escalation cap
+      // does not apply (budget uses the superseded ceiling formula).
+      const escalationCap =
+        vantage === "vehicle"
+          ? 0
+          : Math.max(1, Math.floor(status.frameCount * ESCALATION_MAX_FRACTION));
+
       return {
-        budget: sessionTokenBudget(status.frameCount),
+        budget: sessionTokenBudget(status.frameCount, vantage),
         inputTokens: usage.inputTokens,
-        escalationCap: Math.max(1, Math.floor(status.frameCount * ESCALATION_MAX_FRACTION)),
+        escalationCap,
         escalated: usage.escalated,
         paused: status.status === "cost_paused",
+        vantage,
       };
     })();
     sessions.set(sessionId, loading);
@@ -171,7 +197,7 @@ export async function pumpOnce(deps?: Partial<PumpDeps>): Promise<PumpResponse> 
 type JobDeps = {
   db: CaptureDb;
   vision: VisionClient;
-  frameUrl: (storagePath: string) => string;
+  frameUrl: (storagePath: string) => string | Promise<string>;
   prepareImage: ImagePreparer;
   loadSession: (sessionId: string) => Promise<SessionState>;
 };
@@ -210,19 +236,19 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
 
   let url: string;
   try {
-    url = frameUrl(job.storage_path);
+    url = await frameUrl(job.storage_path);
   } catch (err) {
     await db.failJob(job.frame_id, "failed", `frame_url: ${errText(err)}`);
     return "failed";
   }
 
   // Fetched and shrunk once, then reused if this frame escalates: the stronger
-  // model is asked about the same 512 px image, not sent back to storage for the
-  // full-resolution original.
+  // model is asked about the same downscaled image, not sent back to storage
+  // for the full-resolution original.
   let preparing: Promise<string> | null = null;
   const prepareOnce: ImagePreparer = (u) => (preparing ??= prepareImage(u));
 
-  const model = visionModel();
+  const model = primaryVisionModel(session.vantage);
   const first = await extractFrame(vision, url, model, { prepareImage: prepareOnce });
   session.inputTokens += first.usage.inputTokens;
 
@@ -253,9 +279,15 @@ async function runJob(job: ClaimedJob, deps: JobDeps): Promise<"done" | "failed"
 
   // Escalation: the cheap model answered, but hedged on something it claimed to
   // see. Ask the stronger model once, if this session can still afford to.
+  // Vehicle sessions already run the escalation model as primary (cap = 0), so
+  // this ladder stays off for them.
   let result = first;
   let escalated = false;
-  if (shouldEscalate(first.observation) && session.escalated < session.escalationCap) {
+  if (
+    session.vantage === "pedestrian" &&
+    shouldEscalate(first.observation) &&
+    session.escalated < session.escalationCap
+  ) {
     session.escalated++;
     const second = await extractFrame(vision, url, escalationModel(), {
       prepareImage: prepareOnce,
@@ -392,6 +424,7 @@ export async function rollupSession(
 
   const observations: RollupObservation[] = rows.map((r) => ({
     frameId: r.frame_id,
+    seq: r.seq,
     segmentId: r.segment_id,
     model: r.model,
     items: r.items,
@@ -493,6 +526,7 @@ export async function synthesizeSession(
         sessionId,
         segmentId: rollup.segmentId,
         assessment: outcome.assessment,
+        assessmentEs: outcome.assessmentEs,
         inputTokens: outcome.usage.inputTokens,
         outputTokens: outcome.usage.outputTokens,
       });

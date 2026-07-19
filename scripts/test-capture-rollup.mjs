@@ -57,6 +57,7 @@ function compile() {
         paths: { "@/*": ["./*"] },
       },
       files: [
+        "../lib/capture/continuity.ts",
         "../lib/capture/rollup.ts",
         "../lib/capture/scoring.ts",
         "../lib/capture/types.ts",
@@ -78,6 +79,10 @@ function obs(T, { frameId, value = 3, confidence = 0.9, overrides = {}, ...rest 
   for (const [k, v] of Object.entries(overrides)) items[k] = v;
   return {
     frameId,
+    seq: rest.seq ?? (() => {
+      const m = String(frameId).match(/(\d+)/);
+      return m ? Number(m[1]) : 0;
+    })(),
     segmentId: "north-st",
     model: "gpt-5-nano",
     items,

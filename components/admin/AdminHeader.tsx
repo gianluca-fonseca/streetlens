@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { History, LayoutGrid, ListChecks, Map, Upload } from "lucide-react";
+import { History, LayoutGrid, ListChecks, Map, Upload, Activity } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
 import { LogoMark } from "@/components/ui/Logo";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
@@ -16,7 +16,7 @@ export default async function AdminHeader({
   active,
 }: Readonly<{
   locale: Locale;
-  active: "dashboard" | "queue" | "history" | "import";
+  active: "dashboard" | "queue" | "history" | "import" | "ops";
 }>) {
   const t = await getTranslations({ locale, namespace: "admin" });
   const other: Locale = locale === "en" ? "es" : "en";
@@ -27,7 +27,9 @@ export default async function AdminHeader({
         ? "/history"
         : active === "import"
           ? "/import"
-          : "";
+          : active === "ops"
+            ? "/ops"
+            : "";
 
   const nav = [
     {
@@ -53,6 +55,12 @@ export default async function AdminHeader({
       href: `/${locale}/admin/import`,
       label: t("nav.import"),
       Icon: Upload,
+    },
+    {
+      key: "ops" as const,
+      href: `/${locale}/admin/ops`,
+      label: t("nav.ops"),
+      Icon: Activity,
     },
   ];
 

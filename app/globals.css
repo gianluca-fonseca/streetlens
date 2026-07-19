@@ -593,3 +593,27 @@ section[id] {
     transform: none !important;
   }
 }
+
+/* Civic pack print stylesheet (brief / press one-pagers). Hide chrome + CTAs;
+   unlock the overflow-hidden body so multi-page PDF export works via browser print. */
+@media print {
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    color: black !important;
+  }
+  .civic-no-print {
+    display: none !important;
+  }
+  .civic-page {
+    overflow: visible !important;
+  }
+  .civic-page a[href]::after {
+    content: none !important;
+  }
+  .civic-print-break {
+    break-before: page;
+  }
+}

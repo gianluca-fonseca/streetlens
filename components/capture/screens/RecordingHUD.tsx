@@ -15,6 +15,7 @@
 import { useTranslations } from "next-intl";
 import { CircleStop } from "lucide-react";
 import { Action, LiveDot, Notice, Stat } from "@/components/capture/ui";
+import { QualityCoachRail } from "@/components/capture/QualityCoachRail";
 import { formatDistance, formatElapsed } from "@/components/capture/engine/geo";
 import { CAPTURE_TUNING } from "@/components/capture/engine/tuning";
 import type { RecorderStats } from "@/components/capture/hooks/useRecorder";
@@ -71,6 +72,15 @@ export function RecordingHUD({
           <Notice tone="warn">{t("hud.wakeFailed")}</Notice>
         ) : null}
         {!durable ? <Notice tone="warn">{t("hud.notDurable")}</Notice> : null}
+        <QualityCoachRail
+          input={{
+            accuracyM: geo.latest?.accuracy ?? stats.accuracyM,
+            dropCounts: stats.dropCounts,
+            framesKept: stats.framesKept,
+            meanGray: stats.meanGray,
+            speedMps: stats.speedMps,
+          }}
+        />
       </div>
 
       {/* Instrument panel */}

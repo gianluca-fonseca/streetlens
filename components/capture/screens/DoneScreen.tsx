@@ -1,21 +1,34 @@
 "use client";
 
 /**
- * The end of a walk.
- *
- * The status link is honest about what it leads to: matching and review run in a
- * part of the pipeline that is not live yet, so the status page says "processing
- * starts shortly" rather than inventing a progress bar for work nothing is doing.
+ * The end of a walk — receipt card + status link.
  */
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Action, Eyebrow, Screen } from "@/components/capture/ui";
+import { WalkReceipt } from "@/components/capture/WalkReceipt";
+import type { TrackPoint } from "@/lib/capture/types";
 
 export function DoneScreen({
   sessionId,
+  frameCount,
+  distanceM,
+  elapsedMs,
+  track,
+  streetNames,
+  submittedAt,
   onAgain,
-}: Readonly<{ sessionId: string | null; onAgain: () => void }>) {
+}: Readonly<{
+  sessionId: string | null;
+  frameCount: number;
+  distanceM: number;
+  elapsedMs: number;
+  track: readonly TrackPoint[];
+  streetNames?: readonly string[];
+  submittedAt: Date;
+  onAgain: () => void;
+}>) {
   const t = useTranslations("collect");
 
   return (
@@ -27,6 +40,18 @@ export function DoneScreen({
         </h1>
         <p className="font-serif text-[17px] leading-[1.6] text-neutral-strong">{t("done.body")}</p>
       </header>
+
+      {sessionId ? (
+        <WalkReceipt
+          sessionId={sessionId}
+          frameCount={frameCount}
+          distanceM={distanceM}
+          elapsedMs={elapsedMs}
+          track={track}
+          streetNames={streetNames}
+          submittedAt={submittedAt}
+        />
+      ) : null}
 
       <div className="flex flex-col gap-2">
         {sessionId ? (

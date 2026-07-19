@@ -245,6 +245,7 @@ export function recomputeReview(
     surviving.push({
       obs: {
         frameId: String(f.seq),
+        seq: f.seq,
         segmentId: f.segmentId,
         model: f.observation.model,
         items: applyItemOverrides(f.observation.items, corrections.itemOverrides[f.seq]),

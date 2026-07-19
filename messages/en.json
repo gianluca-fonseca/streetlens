@@ -25,7 +25,8 @@
   "mapChrome": {
     "home": "StreetLens home",
     "tagline": "Escazú street instrument",
-    "contribute": "Contribute a street"
+    "contribute": "Contribute a street",
+    "insights": "Insights"
   },
   "map": {
     "ariaLabel": "Interactive map of audited street segments in Escazú",
@@ -99,6 +100,8 @@
     "breakdownHeading": "Rubric breakdown",
     "photosHeading": "Photos",
     "photoPlaceholder": "Photo pending fieldwork",
+    "photoHeld": "Camera frames held for review",
+    "photoUnavailable": "Evidence frames unavailable",
     "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
     "close": "Close detail panel",
     "communityPending": "Community-contributed · pending field verification",
@@ -122,7 +125,7 @@
     "cvCoverageLabel": "Coverage",
     "cvFramesLabel": "Frames",
     "cvAssessmentLabel": "Assessment",
-    "cvAssessmentNote": "Written by the camera model, in English. Not a field audit."
+    "cvAssessmentNote": "Written by the camera model. Falls back to English when Spanish is missing. Not a field audit."
   },
   "rubric": {
     "overall": {
@@ -158,6 +161,7 @@
       "queue": "Verification queue",
       "history": "History",
       "import": "Bulk import",
+      "ops": "Pipeline ops",
       "logout": "Log out",
       "publicMap": "Public map"
     },
@@ -189,6 +193,15 @@
       "colSegments": "Segments",
       "colAvg": "Avg. overall",
       "demoNote": "Demo dataset over real OSM geometry. No figure is a real measurement until field collection begins."
+    },
+    "qrPosters": {
+      "title": "QR posters",
+      "subtitle": "Generate a bilingual printable poster for a street segment. Deep links open /collect with src=qr and the spot id.",
+      "spotLabel": "Segment id",
+      "spotHint": "e.g. esc-sa-0001 — must exist in the street network.",
+      "originLabel": "Site origin (for the QR URL)",
+      "generate": "Open printable poster",
+      "scriptHint": "CLI: node scripts/generate-qr-poster.mjs --spot <id> --origin <url>"
     },
     "queue": {
       "title": "Verification queue",
@@ -429,6 +442,7 @@
       "boolNo": "No",
       "overrideItemLabel": "Override the {item} reading",
       "overrideModel": "Model",
+      "inferredFromNeighbors": "Inferred from neighbors",
       "excludeFrame": "Exclude",
       "includeFrame": "Include again",
       "resetFrame": "Reset frame",
@@ -436,6 +450,18 @@
       "deleteConfirm": "This permanently removes the frame's image.",
       "deleteConfirmYes": "Delete it",
       "deleteError": "That frame could not be deleted. Please try again.",
+      "reprocessHeading": "Re-run map matching",
+      "reprocessBody": "Some frames matched no street when this walk was first processed. If the street network has grown since then, re-matching may place them on a segment.",
+      "reprocessPreviewBtn": "Preview match",
+      "reprocessCommitBtn": "Re-run matching",
+      "reprocessConfirm": "Re-run map matching on this session? Frames that now match will be re-queued for extraction.",
+      "reprocessPreviewResult": "Preview: {attributed} of {total} frames would be placed on a segment.",
+      "reprocessCommitResult": "Re-matched {reprocessed} frames; {requeued} re-queued for extraction.",
+      "reprocessError": "Could not re-run map matching. Please try again.",
+      "rerunAnalysis": "Re-run analysis",
+      "rerunSuccess": "Analysis updated ({input} in / {output} out tokens).",
+      "rerunError": "Could not re-run analysis. Please try again.",
+      "rerunDisabled": "Extraction is disabled — enable CV_EXTRACTION_ENABLED to re-run analysis.",
       "cancel": "Cancel",
       "status": {
         "pending_upload": "Waiting to upload",
@@ -444,6 +470,62 @@
         "extracting": "Reading frames",
         "cost_paused": "Paused: budget",
         "review_ready": "Ready for review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "failed": "Failed"
+      }
+    },
+    "ops": {
+      "title": "Pipeline ops",
+      "subtitle": "Token spend, budget headroom, and fleet health across capture sessions.",
+      "localNote": "No database configured. Ops metrics require a live Supabase connection.",
+      "tile": {
+        "costPaused": "Cost paused",
+        "stuckJobs": "Stuck running jobs",
+        "failedJobs": "Failed jobs",
+        "pendingJobs": "Pending jobs"
+      },
+      "spendHeading": "Token spend",
+      "extractionTokens": "Extraction tokens",
+      "synthesisTokens": "Synthesis tokens",
+      "escalationRate": "Escalation rate",
+      "sessionsHeading": "Recent sessions",
+      "modelQualityHeading": "Model quality (human corrections)",
+      "trendHeading": "Correction rate by month",
+      "noModelData": "No approved observations yet.",
+      "colModel": "Model",
+      "colObservations": "Observations",
+      "colCorrected": "Corrected",
+      "colCorrectionRate": "Correction rate",
+      "colTopOverrides": "Top overrides",
+      "colSession": "Session",
+      "colStatus": "Status",
+      "colFrames": "Frames",
+      "colTokens": "Tokens",
+      "colEscalated": "Escalated",
+      "colActions": "Actions",
+      "colDay": "Day",
+      "colExtraction": "Extraction",
+      "colSynthesis": "Synthesis",
+      "none": "—",
+      "resume": "Resume extraction",
+      "resumeReasonPlaceholder": "Why are you resuming?",
+      "resumeReasonRequired": "A resume reason is required.",
+      "resumeSuccess": "Resumed — {count} jobs re-queued.",
+      "reprocessPreviewBtn": "Preview re-match",
+      "reprocessCommit": "Re-run matching",
+      "reprocessConfirm": "Re-run map matching on this session?",
+      "reprocessPreview": "Preview: {attributed}/{total} frames would match.",
+      "reprocessSuccess": "Re-matched {reprocessed}; {requeued} re-queued.",
+      "actionError": "Action failed. Please try again.",
+      "openReview": "Open review",
+      "status": {
+        "pending_upload": "Waiting to upload",
+        "uploading": "Uploading",
+        "matching": "Matching",
+        "extracting": "Extracting",
+        "cost_paused": "Cost paused",
+        "review_ready": "Review ready",
         "approved": "Approved",
         "rejected": "Rejected",
         "failed": "Failed"
@@ -601,7 +683,8 @@
       "banner": {
         "methodQuestion": "How does StreetLens work?",
         "methodLink": "Method",
-        "platform": "Open the platform"
+        "platform": "Open the platform",
+        "insightsLink": "Insights"
       },
       "segments": {
         "title": "Lowest-scoring streets",
@@ -609,7 +692,8 @@
         "activate": "Open {name} in the platform",
         "cvTitle": "Recently camera-observed",
         "cvBadge": "CV",
-        "empty": "No camera observations published yet. Record a walk or add a street from the map."
+        "empty": "No camera observations published yet. Record a walk or add a street from the map.",
+        "cvWorstTitle": "Lowest camera scores"
       },
       "stats": {
         "failLabel": "Fail Ley 7600 minimums",
@@ -786,7 +870,9 @@
           "source": "Live today: camera proposals on the map, admin-reviewed. Field audits remain the published source of truth.",
           "alt": "Method pipeline diagram: field audits flow to open data today, with a dashed roadmap loop where a computer-vision and machine-learning model scores streets and a human always verifies the result."
         }
-      }
+      },
+      "fullMethod": "Read the full method",
+      "fullRubric": "See rubric v0.1"
     },
     "grounding": {
       "eyebrow": "References",
@@ -889,7 +975,8 @@
       "heading": "Measure what the city forgot to.",
       "support": "Open the live map, or add a street you know. Every score ships with its formula.",
       "explore": "Explore the live map",
-      "contribute": "Contribute a street"
+      "contribute": "Contribute a street",
+      "insights": "Open insights"
     },
     "footer": {
       "tagline": "An open field instrument for the street. Now measuring Escazú, Costa Rica.",
@@ -899,7 +986,10 @@
       "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
       "localeLabel": "Language",
       "openData": "Street geometry from OpenStreetMap, under ODbL 1.0. Scores are demo data until field collection begins in August 2026.",
-      "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress."
+      "built": "A project of CUSP, the Collective for Urbanism and Sustainable Progress.",
+      "insights": "Insights",
+      "method": "Method",
+      "rubric": "Rubric"
     }
   },
   "collect": {
@@ -1271,6 +1361,475 @@
       },
       "sessionLabel": "SESSION",
       "backToMap": "Back to the map"
+    },
+    "qr": {
+      "eyebrow": "WELCOME",
+      "title": "Help measure {municipality}",
+      "lead": "You scanned a code on the street. StreetLens turns a short walk into public data about sidewalk condition — after a human reviewer checks it.",
+      "loadingSpot": "Loading this street…",
+      "spotUnknown": "We could not load details for this spot, but you can still record a walk here.",
+      "howEyebrow": "WHAT TO DO",
+      "how1": "Hold your phone in portrait, camera pointed forward down the sidewalk.",
+      "how2": "Walk at a normal pace for one block or more.",
+      "how3": "Review and upload when you stop — nothing leaves your phone until you say so.",
+      "privacy": "Do not record people close up or inside private property.",
+      "cta": "Start — show me how"
+    },
+    "mission": {
+      "eyebrow": "YOUR STREET",
+      "title": "Walk {street}",
+      "lead": "This lamppost code points at {district}. Walk the sidewalk in front of you and we will match your frames to this street."
+    },
+    "coach": {
+      "gps_poor": "GPS accuracy is weak — step outside if you can, and stay on the sidewalk line.",
+      "moving_fast": "You may be moving too fast — slow to a walking pace so frames stay sharp.",
+      "too_dark": "Scene looks dark — move to better light or wipe the lens if it is smudged.",
+      "stationary": "Phone has not moved much — keep walking; frames are kept every few metres."
+    },
+    "myWalks": {
+      "eyebrow": "MY WALKS",
+      "lead": "Saved on this device only. Tap to open the status page.",
+      "unnamedWalk": "Walk in review",
+      "meta": "{frames} frames · {distance} · {duration}",
+      "status": {
+        "pending_upload": "Uploading",
+        "uploading": "Uploading",
+        "matching": "Matching",
+        "extracting": "Reading",
+        "cost_paused": "Paused",
+        "review_ready": "In review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "failed": "Failed"
+      }
+    },
+    "gate": {
+      "eyebrow": "READY TO SEND?",
+      "lead": "A quick check before your walk leaves this device.",
+      "coverageEstimate": "Rough corridor covered: ~{meters} m",
+      "ready": "Looks ready — you can upload when you are satisfied.",
+      "blocked": "This walk cannot be uploaded yet — see the hints above.",
+      "items": {
+        "frames": {
+          "label": "Frames kept",
+          "hints": {
+            "frames_none": "No frames were kept. Walk farther and try again.",
+            "frames_low": "Very few frames — walk a longer stretch for better coverage."
+          }
+        },
+        "fixes": {
+          "label": "GPS fixes",
+          "hints": {
+            "fixes_low": "Not enough GPS fixes — enable location and walk outside."
+          }
+        },
+        "duration": {
+          "label": "Duration (min)",
+          "hints": {
+            "duration_short": "Very short walk — consider covering more of the block."
+          }
+        },
+        "track_length": {
+          "label": "Track length (m)",
+          "hints": {
+            "track_short": "GPS track is short — walk farther along the street."
+          }
+        },
+        "gps_quality": {
+          "label": "GPS accuracy (m)",
+          "hints": {
+            "gps_poor": "Weak GPS — fixes above 25 m may be dropped when matched.",
+            "gps_unknown": "No accuracy data yet — wait for a GPS fix before uploading."
+          }
+        },
+        "drop_ratio": {
+          "label": "Dropped frames",
+          "hints": {
+            "drops_displacement": "Most drops were because the phone had not moved — keep walking steadily.",
+            "drops_blurry": "Many frames were too blurry — wipe the lens and slow down.",
+            "drops_high": "Most camera frames were dropped — check GPS, pace, and lighting."
+          }
+        }
+      }
+    },
+    "receipt": {
+      "eyebrow": "WALK RECEIPT",
+      "streetsPending": "Streets pending match",
+      "frames": "Frames",
+      "distance": "Distance",
+      "duration": "Duration",
+      "pendingNote": "Pending human review — not public data yet.",
+      "share": "Share status link",
+      "shareTitle": "My StreetLens walk",
+      "shareText": "I walked {streets} — {frames} frames on {date}. Pending review on StreetLens."
+    }
+  },
+  "brief": {
+    "meta": {
+      "title": "Ley 7600 compliance brief · {municipality} | StreetLens",
+      "description": "Accessibility-lens compliance summary for {municipality}: district rollups, worst corridors, and methodology. Camera-observed evidence pending field audit."
+    },
+    "home": "Home",
+    "downloadPdf": "Download PDF",
+    "title": "Ley 7600 compliance brief · {municipality}",
+    "lead": "Accessibility-lens readings for the {municipality} street network against the Ley 7600 minimum score of {threshold}. Built for municipal packets — print or save as PDF from your browser.",
+    "disclaimerTitle": "Provenance.",
+    "disclaimer": "Figures below mix camera-observed evidence (provisional) and published field audits when present. Camera scores are not legal determinations. Field audit confirmation is pending corridor by corridor.",
+    "summaryHeading": "Network summary",
+    "statObserved": "Segments with evidence",
+    "statFailing": "Below Ley 7600 minimum",
+    "statFailRate": "Fail rate",
+    "statThreshold": "Pass threshold",
+    "empty": "No accessibility evidence published yet. Walk a street or wait for field audits.",
+    "districtsHeading": "By district",
+    "colDistrict": "District",
+    "colObserved": "Observed",
+    "colFailing": "Failing",
+    "colFailRate": "Fail %",
+    "colMean": "Mean access.",
+    "worstHeading": "Worst corridors",
+    "scoreLabel": "accessibility",
+    "source": {
+      "cv": "camera-observed",
+      "audit": "field audit",
+      "mixed": "camera + audit",
+      "unknown": "unknown source"
+    },
+    "methodHeading": "Methodology",
+    "methodBody": "Each segment is scored 0–100 on the accessibility lens from rubric v0.1 items that map to Reglamento a la Ley 7600 Arts. 125–127 (width, ramps, crossings). A score below {threshold} is counted as failing the legal minimum for this briefing. Camera walks produce provisional readings reviewed before publish; they never replace a field audit until one is promoted."
+  },
+  "data": {
+    "meta": {
+      "title": "Open data · {municipality} | StreetLens",
+      "description": "Download scrubbed GeoJSON and CSV of the published StreetLens observed network. License, field dictionary, and privacy notes."
+    },
+    "home": "Home",
+    "title": "Open data",
+    "lead": "Download the published observed street network for {municipality}. Geometry and scores only — no session ids, frame paths, or contacts.",
+    "downloadHeading": "Downloads",
+    "downloadGeojson": "Download GeoJSON",
+    "downloadCsv": "Download CSV",
+    "licenseHeading": "License",
+    "licenseGeometry": "Street geometry",
+    "licenseScores": "Scores and attributes",
+    "licenseNote": "Camera-observed scores are provisional until a field audit is published. Cite StreetLens and OpenStreetMap when you reuse the pack.",
+    "fieldsHeading": "Field dictionary",
+    "fieldsLead": "Every downloadable row carries these columns. The GeoJSON properties mirror the CSV.",
+    "colField": "Field",
+    "colDesc": "Description",
+    "fields": {
+      "id": "Stable segment identifier",
+      "name": "Street or way name",
+      "district": "District name within the pilot municipality",
+      "length_m": "Segment length in metres",
+      "score_overall": "Published overall score (0–100); may reflect camera paint when no field audit exists",
+      "score_accessibility": "Published accessibility score (0–100)",
+      "score_drainage": "Published drainage score (0–100)",
+      "score_shade": "Published shade score (0–100)",
+      "score_bike": "Published bike-infrastructure score (0–100)",
+      "cv_overall": "Canonical camera overall score, or empty",
+      "cv_accessibility": "Canonical camera accessibility score, or empty",
+      "cv_drainage": "Canonical camera drainage score, or empty",
+      "cv_shade": "Canonical camera shade score, or empty",
+      "cv_bike": "Canonical camera bike score, or empty",
+      "source": "Provenance: audit, community, import, or unknown",
+      "cv_count": "Number of approved camera observations",
+      "captured_on": "ISO walk date of the canonical camera observation",
+      "rubric_version": "Rubric version used for scoring",
+      "audited_at": "Field-audit date when published; empty otherwise"
+    },
+    "privacyNote": "Privacy scrub: session_id, frame_refs, contact, and community report bodies are never exported."
+  },
+  "press": {
+    "meta": {
+      "title": "Press kit | StreetLens",
+      "description": "What StreetLens is, the {municipality} pilot, live key figures, contact, and brand assets."
+    },
+    "home": "Home",
+    "downloadPdf": "Download PDF",
+    "title": "Press kit",
+    "elevator": "StreetLens is an open-source field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure — segment by segment. The live pilot is measuring {municipality}.",
+    "whatHeading": "What it is",
+    "whatBody": "StreetLens turns street walks into a public, checkable record. Four lenses, one rubric, bilingual surfaces, and honest provenance: camera observations stay labeled until a field audit is published.",
+    "pilotHeading": "The pilot",
+    "pilotBody": "The first live deployment is in {municipality}, {country}, with CUSP. Field audits begin corridor by corridor in 2026; until then the map paints reviewed camera walks and community contributions on real OpenStreetMap geometry.",
+    "figuresHeading": "Key figures (live)",
+    "statCvSegments": "Streets camera-observed",
+    "statCvSessions": "Walks reviewed",
+    "statCvCoverage": "Camera network coverage",
+    "statCommunity": "Community contributions",
+    "statAudited": "Field audits published",
+    "statLeyFail": "Ley 7600 fail rate (audited)",
+    "figuresNote": "Camera and community counters move when reviews approve work. Audited Ley 7600 fail rate stays at zero until field audits are published.",
+    "contactHeading": "Contact",
+    "contactIssues": "Press and city requests via GitHub Issues",
+    "contactGithub": "Source repository",
+    "contactCusp": "CUSP — Collective for Urbanism and Sustainable Progress",
+    "contactAuthor": "Gianluca Fonseca on LinkedIn",
+    "assetsHeading": "Brand assets",
+    "assetsLead": "Download the mark (light and dark) and a sealed atlas render. Prefer SVG for print.",
+    "markLight": "Mark · light",
+    "markDark": "Mark · dark",
+    "markLightAlt": "StreetLens mark on light background",
+    "markDarkAlt": "StreetLens mark on dark background",
+    "atlas": "Atlas render",
+    "atlasAlt": "StreetLens atlas-wide sealed render"
+  },
+  "street": {
+    "meta": {
+      "title": "{name} · {district}",
+      "description": "Street report card for {name} in {district}. Overall score {score}/100.",
+      "notFoundTitle": "Street not found"
+    },
+    "chrome": {
+      "home": "StreetLens home",
+      "tagline": "Street report card",
+      "map": "Open on map"
+    },
+    "eyebrow": "Street report card",
+    "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
+    "scoresHeading": "Scores by layer",
+    "provenanceHeading": "Provenance",
+    "assessmentHeading": "Assessment",
+    "assessmentNote": "Written by the camera model, in English. Not a field audit.",
+    "mapHeading": "Location",
+    "mapHint": "Open the full map to explore this segment in context.",
+    "layers": {
+      "overall": "Overall",
+      "accessibility": "Accessibility",
+      "drainage": "Drainage",
+      "shade": "Shade",
+      "bike": "Bike"
+    },
+    "provenance": {
+      "audited": "Field audited",
+      "camera": "Camera observed",
+      "community": "Community contributed",
+      "updated": "Last updated"
+    },
+    "share": {
+      "copyLink": "Copy link",
+      "copied": "Copied",
+      "openStreetPage": "Open street page",
+      "openOnMap": "Open on map"
+    },
+    "og": {
+      "eyebrow": "Street report card",
+      "overall": "Overall",
+      "layers": {
+        "accessibility": "Access",
+        "drainage": "Drain",
+        "shade": "Shade",
+        "bike": "Bike"
+      }
+    }
+  },
+  "insights": {
+    "meta": {
+      "title": "Insights | StreetLens",
+      "description": "Live instrument panel: camera-observed coverage, district rollups, worst streets, lens distributions, and the observation timeline — kept separate from field audits."
+    },
+    "chrome": {
+      "home": "StreetLens home",
+      "insights": "Insights",
+      "method": "Method",
+      "rubric": "Rubric",
+      "map": "Map"
+    },
+    "eyebrow": "Instrument panel · {municipality}",
+    "title": "What the cameras have measured so far.",
+    "lead": "Rankings, district rollups, coverage progress, and lens shape — built only from reviewed camera observations until field audits publish. Bookmark this page for the live municipal readout.",
+    "honesty": "Camera-observed scores are provisional. They are never averaged into field-audit figures, and a low camera score is not a Ley 7600 legal determination.",
+    "coverage": {
+      "heading": "Coverage progress",
+      "support": "Network kilometres a reviewed camera walk has touched, as a sibling of audited corridor coverage — never merged with it.",
+      "observedKm": "Km camera-observed",
+      "networkKm": "Network km",
+      "pct": "Camera network share",
+      "cvSegments": "Streets camera-observed",
+      "sessions": "Walks reviewed",
+      "auditedSegments": "Segments field-audited",
+      "cameraLabel": "Camera-observed",
+      "auditedLabel": "Field-audited",
+      "networkLabel": "Full street network",
+      "overTime": "Cumulative km observed over time",
+      "sparkAria": "Sparkline of cumulative camera-observed kilometres by walk day",
+      "empty": "No approved camera walks yet. Coverage will climb here once a session is reviewed.",
+      "statsLine": "Live camera coverage from stats: {pct} of the network."
+    },
+    "districts": {
+      "heading": "District rollups",
+      "support": "Districts are computed from segment data — not a fixed list of names. Camera means and audited Ley shares stay in separate columns.",
+      "empty": "No segments available.",
+      "colName": "District",
+      "colCvKm": "CV km",
+      "colCvPct": "CV %",
+      "colMean": "Mean overall",
+      "colLey": "Ley fail",
+      "colMap": "Map",
+      "segmentMeta": "{count} segments · {cv} camera-observed",
+      "cameraMean": "Camera mean",
+      "auditedOnly": "Audited only",
+      "openMap": "Open"
+    },
+    "worst": {
+      "heading": "Lowest camera scores",
+      "support": "Ranked from canonical camera observations (overall lens). Open a street page when available, otherwise the map.",
+      "empty": "No camera-observed streets to rank yet.",
+      "cameraBadge": "Camera-observed"
+    },
+    "lenses": {
+      "heading": "Lens distribution",
+      "support": "How camera-observed segments fall across the sealed Excellent–Poor bins, per lens. Means hide whether problems are concentrated or systemic.",
+      "mean": "mean {value}",
+      "noMean": "no scores",
+      "cameraOnly": "{count} camera-observed",
+      "chartAria": "Score bin histogram for the {layer} lens"
+    },
+    "timeline": {
+      "heading": "Observation timeline",
+      "support": "Reviewed camera walks by day — a public paper trail of measurement activity, without contacts or frame paths.",
+      "empty": "No approved walks yet.",
+      "segments": "{count, plural, one {# segment} other {# segments}}",
+      "mean": "mean overall {value}",
+      "more": ", +{count} more",
+      "cameraBadge": "Camera-observed",
+      "open": "Open on map"
+    },
+    "footer": {
+      "method": "How scores are made →",
+      "rubric": "Rubric v0.1 →",
+      "map": "Open the map →"
+    }
+  },
+  "methodPage": {
+    "meta": {
+      "title": "Method | StreetLens",
+      "description": "How StreetLens turns a walked street into a checkable score: lenses, Ley 7600 threshold, bins, and the camera-vs-audit honesty contract."
+    },
+    "eyebrow": "Method",
+    "title": "How a street becomes a score.",
+    "lead": "The same open rubric, the same bins, and a hard line between what a camera proposed and what a field audit verified.",
+    "honesty": {
+      "heading": "The honesty contract",
+      "body": "StreetLens publishes two kinds of evidence. Confusing them would make the numbers look stronger than they are.",
+      "camera": "Camera-observed: a vision model proposes scores; an admin reviews the walk before anything is public. Provisional until field-audited.",
+      "audit": "Field-audited: a person scores the street against rubric v0.1 on site. This is the source of truth for Ley 7600 compliance claims.",
+      "neverMerge": "Counters and means never mix the two. Insights, the map, and the landing keep them labeled apart."
+    },
+    "lineage": {
+      "heading": "Lineage",
+      "body": "The rubric derives from validated instruments, not invented ones.",
+      "items": {
+        "maps": {
+          "title": "MAPS-Mini",
+          "desc": "A validated microscale audit of pedestrian streetscapes: sidewalks, crossings, and buffers."
+        },
+        "lanamme": {
+          "title": "LANAMME-UCR",
+          "desc": "Costa Rica's national road-materials laboratory at the University of Costa Rica, for pavement and condition standards."
+        },
+        "ley": {
+          "title": "Ley 7600",
+          "desc": "Equal Opportunities for Persons with Disabilities Act and its Reglamento (Decreto Ejecutivo N° 26831-MP)."
+        },
+        "osm": {
+          "title": "OpenStreetMap",
+          "desc": "Segment geometry under ODbL; audited sidewalk geometry is contributed back under OpenSidewalks."
+        }
+      }
+    },
+    "lenses": {
+      "heading": "The five lenses",
+      "support": "Every segment is scored 0–100 on four independent lenses plus an overall composite. The same instrument runs in any municipality — {municipality} is the pilot, not a special case in the math.",
+      "items": {
+        "accessibility": {
+          "title": "Accessibility",
+          "desc": "Curb ramps, tactile paving, safe crossings, effective width — can everyone use this sidewalk?"
+        },
+        "drainage": {
+          "title": "Drainage",
+          "desc": "Grates and inlets, cross slope, ponding history — does it flood, or drain?"
+        },
+        "shade": {
+          "title": "Shade",
+          "desc": "Tree canopy, cover, sun exposure — heat resilience on the sidewalk."
+        },
+        "bike": {
+          "title": "Bike",
+          "desc": "Lanes, separation from traffic, connectivity — can you ride it, and is it protected?"
+        },
+        "overall": {
+          "title": "Overall",
+          "desc": "The composite sidewalk score — one number anyone can act on."
+        }
+      }
+    },
+    "ley": {
+      "heading": "Accessibility and the law",
+      "body": "An accessibility score below {threshold} is treated as failing the legal minimum for audited segments. Camera scores use the same scale for orientation only — they are not legal determinations.",
+      "art125": "Art. 125 — sidewalks ≥ 1.20 m, non-slip, no steps, cross slope ≤ 3%.",
+      "art126": "Art. 126 — curb ramps at corners, gradient ≤ 10%, width ≥ 1.20 m.",
+      "art127": "Art. 127 — signs and projecting objects clear ≥ 2.20 m."
+    },
+    "bins": {
+      "heading": "Scoring bins",
+      "support": "Scores are continuous 0–100 and grouped into four legend bins. The legend is never color-only.",
+      "colBin": "Bin",
+      "colRange": "Range",
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "reaudits": {
+      "heading": "Re-audits are first-class",
+      "body": "When a street is walked again, the newest walk becomes the canonical camera reading and earlier ones move to archive. Change over time — did it get fixed? — is queryable once multiple observations exist."
+    },
+    "footer": {
+      "rubric": "See the 15 rubric items →",
+      "insights": "Open insights →",
+      "map": "Open the map →"
+    }
+  },
+  "rubricPage": {
+    "meta": {
+      "title": "Rubric v0.1 | StreetLens",
+      "description": "The 15 observed items in rubric v0.1, by lens, with response types and the Ley 7600 accessibility threshold."
+    },
+    "eyebrow": "Rubric v0.1",
+    "title": "Fifteen items. One checkable score.",
+    "lead": "Versions are permanent: an audit taken under v0.1 stays interpretable forever. Every published score carries its version.",
+    "honesty": "Camera proposals use the same item keys so they can be compared to field audits item-for-item — without ever being treated as audits.",
+    "threshold": "Accessibility scores below {threshold} fail the Ley 7600 minimum on audited segments.",
+    "colItem": "Item",
+    "colResponse": "Response",
+    "response": {
+      "boolean": "boolean",
+      "scale_0_4": "scale 0–4",
+      "percent": "percent"
+    },
+    "items": {
+      "sidewalk_present": "Sidewalk present",
+      "sidewalk_width": "Sidewalk width ≥ 1.2 m",
+      "surface_condition": "Sidewalk surface condition",
+      "curb_ramp": "Curb ramp at crossing",
+      "obstruction_free": "Path free of obstructions",
+      "drain_present": "Storm drain / grate present",
+      "standing_water": "No standing-water evidence",
+      "curb_gutter": "Curb and gutter condition",
+      "canopy_cover": "Tree canopy coverage",
+      "midday_shade": "Shade at midday",
+      "lighting": "Street lighting",
+      "crossing_safety": "Crossing safety",
+      "bike_lane_present": "Dedicated bike lane or path",
+      "bike_separation": "Separation from motor traffic",
+      "bike_surface": "Cycling surface quality"
+    },
+    "footer": {
+      "method": "Read the method →",
+      "insights": "Open insights →",
+      "map": "Open the map →"
     }
   }
 }

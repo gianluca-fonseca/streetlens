@@ -188,6 +188,7 @@ export async function POST(request: NextRequest) {
         // The synthesis is context that rides along to the map (seal #3): the overall
         // verdict shown on the public popover. The chosen NUMBERS are still s.scores.
         assessment: s.assessment ?? undefined,
+        assessment_es: review.assessmentsEs[s.segmentId] ?? undefined,
       })),
     });
 

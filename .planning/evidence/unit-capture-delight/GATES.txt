@@ -1,0 +1,5 @@
+npx tsc --noEmit — PASS (exit 0)
+npm run lint — PASS (exit 0)
+npm run build — PASS (exit 0)
+npm test — PASS (42/42 suites, after node scripts/seed-provenance-drive.mjs --clean)
+node scripts/test-i18n-parity.mjs — PASS (1038/1038 keys EN+ES)

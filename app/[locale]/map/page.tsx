@@ -27,14 +27,15 @@ export default async function MapPage({
   searchParams,
 }: Readonly<{
   params: Promise<{ locale: Locale }>;
-  searchParams: Promise<{ contribute?: string }>;
+  searchParams: Promise<{ contribute?: string; segment?: string }>;
 }>) {
   const { locale } = await params;
-  const { contribute } = await searchParams;
+  const { contribute, segment } = await searchParams;
   setRequestLocale(locale);
 
   const [segments, stats] = await Promise.all([getSegments(), getStats()]);
   const openContribute = contribute === "1";
+  const initialSegmentId = segment?.trim() || undefined;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -45,6 +46,7 @@ export default async function MapPage({
           segments={segments}
           stats={stats}
           openContributeOnMount={openContribute}
+          initialSegmentId={initialSegmentId}
         />
       </main>
     </div>
