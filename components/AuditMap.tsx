@@ -771,6 +771,41 @@ export default function AuditMap({
     setSelected(null);
   };
 
+  // Outside-tap dismissal: any pointer down outside the detail panel closes it.
+  // Map hits on another segment are left to the layer click handler so the
+  // selection switches without a close-then-reopen flicker.
+  useEffect(() => {
+    if (!selected) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target;
+      if (!(target instanceof Node)) return;
+      if (document.querySelector("[data-segment-detail]")?.contains(target)) {
+        return;
+      }
+
+      const map = mapRef.current;
+      const canvas = map?.getCanvas();
+      if (map && canvas && (target === canvas || canvas.contains(target))) {
+        const rect = canvas.getBoundingClientRect();
+        const point = new maplibregl.Point(
+          e.clientX - rect.left,
+          e.clientY - rect.top,
+        );
+        const features = map.queryRenderedFeatures(point, {
+          layers: INTERACTIVE_LAYER_IDS,
+        });
+        if (features.length > 0) return;
+      }
+
+      handleClose();
+    };
+
+    document.addEventListener("pointerdown", onPointerDown, { capture: true });
+    return () =>
+      document.removeEventListener("pointerdown", onPointerDown, { capture: true });
+  }, [selected]);
+
   if (isHero) {
     // Read-only backdrop OR the interactive platform embed. The informational
     // glass chips (LIVE / legend) are composed by the landing Hero over this
@@ -855,6 +890,7 @@ export default function AuditMap({
             onClick={handleClose}
             aria-hidden="true"
             tabIndex={-1}
+            data-segment-scrim
             className="absolute inset-0 z-20 bg-[rgba(0,0,0,0.32)] md:hidden"
           />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center md:inset-x-auto md:bottom-auto md:right-4 md:top-4 md:block">
