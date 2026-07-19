@@ -1120,6 +1120,7 @@ export default function CaptureReview({
 
                         {!dropped && !decided ? (
                           <ReviewDialoguePanel
+                            key={`${segmentId}:${(dialogues[segmentId] ?? []).map((m) => m.id).join(",")}`}
                             sessionId={review.sessionId}
                             segmentId={segmentId}
                             knownSeqs={frames.map((f) => f.seq)}

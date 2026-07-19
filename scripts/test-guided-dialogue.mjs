@@ -189,7 +189,8 @@ console.log("\nframe-ref parsing");
   const mixed = Refs.resolveFrameRefs("bookends #3 and #14 plus #1-2", known);
   check(
     "parses mixed refs",
-    Refs.referencedSeqs("bookends #3 and #14 plus #1-2", known).join(",") === "1,2,3,14",
+    mixed.length >= 2 &&
+      Refs.referencedSeqs("bookends #3 and #14 plus #1-2", known).join(",") === "1,2,3,14",
   );
 
   const bad = Refs.resolveFrameRefs("ghost #99 and #0", known);

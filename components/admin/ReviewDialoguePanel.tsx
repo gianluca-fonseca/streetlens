@@ -108,10 +108,6 @@ export default function ReviewDialoguePanel({
   const knownSet = useMemo(() => new Set(knownSeqs), [knownSeqs]);
 
   useEffect(() => {
-    setMessages(initialMessages);
-  }, [initialMessages]);
-
-  useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [messages, busy]);
 

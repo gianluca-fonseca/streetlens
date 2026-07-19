@@ -98,13 +98,30 @@ async function loadNetworkContext(segmentId: string): Promise<{
       const id = f.properties.id;
       if (f.properties.name) nameById.set(id, f.properties.name);
       if (id === segmentId) {
+        const coordinates = f.geometry.coordinates.map(
+          (c) => [c[0], c[1]] as [number, number],
+        );
+        let lengthM = 0;
+        for (let i = 0; i < coordinates.length - 1; i++) {
+          const a = coordinates[i];
+          const b = coordinates[i + 1];
+          const toRad = (d: number) => (d * Math.PI) / 180;
+          const dLat = toRad(b[1] - a[1]);
+          const dLng = toRad(b[0] - a[0]);
+          const lat1 = toRad(a[1]);
+          const lat2 = toRad(b[1]);
+          const h =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+          lengthM += 2 * 6_371_000 * Math.asin(Math.min(1, Math.sqrt(h)));
+        }
         segmentMeta = {
           id,
           name: f.properties.name,
           district: f.properties.district,
-          highway: f.properties.highway ?? null,
-          lengthM: f.properties.length_m ?? null,
-          coordinates: f.geometry.coordinates.map((c) => [c[0], c[1]] as [number, number]),
+          highway: null,
+          lengthM,
+          coordinates,
         };
       }
     }
