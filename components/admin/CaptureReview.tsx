@@ -32,6 +32,7 @@ import {
 import { LENS_KEYS, type LensKey } from "@/lib/capture/scoring";
 import { formatProvenanceDate, sanitizeContact } from "@/lib/cv-provenance";
 import type { RubricItemKey } from "@/lib/capture/types";
+import { inferredKeysForFrame } from "@/lib/capture/continuity";
 import {
   captureReviewErrorKey,
   REASON_PRESET_KEYS,
@@ -217,6 +218,51 @@ export default function CaptureReview({
     [selectedSeq, review.frames],
   );
   const selectedSegmentId = selectedFrame?.segmentId ?? null;
+
+  // Continuity-inferred keys for the open frame — same pure rules as the rollup
+  // baseline, using override-applied readings from usable mid-block segment mates.
+  const selectedInferredKeys = useMemo(() => {
+    if (!selectedFrame?.segmentId || !selectedFrame.observation) return undefined;
+    if (excludedSet.has(selectedFrame.seq) || deletedSet.has(selectedFrame.seq)) {
+      return undefined;
+    }
+    const mates = (framesBySegment.get(selectedFrame.segmentId) ?? []).filter(
+      (f) =>
+        f.observation &&
+        f.usable &&
+        !f.deleted &&
+        !excludedSet.has(f.seq) &&
+        !deletedSet.has(f.seq) &&
+        !f.nearJunction,
+    );
+    if (mates.length === 0) return undefined;
+    return inferredKeysForFrame(
+      String(selectedFrame.seq),
+      mates.map((f) => {
+        const items = { ...f.observation!.items };
+        const over = corrections.itemOverrides[f.seq];
+        if (over) {
+          for (const [k, v] of Object.entries(over)) {
+            items[k as RubricItemKey] = {
+              value: v ?? null,
+              confidence: 1,
+            };
+          }
+        }
+        return {
+          frameId: String(f.seq),
+          seq: f.seq,
+          items,
+        };
+      }),
+    );
+  }, [
+    selectedFrame,
+    framesBySegment,
+    corrections.itemOverrides,
+    excludedSet,
+    deletedSet,
+  ]);
 
   const hasMap =
     review.track.length > 0 || review.frames.some((f) => f.position !== null);
@@ -1182,6 +1228,7 @@ export default function CaptureReview({
               )}
               overrides={corrections.itemOverrides[selectedFrame.seq]}
               excluded={excludedSet.has(selectedFrame.seq)}
+              inferredKeys={selectedInferredKeys}
               onOverrideItem={(key, value) => overrideItem(selectedFrame.seq, key, value)}
               onToggleExclude={() => toggleExclude(selectedFrame.seq)}
               onDelete={() => deleteFrame(selectedFrame.seq)}

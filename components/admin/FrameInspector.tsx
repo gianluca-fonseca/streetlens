@@ -25,6 +25,9 @@ import {
 import type { ReviewFrame } from "@/lib/capture/review-store";
 import styles from "@/components/ui/zen.module.css";
 
+/** Keys whose baseline reading for this frame was continuity-inferred. */
+type InferredKeys = ReadonlySet<RubricItemKey> | undefined;
+
 /** The override options offered per response type, in raw rubric units. */
 const SCALE_OPTIONS = [0, 1, 2, 3, 4];
 const PERCENT_OPTIONS = [0, 20, 40, 60, 80, 100];
@@ -48,6 +51,7 @@ export default function FrameInspector({
   segmentCaption,
   overrides,
   excluded,
+  inferredKeys,
   onOverrideItem,
   onToggleExclude,
   onDelete,
@@ -59,6 +63,7 @@ export default function FrameInspector({
   segmentCaption?: string;
   overrides: ItemOverrides | undefined;
   excluded: boolean;
+  inferredKeys?: InferredKeys;
   onOverrideItem: (key: RubricItemKey, value: number | null | undefined) => void;
   onToggleExclude: () => void;
   onDelete: () => void;
@@ -222,6 +227,14 @@ export default function FrameInspector({
                   {item && item.confidence !== undefined && !hasOverride ? (
                     <span className="font-mono text-[10px] text-neutral">
                       {Math.round(item.confidence * 100)}%
+                    </span>
+                  ) : null}
+                  {!hasOverride && inferredKeys?.has(key) ? (
+                    <span
+                      title={t("inferredFromNeighbors")}
+                      className="inline-flex items-center rounded-[3px] border border-border bg-surface-sunken px-1.5 py-0.5 text-[10px] font-medium text-neutral-strong"
+                    >
+                      {t("inferredFromNeighbors")}
                     </span>
                   ) : null}
                   {hasOverride ? (
