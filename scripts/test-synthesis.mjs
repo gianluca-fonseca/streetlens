@@ -62,6 +62,7 @@ function compile() {
         "../lib/extraction/schema.ts",
         "../lib/capture/types.ts",
         "../lib/capture/scoring.ts",
+        "../lib/capture/continuity.ts",
         "../lib/capture/rollup.ts",
         "../lib/capture/schemas.ts",
       ],
