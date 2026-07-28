@@ -5,11 +5,18 @@ import { Link } from "@/i18n/navigation";
 import Logo from "@/components/ui/Logo";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import DemoDataToggle from "@/components/DemoDataToggle";
 
 /**
- * Always-on slim chrome for the full-bleed map: home, locale, theme, and an
- * optional contribute hint. Replaces the demo-banner-as-header pattern in the
- * real-data era while keeping identity and navigation on `/map`.
+ * Always-on slim chrome for the full-bleed map: home, the demo-data switch,
+ * locale, theme, and an optional contribute hint. Replaces the
+ * demo-banner-as-header pattern in the real-data era while keeping identity and
+ * navigation on `/map`.
+ *
+ * The demo switch lives here, not in `DemoBanner`, for one reason: the banner
+ * only exists while the demo era is on, so a switch inside it would be a
+ * one-way door. This chrome is always mounted, so the control reads the same
+ * and works in both directions.
  */
 export default function MapChrome() {
   const t = useTranslations("mapChrome");
@@ -38,6 +45,7 @@ export default function MapChrome() {
         >
           {t("contribute")}
         </Link>
+        <DemoDataToggle />
         <LocaleSwitcher />
         <ThemeSwitcher className="shrink-0" />
       </div>

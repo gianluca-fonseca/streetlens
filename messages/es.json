@@ -6,6 +6,10 @@
   "demoBanner": {
     "message": "Datos de demostración sobre geometría vial real. El piloto de campo inicia en agosto de 2026: ninguna cifra mostrada es una medición real."
   },
+  "demoToggle": {
+    "label": "Datos de demo",
+    "hint": "Muestra u oculta los puntajes simulados del piloto. Las observaciones reales de la comunidad y de cámara nunca se ven afectadas."
+  },
   "dataDegradedBanner": {
     "message": "No se puede conectar a la base de datos en vivo — mostrando datos estáticos en caché. Las cifras del mapa pueden estar desactualizadas hasta que se recupere la conexión."
   },

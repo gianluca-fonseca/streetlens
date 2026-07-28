@@ -6,6 +6,10 @@
   "demoBanner": {
     "message": "Demo data over real street geometry. Field pilot begins August 2026: no number shown is a real measurement."
   },
+  "demoToggle": {
+    "label": "Demo data",
+    "hint": "Show or hide the simulated pilot scores. Real community and camera observations are never affected."
+  },
   "dataDegradedBanner": {
     "message": "Live database unreachable — showing cached static data. Map numbers may be stale until the connection recovers."
   },
