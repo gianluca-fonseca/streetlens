@@ -41,6 +41,10 @@ export default async function OgImage({ params }: OgProps) {
     );
   }
 
+  // The share card is a shared, crawler-fetched artifact, so it renders the
+  // build-time demo default rather than any one browser's cookie. When no audit
+  // stands behind this street the figures are simply absent: a 96px "0" in a
+  // link preview is the loudest orphaned zero the site could ship.
   const overallColor = sampleRamp("overall", card.scores.overall);
 
   return new ImageResponse(
@@ -86,30 +90,32 @@ export default async function OgImage({ params }: OgProps) {
             </div>
             <div style={{ display: "flex", fontSize: 28, color: "#d4d4d4" }}>{card.district}</div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-            <div
-              style={{
-                display: "flex",
-                fontSize: 18,
-                color: "#a3a3a3",
-                textTransform: "uppercase",
-                marginBottom: 8,
-              }}
-            >
-              {t("overall")}
+          {card.hasAudit ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: 18,
+                  color: "#a3a3a3",
+                  textTransform: "uppercase",
+                  marginBottom: 8,
+                }}
+              >
+                {t("overall")}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: 96,
+                  fontWeight: 700,
+                  color: overallColor,
+                  lineHeight: 1,
+                }}
+              >
+                {card.scores.overall}
+              </div>
             </div>
-            <div
-              style={{
-                display: "flex",
-                fontSize: 96,
-                fontWeight: 700,
-                color: overallColor,
-                lineHeight: 1,
-              }}
-            >
-              {card.scores.overall}
-            </div>
-          </div>
+          ) : null}
         </div>
         <div
           style={{
@@ -120,6 +126,7 @@ export default async function OgImage({ params }: OgProps) {
             paddingTop: 28,
           }}
         >
+          {card.hasAudit ? (
           <div style={{ display: "flex" }}>
             <div style={{ display: "flex", flexDirection: "column", marginRight: 32 }}>
               <div style={{ display: "flex", fontSize: 14, color: "#a3a3a3", textTransform: "uppercase" }}>
@@ -158,6 +165,11 @@ export default async function OgImage({ params }: OgProps) {
               </div>
             </div>
           </div>
+          ) : (
+            <div style={{ display: "flex", maxWidth: 760, fontSize: 24, lineHeight: 1.35, color: "#a3a3a3" }}>
+              {t("unaudited")}
+            </div>
+          )}
           <div style={{ display: "flex", fontSize: 28, fontWeight: 700, color: "#ff2d8a" }}>StreetLens</div>
         </div>
       </div>
