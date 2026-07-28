@@ -105,8 +105,17 @@ export default async function StreetCard({ card }: StreetCardProps) {
           the ones they wrote about. Sits directly under the scores on purpose:
           a note is the reason for a score, and a reader should not have to
           scroll past the provenance and the assessment to find out why a
-          street reads badly. */}
-      {observationGroups.length > 0 ? (
+          street reads badly.
+
+          Gated on `hasAudit` as well as on having any observation at all. The
+          two cannot disagree today (an observation only exists because an audit
+          block does, and that block is what sets `hasAudit`), so this reads as
+          redundant. It is the invariant stated where it matters: the section
+          directly above this one says in plain words that no field audit stands
+          behind the street, and prose from a crew is the one thing that must
+          never appear underneath that sentence. A number contradicting an empty
+          state is a bug; a field note contradicting it is a false witness. */}
+      {card.hasAudit && observationGroups.length > 0 ? (
         <section className="mt-6">
           <h2 className="mb-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-strong">
             {t("observationsHeading")}
