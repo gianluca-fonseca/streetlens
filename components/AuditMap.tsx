@@ -1011,8 +1011,17 @@ export default function AuditMap({
           overflow (it caps its own height and scrolls). Without the budget the
           Spanish panel already buried the toggle at 1440x800. The reserve is
           the contribute button's own band: taller on phones, where it centres
-          on the bottom edge and clears the home bar. */}
-      <div className="pointer-events-none absolute inset-0 flex items-start gap-3 p-3 pb-16 sm:p-4 sm:pb-14">
+          on the bottom edge and clears the home bar.
+
+          Re-measured after the contribute button took the 44px coarse-pointer
+          tap floor (it was 35.5px). Phones: dock is `bottom-0 p-3`, so the
+          button spans 12..56px off the plate bottom and `pb-16` (64px) still
+          clears it. At sm+ the dock returns to `sm:bottom-4 sm:p-0`, so on a
+          coarse-pointer tablet it spans 16..60px and the old `sm:pb-14` (56px)
+          would have been 4px short — hence the sm+ coarse reserve below. A
+          fine-pointer desktop keeps 56px exactly, because the button is still
+          35.5px there. */}
+      <div className="pointer-events-none absolute inset-0 flex items-start gap-3 p-3 pb-16 sm:p-4 sm:pb-14 sm:pointer-coarse:pb-16">
         <div className="pointer-events-none flex h-full flex-col items-start gap-3">
           {stats ? (
             <MapPanel

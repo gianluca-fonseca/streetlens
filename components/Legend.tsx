@@ -49,7 +49,15 @@ export default function Legend({
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="flex items-center gap-1.5 md:pointer-events-none"
+          // Measured at 390x844: the visible chip is 69.2x16.5 (es 77.5x16.5),
+          // a quarter of the 44px tap floor, and on a phone it is the only way
+          // to the colour key. The hit area is grown with a pseudo-element
+          // rather than padding because this row is `items-baseline`: any box
+          // growth here drags the "0–4" scale hint off its baseline with it.
+          // -inset-y-[14px] takes 16.5 to 44.5. Scoped `max-md` because at md+
+          // the legend is always open and this button is `pointer-events-none`,
+          // so the desktop layout is provably untouched.
+          className="relative flex items-center gap-1.5 max-md:after:absolute max-md:after:-inset-x-2 max-md:after:-inset-y-[14px] max-md:after:content-[''] md:pointer-events-none"
         >
           <h3 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
             {t("title")}

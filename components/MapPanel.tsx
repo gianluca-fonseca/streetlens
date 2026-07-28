@@ -85,7 +85,11 @@ export default function MapPanel({
       data-map-panel
       data-panel-hydrated={hydrated ? "true" : "false"}
       aria-label={t("eyebrow")}
-      className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex max-h-[calc(100%-3.25rem)] w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 overflow-y-auto rounded-[12px] p-4 pb-0`}
+      /* The cap reserves the row beneath the aside for the 3D toggle: 3.25rem
+         is the column `gap-3` (12px) plus the toggle's 37.5px. On a coarse
+         pointer the toggle takes the 44px tap floor, so the reserve becomes
+         12 + 44 = 3.5rem. */
+      className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex max-h-[calc(100%-3.25rem)] pointer-coarse:max-h-[calc(100%-3.5rem)] w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 overflow-y-auto rounded-[12px] p-4 pb-0`}
     >
       <header>
         <div className="flex items-start justify-between gap-2">
@@ -106,7 +110,11 @@ export default function MapPanel({
             aria-expanded={expanded}
             aria-controls="map-panel-collapsible"
             aria-label={expanded ? t("collapse") : t("expand")}
-            className="-mr-1 -mt-1 shrink-0 rounded-[4px] p-1.5 text-neutral-strong transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            // 30x30 measured at 390x844. On a coarse pointer this is the only
+            // way to open the aside (it starts collapsed below 768px), so it
+            // takes the full 44px floor; the negative margins already pull it
+            // into the panel padding, so the header does not grow with it.
+            className="-mr-1 -mt-1 flex shrink-0 items-center justify-center rounded-[4px] p-1.5 text-neutral-strong transition-colors pointer-coarse:min-h-[44px] pointer-coarse:min-w-[44px] hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <ChevronDown
               size={18}

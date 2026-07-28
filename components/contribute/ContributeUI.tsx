@@ -50,8 +50,8 @@ const LABEL = "mb-1 block text-[12px] font-medium text-ink";
 // rev-5 primary = ink fill / paper label. Flips by theme: near-black fill + paper
 // label in light (17.49:1), creme fill + dark-paper label in dark (17.75:1). Both
 // clear AA. (Retires the rev-4 fixed-dark-pine + white-text pair.)
-const PRIMARY_BTN = `${styles.controlSoft} inline-flex items-center justify-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-semibold text-surface hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated disabled:pointer-events-none disabled:opacity-50`;
-const GHOST_BTN = `${styles.control} inline-flex items-center justify-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink`;
+const PRIMARY_BTN = `${styles.controlSoft} inline-flex items-center justify-center gap-1.5 rounded-[4px] bg-ink-display px-3.5 py-2 text-[13px] font-semibold text-surface hover:opacity-90 pointer-coarse:min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated disabled:pointer-events-none disabled:opacity-50`;
+const GHOST_BTN = `${styles.control} inline-flex items-center justify-center gap-1.5 rounded-[4px] border border-border bg-surface-elevated px-3 py-2 text-[13px] font-medium text-ink hover:border-border-strong hover:bg-surface-sunken pointer-coarse:min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink`;
 
 /** Gentle one-time slide-up on mount (entrance on user action, not idle motion). */
 function SlideUp({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -244,7 +244,7 @@ function ChoosePanel({
             type="button"
             onClick={onCancel}
             aria-label={t("choose.cancel")}
-            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="flex shrink-0 items-center justify-center rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors pointer-coarse:min-h-[44px] pointer-coarse:min-w-[44px] hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <X size={16} strokeWidth={1.75} aria-hidden="true" />
           </button>
@@ -341,7 +341,7 @@ function InstructionPill({
           type="button"
           onClick={onCancel}
           aria-label={cancelLabel}
-          className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="flex shrink-0 items-center justify-center rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors pointer-coarse:min-h-[44px] pointer-coarse:min-w-[44px] hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
           <X size={15} strokeWidth={1.75} aria-hidden="true" />
         </button>
@@ -520,7 +520,7 @@ function AddForm({
             type="button"
             onClick={contribute.cancel}
             aria-label={t("form.cancel")}
-            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="flex shrink-0 items-center justify-center rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors pointer-coarse:min-h-[44px] pointer-coarse:min-w-[44px] hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <X size={16} strokeWidth={1.75} aria-hidden="true" />
           </button>
@@ -720,7 +720,7 @@ function UpdateForm({
             type="button"
             onClick={contribute.cancel}
             aria-label={t("form.cancel")}
-            className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="flex shrink-0 items-center justify-center rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors pointer-coarse:min-h-[44px] pointer-coarse:min-w-[44px] hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             <X size={16} strokeWidth={1.75} aria-hidden="true" />
           </button>

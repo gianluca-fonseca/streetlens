@@ -48,7 +48,10 @@ export default function LayerSwitcher({
             aria-checked={isActive}
             onClick={() => onSelect(layer)}
             className={[
-              "flex items-center gap-2 rounded-[4px] border px-2.5 py-2 text-left text-[13px] font-medium",
+              // 133x37.5 measured at 390x844. min-h rather than more padding:
+              // the row is already `items-center`, so the box grows and the
+              // label stays put. Fine-pointer desktop keeps its 37.5px exactly.
+              "flex items-center gap-2 rounded-[4px] border px-2.5 py-2 text-left text-[13px] font-medium pointer-coarse:min-h-[44px]",
               styles.control,
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1 focus-visible:ring-offset-surface-sunken",
               // Active step carries structure via hairline + bg only — NO zen-soft

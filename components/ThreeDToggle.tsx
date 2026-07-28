@@ -27,7 +27,10 @@ export default function ThreeDToggle({
       aria-label={active ? t("disable") : t("enable")}
       onClick={() => onToggle(!active)}
       className={[
-        "pointer-events-auto flex items-center gap-2 rounded-[8px] px-3 py-2 text-[13px] font-medium",
+        // 98.1x37.5 measured at 390x844 (es 101.3x37.5). Growing this control
+        // changes the map column's height budget, so AuditMap's reserve comment
+        // was re-measured with it: see the `pb-16` / `sm:pb-14` note there.
+        "pointer-events-auto flex items-center gap-2 rounded-[8px] px-3 py-2 text-[13px] font-medium pointer-coarse:min-h-[44px]",
         styles.control,
         styles.enterChip,
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-1",
