@@ -13,6 +13,7 @@ import { streetPath } from "@/lib/street-links";
 import { listWorstCvStreets } from "@/lib/insights";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
+import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/ui/Logo";
 import ProvenanceNote from "@/components/ProvenanceNote";
 import StatFigure from "@/components/ui/StatFigure";
@@ -93,12 +94,13 @@ function LiveChip({ label }: Readonly<{ label: string }>) {
   );
 }
 
-/** Compact expandable legend chip (glass Recipe C). Composes the sealed score
- * ramp (BINS + sampleRamp) and the shared `legend` copy, rather than restyling the
+/** Compact expandable legend chip (glass Recipe C). Composes the score ramp
+ * (BINS + sampleRamp, sampled for the ACTIVE theme) and the shared `legend` copy, rather than restyling the
  * app's Legend surface (u18-owned). The color swatch is a SOLID sub-element on the
  * glass — never a tint of the glass itself. */
 function LegendChip() {
   const t = useTranslations("legend");
+  const { resolved } = useTheme();
   const [open, setOpen] = useState(false);
   return (
     <div
@@ -126,7 +128,7 @@ function LegendChip() {
               <span
                 aria-hidden="true"
                 className="h-1 w-5 shrink-0 rounded-full"
-                style={{ backgroundColor: sampleRamp("overall", bin.mid) }}
+                style={{ backgroundColor: sampleRamp("overall", bin.mid, resolved) }}
               />
               <span className="font-mono text-[11px] text-ink">
                 {t(`bins.${bin.key}`)}
@@ -194,6 +196,7 @@ function SegmentRow({
   activateLabel: string;
   onActivate: () => void;
 }>) {
+  const { resolved } = useTheme();
   return (
     <button
       type="button"
@@ -204,7 +207,7 @@ function SegmentRow({
       <span
         aria-hidden="true"
         className="h-2.5 w-2.5 shrink-0 rounded-full"
-        style={{ backgroundColor: sampleRamp("overall", score) }}
+        style={{ backgroundColor: sampleRamp("overall", score, resolved) }}
       />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[13.5px] font-medium leading-tight text-ink">

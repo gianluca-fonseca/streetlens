@@ -14,6 +14,7 @@
  */
 
 import { ImageResponse } from "next/og";
+// Ground is #0a0a0a: sample the DARK half of the ramp (mapConfig rev 8).
 import { sampleRamp } from "@/components/mapConfig";
 import type { Locale } from "@/i18n/routing";
 import { MUNICIPALITY, getMunicipalityConfig } from "@/lib/municipality";
@@ -202,7 +203,7 @@ export async function renderBrandOgImage({
                     height: 14,
                     borderRadius: 4,
                     marginRight: 10,
-                    background: sampleRamp(lens, 50),
+                    background: sampleRamp(lens, 50, "dark"),
                   }}
                 />
                 <div

@@ -31,8 +31,11 @@ export default function SegmentMiniMap({ geometry, overallScore }: SegmentMiniMa
     if (!container || coordinates.length < 2) return;
 
     const audited = overallScore !== null;
+    // The mini-map keeps Liberty's own LIGHT basemap (it is never re-tinted for
+    // the app theme) and draws the line over a white casing, so it always wants
+    // the light half of the ramp regardless of what the page around it is doing.
     const lineColor = audited
-      ? sampleRamp("overall", overallScore)
+      ? sampleRamp("overall", overallScore, "light")
       : COMMUNITY_CASING.color;
 
     const map = new maplibregl.Map({

@@ -3,21 +3,26 @@
  *
  * The detail panel must speak the map's colour language: a score's value should
  * carry the same hue the segment carries on the map, so Accessibility 87.5
- * visibly towers over Bike 16.67. But the sealed RAMP in components/mapConfig.ts
- * is tuned for LINES ON A BASEMAP, not for text on a panel surface, and under
- * rev 7 essentially NONE of its stops is usable as ink:
+ * visibly towers over Bike 16.67. But the RAMP in components/mapConfig.ts is
+ * tuned for LINES ON A BASEMAP, not for text on a panel surface, and most of its
+ * stops are unusable as ink. Rev 7 could not put ANY of them on a panel:
  *
  *   every @0   stop (e.g. overall #F45E53) → ~2.8:1 on light #f1f1f1
  *   every @50  stop (e.g. overall #CE4D02) → ~4.0:1 light AND ~3.6:1 dark
  *   every @100 stop (e.g. overall #056E48) → ~2.6:1 on dark #212121
  *
- * That is not an accident of colour picking, it is structural. Rev 7 solves
- * every stop to a target luminance inside a narrow middle band (0.118–0.278),
- * because the basemap is near-white in light and near-black in dark and only
- * that band clears both. A colour engineered to sit in the middle is by
- * definition too dark for the light panel at one end and too light for the dark
- * panel at the other. Painting those raw would fail WCAG AA outright, and
- * accessibility is a hard constraint on this panel, not a preference.
+ * That was structural, not a colour-picking accident: rev 7 solved every stop
+ * into a narrow middle luminance band (0.118–0.278) because one table had to
+ * clear a near-white basemap and a near-black one at the same time, and a colour
+ * engineered to sit in the middle is by definition too dark for the light panel
+ * at one end and too light for the dark panel at the other.
+ *
+ * Rev 8 splits the ramp per theme, which helps a great deal — the light half is
+ * already dark-leaning and the dark half already bright-leaning, so the ink
+ * derived below is now a nudge rather than a rescue. It does not remove the
+ * need for this module: the map's floor is the 3:1 graphical-object rule and the
+ * panel's is WCAG AA text at 4.5:1, so the quiet end of each ramp still lands
+ * short. Accessibility is a hard constraint on this panel, not a preference.
  *
  * So the map's constraint and the panel's genuinely conflict, and this module is
  * the resolution: same hue, different lightness, each surface getting the value
@@ -201,10 +206,12 @@ export function readableInk(hex: string, bg: string, target = AA_TEXT): string {
  * object, so the bar is covered by the stricter of the two rules.
  */
 export function rampInk(layer: ScoreLayer, value: number): ThemedInk {
-  const base = sampleRamp(layer, value);
+  // Each theme derives from ITS OWN half of the ramp (rev 8), so the panel ink
+  // is a nudge off the colour that theme's map is actually painting rather than
+  // a large correction off the other theme's.
   return {
-    light: readableInk(base, SURFACE_LIGHT),
-    dark: readableInk(base, SURFACE_DARK, DARK_INK_TARGET),
+    light: readableInk(sampleRamp(layer, value, "light"), SURFACE_LIGHT),
+    dark: readableInk(sampleRamp(layer, value, "dark"), SURFACE_DARK, DARK_INK_TARGET),
   };
 }
 

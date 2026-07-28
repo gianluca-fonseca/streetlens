@@ -10,11 +10,17 @@ import {
   sampleRamp,
   widthForValue,
 } from "@/components/mapConfig";
+import { useTheme } from "@/components/ThemeProvider";
 
 /**
  * Legend with explicit value bins (never color-only encoding). Each row pairs
  * the color swatch with a width cue, and the width channel is explained in one
  * line so it does not read as noise.
+ *
+ * The swatches follow the THEME, because the ramp does (mapConfig rev 8: one
+ * half of the table per basemap). Reading `resolved` here rather than styling
+ * the swatch in CSS is what keeps the legend and the map the same colour — the
+ * swatch is a sample of the ramp, not a decoration that resembles it.
  *
  * On phones the legend is collapsible via a chip toggle (map real estate is
  * scarce); it starts collapsed and the body reveals on tap. On desktop it is
@@ -31,6 +37,7 @@ export default function Legend({
 }>) {
   const t = useTranslations("legend");
   const tl = useTranslations("layers");
+  const { resolved } = useTheme();
   const [open, setOpen] = useState(false);
   // Body is shown when the user opens it (mobile) OR always on desktop.
   const bodyClass = open ? "block" : "hidden md:block";
@@ -75,7 +82,7 @@ export default function Legend({
               style={{
                 width: 22,
                 height: Math.max(3, Math.round(widthForValue(bin.mid))),
-                backgroundColor: sampleRamp(layer, bin.mid),
+                backgroundColor: sampleRamp(layer, bin.mid, resolved),
               }}
               aria-hidden="true"
             />

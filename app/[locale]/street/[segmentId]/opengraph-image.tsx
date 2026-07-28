@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
+// The card ground is #0a0a0a, so it samples the DARK half of the ramp — the
+// same half the dark basemap paints (mapConfig rev 8).
 import { sampleRamp } from "@/components/mapConfig";
 import type { Locale } from "@/i18n/routing";
 import { getStreetCard } from "@/lib/street-card";
@@ -45,7 +47,7 @@ export default async function OgImage({ params }: OgProps) {
   // build-time demo default rather than any one browser's cookie. When no audit
   // stands behind this street the figures are simply absent: a 96px "0" in a
   // link preview is the loudest orphaned zero the site could ship.
-  const overallColor = sampleRamp("overall", card.scores.overall);
+  const overallColor = sampleRamp("overall", card.scores.overall, "dark");
 
   return new ImageResponse(
     (
@@ -132,7 +134,7 @@ export default async function OgImage({ params }: OgProps) {
               <div style={{ display: "flex", fontSize: 14, color: "#a3a3a3", textTransform: "uppercase" }}>
                 {t("layers.accessibility")}
               </div>
-              <div style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("accessibility", card.scores.accessibility) }}>
+              <div style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("accessibility", card.scores.accessibility, "dark") }}>
                 {card.scores.accessibility}
               </div>
             </div>
@@ -141,7 +143,7 @@ export default async function OgImage({ params }: OgProps) {
                 {t("layers.drainage")}
               </div>
               <div
-                style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("drainage", card.scores.drainage) }}
+                style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("drainage", card.scores.drainage, "dark") }}
               >
                 {card.scores.drainage}
               </div>
@@ -151,7 +153,7 @@ export default async function OgImage({ params }: OgProps) {
                 {t("layers.shade")}
               </div>
               <div
-                style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("shade", card.scores.shade) }}
+                style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("shade", card.scores.shade, "dark") }}
               >
                 {card.scores.shade}
               </div>
@@ -160,7 +162,7 @@ export default async function OgImage({ params }: OgProps) {
               <div style={{ display: "flex", fontSize: 14, color: "#a3a3a3", textTransform: "uppercase" }}>
                 {t("layers.bike")}
               </div>
-              <div style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("bike", card.scores.bike) }}>
+              <div style={{ display: "flex", fontSize: 32, fontWeight: 600, color: sampleRamp("bike", card.scores.bike, "dark") }}>
                 {card.scores.bike}
               </div>
             </div>

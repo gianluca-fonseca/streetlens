@@ -23,6 +23,7 @@ import {
   lineColorExpression,
   lineWidthExpression,
 } from "@/components/mapConfig";
+import type { RampTheme } from "@/components/mapConfig";
 import {
   RELIEF_LAYER_ID,
   RELIEF_SOURCE_ID,
@@ -171,7 +172,11 @@ function muteBasemap(map: maplibregl.Map, dark: boolean) {
   }
 }
 
-function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
+function addDataLayers(
+  map: maplibregl.Map,
+  data: SegmentCollection,
+  theme: RampTheme,
+) {
   if (!map.getSource(SOURCE_ID)) {
     map.addSource(SOURCE_ID, {
       type: "geojson",
@@ -180,7 +185,7 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
     });
   }
 
-  const color = lineColorExpression("overall");
+  const color = lineColorExpression("overall", theme);
   const width = lineWidthExpression("overall");
   const glowWidth = ["+", width, 7] as unknown as ExpressionSpecification;
 
@@ -255,7 +260,11 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
  * wherever nothing is extruded (real-data era, unaudited casings). The app
  * surface never calls this.
  */
-function addReliefLayer(map: maplibregl.Map, data: SegmentCollection) {
+function addReliefLayer(
+  map: maplibregl.Map,
+  data: SegmentCollection,
+  theme: RampTheme,
+) {
   if (!map.getSource(RELIEF_SOURCE_ID)) {
     map.addSource(RELIEF_SOURCE_ID, {
       type: "geojson",
@@ -268,8 +277,10 @@ function addReliefLayer(map: maplibregl.Map, data: SegmentCollection) {
       type: "fill-extrusion",
       source: RELIEF_SOURCE_ID,
       paint: {
-        // The SAME sealed overall ramp as the 2D lines — one encoding, three axes.
-        "fill-extrusion-color": lineColorExpression("overall"),
+        // The SAME overall ramp as the 2D lines, on the same basemap — one
+        // encoding, three axes: colour, width, and now height, all agreeing
+        // that more presence means a better score.
+        "fill-extrusion-color": lineColorExpression("overall", theme),
         "fill-extrusion-height": reliefHeightExpression,
         "fill-extrusion-base": 0,
         "fill-extrusion-opacity": 0.92,
@@ -280,7 +291,8 @@ function addReliefLayer(map: maplibregl.Map, data: SegmentCollection) {
 
 /** Repaint the data layers for a score layer; glow is data-only + dark-only. */
 function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
-  const color = lineColorExpression(layer);
+  const theme: RampTheme = dark ? "dark" : "light";
+  const color = lineColorExpression(layer, theme);
   const width = lineWidthExpression(layer);
   const glowWidth = ["+", width, 7] as unknown as ExpressionSpecification;
   try {
@@ -297,6 +309,19 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
     );
   } catch {
     /* layers not ready yet */
+  }
+  // The hero relief is always the `overall` lens, but it still has to follow
+  // the theme: its ramp half changes when the basemap under it does.
+  if (map.getLayer(RELIEF_LAYER_ID)) {
+    try {
+      map.setPaintProperty(
+        RELIEF_LAYER_ID,
+        "fill-extrusion-color",
+        lineColorExpression("overall", theme),
+      );
+    } catch {
+      /* not ready */
+    }
   }
 }
 
@@ -638,9 +663,9 @@ export default function AuditMap({
       // map's first paint is already the right theme (no dark flash then correct).
       const dark = resolvedDark();
       muteBasemap(map, dark);
-      addDataLayers(map, segmentsRef.current);
+      addDataLayers(map, segmentsRef.current, dark ? "dark" : "light");
       // The landing hero carries the extruded score relief; /map never does.
-      if (hero) addReliefLayer(map, segmentsRef.current);
+      if (hero) addReliefLayer(map, segmentsRef.current, dark ? "dark" : "light");
       paintedSegmentsRef.current = segmentsRef.current;
       // DEM + hillshade load lazily when 3D is toggled on (applyThreeD).
 
