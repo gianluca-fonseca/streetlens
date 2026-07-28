@@ -62,16 +62,21 @@ export default async function HomePage({
     <main className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
       {stats.dataRead?.degraded ? <DataDegradedBanner /> : null}
       <Hero segments={segments} stats={stats} />
-      <MissionSection />
-      <MeasureSection />
-      <GapSection heroPct={stats.heroPct} />
-      <PilotSection stats={stats} />
-      <MethodSection />
-      <GroundingSection />
-      <RoadmapSection />
-      <FaqSection />
-      <CtaSection />
-      <Footer />
+      {/* Raised stacking context: the hero plate parallax-drifts beneath this
+          document (see .sl-parallax-plate in globals.css), so everything after
+          the hero must paint above it. */}
+      <div className="relative z-[1]">
+        <MissionSection />
+        <MeasureSection />
+        <GapSection heroPct={stats.heroPct} />
+        <PilotSection stats={stats} />
+        <MethodSection />
+        <GroundingSection />
+        <RoadmapSection />
+        <FaqSection />
+        <CtaSection />
+        <Footer />
+      </div>
     </main>
   );
 }

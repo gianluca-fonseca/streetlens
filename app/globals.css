@@ -568,6 +568,31 @@ section[id] {
   transform: none;
 }
 
+/* ─── landing-dimensional: the hero plate as a parallax plane ─────────────────
+   The hero is the instrument PLATE; the manifesto document rides over it. As the
+   page scrolls its first ~700px, the plate counter-drifts ~12% slower than the
+   document, so the two read as separate planes rather than one flat scroll.
+   CSS scroll-driven animation only: compositor-side transform, zero JS, and on
+   engines without `animation-timeline` (or with reduced motion, see below) it
+   simply never runs — the page is complete without it. The sections that follow
+   the hero sit in a raised stacking context (see app/[locale]/page.tsx) so the
+   drifting plate always passes UNDER the document. */
+@supports (animation-timeline: scroll()) {
+  .sl-parallax-plate {
+    animation: sl-parallax-drift linear both;
+    animation-timeline: scroll(nearest);
+    animation-range: 0px 720px;
+  }
+  @keyframes sl-parallax-drift {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(88px);
+    }
+  }
+}
+
 /* Reduced motion (research §3): disable translate/scale/pulse/hover-lift and the
    smooth scroll; KEEP short opacity fades, colour feedback, focus rings, the solid
    live dot. Author the reduced variant, do not blanket-strip presence. */
@@ -590,6 +615,11 @@ section[id] {
     animation: none !important;
   }
   .sl-card:hover {
+    transform: none !important;
+  }
+  /* Parallax is non-essential motion: off entirely, plate sits in flow. */
+  .sl-parallax-plate {
+    animation: none !important;
     transform: none !important;
   }
 }

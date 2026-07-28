@@ -415,7 +415,10 @@ export default function Hero({
   return (
     <section className="pb-10 sm:pb-14 lg:pb-16">
       <Banner />
-      <div className="mx-auto w-full pl-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-left))] pr-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-right))] pt-6 sm:pt-8">
+      {/* The plate plane: counter-drifts under the document on scroll (CSS
+          scroll-driven, progressive, reduced-motion off). The banner stays in
+          normal flow — only the instrument is a plane. */}
+      <div className="sl-parallax-plate mx-auto w-full pl-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-left))] pr-[max(clamp(1rem,3vw,4rem),env(safe-area-inset-right))] pt-6 sm:pt-8">
         <div className="grid grid-cols-1 gap-x-[clamp(1.25rem,2.2vw,2.5rem)] gap-y-8 lg:h-[78vh] lg:max-h-[52rem] lg:grid-cols-[clamp(280px,20vw,360px)_minmax(0,1fr)_clamp(220px,17vw,320px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-y-6">
           {/* ── LEFT zone head: lockup, pilot status, question, request +
                attribution pills ──────────────────────────────────────── */}
