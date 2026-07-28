@@ -11,7 +11,7 @@ import {
   parseCommunityReports,
   parseCvObservations,
 } from "@/lib/parse-feature-props";
-import { formatProvenanceDate, splitCvObservations, cvOverallAssessment } from "@/lib/cv-provenance";
+import { formatProvenanceDate, splitCvObservations } from "@/lib/cv-provenance";
 import {
   auditorLabel,
   fieldObservationsForLayer,
