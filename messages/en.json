@@ -87,7 +87,9 @@
     "kmLabel": "Corridor km",
     "coverageLabel": "Pilot coverage",
     "unitKm": "km",
-    "unitPct": "%"
+    "unitPct": "%",
+    "exploreTitle": "There's more than the map",
+    "exploreSub": "Rankings, coverage, and scoring"
   },
   "provenance": {
     "cv": "{segments, plural, one {# street} other {# streets}} camera-observed ({sessions, plural, one {# session} other {# sessions}} reviewed) · pending field verification",

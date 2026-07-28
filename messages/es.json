@@ -87,7 +87,9 @@
     "kmLabel": "Km del corredor",
     "coverageLabel": "Cobertura del piloto",
     "unitKm": "km",
-    "unitPct": "%"
+    "unitPct": "%",
+    "exploreTitle": "Hay más que el mapa",
+    "exploreSub": "Clasificaciones, cobertura y criterios"
   },
   "provenance": {
     "cv": "{segments, plural, one {# calle observada} other {# calles observadas}} por cámara ({sessions, plural, one {# sesión revisada} other {# sesiones revisadas}}) · pendiente de verificación en campo",

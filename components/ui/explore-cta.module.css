@@ -1,0 +1,61 @@
+/*
+ * explore-cta.module.css — the map aside's "there is more than the map" invite.
+ *
+ * One idea, held quietly: the row sits still, and every few seconds the arrow
+ * takes a single small step right and settles back. Travel is 3px, the loop
+ * rests for well over half its cycle, and nothing but the arrow glyph moves, so
+ * the panel never reflows (transform only, zero layout shift).
+ *
+ * Under prefers-reduced-motion the loop is switched OFF, not slowed. The row
+ * keeps its label, its arrow, its hover step, and its focus ring; only the
+ * looping motion goes away.
+ */
+
+.link {
+  /* A link row, not a plate: hairline + sunken fill, no shadow and no glass
+     (glass never stacks on glass — the aside is already Recipe A). */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.arrowTrack {
+  display: inline-flex;
+  transition: transform var(--dur-base) var(--ease-standard);
+}
+
+/* Pointer/keyboard intent takes the arrow one step further out, on top of the
+   ambient loop below. Transform only, so the row's box never moves. */
+.link:hover .arrowTrack,
+.link:focus-visible .arrowTrack {
+  transform: translateX(2px);
+}
+
+.arrow {
+  animation: exploreNudge 3200ms var(--ease-standard) infinite;
+}
+
+@keyframes exploreNudge {
+  0%,
+  58%,
+  100% {
+    transform: translateX(0);
+  }
+  72% {
+    transform: translateX(3px);
+  }
+  86% {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow {
+    animation: none;
+  }
+  .arrowTrack {
+    transition: none;
+  }
+  .link:hover .arrowTrack,
+  .link:focus-visible .arrowTrack {
+    transform: none;
+  }
+}
