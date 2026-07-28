@@ -871,8 +871,10 @@ export default function AuditMap({
           bottom band for the contribute button, so the 3D toggle beneath the
           aside can never be pushed under it. The aside itself absorbs the
           overflow (it caps its own height and scrolls). Without the budget the
-          Spanish panel already buried the toggle at 1440x800. */}
-      <div className="pointer-events-none absolute inset-0 flex items-start gap-3 p-3 pb-16 sm:p-4 sm:pb-20">
+          Spanish panel already buried the toggle at 1440x800. The reserve is
+          the contribute button's own band: taller on phones, where it centres
+          on the bottom edge and clears the home bar. */}
+      <div className="pointer-events-none absolute inset-0 flex items-start gap-3 p-3 pb-16 sm:p-4 sm:pb-14">
         <div className="pointer-events-none flex h-full flex-col items-start gap-3">
           {stats ? (
             <MapPanel
