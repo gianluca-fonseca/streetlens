@@ -31,7 +31,8 @@
   "map": {
     "meta": {
       "title": "Mapa de calles · {municipality}",
-      "description": "La red vial de {municipality}, segmento a segmento, coloreada según la puntuación de accesibilidad, drenaje, sombra e infraestructura ciclista de las aceras. Abrí cualquier segmento para ver su ficha y la evidencia detrás de cada número."
+      "description": "La red vial de {municipality}, segmento a segmento, coloreada según la puntuación de accesibilidad, drenaje, sombra e infraestructura ciclista de las aceras. Abrí cualquier segmento para ver su ficha y la evidencia detrás de cada número.",
+      "ogAlt": "El mapa de calles de StreetLens: cada segmento de la red del piloto, coloreado según su puntuación de accesibilidad, drenaje, sombra e infraestructura ciclista."
     },
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
     "demoTag": "DEMO",
@@ -690,6 +691,7 @@
     "meta": {
       "title": "StreetLens: toda calle puede medirse",
       "description": "Toda calle puede medirse. Casi ninguna se mide. StreetLens es un instrumento de campo de código abierto que puntúa la accesibilidad, el drenaje, la sombra y la infraestructura ciclista de las aceras, segmento a segmento. Ahora mide Escazú, Costa Rica, con datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
+      "ogAlt": "StreetLens: un instrumento de campo de código abierto que puntúa la accesibilidad, el drenaje, la sombra y la infraestructura ciclista de las aceras, segmento a segmento.",
       "ogTitle": "Toda calle puede medirse. Casi ninguna se mide.",
       "ogDescription": "Un instrumento de campo de código abierto para la calle: accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento. Ahora en Escazú, Costa Rica."
     },
@@ -1016,7 +1018,8 @@
   "collect": {
     "meta": {
       "title": "Grabá una caminata",
-      "description": "Grabá una calle con tu teléfono mientras la caminás. StreetLens le pone GPS a cada cuadro y lo une a un segmento, para medir el estado de las aceras donde nadie las ha medido."
+      "description": "Grabá una calle con tu teléfono mientras la caminás. StreetLens le pone GPS a cada cuadro y lo une a un segmento, para medir el estado de las aceras donde nadie las ha medido.",
+      "ogAlt": "Grabá una caminata con StreetLens: tu teléfono le pone GPS a cada cuadro y lo une a un segmento de calle."
     },
     "start": {
       "eyebrow": "GRABÁ UNA CAMINATA",
@@ -1488,7 +1491,8 @@
   "brief": {
     "meta": {
       "title": "Informe de cumplimiento Ley 7600 · {municipality}",
-      "description": "Resumen de cumplimiento del lente de accesibilidad para {municipality}: distritos, peores corredores y metodología. Evidencia observada por cámara pendiente de auditoría de campo."
+      "description": "Resumen de cumplimiento del lente de accesibilidad para {municipality}: distritos, peores corredores y metodología. Evidencia observada por cámara pendiente de auditoría de campo.",
+      "ogAlt": "El informe de cumplimiento de la Ley 7600 de StreetLens: resumen del lente de accesibilidad por distrito, con metodología."
     },
     "home": "Inicio",
     "downloadPdf": "Descargar PDF",
@@ -1522,7 +1526,8 @@
   "data": {
     "meta": {
       "title": "Datos abiertos · {municipality}",
-      "description": "Descarga GeoJSON y CSV depurados de la red observada publicada de StreetLens. Licencia, diccionario de campos y notas de privacidad."
+      "description": "Descarga GeoJSON y CSV depurados de la red observada publicada de StreetLens. Licencia, diccionario de campos y notas de privacidad.",
+      "ogAlt": "Datos abiertos de StreetLens: GeoJSON y CSV depurados de la red observada publicada, con licencia y diccionario de campos."
     },
     "home": "Inicio",
     "title": "Datos abiertos",
@@ -1564,7 +1569,8 @@
   "press": {
     "meta": {
       "title": "Kit de prensa",
-      "description": "Qué es StreetLens, el piloto de {municipality}, cifras clave en vivo, contacto y activos de marca."
+      "description": "Qué es StreetLens, el piloto de {municipality}, cifras clave en vivo, contacto y activos de marca.",
+      "ogAlt": "El kit de prensa de StreetLens: qué es el proyecto, el piloto, contacto y activos de marca."
     },
     "home": "Inicio",
     "downloadPdf": "Descargar PDF",
@@ -1648,7 +1654,8 @@
   "insights": {
     "meta": {
       "title": "Indicadores",
-      "description": "Panel en vivo: cobertura observada por cámara, resúmenes por distrito, peores calles, distribución por lente y cronología, todo separado de las auditorías de campo."
+      "description": "Panel en vivo: cobertura observada por cámara, resúmenes por distrito, peores calles, distribución por lente y cronología, todo separado de las auditorías de campo.",
+      "ogAlt": "El panel de indicadores de StreetLens: cobertura observada por cámara, resúmenes por distrito, peores calles y distribución por lente."
     },
     "chrome": {
       "home": "Inicio de StreetLens",
@@ -1726,7 +1733,8 @@
   "methodPage": {
     "meta": {
       "title": "Método",
-      "description": "Cómo StreetLens convierte una calle caminada en una puntuación verificable: lentes, umbral de la Ley 7600, bins y el contrato de honestidad cámara vs auditoría."
+      "description": "Cómo StreetLens convierte una calle caminada en una puntuación verificable: lentes, umbral de la Ley 7600, bins y el contrato de honestidad cámara vs auditoría.",
+      "ogAlt": "El método de StreetLens: cómo una calle caminada se convierte en una puntuación verificable, lente por lente."
     },
     "eyebrow": "Método",
     "title": "Cómo una calle se convierte en puntuación.",
@@ -1816,7 +1824,8 @@
   "rubricPage": {
     "meta": {
       "title": "Rúbrica v0.1",
-      "description": "Los 15 ítems observados de la rúbrica v0.1, por lente, con tipos de respuesta y el umbral de accesibilidad de la Ley 7600."
+      "description": "Los 15 ítems observados de la rúbrica v0.1, por lente, con tipos de respuesta y el umbral de accesibilidad de la Ley 7600.",
+      "ogAlt": "Rúbrica v0.1 de StreetLens: los 15 ítems observados, por lente, con el umbral de accesibilidad de la Ley 7600."
     },
     "eyebrow": "Rúbrica v0.1",
     "title": "Quince ítems. Una puntuación verificable.",

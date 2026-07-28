@@ -31,7 +31,8 @@
   "map": {
     "meta": {
       "title": "Street map · {municipality}",
-      "description": "The {municipality} street network, segment by segment, coloured by sidewalk accessibility, drainage, shade and bike-infrastructure score. Open any segment for its report card and the evidence behind each number."
+      "description": "The {municipality} street network, segment by segment, coloured by sidewalk accessibility, drainage, shade and bike-infrastructure score. Open any segment for its report card and the evidence behind each number.",
+      "ogAlt": "The StreetLens street map: every segment of the pilot network, coloured by its accessibility, drainage, shade, and bike-infrastructure score."
     },
     "ariaLabel": "Interactive map of audited street segments in Escazú",
     "demoTag": "DEMO",
@@ -690,6 +691,7 @@
     "meta": {
       "title": "StreetLens: every street can be measured",
       "description": "Every street can be measured. Most never are. StreetLens is an open-source field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure, segment by segment. Now measuring Escazú, Costa Rica, on demo data until fieldwork begins in August 2026.",
+      "ogAlt": "StreetLens: an open-source field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure segment by segment.",
       "ogTitle": "Every street can be measured. Most never are.",
       "ogDescription": "An open-source field instrument for the street: accessibility, drainage, shade, and bike infrastructure, scored segment by segment. Now measuring Escazú, Costa Rica."
     },
@@ -1016,7 +1018,8 @@
   "collect": {
     "meta": {
       "title": "Record a walk",
-      "description": "Record a street with your phone as you walk it. StreetLens stamps every frame with GPS and matches it to a segment, so sidewalk condition gets measured where nobody has measured it."
+      "description": "Record a street with your phone as you walk it. StreetLens stamps every frame with GPS and matches it to a segment, so sidewalk condition gets measured where nobody has measured it.",
+      "ogAlt": "Record a walk with StreetLens: your phone stamps every frame with GPS and matches it to a street segment."
     },
     "start": {
       "eyebrow": "RECORD A WALK",
@@ -1488,7 +1491,8 @@
   "brief": {
     "meta": {
       "title": "Ley 7600 compliance brief · {municipality}",
-      "description": "Accessibility-lens compliance summary for {municipality}: district rollups, worst corridors, and methodology. Camera-observed evidence pending field audit."
+      "description": "Accessibility-lens compliance summary for {municipality}: district rollups, worst corridors, and methodology. Camera-observed evidence pending field audit.",
+      "ogAlt": "The StreetLens Ley 7600 compliance brief: an accessibility-lens summary by district, with methodology."
     },
     "home": "Home",
     "downloadPdf": "Download PDF",
@@ -1522,7 +1526,8 @@
   "data": {
     "meta": {
       "title": "Open data · {municipality}",
-      "description": "Download scrubbed GeoJSON and CSV of the published StreetLens observed network. License, field dictionary, and privacy notes."
+      "description": "Download scrubbed GeoJSON and CSV of the published StreetLens observed network. License, field dictionary, and privacy notes.",
+      "ogAlt": "StreetLens open data: scrubbed GeoJSON and CSV of the published observed street network, with licence and field dictionary."
     },
     "home": "Home",
     "title": "Open data",
@@ -1564,7 +1569,8 @@
   "press": {
     "meta": {
       "title": "Press kit",
-      "description": "What StreetLens is, the {municipality} pilot, live key figures, contact, and brand assets."
+      "description": "What StreetLens is, the {municipality} pilot, live key figures, contact, and brand assets.",
+      "ogAlt": "The StreetLens press kit: what the project is, the pilot, contact, and brand assets."
     },
     "home": "Home",
     "downloadPdf": "Download PDF",
@@ -1648,7 +1654,8 @@
   "insights": {
     "meta": {
       "title": "Insights",
-      "description": "Live instrument panel: camera-observed coverage, district rollups, worst streets, lens distributions, and the observation timeline, all kept separate from field audits."
+      "description": "Live instrument panel: camera-observed coverage, district rollups, worst streets, lens distributions, and the observation timeline, all kept separate from field audits.",
+      "ogAlt": "The StreetLens insights panel: camera-observed coverage, district rollups, worst streets, and lens distributions."
     },
     "chrome": {
       "home": "StreetLens home",
@@ -1726,7 +1733,8 @@
   "methodPage": {
     "meta": {
       "title": "Method",
-      "description": "How StreetLens turns a walked street into a checkable score: lenses, Ley 7600 threshold, bins, and the camera-vs-audit honesty contract."
+      "description": "How StreetLens turns a walked street into a checkable score: lenses, Ley 7600 threshold, bins, and the camera-vs-audit honesty contract.",
+      "ogAlt": "The StreetLens method: how a walked street becomes a checkable score, lens by lens."
     },
     "eyebrow": "Method",
     "title": "How a street becomes a score.",
@@ -1816,7 +1824,8 @@
   "rubricPage": {
     "meta": {
       "title": "Rubric v0.1",
-      "description": "The 15 observed items in rubric v0.1, by lens, with response types and the Ley 7600 accessibility threshold."
+      "description": "The 15 observed items in rubric v0.1, by lens, with response types and the Ley 7600 accessibility threshold.",
+      "ogAlt": "StreetLens rubric v0.1: the 15 observed items, by lens, with the Ley 7600 accessibility threshold."
     },
     "eyebrow": "Rubric v0.1",
     "title": "Fifteen items. One checkable score.",

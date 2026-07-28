@@ -14,15 +14,90 @@
  */
 
 import { ImageResponse } from "next/og";
-import { getTranslations } from "next-intl/server";
 import { sampleRamp } from "@/components/mapConfig";
 import type { Locale } from "@/i18n/routing";
-import { getMunicipalityConfig } from "@/lib/municipality";
-import { SITE_NAME } from "@/lib/site";
+import { MUNICIPALITY, getMunicipalityConfig } from "@/lib/municipality";
+import { DEFAULT_SITE_LOCALE, SITE_LOCALES, SITE_NAME } from "@/lib/site";
+
+/**
+ * Messages are read straight from the locale file rather than through
+ * `getTranslations`. next-intl's server API resolves the locale from the
+ * request, which calls `headers()`; `generateImageMetadata` runs inside
+ * `generateStaticParams` at BUILD time, where there is no request, and Next
+ * fails the build for it. The locale is already an explicit argument here, so
+ * the request lookup buys nothing. Reading the file directly is what keeps
+ * these cards prerenderable, so a crawler is never waiting on image generation.
+ */
+async function messagesFor(locale: Locale): Promise<Record<string, unknown>> {
+  return (await import(`../messages/${locale}.json`)).default;
+}
+
+/**
+ * Next probes an image route's `generateImageMetadata` once during page-data
+ * collection, before the parent `[locale]` params exist, so `params.locale`
+ * arrives undefined on that one call. Fall back to the canonical locale rather
+ * than trying to import `messages/undefined.json`; the real per-locale calls
+ * that follow carry a real locale.
+ */
+export function resolveOgLocale(params: { locale?: string } | undefined): Locale {
+  const candidate = params?.locale;
+  return SITE_LOCALES.includes(candidate as Locale)
+    ? (candidate as Locale)
+    : DEFAULT_SITE_LOCALE;
+}
+
+/** The `{municipality}` placeholder is the only one these strings use. */
+function interpolate(template: string): string {
+  return template.replace(/\{municipality\}/g, MUNICIPALITY.name);
+}
+
+function resolve(messages: Record<string, unknown>, dottedPath: string): unknown {
+  return dottedPath
+    .split(".")
+    .reduce<unknown>(
+      (node, key) =>
+        node && typeof node === "object" ? (node as Record<string, unknown>)[key] : undefined,
+      messages,
+    );
+}
+
+/**
+ * Every string in one `*.meta` namespace, interpolated and ready to draw.
+ * Routes pull `title`/`description`/`ogAlt` (or the landing's `ogTitle` and
+ * `ogDescription`) off the result, so no route file repeats the lookup dance.
+ */
+export async function brandOgStrings(
+  locale: Locale,
+  namespace: string,
+): Promise<Record<string, string>> {
+  const node = resolve(await messagesFor(locale), namespace);
+  if (!node || typeof node !== "object") {
+    throw new Error(`og-brand: message namespace "${namespace}" not found for locale "${locale}"`);
+  }
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (typeof value === "string") out[key] = interpolate(value);
+  }
+  return out;
+}
 
 /** Shared config exports, re-exported by each route's opengraph-image file. */
 export const brandOgSize = { width: 1200, height: 630 } as const;
 export const brandOgContentType = "image/png";
+
+/**
+ * The image-metadata descriptor each route returns from
+ * `generateImageMetadata`.
+ *
+ * A plain `export const alt = "…"` would be simpler, but a static export cannot
+ * see the locale, and this site ships every user-facing string in both English
+ * and Spanish. `generateImageMetadata` receives the route params, so the alt
+ * text can be translated like everything else. One card per route, hence the
+ * single fixed id.
+ */
+export function brandOgImageMetadata(alt: string) {
+  return { id: "card", alt, size: brandOgSize, contentType: brandOgContentType };
+}
 
 const LENSES = ["accessibility", "drainage", "shade", "bike"] as const;
 
@@ -45,7 +120,9 @@ export async function renderBrandOgImage({
   title,
   subtitle,
 }: BrandOgInput): Promise<ImageResponse> {
-  const t = await getTranslations({ locale, namespace: "layers" });
+  const lensNames = await Promise.all(
+    LENSES.map(async (lens) => (await brandOgStrings(locale, `layers.${lens}`)).name),
+  );
   const municipality = getMunicipalityConfig();
   const eyebrow = `${SITE_NAME} · ${municipality.name[locale]}, ${municipality.region[locale]}`;
 
@@ -64,7 +141,9 @@ export async function renderBrandOgImage({
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        {/* Takes the slack so a short title sits optically centred rather than
+            stranded above a band of empty ground. */}
+        <div style={{ display: "flex", flex: 1, flexDirection: "column", justifyContent: "center" }}>
           <div
             style={{
               display: "flex",
@@ -111,7 +190,7 @@ export async function renderBrandOgImage({
           }}
         >
           <div style={{ display: "flex" }}>
-            {LENSES.map((lens) => (
+            {LENSES.map((lens, i) => (
               <div
                 key={lens}
                 style={{ display: "flex", alignItems: "center", marginRight: 36 }}
@@ -133,7 +212,7 @@ export async function renderBrandOgImage({
                     color: "#a3a3a3",
                   }}
                 >
-                  {t(`${lens}.name`)}
+                  {lensNames[i]}
                 </div>
               </div>
             ))}

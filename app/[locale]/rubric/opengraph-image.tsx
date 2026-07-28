@@ -3,25 +3,31 @@
  * brand card so every StreetLens link previews as one system.
  */
 import type { Locale } from "@/i18n/routing";
-import { getTranslations } from "next-intl/server";
-import { brandOgContentType, brandOgSize, renderBrandOgImage } from "@/lib/og-brand";
+import {
+  brandOgImageMetadata,
+  brandOgStrings,
+  renderBrandOgImage,
+  resolveOgLocale,
+} from "@/lib/og-brand";
 
 export const runtime = "nodejs";
-export const alt =
-  "StreetLens rubric v0.1: the 15 observed items, by lens, with the Ley 7600 accessibility threshold.";
-export const size = brandOgSize;
-export const contentType = brandOgContentType;
 
-export default async function Image({
-  params,
-}: {
-  params: Promise<{ locale: Locale }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "rubricPage.meta" });
+const NAMESPACE = "rubricPage.meta";
+
+type OgProps = Readonly<{ params: Promise<{ locale: Locale }> }>;
+
+export async function generateImageMetadata({ params }: OgProps) {
+  const locale = resolveOgLocale(await params);
+  const strings = await brandOgStrings(locale, NAMESPACE);
+  return [brandOgImageMetadata(strings.ogAlt)];
+}
+
+export default async function Image({ params }: OgProps) {
+  const locale = resolveOgLocale(await params);
+  const strings = await brandOgStrings(locale, NAMESPACE);
   return renderBrandOgImage({
     locale,
-    title: t("title"),
-    subtitle: t("description"),
+    title: strings.title,
+    subtitle: strings.description,
   });
 }

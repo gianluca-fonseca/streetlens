@@ -3,25 +3,31 @@
  * brand card so every StreetLens link previews as one system.
  */
 import type { Locale } from "@/i18n/routing";
-import { getTranslations } from "next-intl/server";
-import { brandOgContentType, brandOgSize, renderBrandOgImage } from "@/lib/og-brand";
+import {
+  brandOgImageMetadata,
+  brandOgStrings,
+  renderBrandOgImage,
+  resolveOgLocale,
+} from "@/lib/og-brand";
 
 export const runtime = "nodejs";
-export const alt =
-  "Record a walk with StreetLens: your phone stamps every frame with GPS and matches it to a street segment.";
-export const size = brandOgSize;
-export const contentType = brandOgContentType;
 
-export default async function Image({
-  params,
-}: {
-  params: Promise<{ locale: Locale }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "collect.meta" });
+const NAMESPACE = "collect.meta";
+
+type OgProps = Readonly<{ params: Promise<{ locale: Locale }> }>;
+
+export async function generateImageMetadata({ params }: OgProps) {
+  const locale = resolveOgLocale(await params);
+  const strings = await brandOgStrings(locale, NAMESPACE);
+  return [brandOgImageMetadata(strings.ogAlt)];
+}
+
+export default async function Image({ params }: OgProps) {
+  const locale = resolveOgLocale(await params);
+  const strings = await brandOgStrings(locale, NAMESPACE);
   return renderBrandOgImage({
     locale,
-    title: t("title"),
-    subtitle: t("description"),
+    title: strings.title,
+    subtitle: strings.description,
   });
 }
