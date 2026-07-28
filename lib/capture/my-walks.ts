@@ -56,8 +56,41 @@ function writeAll(entries: MyWalkEntry[]): void {
   }
 }
 
+/*
+ * Snapshot cache — load-bearing, not an optimisation.
+ *
+ * `listMyWalks` is the `getSnapshot` of a `useSyncExternalStore`
+ * (MyWalksShelf). React compares snapshots with `Object.is`, so returning a
+ * freshly parsed-and-sorted array on every call means the store never
+ * converges: React re-renders, re-reads, gets another new array, and blows the
+ * update-depth limit. That threw "Maximum update depth exceeded" (React #185)
+ * out of the client boundary and took the WHOLE /collect and
+ * /collect/status/[id] tree down to Next's global error fallback, at every
+ * viewport and in both locales, including on a first visit with empty storage
+ * (`[] !== []`).
+ *
+ * So the identity has to be stable for as long as the underlying data is. The
+ * raw string is the cache key: writes go through `writeAll`, which rewrites
+ * that string, so any real change misses the cache and any repeat read hits it.
+ */
+let cachedRaw: string | null = null;
+let cachedList: readonly MyWalkEntry[] = Object.freeze([]);
+
 export function listMyWalks(): readonly MyWalkEntry[] {
-  return readAll().sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+  if (typeof window === "undefined") return cachedList;
+  let raw: string | null;
+  try {
+    raw = localStorage.getItem(STORAGE_KEY);
+  } catch {
+    // Private mode: nothing readable, and nothing that can change underneath us.
+    return cachedList;
+  }
+  if (raw === cachedRaw) return cachedList;
+  cachedRaw = raw;
+  cachedList = Object.freeze(
+    readAll().sort((a, b) => b.submittedAt.localeCompare(a.submittedAt)),
+  );
+  return cachedList;
 }
 
 export function addMyWalk(entry: MyWalkEntry): void {

@@ -20,6 +20,12 @@ function getMyWalksSnapshot(): readonly MyWalkEntry[] {
   return listMyWalks();
 }
 
+/* Hoisted, not an inline `() => []`: the server snapshot is compared by
+   identity too, so a fresh array literal per call is the same trap the client
+   snapshot fell into (see lib/capture/my-walks.ts). */
+const EMPTY: readonly MyWalkEntry[] = Object.freeze([]);
+const getMyWalksServerSnapshot = (): readonly MyWalkEntry[] => EMPTY;
+
 function WalkRow({ entry }: Readonly<{ entry: MyWalkEntry }>) {
   const t = useTranslations("collect.myWalks");
   const streets =
@@ -55,7 +61,11 @@ function WalkRow({ entry }: Readonly<{ entry: MyWalkEntry }>) {
 
 export function MyWalksShelf({ className }: Readonly<{ className?: string }>) {
   const t = useTranslations("collect.myWalks");
-  const entries = useSyncExternalStore(subscribeMyWalks, getMyWalksSnapshot, () => []);
+  const entries = useSyncExternalStore(
+    subscribeMyWalks,
+    getMyWalksSnapshot,
+    getMyWalksServerSnapshot,
+  );
 
   if (entries.length === 0) return null;
 
