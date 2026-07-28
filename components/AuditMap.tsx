@@ -960,13 +960,15 @@ export default function AuditMap({
         {heroInteractive ? (
           <>
             {/* Explicit +/- zoom (mono, glass): the always-available non-scroll
-                path so gating wheel-zoom never blocks the user. */}
+                path so gating wheel-zoom never blocks the user. 36x36 measured
+                on a phone, so they take the 44px tap floor on a coarse pointer;
+                they float over the canvas, so nothing reflows around them. */}
             <div className="absolute bottom-3 right-3 z-10 flex flex-col">
               <button
                 type="button"
                 onClick={() => mapRef.current?.zoomIn({ duration: 220 })}
                 aria-label={t("zoomIn")}
-                className="sl-glass-chip flex h-9 w-9 items-center justify-center rounded-t-[10px] font-mono text-[19px] leading-none text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                className="sl-glass-chip flex h-9 w-9 pointer-coarse:h-11 pointer-coarse:w-11 items-center justify-center rounded-t-[10px] font-mono text-[19px] leading-none text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
                 +
               </button>
@@ -974,7 +976,7 @@ export default function AuditMap({
                 type="button"
                 onClick={() => mapRef.current?.zoomOut({ duration: 220 })}
                 aria-label={t("zoomOut")}
-                className="sl-glass-chip -mt-px flex h-9 w-9 items-center justify-center rounded-b-[10px] font-mono text-[19px] leading-none text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                className="sl-glass-chip -mt-px flex h-9 w-9 pointer-coarse:h-11 pointer-coarse:w-11 items-center justify-center rounded-b-[10px] font-mono text-[19px] leading-none text-ink transition-colors hover:text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
                 −
               </button>
