@@ -21,7 +21,7 @@
  * exercise several origins in one process.
  */
 
-import type { Metadata } from "next";
+import type { Metadata, MetadataRoute } from "next";
 import type { Locale } from "@/i18n/routing";
 
 /** Brand name used in `og:site_name` and the document title template. */
@@ -114,6 +114,46 @@ export function routeAlternates(locale: Locale, path: string): Metadata["alterna
   languages["x-default"] = localePath(DEFAULT_SITE_LOCALE, path);
 
   return { canonical: localePath(locale, path), languages };
+}
+
+/**
+ * Every public, indexable route, locale prefix excluded. The sitemap is built
+ * from this list and the metadata test asserts each entry against the page that
+ * serves it, so a new route cannot be added without both noticing.
+ *
+ * Street report cards (`/street/[segmentId]`) are deliberately ABSENT. They are
+ * generated per segment from a dataset that is currently simulated, and
+ * submitting several hundred simulated report cards for indexing would put
+ * numbers in search results that no one has measured yet. They stay shareable
+ * by link; they are not advertised to crawlers until the field data is real.
+ */
+export const PUBLIC_ROUTES = [
+  { path: "/", changeFrequency: "weekly", priority: 1 },
+  { path: "/map", changeFrequency: "daily", priority: 0.9 },
+  { path: "/insights", changeFrequency: "daily", priority: 0.8 },
+  { path: "/method", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/rubric", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/data", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/brief", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/press", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/collect", changeFrequency: "monthly", priority: 0.6 },
+] as const satisfies ReadonlyArray<{
+  path: string;
+  changeFrequency: NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
+  priority: number;
+}>;
+
+/**
+ * Route prefixes no crawler should follow: the password-gated admin surface and
+ * the per-walk status pages, whose URLs carry a session id. Both also declare
+ * `noindex` in their own segments; robots.txt keeps the crawl from happening at
+ * all, the meta tag covers a URL that leaks some other way.
+ */
+export function disallowedCrawlPaths(): string[] {
+  return SITE_LOCALES.flatMap((locale) => [
+    `/${locale}/admin/`,
+    `/${locale}/collect/status/`,
+  ]).concat("/api/");
 }
 
 export type PageMetadataInput = Readonly<{
