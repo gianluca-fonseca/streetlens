@@ -85,6 +85,7 @@
     "eyebrow": "Escazú pilot",
     "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",
     "heroDemoNote": "Demo figure. Not a real measurement.",
+  "auditedEmpty": "No field audits published yet. The canton network is live on the map; camera walks and community reports are the signals that move today.",
     "expand": "Show full pilot stats and legend",
     "collapse": "Hide pilot stats and legend",
     "segmentsLabel": "Segments audited",

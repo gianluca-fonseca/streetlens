@@ -4,6 +4,7 @@ import { useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { ScoreLayer, StreetStats } from "@/lib/segments";
+import { hideAuditedZeros } from "@/lib/real-data-era";
 import { useDemoData } from "@/components/DemoDataProvider";
 import {
   defaultMapPanelCollapsed,
@@ -37,6 +38,10 @@ export default function MapPanel({
 }>) {
   const t = useTranslations("panel");
   const demoEnabled = useDemoData();
+  // With the demo era off and nothing audited yet, every audited figure reads 0.
+  // A 0% hero and a "0 / 0.0 / 0%" row look like breakage, not honesty, so the
+  // panel says so in words and lets the live provenance counters carry the panel.
+  const auditedHidden = hideAuditedZeros(stats, demoEnabled);
   const [expanded, setExpanded] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
@@ -87,10 +92,12 @@ export default function MapPanel({
             <p className="mb-1.5 text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-ink-muted">
               {t("eyebrow")}
             </p>
-            <p className="font-mono text-[2.15rem] font-medium leading-none tracking-tight text-accent-text">
-              {stats.heroPct}
-              <span className="text-[1.4rem] text-neutral-strong">%</span>
-            </p>
+            {auditedHidden ? null : (
+              <p className="font-mono text-[2.15rem] font-medium leading-none tracking-tight text-accent-text">
+                {stats.heroPct}
+                <span className="text-[1.4rem] text-neutral-strong">%</span>
+              </p>
+            )}
           </div>
           <button
             type="button"
@@ -115,41 +122,53 @@ export default function MapPanel({
           className={panelStyles.collapsible}
         >
           <div className={panelStyles.collapsibleInner}>
-            <p className="mt-1.5 font-display text-[0.95rem] leading-snug text-ink">
-              {t("heroStat", { pct: stats.heroPct })}
-            </p>
-            {demoEnabled && (
-              <p className="mt-1 text-[11px] text-neutral-strong">
-                {t("heroDemoNote")}
+            {auditedHidden ? (
+              <p className="mt-1.5 font-mono text-[11.5px] leading-relaxed text-neutral-strong">
+                {t("auditedEmpty")}
               </p>
+            ) : (
+              <>
+                <p className="mt-1.5 font-display text-[0.95rem] leading-snug text-ink">
+                  {t("heroStat", { pct: stats.heroPct })}
+                </p>
+                {demoEnabled && (
+                  <p className="mt-1 text-[11px] text-neutral-strong">
+                    {t("heroDemoNote")}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
       </header>
 
-      <div
-        data-expanded={expanded ? "true" : "false"}
-        className={panelStyles.collapsible}
-      >
-        <div className={panelStyles.collapsibleInner}>
-          <dl className="grid grid-cols-3 gap-2 border-y border-border py-3">
-            {figures.map((f) => (
-              <div key={f.key} className="flex flex-col gap-0.5">
-                <dt className="sr-only">{f.label}</dt>
-                <dd className="font-mono text-[1.1rem] font-medium leading-none text-ink">
-                  {f.value}
-                </dd>
-                <span
-                  aria-hidden="true"
-                  className="text-[10.5px] leading-tight text-neutral-strong"
-                >
-                  {f.label}
-                </span>
-              </div>
-            ))}
-          </dl>
+      {/* Not rendered at all in the real-data era: a hidden-but-present "0"
+          would still reach assistive tech as an audited readout. */}
+      {auditedHidden ? null : (
+        <div
+          data-expanded={expanded ? "true" : "false"}
+          className={panelStyles.collapsible}
+        >
+          <div className={panelStyles.collapsibleInner}>
+            <dl className="grid grid-cols-3 gap-2 border-y border-border py-3">
+              {figures.map((f) => (
+                <div key={f.key} className="flex flex-col gap-0.5">
+                  <dt className="sr-only">{f.label}</dt>
+                  <dd className="font-mono text-[1.1rem] font-medium leading-none text-ink">
+                    {f.value}
+                  </dd>
+                  <span
+                    aria-hidden="true"
+                    className="text-[10.5px] leading-tight text-neutral-strong"
+                  >
+                    {f.label}
+                  </span>
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Outside the collapsible block on purpose: when the audited figures are
           zero these counters are the only live data on the map, and burying them

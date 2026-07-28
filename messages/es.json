@@ -85,6 +85,7 @@
     "eyebrow": "Piloto de Escazú",
     "heroStat": "{pct}% de los segmentos auditados incumplen los mínimos de accesibilidad de la Ley 7600",
     "heroDemoNote": "Cifra de demostración. No es una medición real.",
+  "auditedEmpty": "Todavía no hay auditorías de campo publicadas. La red cantonal está en vivo en el mapa; las caminatas con cámara y los reportes de la comunidad son las señales que se mueven hoy.",
     "expand": "Mostrar estadísticas del piloto y la leyenda",
     "collapse": "Ocultar estadísticas del piloto y la leyenda",
     "segmentsLabel": "Segmentos auditados",

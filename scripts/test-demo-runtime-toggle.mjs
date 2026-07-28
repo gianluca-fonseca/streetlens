@@ -283,6 +283,23 @@ console.log("server wiring");
     /hideAuditedZeros\(\s*stats: StreetStats,\s*demoEnabled: boolean,?\s*\)/.test(era),
   );
   check("real-data-era no longer reads the flag itself", !era.includes("showDemoData"));
+
+  // Every surface that publishes an audited figure must honor hideAuditedZeros,
+  // or turning the demo off leaves a "0 / 0.0 / 0%" row reading as a headline.
+  for (const surface of [
+    "components/MapPanel.tsx",
+    "components/landing/PilotSection.tsx",
+    "components/landing/Hero.tsx",
+  ]) {
+    check(
+      `${surface} honors hideAuditedZeros`,
+      code(surface).includes("hideAuditedZeros(stats, demoEnabled)"),
+    );
+  }
+  check(
+    "MapPanel has an empty state instead of zeroed figures",
+    code("components/MapPanel.tsx").includes('t("auditedEmpty")'),
+  );
 }
 
 console.log("");
