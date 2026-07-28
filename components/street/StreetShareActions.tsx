@@ -13,6 +13,12 @@ type StreetShareActionsProps = Readonly<{
 
 /**
  * Copy-link and open-street-page affordances for the map panel and street card.
+ *
+ * The 32px floor is a fine-pointer measurement. On a coarse pointer these
+ * measured 85.9x32 / 110.6x32 in English and 109.3x32 / 126.3x32 in Spanish on
+ * the street card, and the icon-only panel variant was 31x32 — the smallest
+ * control inside the segment sheet, which is a modal bottom sheet on a phone
+ * and so the worst place to miss a tap. Hence the second, coarse-only floor.
  */
 export default function StreetShareActions({
   segmentId,
@@ -40,7 +46,7 @@ export default function StreetShareActions({
       <button
         type="button"
         onClick={() => void copyLink()}
-        className="inline-flex min-h-[32px] items-center gap-1.5 rounded-[4px] border border-border px-2 py-1 text-[11px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center gap-1.5 rounded-[4px] border border-border px-2 py-1 text-[11px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {copied ? (
           <Check size={13} strokeWidth={2} aria-hidden="true" />
@@ -52,7 +58,7 @@ export default function StreetShareActions({
       {compact ? (
         <Link
           href={streetPath(segmentId)}
-          className="inline-flex min-h-[32px] items-center gap-1 rounded-[4px] border border-border px-2 py-1 text-[11px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] pointer-coarse:min-w-[44px] items-center justify-center gap-1 rounded-[4px] border border-border px-2 py-1 text-[11px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           title={t("openStreetPage")}
         >
           <ExternalLink size={13} strokeWidth={2} aria-hidden="true" />
@@ -61,7 +67,7 @@ export default function StreetShareActions({
       ) : (
         <Link
           href={mapSegmentPath(segmentId)}
-          className="inline-flex min-h-[32px] items-center gap-1.5 rounded-[4px] border border-border px-2.5 py-1 text-[11px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center gap-1.5 rounded-[4px] border border-border px-2.5 py-1 text-[11px] font-medium text-ink transition-colors hover:border-border-strong hover:bg-surface-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ExternalLink size={13} strokeWidth={2} aria-hidden="true" />
           {t("openOnMap")}

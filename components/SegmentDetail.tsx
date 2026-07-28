@@ -644,7 +644,7 @@ export default function SegmentDetail({
           type="button"
           onClick={onClose}
           aria-label={t("close")}
-          className="shrink-0 rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="flex shrink-0 items-center justify-center rounded-[4px] border border-border p-1.5 text-neutral-strong transition-colors pointer-coarse:min-h-[44px] pointer-coarse:min-w-[44px] hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
           <X size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>
@@ -840,7 +840,8 @@ export default function SegmentDetail({
                   onClick={() => setArchiveOpen((open) => !open)}
                   aria-expanded={archiveOpen}
                   aria-controls="cv-archive"
-                  className="flex w-full items-center justify-between gap-2 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 py-2 text-left text-[11px] font-medium text-neutral-strong transition-colors hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                  // 344x34.5 measured at 390x844: wide enough, 9.5px short.
+                  className="flex w-full items-center justify-between gap-2 rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 py-2 text-left text-[11px] font-medium text-neutral-strong transition-colors pointer-coarse:min-h-[44px] hover:border-border-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
                 >
                   <span className="font-mono uppercase tracking-[0.12em]">
                     {t("cvArchiveToggle")}
