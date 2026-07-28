@@ -10,6 +10,7 @@ import {
   readMapPanelCollapsed,
   writeMapPanelCollapsed,
 } from "@/lib/map-panel-storage";
+import ExploreCta from "@/components/ExploreCta";
 import LayerSwitcher from "@/components/LayerSwitcher";
 import Legend from "@/components/Legend";
 import ProvenanceNote from "@/components/ProvenanceNote";
@@ -168,6 +169,11 @@ export default function MapPanel({
           />
         </div>
       </div>
+
+      {/* Outside the collapsible blocks on purpose: collapsing is how a visitor
+          asks for more map, and the invitation out of the map is exactly what a
+          visitor who never expands the panel would otherwise never see. */}
+      <ExploreCta />
     </section>
   );
 }
