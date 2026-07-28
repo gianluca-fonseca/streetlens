@@ -110,8 +110,24 @@ const HERO_END: HeroCamera = {
   bearing: -15,
   pitch: 55,
 };
-const HERO_FLY_DELAY_MS = 650;
-const HERO_FLY_DURATION_MS = 3000;
+/*
+ * The establishing move stays, but it settles sooner.
+ *
+ * It used to be 650ms of hold plus a 3000ms fly, landing 4.73s after navigation
+ * start once the ~1.07s style load is counted. Nothing is wrong with that in a
+ * vacuum, and the slow glide is the point. The problem is the room: a presenter
+ * opening this page live is TALKING over those five seconds, and the frame they
+ * are talking about is not there yet. That is the one cost a cinematic opening
+ * cannot be allowed to have.
+ *
+ * 300 + 2400 settles at ~3.77s, a fifth off, and the move keeps its character:
+ * the hold is still long enough that the flat overhead survey registers as its
+ * own frame before the camera commits, and 2.4s at curve 1.35 is still a glide
+ * rather than a cut. Performance was never the constraint (the page measures
+ * ~1ms/frame at p99 and goes quiet once settled); attention was.
+ */
+const HERO_FLY_DELAY_MS = 300;
+const HERO_FLY_DURATION_MS = 2400;
 
 /**
  * Recolour Liberty into the calm zen basemap, keeping its labels.
