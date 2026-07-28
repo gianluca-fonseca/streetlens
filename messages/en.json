@@ -88,8 +88,7 @@
     "coverageLabel": "Pilot coverage",
     "unitKm": "km",
     "unitPct": "%",
-    "exploreTitle": "There's more than the map",
-    "exploreSub": "Rankings, coverage, and scoring"
+    "explore": "Explore the instrument panel"
   },
   "provenance": {
     "cv": "{segments, plural, one {# street} other {# streets}} camera-observed ({sessions, plural, one {# session} other {# sessions}} reviewed) · pending field verification",

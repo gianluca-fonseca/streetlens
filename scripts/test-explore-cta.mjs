@@ -10,7 +10,7 @@
  *   2. ACCESSIBLE NAME. The name comes from visible, message-bound label text,
  *      and the arrow is decorative (aria-hidden), so the name never degrades to
  *      an icon-only or empty link.
- *   3. BOTH LOCALES. EN and ES both carry non-empty copy for both label lines.
+ *   3. BOTH LOCALES. EN and ES both carry non-empty label copy.
  *   4. REDUCED MOTION. The looping nudge is CANCELLED, not merely shortened,
  *      and the motion is transform-only so the row can never shift layout.
  *
@@ -73,10 +73,8 @@ check(
 console.log("");
 console.log("accessible name — visible label text, decorative arrow");
 check(
-  "both label lines render from the panel message namespace",
-  cta.includes('useTranslations("panel")') &&
-    cta.includes('t("exploreTitle")') &&
-    cta.includes('t("exploreSub")'),
+  "the label renders from the panel message namespace",
+  cta.includes('useTranslations("panel")') && cta.includes('t("explore")'),
 );
 check(
   "no aria-label overrides the visible text (label-in-name holds)",
@@ -106,17 +104,23 @@ check(
   "the CTA sits outside every collapsible block",
   !/collapsibleInner[\s\S]*?<ExploreCta[\s\S]*?<\/div>/.test(panel),
 );
+// The left column also carries the 3D toggle above the contribute button, and
+// it has no scroll: every pixel the aside grows pushes that toggle down. The
+// footer goes full bleed and takes over the panel's own bottom padding so the
+// invitation costs the column ~44px instead of ~66px. Keep it that way.
+check(
+  "the footer reclaims the panel's own bottom padding",
+  cta.includes("-mx-4") && cta.includes("-mb-4") && cta.includes("border-t"),
+);
 
 console.log("");
 console.log("i18n parity for the explore copy");
 for (const loc of ["en", "es"]) {
   const messages = JSON.parse(read(`messages/${loc}.json`)).panel;
-  for (const key of ["exploreTitle", "exploreSub"]) {
-    check(
-      `${loc}: panel.${key} is non-empty`,
-      typeof messages[key] === "string" && messages[key].trim().length > 0,
-    );
-  }
+  check(
+    `${loc}: panel.explore is non-empty`,
+    typeof messages.explore === "string" && messages.explore.trim().length > 0,
+  );
 }
 
 console.log("");
