@@ -139,7 +139,6 @@ const RUBRIC_ITEMS = [
   { key: "bike_surface", layer: "bike", response_type: "scale_0_4", label_en: "Cycling surface quality", label_es: "Calidad de la superficie ciclable" },
 ];
 
-const ITEM_LAYER = Object.fromEntries(RUBRIC_ITEMS.map((i) => [i.key, i.layer]));
 const ITEM_TYPE = Object.fromEntries(
   RUBRIC_ITEMS.map((i) => [i.key, i.response_type]),
 );
