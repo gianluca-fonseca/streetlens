@@ -487,6 +487,10 @@ export default function AuditMap({
   const selectedIdRef = useRef<string | null>(null);
   const hoveredIdRef = useRef<string | null>(null);
   const segmentsRef = useRef(segments);
+  // The collection currently drawn by the source, so a re-render that did not
+  // change the data never re-sets it (setData drops feature-state, which is what
+  // carries the selected and hovered casings).
+  const paintedSegmentsRef = useRef<SegmentCollection | null>(null);
   // Keep the latest contribute API reachable from the once-created map handlers
   // without re-running the map-init effect.
   const contributeRef = useRef(contribute);
@@ -581,6 +585,7 @@ export default function AuditMap({
       const dark = resolvedDark();
       muteBasemap(map, dark);
       addDataLayers(map, segmentsRef.current);
+      paintedSegmentsRef.current = segmentsRef.current;
       // DEM + hillshade load lazily when 3D is toggled on (applyThreeD).
 
       // Apply the current active layer + dark-mode glow.
@@ -723,6 +728,24 @@ export default function AuditMap({
     if (!map || !readyRef.current) return;
     applyLayer(map, activeLayer, dark);
   }, [activeLayer, dark, mapReady]);
+
+  // Push a NEW segment collection into the live source. The map is created once
+  // and seeded from a ref, so without this the GeoJSON MapLibre holds is frozen
+  // at mount: flipping the demo-data switch re-renders the panel from fresh
+  // server props while the drawn network still shows the previous era's scores.
+  // The first collection is the one addDataLayers already seeded, so it is
+  // recorded rather than re-set.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !readyRef.current) return;
+    if (paintedSegmentsRef.current === segments) return;
+    const source = map.getSource(SOURCE_ID) as
+      | maplibregl.GeoJSONSource
+      | undefined;
+    if (!source) return;
+    paintedSegmentsRef.current = segments;
+    source.setData(segments);
+  }, [segments, mapReady]);
 
   // Cooperative wheel gating (research §4): a plain wheel over the embedded hero
   // map scrolls the PAGE — we stop the event in the capture phase before it reaches
