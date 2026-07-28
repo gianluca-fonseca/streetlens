@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { OG_LOCALE, SITE_NAME, TITLE_TEMPLATE, siteMetadataBase } from "@/lib/site";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
+import DemoDataProvider from "@/components/DemoDataProvider";
 import "../globals.css";
 
 // Display + UI/body (single app-wide typeface, variable axis 300–700)
@@ -107,6 +109,13 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
 
+  // The demo era is resolved ONCE per request, here: build-time default,
+  // overridden by the `sl_demo_data` cookie the demo switch writes. Every client
+  // component below reads it from the provider; server code takes it as an
+  // argument. Reading a cookie makes these routes render dynamically, which is
+  // exactly what lets the switch take effect without a rebuild.
+  const demoData = await demoDataEnabled();
+
   return (
     // suppressHydrationWarning: THEME_INIT_SCRIPT mutates <html>'s class (adds
     // `.dark`/`.light`) before React hydrates, so the server/client class attribute
@@ -129,7 +138,9 @@ export default async function LocaleLayout({
             __html: "document.documentElement.classList.add('js-enabled')",
           }}
         />
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <DemoDataProvider value={demoData}>{children}</DemoDataProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

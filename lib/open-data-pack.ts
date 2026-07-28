@@ -1,5 +1,9 @@
 /**
  * Shared loader for open-data API routes: paint segments + lengths + CV map.
+ *
+ * Both loaders take the effective demo-data flag so the published export never
+ * disagrees with the site the caller is looking at: with the demo era off, the
+ * generated pilot scores are stripped here exactly as they are on the map.
  */
 
 import {
@@ -25,18 +29,18 @@ function groupCvBySegment(
   return byId;
 }
 
-export async function loadOpenDataGeoJson() {
+export async function loadOpenDataGeoJson(demoEnabled: boolean) {
   const [segments, lengths, cv] = await Promise.all([
-    getSegments(),
+    getSegments(demoEnabled),
     getNetworkLengthsById(),
     listApprovedCvObservations(),
   ]);
   return buildOpenDataGeoJson(segments, lengths, groupCvBySegment(cv));
 }
 
-export async function loadOpenDataCsv(): Promise<string> {
+export async function loadOpenDataCsv(demoEnabled: boolean): Promise<string> {
   const [segments, lengths, cv] = await Promise.all([
-    getSegments(),
+    getSegments(demoEnabled),
     getNetworkLengthsById(),
     listApprovedCvObservations(),
   ]);

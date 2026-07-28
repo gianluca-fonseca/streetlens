@@ -6,6 +6,10 @@
   "demoBanner": {
     "message": "Datos de demostración sobre geometría vial real. El piloto de campo inicia en agosto de 2026: ninguna cifra mostrada es una medición real."
   },
+  "demoToggle": {
+    "label": "Datos de demo",
+    "hint": "Muestra u oculta los puntajes simulados del piloto. Las observaciones reales de la comunidad y de cámara nunca se ven afectadas."
+  },
   "dataDegradedBanner": {
     "message": "No se puede conectar a la base de datos en vivo — mostrando datos estáticos en caché. Las cifras del mapa pueden estar desactualizadas hasta que se recupere la conexión."
   },
@@ -86,6 +90,7 @@
     "eyebrow": "Piloto de Escazú",
     "heroStat": "{pct}% de los segmentos auditados incumplen los mínimos de accesibilidad de la Ley 7600",
     "heroDemoNote": "Cifra de demostración. No es una medición real.",
+  "auditedEmpty": "Todavía no hay auditorías de campo publicadas. La red cantonal está en vivo en el mapa; las caminatas con cámara y los reportes de la comunidad son las señales que se mueven hoy.",
     "expand": "Mostrar estadísticas del piloto y la leyenda",
     "collapse": "Ocultar estadísticas del piloto y la leyenda",
     "segmentsLabel": "Segmentos auditados",
@@ -965,7 +970,7 @@
       "items": {
         "real": {
           "q": "¿Estos son datos reales?",
-          "a": "La red de calles es geometría real de OpenStreetMap. Las puntuaciones de demostración están apagadas por defecto; lo que ves coloreado hoy es trabajo observado con cámara o reportado por la comunidad, cada uno revisado antes de aparecer. Las auditorías de campo reemplazarán las puntuaciones de demostración corredor por corredor cuando se publiquen."
+          "a": "La red de calles es geometría real de OpenStreetMap. Las puntuaciones de auditoría que ves coloreadas hoy son datos de demostración simulados, señalados como tales donde aparecen, y puedes apagarlas desde el mapa. El trabajo observado con cámara y el reportado por la comunidad sí es real, y cada uno se revisa antes de aparecer. Las auditorías de campo reemplazarán las puntuaciones de demostración corredor por corredor cuando se publiquen."
         },
         "scores": {
           "q": "¿Cómo se calculan las puntuaciones?",

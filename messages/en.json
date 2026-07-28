@@ -6,6 +6,10 @@
   "demoBanner": {
     "message": "Demo data over real street geometry. Field pilot begins August 2026: no number shown is a real measurement."
   },
+  "demoToggle": {
+    "label": "Demo data",
+    "hint": "Show or hide the simulated pilot scores. Real community and camera observations are never affected."
+  },
   "dataDegradedBanner": {
     "message": "Live database unreachable — showing cached static data. Map numbers may be stale until the connection recovers."
   },
@@ -86,6 +90,7 @@
     "eyebrow": "Escazú pilot",
     "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",
     "heroDemoNote": "Demo figure. Not a real measurement.",
+  "auditedEmpty": "No field audits published yet. The canton network is live on the map; camera walks and community reports are the signals that move today.",
     "expand": "Show full pilot stats and legend",
     "collapse": "Hide pilot stats and legend",
     "segmentsLabel": "Segments audited",
@@ -965,7 +970,7 @@
       "items": {
         "real": {
           "q": "Is this real data?",
-          "a": "The street network is real OpenStreetMap geometry. Demo audit scores are off by default; what you see colored today is camera-observed or community-reported work, each reviewed before it appears. Field audits will replace demo scores corridor by corridor once published."
+          "a": "The street network is real OpenStreetMap geometry. The audit scores you see colored today are simulated demo data, labeled as such wherever they appear, and you can switch them off from the map. Camera-observed and community-reported work is real, and each one is reviewed before it appears. Field audits will replace the demo scores corridor by corridor once published."
         },
         "scores": {
           "q": "How are scores computed?",

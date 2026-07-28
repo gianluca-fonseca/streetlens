@@ -176,11 +176,13 @@ function attachWalkDates(
   }));
 }
 
-/** Full public insights snapshot for the ISR page. */
-export async function getInsightsSnapshot(): Promise<InsightsSnapshot> {
+/** Full public insights snapshot, in the caller's resolved demo-data era. */
+export async function getInsightsSnapshot(
+  demoEnabled: boolean,
+): Promise<InsightsSnapshot> {
   const [segments, stats, observations, lengths] = await Promise.all([
-    getSegments(),
-    getStats(),
+    getSegments(demoEnabled),
+    getStats(demoEnabled),
     getAllCvObservations(),
     readNetworkLengths(),
   ]);

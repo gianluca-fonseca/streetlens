@@ -19,6 +19,7 @@ import { getSessionReview } from "@/lib/capture/review-store";
 import { listReviewDialoguesBySegment } from "@/lib/capture/dialogue-store";
 import { getPendingCaptureSessionIds } from "@/lib/capture/pending-captures";
 import { getSegments } from "@/lib/segments";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
 import AdminHeader from "@/components/admin/AdminHeader";
 import CaptureReview from "@/components/admin/CaptureReview";
 import type { MatchedGeometry } from "@/components/admin/ReviewMap";
@@ -48,7 +49,7 @@ export default async function AdminCaptureReviewPage({
   let segmentMeta: SegmentMeta[] = [];
   if (matchedIds.size > 0) {
     try {
-      const collection = await getSegments();
+      const collection = await getSegments(await demoDataEnabled());
       matchedGeometry = collection.features
         .filter((f) => matchedIds.has(f.properties.id))
         .map((f) => ({

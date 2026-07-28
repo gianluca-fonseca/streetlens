@@ -1322,31 +1322,51 @@ RUN_LIVE_SMOKE=1 node --env-file=.env.local scripts/live-smoke-extraction.mjs
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key. | undefined |
 | `SUBMISSIONS_IP_SALT` | Salt for hashing contributor IPs. | `streetlens-dev-salt` |
 | `ADMIN_PASSWORD` | Admin login password (review UI). | undefined |
-| `NEXT_PUBLIC_SHOW_DEMO_DATA` | **Demo data switch.** Must equal exactly `"true"` to publish the generated pilot scores; anything else (including unset) hides them. | disabled (demo hidden) |
+| `NEXT_PUBLIC_SHOW_DEMO_DATA` | **Demo data switch, build-time default.** Publishes the generated pilot scores unless it equals exactly `"false"`. The `sl_demo_data` cookie overrides it per browser. | enabled (demo shown) |
 
-#### The demo data switch (`NEXT_PUBLIC_SHOW_DEMO_DATA`)
+#### The demo data switch (`NEXT_PUBLIC_SHOW_DEMO_DATA` + `sl_demo_data`)
 
-Real collection has started, so the generated mock pilot scores are hidden on
-the public site by default. The flag is read in exactly one place,
-`lib/demo-flag.ts` (`showDemoData()`), and consumed by the data adapter and the
-copy that caveats live counts.
+The demo era has two layers, combined in exactly one place, `lib/demo-flag.ts`:
 
-- **Off (default, unset or any value other than `"true"`).** The 535 esc-sa
-  pilot segments render as part of the neutral, unaudited canton network: no
-  score colors on the map, no scores in the detail popover, and the audited
-  stat figures (`segments`, `km`, `coveragePct`, `heroPct`) degrade to zero.
-  The map demo banner and every "demo figure/data" caveat on those counts
-  disappear, because there is nothing left to label. Real community and CV
-  observations (e.g. the approved `esc-sr-0793` camera pass) are unaffected and
-  are the only colored data.
-- **On (`NEXT_PUBLIC_SHOW_DEMO_DATA=true`).** Today's behavior returns verbatim:
-  the pilot scores, the demo banner, and all demo caveats.
+1. **Build-time default.** `showDemoData()` is the only reader of
+   `NEXT_PUBLIC_SHOW_DEMO_DATA` in the repo. Unset (or anything other than the
+   exact string `"false"`) publishes the generated pilot scores. Set it to
+   `"false"` to ship a build that defaults to the real-data era.
+2. **Runtime override, and it wins.** The `sl_demo_data` cookie (`"on"` /
+   `"off"`), written by the switch in the map chrome
+   (`components/DemoDataToggle.tsx`) through the `setDemoData` server action.
+   Path `/`, `SameSite=Lax`, httpOnly, one year.
+
+`resolveDemoData()` folds the two together. `demoDataEnabled()`
+(`lib/demo-flag-server.ts`) reads the cookie and calls it once per request, in
+the locale layout. From there the resolved boolean travels two ways: down to
+client components through `DemoDataProvider` (`useDemoData()`), and into
+`getSegments()` / `getStats()` / `hideAuditedZeros()` as an explicit argument.
+Nothing else reads the env var or the cookie, and `lib/segments.ts` stays free
+of `next/headers` so the plain-Node smoke harnesses can still import it.
+
+Reading the cookie opts the pages under `app/[locale]` into dynamic rendering.
+That is the cost of a switch that works without a rebuild. The shared-cached
+open-data routes deliberately pass the build-time default instead, since a
+per-browser cookie must not vary a CDN-cached export.
+
+- **Off.** The 535 esc-sa pilot segments render as part of the neutral,
+  unaudited canton network: no score colors on the map, no scores in the detail
+  popover, and the audited stat figures (`segments`, `km`, `coveragePct`,
+  `heroPct`) degrade to zero. The map demo banner and every "demo figure/data"
+  caveat on those counts disappear, because there is nothing left to label.
+  Real community and CV observations (e.g. the approved `esc-sr-0793` camera
+  pass) are unaffected and are the only colored data.
+- **On (the default).** The pilot scores, the demo banner, and all demo caveats.
+  The banner is non-dismissable while the data is on: the switch turns the data
+  off, it never hides the honesty strip.
 
 Nothing is deleted to hide the demo data: `scripts/generate-demo-audits.mjs`,
 `data/demo-segments.geojson`, and `data/demo-audits.json` stay in the repo, so
-flipping the flag on republishes the pilot with no regeneration. Coverage:
-`scripts/smoke-adapter.mjs` exercises both states (demo-on assertions run with
-the flag set; a demo-off scenario asserts the default hides every score).
+flipping the switch back on republishes the pilot with no regeneration.
+Coverage: `scripts/test-demo-runtime-toggle.mjs` locks the default, both cookie
+directions, the provider wiring, and the single-env-reader property;
+`scripts/smoke-adapter.mjs` exercises both states against the real adapter.
 
 The bucket name is not an env var; it is the constant `streetlens-frames`
 (`CAPTURE_BUCKET` in `lib/capture/types.ts`), matching the bucket created in

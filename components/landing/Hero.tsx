@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
-import { showDemoData } from "@/lib/demo-flag";
+import { useDemoData } from "@/components/DemoDataProvider";
 import { formatCvCoveragePct } from "@/lib/cv-provenance";
 import { hideAuditedZeros, listRecentlyCvObserved } from "@/lib/real-data-era";
 import { streetPath } from "@/lib/street-links";
@@ -358,7 +358,8 @@ export default function Hero({
   const t = useTranslations("landing.hero");
   const locale = useLocale();
   const router = useRouter();
-  const auditedHidden = hideAuditedZeros(stats);
+  const demoEnabled = useDemoData();
+  const auditedHidden = hideAuditedZeros(stats, demoEnabled);
   // Drop the over-tile glass chips to solid while the map is moving (research §1
   // perf note): backdrop-blur re-blurs every frame a map pans/zooms.
   const [mapMoving, setMapMoving] = useState(false);
@@ -575,7 +576,7 @@ export default function Hero({
                 a camera pass and a community add are real work, and with no
                 published audit they are the only live numbers on the page. */}
             <ProvenanceNote stats={stats} align="center" className="px-1 lg:px-0" />
-            {showDemoData() && (
+            {demoEnabled && (
               <p className="px-1 text-center font-mono text-[11px] leading-snug text-ink-muted lg:px-0 lg:text-left">
                 {t("stats.demoFootnote")}
               </p>
@@ -592,7 +593,7 @@ export default function Hero({
                     : t("segments.cvTitle")
                   : t("segments.title")}
               </p>
-              {showDemoData() && !auditedHidden && (
+              {demoEnabled && !auditedHidden && (
                 <p className="mt-1 font-mono text-[11px] leading-snug text-ink-muted">
                   {t("segments.caveat")}
                 </p>

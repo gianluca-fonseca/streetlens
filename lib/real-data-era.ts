@@ -1,4 +1,3 @@
-import { showDemoData } from "@/lib/demo-flag";
 import { canonicalCvObservation } from "@/lib/cv-provenance";
 import type { SegmentCollection, StreetStats } from "@/lib/segments";
 
@@ -6,9 +5,16 @@ import type { SegmentCollection, StreetStats } from "@/lib/segments";
  * True when the public site is in the real-data era with no published field
  * audits yet. Audited headline figures read 0 in this state; the UI must not
  * treat them as the hero readout.
+ *
+ * Takes the effective demo-data flag rather than reading it: this helper runs
+ * inside client components, which get the resolved value from
+ * `DemoDataProvider` (a client-side env read would miss the cookie override).
  */
-export function hideAuditedZeros(stats: StreetStats): boolean {
-  return !showDemoData() && stats.segments === 0;
+export function hideAuditedZeros(
+  stats: StreetStats,
+  demoEnabled: boolean,
+): boolean {
+  return !demoEnabled && stats.segments === 0;
 }
 
 export type CvObservedStreet = {

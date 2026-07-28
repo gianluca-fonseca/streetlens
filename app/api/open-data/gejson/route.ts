@@ -4,11 +4,14 @@
  */
 
 import { loadOpenDataGeoJson } from "@/lib/open-data-pack";
+import { showDemoData } from "@/lib/demo-flag";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const body = await loadOpenDataGeoJson();
+  // Build-time default, not the cookie: this response is shared-cached, so it
+  // must not vary by one visitor's demo switch.
+  const body = await loadOpenDataGeoJson(showDemoData());
   return Response.json(body, {
     status: 200,
     headers: {

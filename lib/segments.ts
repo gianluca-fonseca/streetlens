@@ -8,6 +8,12 @@
  *   - `getSegmentDetail()` -> SegmentDetail | null
  *   - `getStats()`         -> StreetStats { segments, km, coveragePct, heroPct }
  *
+ * `getSegments` and `getStats` take the EFFECTIVE demo-data flag as an argument.
+ * Next-side callers resolve it per request with `demoDataEnabled()` (cookie
+ * override over build-time default) and pass it in; this module never reads the
+ * cookie, so it stays importable from plain Node scripts. The default argument
+ * is the build-time default, which is what those scripts get.
+ *
  * Each reader tries Supabase first when it is configured. When configured and a
  * live read fails, the failure is logged and `dataRead.degraded` is set — the map
  * may still render static fallback data, but never silently pretends it is live.
@@ -201,7 +207,7 @@ async function readDemoCollection(): Promise<DemoCollection> {
 }
 
 /**
- * Demo era off (NEXT_PUBLIC_SHOW_DEMO_DATA unset): strip the generated pilot
+ * Demo era off (the caller's resolved flag is false): strip the generated pilot
  * scores and re-cast the 535 esc-sa features as the neutral, unaudited canton
  * network. `source: "import"` routes them through the exact community casing the
  * canton overlay already uses (RAMP_LAYER_FILTER excludes source:community/import,
@@ -635,8 +641,13 @@ function attachCommunity(
  * All segments as a GeoJSON collection for the map: the audited reference set
  * plus any applied community/import segments (flagged `source`/`verified`, no
  * scores). Community reports are attached to their target features.
+ *
+ * @param demoEnabled The effective demo-data flag for this request. Defaults to
+ * the build-time default for non-Next callers (scripts, smoke harnesses).
  */
-export async function getSegments(): Promise<SegmentCollection> {
+export async function getSegments(
+  demoEnabled: boolean = showDemoData(),
+): Promise<SegmentCollection> {
   resetSegmentDataReadMeta();
   const [community, reports, cvObservations] = await Promise.all([
     readAllContributedSegments(),
@@ -654,7 +665,7 @@ export async function getSegments(): Promise<SegmentCollection> {
   const officialFeatures =
     demoFeatures === null
       ? live!.map(rowToFeature)
-      : showDemoData()
+      : demoEnabled
         ? demoFeatures
         : hideDemoScores(demoFeatures);
 
@@ -754,7 +765,9 @@ export async function getSegmentDetail(
 }
 
 /** Headline aggregate stats for the hero panel. */
-export async function getStats(): Promise<StreetStats> {
+export async function getStats(
+  demoEnabled: boolean = showDemoData(),
+): Promise<StreetStats> {
   resetSegmentDataReadMeta();
   const demo = await readDemoCollection();
   const networkKm = demo.metadata?.network_km;
@@ -797,7 +810,7 @@ export async function getStats(): Promise<StreetStats> {
   // Demo era off: no audited scores are published, so the headline audited
   // figures degrade honestly to zero. The real community/CV counters (computed
   // above) are unaffected and stay the only live signal.
-  if (!showDemoData()) {
+  if (!demoEnabled) {
     return {
       segments: 0,
       km: 0,

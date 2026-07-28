@@ -7,9 +7,9 @@
  *
  * - Compiles lib/{types,supabase,demo-flag,segments}.ts to CJS in .smoke-build/
  *   and exercises getSegments / getSegmentDetail / getStats with no Supabase env.
- * - With demo data ON (NEXT_PUBLIC_SHOW_DEMO_DATA=true): asserts every audited
- *   feature carries district, audited_at, all five score_* fields, and demo:true.
- * - With demo data OFF (the default): asserts the generated pilot scores are
+ * - With demo data ON (the default): asserts every audited feature carries
+ *   district, audited_at, all five score_* fields, and demo:true.
+ * - With demo data OFF (NEXT_PUBLIC_SHOW_DEMO_DATA=false): asserts the generated pilot scores are
  *   hidden — the 535 esc-sa features re-cast as the neutral canton overlay and
  *   the audited stat figures degrade to zero.
  * - Asserts the module's export names match the frozen list exactly:
@@ -21,7 +21,7 @@
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { promises as fs } from "node:fs";
-import { rmSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -91,10 +91,11 @@ async function main() {
     { cwd: ROOT, stdio: "inherit" },
   );
 
-  // The demo-on assertions below are the legacy behavior, now gated behind the
-  // flag. Set it explicitly so this suite exercises the preserved demo path;
-  // showDemoData() reads process.env at call time, so a later delete flips it off
-  // for the demo-off scenario without reloading the module.
+  // Demo data is the default era, but pin it explicitly so this suite states the
+  // state it is asserting; showDemoData() reads process.env at call time, so
+  // setting it to "false" later flips the demo-off scenario without reloading
+  // the module. These no-arg calls exercise the build-time default deliberately:
+  // lib/segments.ts must stay usable outside a Next request, with no cookie.
   process.env.NEXT_PUBLIC_SHOW_DEMO_DATA = "true";
 
   const seg = require(path.join(BUILD_DIR, "segments.js"));
@@ -260,13 +261,14 @@ async function main() {
     await fs.rm(COMMUNITY_SEGMENTS_PATH, { force: true });
   }
 
-  // 4. Demo era OFF (the default): NEXT_PUBLIC_SHOW_DEMO_DATA unset must hide
-  // every generated pilot score. The 535 esc-sa features re-cast as the neutral
-  // unaudited network (source:"import", scores zeroed), so NO ramp/audited
-  // feature survives and the audited stat figures degrade to zero. Real
-  // community/CV data is unaffected (none present here → all zero counters).
-  console.log("demo data OFF (default):");
-  delete process.env.NEXT_PUBLIC_SHOW_DEMO_DATA;
+  // 4. Demo era OFF (NEXT_PUBLIC_SHOW_DEMO_DATA="false", or the `sl_demo_data`
+  // cookie set to "off" in the browser): every generated pilot score must be
+  // hidden. The 535 esc-sa features re-cast as the neutral unaudited network
+  // (source:"import", scores zeroed), so NO ramp/audited feature survives and
+  // the audited stat figures degrade to zero. Real community/CV data is
+  // unaffected (none present here → all zero counters).
+  console.log("demo data OFF:");
+  process.env.NEXT_PUBLIC_SHOW_DEMO_DATA = "false";
   const offCol = await seg.getSegments();
   const offStats = await seg.getStats();
   console.log(`  -> ${JSON.stringify(offStats)}`);

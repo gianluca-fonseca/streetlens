@@ -3,6 +3,7 @@ import Link from "next/link";
 import { History, ListChecks } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
 import { getSubmissionCounts } from "@/lib/submissions";
 import AdminHeader from "@/components/admin/AdminHeader";
 import StatTiles, { type StatTile } from "@/components/admin/StatTiles";
@@ -25,10 +26,11 @@ export default async function AdminDashboardPage({
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "admin.dashboard" });
 
+  const demoEnabled = await demoDataEnabled();
   const [stats, counts, segments] = await Promise.all([
-    getStats(),
+    getStats(demoEnabled),
     getSubmissionCounts(),
-    getSegments(),
+    getSegments(demoEnabled),
   ]);
 
   // Per-district breakdown (count + average overall score).
