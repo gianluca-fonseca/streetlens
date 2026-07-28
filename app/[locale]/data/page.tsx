@@ -4,6 +4,7 @@ import type { Locale } from "@/i18n/routing";
 import CivicChrome from "@/components/civic/CivicChrome";
 import { OPEN_DATA_CSV_COLUMNS, OPEN_DATA_LICENSE } from "@/lib/open-data";
 import { MUNICIPALITY } from "@/lib/municipality";
+import { buildPageMetadata } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -14,10 +15,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "data.meta" });
-  return {
+  return buildPageMetadata({
+    locale,
+    path: "/data",
     title: t("title", { municipality: MUNICIPALITY.name }),
     description: t("description"),
-  };
+  });
 }
 
 export default async function DataPage({

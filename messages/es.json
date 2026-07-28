@@ -29,6 +29,10 @@
     "insights": "Indicadores"
   },
   "map": {
+    "meta": {
+      "title": "Mapa de calles · {municipality}",
+      "description": "La red vial de {municipality}, segmento a segmento, coloreada según la puntuación de accesibilidad, drenaje, sombra e infraestructura ciclista de las aceras. Abrí cualquier segmento para ver su ficha y la evidencia detrás de cada número."
+    },
     "ariaLabel": "Mapa interactivo de los segmentos de calle auditados en Escazú",
     "demoTag": "DEMO",
     "loading": "Cargando el mapa…",
@@ -1011,7 +1015,7 @@
   },
   "collect": {
     "meta": {
-      "title": "Grabá una caminata | StreetLens",
+      "title": "Grabá una caminata",
       "description": "Grabá una calle con tu teléfono mientras la caminás. StreetLens le pone GPS a cada cuadro y lo une a un segmento, para medir el estado de las aceras donde nadie las ha medido."
     },
     "start": {
@@ -1314,7 +1318,7 @@
     },
     "status": {
       "meta": {
-        "title": "Estado de la caminata | StreetLens",
+        "title": "Estado de la caminata",
         "description": "El estado de procesamiento de una caminata grabada con StreetLens."
       },
       "eyebrow": "ESTADO DE LA CAMINATA",
@@ -1483,7 +1487,7 @@
   },
   "brief": {
     "meta": {
-      "title": "Informe de cumplimiento Ley 7600 · {municipality} | StreetLens",
+      "title": "Informe de cumplimiento Ley 7600 · {municipality}",
       "description": "Resumen de cumplimiento del lente de accesibilidad para {municipality}: distritos, peores corredores y metodología. Evidencia observada por cámara pendiente de auditoría de campo."
     },
     "home": "Inicio",
@@ -1517,7 +1521,7 @@
   },
   "data": {
     "meta": {
-      "title": "Datos abiertos · {municipality} | StreetLens",
+      "title": "Datos abiertos · {municipality}",
       "description": "Descarga GeoJSON y CSV depurados de la red observada publicada de StreetLens. Licencia, diccionario de campos y notas de privacidad."
     },
     "home": "Inicio",
@@ -1559,7 +1563,7 @@
   },
   "press": {
     "meta": {
-      "title": "Kit de prensa | StreetLens",
+      "title": "Kit de prensa",
       "description": "Qué es StreetLens, el piloto de {municipality}, cifras clave en vivo, contacto y activos de marca."
     },
     "home": "Inicio",
@@ -1643,8 +1647,8 @@
   },
   "insights": {
     "meta": {
-      "title": "Indicadores | StreetLens",
-      "description": "Panel en vivo: cobertura observada por cámara, resúmenes por distrito, peores calles, distribución por lente y cronología — separados de las auditorías de campo."
+      "title": "Indicadores",
+      "description": "Panel en vivo: cobertura observada por cámara, resúmenes por distrito, peores calles, distribución por lente y cronología, todo separado de las auditorías de campo."
     },
     "chrome": {
       "home": "Inicio de StreetLens",
@@ -1721,7 +1725,7 @@
   },
   "methodPage": {
     "meta": {
-      "title": "Método | StreetLens",
+      "title": "Método",
       "description": "Cómo StreetLens convierte una calle caminada en una puntuación verificable: lentes, umbral de la Ley 7600, bins y el contrato de honestidad cámara vs auditoría."
     },
     "eyebrow": "Método",
@@ -1811,7 +1815,7 @@
   },
   "rubricPage": {
     "meta": {
-      "title": "Rúbrica v0.1 | StreetLens",
+      "title": "Rúbrica v0.1",
       "description": "Los 15 ítems observados de la rúbrica v0.1, por lente, con tipos de respuesta y el umbral de accesibilidad de la Ley 7600."
     },
     "eyebrow": "Rúbrica v0.1",

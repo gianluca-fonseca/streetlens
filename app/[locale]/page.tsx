@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
+import { buildPageMetadata } from "@/lib/site";
 import Hero from "@/components/landing/Hero";
 import MissionSection from "@/components/landing/MissionSection";
 import MeasureSection from "@/components/landing/MeasureSection";
@@ -27,15 +28,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "landing.meta" });
-  return {
+  return buildPageMetadata({
+    locale,
+    path: "/",
+    // The landing title already carries the brand, so it opts out of the
+    // layout's "%s · StreetLens" template rather than saying it twice.
+    absoluteTitle: true,
     title: t("title"),
     description: t("description"),
-    openGraph: {
-      title: t("ogTitle"),
-      description: t("ogDescription"),
-      type: "website",
-    },
-  };
+    ogTitle: t("ogTitle"),
+    ogDescription: t("ogDescription"),
+  });
 }
 
 export default async function HomePage({

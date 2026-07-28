@@ -7,6 +7,7 @@ import { formatCvCoveragePct } from "@/lib/cv-provenance";
 import { AUTHOR_LINKEDIN, CUSP_URL, GITHUB_URL } from "@/lib/links";
 import { MUNICIPALITY } from "@/lib/municipality";
 import { getStats } from "@/lib/segments";
+import { buildPageMetadata } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -17,10 +18,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "press.meta" });
-  return {
+  return buildPageMetadata({
+    locale,
+    path: "/press",
     title: t("title"),
     description: t("description", { municipality: MUNICIPALITY.name }),
-  };
+  });
 }
 
 export default async function PressPage({

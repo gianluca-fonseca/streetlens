@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import RubricView from "@/components/rubric/RubricView";
+import { buildPageMetadata } from "@/lib/site";
 
 export const revalidate = 3600;
 
@@ -12,10 +13,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "rubricPage.meta" });
-  return {
+  return buildPageMetadata({
+    locale,
+    path: "/rubric",
     title: t("title"),
     description: t("description"),
-  };
+  });
 }
 
 export default async function RubricPage({

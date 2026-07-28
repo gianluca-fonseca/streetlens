@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getInsightsSnapshot } from "@/lib/insights-data";
+import { buildPageMetadata } from "@/lib/site";
 import InsightsView from "@/components/insights/InsightsView";
 import DataDegradedBanner from "@/components/DataDegradedBanner";
 
@@ -14,10 +15,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "insights.meta" });
-  return {
+  return buildPageMetadata({
+    locale,
+    path: "/insights",
     title: t("title"),
     description: t("description"),
-  };
+  });
 }
 
 export default async function InsightsPage({
