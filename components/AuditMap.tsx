@@ -23,6 +23,12 @@ import {
   lineColorExpression,
   lineWidthExpression,
 } from "@/components/mapConfig";
+import {
+  RELIEF_LAYER_ID,
+  RELIEF_SOURCE_ID,
+  buildReliefCollection,
+  reliefHeightExpression,
+} from "@/components/heroRelief";
 import { parseFeatureProps } from "@/lib/parse-feature-props";
 import { useTheme } from "@/components/ThemeProvider";
 import { readStoredPreference, resolveTheme } from "@/lib/theme";
@@ -76,17 +82,35 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-/** Hero camera signature: one gentle scripted glide across the Escazú corridor. */
-const HERO_START: { center: [number, number]; zoom: number; bearing: number } = {
+/**
+ * Hero camera signature (landing-dimensional): the establishing move. First
+ * paint is a flat overhead survey; the camera then eases down into a pitched,
+ * gently rotated frame over the settling score relief — the city resolving
+ * into an instrument — and STOPS. It never drifts under a presenter: one move,
+ * one settle. Under prefers-reduced-motion (or with the fly disabled) the map
+ * jumps straight to the settled pitched frame, so the relief is still there,
+ * minus the motion.
+ */
+type HeroCamera = {
+  center: [number, number];
+  zoom: number;
+  bearing: number;
+  pitch: number;
+};
+const HERO_START: HeroCamera = {
   center: [-84.15, 9.9],
   zoom: 13.0,
-  bearing: -6,
+  bearing: 8,
+  pitch: 0,
 };
-const HERO_END: { center: [number, number]; zoom: number; bearing: number } = {
+const HERO_END: HeroCamera = {
   center: [-84.137, 9.915],
-  zoom: 14.1,
-  bearing: 4,
+  zoom: 14.25,
+  bearing: -15,
+  pitch: 55,
 };
+const HERO_FLY_DELAY_MS = 650;
+const HERO_FLY_DURATION_MS = 3000;
 
 /**
  * Recolour Liberty into the calm zen basemap, keeping its labels.
@@ -219,6 +243,36 @@ function addDataLayers(map: maplibregl.Map, data: SegmentCollection) {
           1,
           0.82,
         ],
+      },
+    });
+  }
+}
+
+/**
+ * Hero-only: the extruded score relief (see heroRelief.ts for the contract).
+ * Added on TOP of the layer stack so each volume owns its footprint; the flat
+ * 2D ramp lines stay underneath as the ground plan and as the whole story
+ * wherever nothing is extruded (real-data era, unaudited casings). The app
+ * surface never calls this.
+ */
+function addReliefLayer(map: maplibregl.Map, data: SegmentCollection) {
+  if (!map.getSource(RELIEF_SOURCE_ID)) {
+    map.addSource(RELIEF_SOURCE_ID, {
+      type: "geojson",
+      data: buildReliefCollection(data),
+    });
+  }
+  if (!map.getLayer(RELIEF_LAYER_ID)) {
+    map.addLayer({
+      id: RELIEF_LAYER_ID,
+      type: "fill-extrusion",
+      source: RELIEF_SOURCE_ID,
+      paint: {
+        // The SAME sealed overall ramp as the 2D lines — one encoding, three axes.
+        "fill-extrusion-color": lineColorExpression("overall"),
+        "fill-extrusion-height": reliefHeightExpression,
+        "fill-extrusion-base": 0,
+        "fill-extrusion-opacity": 0.88,
       },
     });
   }
@@ -585,6 +639,8 @@ export default function AuditMap({
       const dark = resolvedDark();
       muteBasemap(map, dark);
       addDataLayers(map, segmentsRef.current);
+      // The landing hero carries the extruded score relief; /map never does.
+      if (hero) addReliefLayer(map, segmentsRef.current);
       paintedSegmentsRef.current = segmentsRef.current;
       // DEM + hillshade load lazily when 3D is toggled on (applyThreeD).
 
@@ -602,16 +658,18 @@ export default function AuditMap({
               center: HERO_END.center,
               zoom: HERO_END.zoom,
               bearing: HERO_END.bearing,
-              duration: 5200,
+              pitch: HERO_END.pitch,
+              duration: HERO_FLY_DURATION_MS,
               curve: 1.35,
               essential: true,
             });
-          }, 650);
+          }, HERO_FLY_DELAY_MS);
         } else {
           map.jumpTo({
             center: HERO_END.center,
             zoom: HERO_END.zoom,
             bearing: HERO_END.bearing,
+            pitch: HERO_END.pitch,
           });
         }
       }
@@ -686,6 +744,15 @@ export default function AuditMap({
       // chips to solid while the map is in motion (research §1 perf note).
       if (heroLive) {
         map.on("click", INTERACTIVE_LAYER_IDS, () => onActivateRef.current?.());
+        // The relief volumes are the streets' visible bodies in the hero, so
+        // they take the same tap-to-open + pointer affordance as the lines.
+        map.on("click", RELIEF_LAYER_ID, () => onActivateRef.current?.());
+        map.on("mousemove", RELIEF_LAYER_ID, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", RELIEF_LAYER_ID, () => {
+          map.getCanvas().style.cursor = "";
+        });
         map.on("movestart", () => onMoveRef.current?.(true));
         map.on("moveend", () => onMoveRef.current?.(false));
       }
@@ -745,6 +812,13 @@ export default function AuditMap({
     if (!source) return;
     paintedSegmentsRef.current = segments;
     source.setData(segments);
+    // The hero relief derives from the same collection, so it flips eras in
+    // the same effect — otherwise the volumes would keep the previous era's
+    // heights over freshly-swapped lines.
+    const reliefSource = map.getSource(RELIEF_SOURCE_ID) as
+      | maplibregl.GeoJSONSource
+      | undefined;
+    if (reliefSource) reliefSource.setData(buildReliefCollection(segments));
   }, [segments, mapReady]);
 
   // Cooperative wheel gating (research §4): a plain wheel over the embedded hero

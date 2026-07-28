@@ -482,6 +482,7 @@ export default function Hero({
                 <AuditMap
                   variant="hero"
                   interactive
+                  flyOnLoad
                   segments={segments}
                   onSegmentActivate={openPlatform}
                   onMoveStateChange={setMapMoving}
@@ -490,9 +491,13 @@ export default function Hero({
                 <LegendChip />
               </div>
             </div>
-            <p className="mt-2.5 px-1 font-mono text-[11px] leading-snug text-ink-muted">
-              {t("map.affordance")}
-            </p>
+            <div className="mt-2.5 space-y-1 px-1 font-mono text-[11px] leading-snug text-ink-muted">
+              {/* The relief line is the honesty caption for the 3D encoding:
+                  heights are scores, never real elevation. It stays even with
+                  demo data off (the encoding rule holds for real audits too). */}
+              <p>{t("map.relief")}</p>
+              <p>{t("map.affordance")}</p>
+            </div>
           </div>
 
           {/* ── RIGHT zone: zen-solid stat stack (horizontal snap on phone,
