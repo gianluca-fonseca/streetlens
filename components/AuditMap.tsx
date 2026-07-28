@@ -632,8 +632,10 @@ export default function AuditMap({
     const hero = isHeroRef.current;
     const heroLive = hero && interactiveRef.current;
     // Cap pitch on touch / narrow viewports to bound horizon DEM-tile fetches
-    // in 3D (research: mobile ≈60°, desktop 70°). Harmless for the hero, which
-    // never leaves pitch 0.
+    // in 3D (research: mobile ≈60°, desktop 70°). The hero clears it too: its
+    // settled camera is HERO_END.pitch = 55, inside the 60 coarse-pointer cap.
+    // (It used to say the hero "never leaves pitch 0", which stopped being true
+    // when the pitched relief landed.)
     const coarsePointer =
       window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 640;
     const maxPitch = coarsePointer ? 60 : 70;
