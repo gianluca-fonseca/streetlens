@@ -138,6 +138,7 @@ type DemoObservation = {
   layer: ScoreLayer;
   response: number;
   note: string | null;
+  note_en: string | null;
   photos: { storage_path: string; taken_at: string }[];
 };
 

@@ -208,7 +208,10 @@ export type ObservationDetail = {
   layer: ScoreLayer;
   /** Normalized response 0..1 (higher = better). */
   response: number;
+  /** The crew's note in Spanish, as written on the street. Most items have none. */
   note: string | null;
+  /** The English sibling of `note`, paired exactly like label_en/label_es. */
+  note_en: string | null;
   photos: PhotoDetail[];
 };
 
