@@ -51,7 +51,7 @@ Types are the contract, in `lib/types.ts`: `ScoreLayer`, `SCORE_LAYERS`, `Segmen
 
 Data files in `data/`: `demo-segments.geojson` (the audited reference network), `demo-audits.json` (rubric observations tagged `rubric_version_id: "v0.1"`), `routing-network.geojson` (the trace graph), and `raw/overpass-san-antonio.json` (the OSM source). Runtime local stores (`*.local.json`) live under `data/` by default, or under `STREETLENS_DATA_DIR` when set (used by tests for isolation). Community contributions and approved CV observations persist via `lib/community-store.ts` and merge into `getSegments()` with separate provenance.
 
-The demo data switch (`NEXT_PUBLIC_SHOW_DEMO_DATA`) gates whether the 535 generated pilot scores publish on the public map. Off by default; see `lib/demo-flag.ts`.
+The demo data switch gates whether the 535 generated pilot scores publish on the public map. Two layers, both in `lib/demo-flag.ts`: `NEXT_PUBLIC_SHOW_DEMO_DATA` is the build-time default (ON unless it is exactly `"false"`), and the `sl_demo_data` cookie overrides it per browser. `demoDataEnabled()` (`lib/demo-flag-server.ts`) resolves the pair once per request in the locale layout; client components read it from `DemoDataProvider`, and `getSegments`/`getStats` take it as an argument. The switch itself is `components/DemoDataToggle.tsx`, in the map chrome.
 
 ## Map layer
 
