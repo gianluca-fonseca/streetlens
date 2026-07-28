@@ -13,7 +13,7 @@
 
 .link {
   /* A link row, not a plate: hairline + sunken fill, no shadow and no glass
-     (glass never stacks on glass — the aside is already Recipe A). */
+     (glass never stacks on glass; the aside is already Recipe A). */
   -webkit-tap-highlight-color: transparent;
 }
 
