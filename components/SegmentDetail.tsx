@@ -13,6 +13,11 @@ import {
 } from "@/lib/parse-feature-props";
 import { formatProvenanceDate, splitCvObservations, cvOverallAssessment } from "@/lib/cv-provenance";
 import {
+  auditorLabel,
+  fieldObservationsForLayer,
+  toFieldObservations,
+} from "@/lib/field-notes";
+import {
   LAYER_ORDER,
   RUBRIC_ITEMS,
   placeholderItemScore,
@@ -21,6 +26,7 @@ import {
 import { meterWidth, rampInkVars } from "@/components/scoreColor";
 import styles from "@/components/ui/zen.module.css";
 import panel from "@/components/ui/panel.module.css";
+import FieldNote from "@/components/FieldNote";
 import StreetShareActions from "@/components/street/StreetShareActions";
 
 /**
@@ -333,9 +339,17 @@ export default function SegmentDetail({
   const t = useTranslations("detail");
   const tl = useTranslations("layers");
   const tr = useTranslations("rubric");
+  const locale = useLocale();
 
   const [detailLoading, setDetailLoading] = useState(true);
   const [detailCv, setDetailCv] = useState<CvObservation[] | null>(null);
+  // The segment's rubric audit, as returned by /api/segments/[id]/detail. Kept
+  // raw and resolved per render, so switching locale can never leave a stale
+  // Spanish note under an English label.
+  const [detailAudit, setDetailAudit] = useState<{
+    auditor: unknown;
+    observations: unknown;
+  } | null>(null);
   const [detailReports, setDetailReports] = useState<
     ReturnType<typeof parseCommunityReports> | null
   >(null);
@@ -358,11 +372,20 @@ export default function SegmentDetail({
           community_report?: unknown;
           community_reports?: unknown;
           cv_observations?: unknown;
+          audit?: { auditor?: unknown; observations?: unknown } | null;
         };
         if (cancelled) return;
         setDetailEmbedded(parseCommunityReport(data.community_report));
         setDetailReports(parseCommunityReports(data.community_reports));
         setDetailCv(parseCvObservations(data.cv_observations) as CvObservation[]);
+        setDetailAudit(
+          data.audit && typeof data.audit === "object"
+            ? {
+                auditor: data.audit.auditor,
+                observations: data.audit.observations,
+              }
+            : null,
+        );
       } catch {
         /* degrade to paint-only props */
       } finally {
@@ -424,10 +447,50 @@ export default function SegmentDetail({
     bike: segment.score_bike,
   };
   const seed = seedFromId(segment.id);
-  const items = RUBRIC_ITEMS[activeLayer].map((key, i) => ({
-    key,
-    score: placeholderItemScore(scores[activeLayer], seed, i),
-  }));
+
+  /*
+   * The breakdown, real when the audit answered and synthesised when it did not.
+   *
+   * The panel used to always synthesise: RUBRIC_ITEMS' three generic keys per
+   * lens, jittered off the lens score. That was fine while there was nothing
+   * better, but it cannot carry a note — its keys ("ramp", "tactile") are not
+   * the keys the crew answered ("curb_ramp", "surface_condition"), so a note
+   * pinned to one of them would be attached to an item that never existed. The
+   * whole point of a field note is that it explains ONE answer, so the answers
+   * have to be the real ones.
+   *
+   * The synthesised path stays as the fallback, unchanged, for the two cases
+   * that still have no observations: the live Supabase read path (whose scores
+   * view carries no rubric detail) and the instant before the click-time fetch
+   * resolves. Both keep the panel's shape instead of flashing an empty section.
+   */
+  const auditObservations = toFieldObservations(
+    detailAudit?.observations,
+    locale,
+  );
+  const layerObservations = fieldObservationsForLayer(
+    auditObservations,
+    activeLayer,
+  );
+  const crew = auditorLabel(detailAudit?.auditor);
+  // Attribution is the crew label and only the crew label. `Equipo StreetLens
+  // A/B/C` is non-personal by design (the dataset is simulated); a name here
+  // would claim a person wrote a sentence that a generator wrote.
+  const noteLabel = crew ? `${t("fieldNoteLabel")} · ${crew}` : t("fieldNoteLabel");
+  const items =
+    layerObservations.length > 0
+      ? layerObservations.map((o) => ({
+          key: o.item_key,
+          label: o.label,
+          score: o.score,
+          note: o.note,
+        }))
+      : RUBRIC_ITEMS[activeLayer].map((key, i) => ({
+          key,
+          label: tr(`${activeLayer}.${key}` as Parameters<typeof tr>[0]),
+          score: placeholderItemScore(scores[activeLayer], seed, i),
+          note: null as string | null,
+        }));
 
   // Community/import segments carry no rubric scores — show provenance + reports
   // instead of a (fabricated-looking) 0-score breakdown (contract v3, ruling 1).
@@ -658,33 +721,40 @@ export default function SegmentDetail({
             // scale, not a scale of its own. The "/100" stays neutral: it is
             // the denominator, not a value, and colouring it would imply the
             // maximum somehow scores too.
+            //
+            // The row is a column now rather than a single flex line, because a
+            // note belongs INSIDE its item's <li>: indent it, and it is visibly
+            // testimony about the number on the line above. Put it anywhere
+            // else and it is a paragraph the reader has to re-pair by hand. The
+            // answer line itself is byte-for-byte the row that was here before,
+            // so an item with no note (about three in four) renders exactly as
+            // it always did, with no reserved gap where prose might have gone.
             <li
               key={item.key}
               style={inkStyle(activeLayer, item.score)}
-              className="flex items-center justify-between gap-3 px-3 py-2"
+              className="px-3 py-2"
             >
-              <span className="text-[12.5px] text-ink">
-                {tr(
-                  `${activeLayer}.${item.key}` as Parameters<typeof tr>[0],
-                )}
-              </span>
-              <span className="flex shrink-0 items-center gap-2">
-                <span
-                  aria-hidden="true"
-                  className={`${panel.meterTrack} w-12`}
-                >
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[12.5px] text-ink">{item.label}</span>
+                <span className="flex shrink-0 items-center gap-2">
                   <span
-                    className={panel.meterFill}
-                    style={{ width: meterWidth(item.score) }}
-                  />
+                    aria-hidden="true"
+                    className={`${panel.meterTrack} w-12`}
+                  >
+                    <span
+                      className={panel.meterFill}
+                      style={{ width: meterWidth(item.score) }}
+                    />
+                  </span>
+                  <span
+                    className={`font-mono text-[12.5px] font-semibold ${panel.scoreInk}`}
+                  >
+                    {item.score}
+                    <span className="font-medium text-neutral-strong">/100</span>
+                  </span>
                 </span>
-                <span
-                  className={`font-mono text-[12.5px] font-semibold ${panel.scoreInk}`}
-                >
-                  {item.score}
-                  <span className="font-medium text-neutral-strong">/100</span>
-                </span>
-              </span>
+              </div>
+              <FieldNote label={noteLabel} note={item.note} />
             </li>
           ))}
         </ul>
