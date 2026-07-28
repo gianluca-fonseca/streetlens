@@ -964,7 +964,7 @@
       "items": {
         "real": {
           "q": "Is this real data?",
-          "a": "The street network is real OpenStreetMap geometry. Demo audit scores are off by default; what you see colored today is camera-observed or community-reported work, each reviewed before it appears. Field audits will replace demo scores corridor by corridor once published."
+          "a": "The street network is real OpenStreetMap geometry. The audit scores you see colored today are simulated demo data, labeled as such wherever they appear, and you can switch them off from the map. Camera-observed and community-reported work is real, and each one is reviewed before it appears. Field audits will replace the demo scores corridor by corridor once published."
         },
         "scores": {
           "q": "How are scores computed?",

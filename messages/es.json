@@ -964,7 +964,7 @@
       "items": {
         "real": {
           "q": "¿Estos son datos reales?",
-          "a": "La red de calles es geometría real de OpenStreetMap. Las puntuaciones de demostración están apagadas por defecto; lo que ves coloreado hoy es trabajo observado con cámara o reportado por la comunidad, cada uno revisado antes de aparecer. Las auditorías de campo reemplazarán las puntuaciones de demostración corredor por corredor cuando se publiquen."
+          "a": "La red de calles es geometría real de OpenStreetMap. Las puntuaciones de auditoría que ves coloreadas hoy son datos de demostración simulados, señalados como tales donde aparecen, y puedes apagarlas desde el mapa. El trabajo observado con cámara y el reportado por la comunidad sí es real, y cada uno se revisa antes de aparecer. Las auditorías de campo reemplazarán las puntuaciones de demostración corredor por corredor cuando se publiquen."
         },
         "scores": {
           "q": "¿Cómo se calculan las puntuaciones?",
