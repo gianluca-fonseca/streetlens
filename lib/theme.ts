@@ -17,8 +17,12 @@
  * not around it. Nothing outside this module and ThemeProvider should query
  * `prefers-color-scheme` directly; scripts/test-map-theme-source.mjs enforces it.
  *
- * The score RAMP itself is theme-independent: a segment's colour encodes its
- * score, not the lighting, so it is identical in both themes by design.
+ * The score RAMP follows this preference too (mapConfig rev 8). It used to be
+ * theme-independent, which is exactly what made it illegible: one table forced
+ * to clear a near-white basemap and a near-black one at once has almost no
+ * lightness left to spend on the scores themselves. The ramp now ships one half
+ * per basemap, so a segment's colour still encodes only its score — it just
+ * encodes it in the register the current basemap can actually carry.
  */
 
 export const THEME_STORAGE_KEY = "streetlens-theme";

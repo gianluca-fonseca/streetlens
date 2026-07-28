@@ -8,9 +8,15 @@ import type { SegmentCollection, SegmentFeature } from "@/lib/segments";
  *
  * Each score-carrying street is expanded into a corridor polygon and extruded
  * to a height driven by `score_overall`: a good street stands, a bad street
- * sits low against the ground. Colour comes from the SAME sealed overall ramp
- * the 2D lines use (mapConfig.lineColorExpression), so the relief is the score
- * encoding gaining a third axis, not a second encoding.
+ * sits low against the ground. Colour comes from the SAME overall ramp the 2D
+ * lines use (mapConfig.lineColorExpression, on the same basemap half), so the
+ * relief is the score encoding gaining a third axis, not a second encoding.
+ *
+ * Height obeys mapConfig's direction rule — MORE PRESENCE MEANS A BETTER SCORE —
+ * which is now also what colour and line width say. Rev 7 had width running the
+ * opposite way; the two channels agreeing is the point, so if the height mapping
+ * below is ever inverted, WIDTH_AT_0/WIDTH_AT_100 in mapConfig and the `relief`
+ * caption in messages/en.json + messages/es.json have to invert with it.
  *
  * Honesty contract: the relief is a CHART, not terrain. Heights are scores in
  * abstract metres, never real elevation or building height, and the landing

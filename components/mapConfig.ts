@@ -4,59 +4,81 @@ import type { ExpressionSpecification } from "maplibre-gl";
 import type { ScoreLayer } from "@/lib/segments";
 
 /*
- * Score-layer visual encoding — rev 7, resealed. Semantics: HIGH = GOOD for
- * every layer. Each ramp is colorblind-safe and paired with a redundant
- * line-WIDTH channel.
+ * Score-layer visual encoding — rev 8. Semantics: HIGH = GOOD for every layer.
  *
- * value0 = worst (score 0), value100 = best (score 100). These are asserted
- * explicitly per layer so the direction cannot silently regress.
+ * ── THE DIRECTION RULE ─────────────────────────────────────────────────────
+ * MORE PRESENCE MEANS A BETTER SCORE, on every channel, everywhere:
  *
- * ── Why rev 7 replaced rev 2 (#28) ────────────────────────────────────────
- * The owner's ruling: the ramps were muddy and hard to read, and the seal was
- * lifted for exactly this change. Rev 2's real defect was that it ignored the
- * basemap it is painted on. BASEMAP is near-WHITE in light (land #fafafa, roads
- * #ffffff) and near-BLACK in dark (land #0a0a0a) — so a stop is only legible in
- * BOTH themes if its luminance sits in a middle band. Rev 2 broke that at both
- * ends: shade@0 #DDE3CE (pale bone) all but vanished on the light basemap, and
- * accessibility@100 #00204D vanished on the dark one.
+ *   colour  a better street carries more contrast against the page it sits on
+ *           (darker on the light basemap, brighter on the dark one)
+ *   width   a better street is THICKER          (widthForValue, below)
+ *   height  a better street is TALLER           (components/heroRelief.ts)
  *
- * Rev 7 is therefore constructed rather than picked. Every stop is solved to a
- * TARGET RELATIVE LUMINANCE — 0.278 at score 0, 0.183 at 50, 0.118 at 100 — by
- * fixing the hue and saturation and binary-searching lightness. Three
- * consequences, all of them the point:
+ * Rev 7 had width running the other way ("lower score = thicker, to surface the
+ * problems") while the landing relief made the best streets the tallest. Both
+ * are defensible on their own; together they taught the viewer two opposite
+ * rules for one quantity inside one product, which is the thing a reader cannot
+ * un-learn between two screens. Score-as-magnitude wins because it is the
+ * convention every chart already uses (a bigger mark means a bigger number), and
+ * reading the map WITHOUT the legend is the whole requirement. The floor below
+ * keeps the losing side of that trade honest: every stop still clears 3:1
+ * against the basemap, so the worst street is quieter but never invisible.
  *
- *   1. Legibility in both themes, by construction. The band was derived from
- *      the 3:1 non-text contrast floor against the extreme surfaces: L ≤ 0.30
- *      to clear white roads, L ≥ 0.111 to clear the near-black land. Every stop
- *      lands ≥3.06:1 on the light basemap and ≥2.92:1 on the dark one.
+ * ── WHY REV 8 REPLACED REV 7 ───────────────────────────────────────────────
+ * Rev 7 asked ONE table to be legible on both basemaps at once. BASEMAP is
+ * near-white in light (land #fafafa, roads #ffffff) and near-black in dark (land
+ * #0a0a0a, roads #141414), so clearing 3:1 on both pinned every stop into a
+ * relative-luminance band of 0.118–0.278. Inside a band that narrow there is
+ * simply no room left to separate scores: measured on the shipped rev-7 table,
+ * adjacent quartiles sat 3.8–6.1 ΔE apart (OKLab ×100) and 3.3–5.6 apart under
+ * deuteranopia — under the ~8 ΔE at which two colours reliably read as two
+ * colours. That is the "thickness is not a good proxy / hard to see what is
+ * excellent vs poor" report, and no amount of re-picking hexes fixes it, because
+ * the band is the constraint, not the choices inside it.
  *
- *   2. CVD safety without relying on hue. Luminance descends monotonically
- *      across all five ramps, so bad→good survives grayscale (≈1.95:1
- *      end-to-end) and any form of colour blindness. Hue and the width channel
- *      are redundant reinforcement, not the sole carrier — which is what rev 2's
- *      red/green overall ramp leaned on.
+ * So rev 8 splits the table per theme. A line is only ever painted on ONE
+ * basemap at a time, so it only has to clear that one. Each half then gets the
+ * full lightness runway its own basemap allows, and the direction rule falls out
+ * of the geometry: on white, more contrast means darker; on black, brighter.
+ * The luminance direction flipping between themes is the standard sequential-ramp
+ * behaviour (a ramp re-anchors in dark mode), not an inconsistency: within the
+ * theme you are actually looking at, more ink always means a better street.
  *
- *   3. Maximum chroma at both ends. Bad is the LIGHT end and good is the DARK
- *      end, chosen to run WITH the physics rather than against it: saturated
- *      warm hues are naturally high-luminance and saturated cool hues naturally
- *      low, so red stays a vivid red at 0.278 instead of the muddy maroon it
- *      becomes when forced dark, and indigo/teal/forest stay rich at 0.118.
- *      That is where the "flashier" comes from — it is bought with saturation,
- *      not with brightness the basemap cannot afford.
+ * Every stop is SOLVED, not picked — scripts/design-ramps.mjs is the derivation
+ * and re-emits this table. Per lens per theme it walks OKLCH lightness from the
+ * quiet end (the extreme its basemap still allows at 3.05:1) to the loud end in
+ * five even steps, taking 95% of the in-gamut chroma at each, on that lens's
+ * hue journey. Results (worst case across the ten ramps):
  *
- * Each lens owns a distinct HUE FAMILY so a view is recognisable at a glance:
- * overall is the only multi-hue ramp (the traffic light, red low end), and the
- * other four are single-family journeys. Note bike deliberately left the old
- * copper for magenta: a warm rust high end meant the BEST bike streets rendered
- * in alarm-red, directly contradicting the overall lens the user just came from.
+ *   adjacent quartiles   ≥ 8.5 ΔE normal, ≥ 7.8 deuteranopia
+ *   25th vs 75th pct     ≥ 15.3 ΔE normal, ≥ 16.0 deuteranopia, ≥ 9.3 protanopia
+ *   end to end           ≥ 34.7 ΔE normal
+ *   every stop           ≥ 3.05:1 on its theme's land AND road
  *
- * Verified against the light and dark basemap at z12–z17 in a real browser, not
- * by intuition; screenshots in .planning/evidence/map-theme-ramps/.
+ * Stops are declared AT the quartiles rather than at 0/50/100 so the numbers
+ * above describe the ramp's own stops. The map interpolates with
+ * `interpolate-lab` and sampleRamp() mirrors MapLibre's CIELAB maths exactly, so
+ * the legend swatch and the line it explains are the same colour.
  *
- * SEALED AGAIN at these values. scripts/test-score-color.mjs freezes the table
- * stop-for-stop, scripts/test-ramp-legibility.mjs re-derives the luminance band
- * and the monotonicity, and scripts/render-map-images.mjs mirrors it verbatim —
- * change one and you must change all three (then re-run `npm run render:maps`).
+ * ── WHAT IS PRESERVED ──────────────────────────────────────────────────────
+ * Each lens keeps its hue family, measured off the rev-7 stops rather than
+ * re-invented: overall is the only multi-hue ramp (the traffic light, red low
+ * end, a design mandate); accessibility orchid→indigo; drainage cyan→azure, the
+ * water register; shade lime→canopy; bike pink→magenta. Bike stays magenta for
+ * the reason it left copper: a warm rust high end painted the BEST bike streets
+ * in alarm-red, contradicting the overall lens the reader just came from.
+ * Magenta also clears violet by ~25° at these lightnesses.
+ *
+ * CVD: simulated protan and deutan luminance is strictly monotonic across all
+ * ten ramps, so worst→best survives with colour removed entirely. The known
+ * residue is the `overall` traffic light in the light theme, where protanopia
+ * compresses the 50→75 step to 2.9 ΔE; width (and height in the hero) is the
+ * carrier there. See <EVIDENCE>/ramp-discriminability.md.
+ *
+ * scripts/test-ramp-legibility.mjs re-derives every rule above and fails if a
+ * future edit breaks one; scripts/test-score-color.mjs freezes the table
+ * stop-for-stop; scripts/render-map-images.mjs mirrors it verbatim — change one
+ * and you must change all three (then re-run `npm run render:maps`).
  */
 
 /** Client-safe layer order (mirrors SCORE_LAYERS without importing the fs adapter). */
@@ -70,50 +92,120 @@ export const LAYER_ORDER: ScoreLayer[] = [
 
 type RampStop = { at: number; hex: string };
 
-export const RAMP: Record<ScoreLayer, RampStop[]> = {
+/** The two basemaps a score line is ever painted on; each owns half the table. */
+export type RampTheme = "light" | "dark";
+
+type LensRamp = Record<RampTheme, RampStop[]>;
+
+/*
+ * The solved table (scripts/design-ramps.mjs --ts emits exactly this). Read a
+ * row left to right as worst → best. In `light` the journey darkens; in `dark`
+ * it brightens. Both are the same sentence: the better the street, the more it
+ * stands off the page.
+ */
+export const RAMP: Record<ScoreLayer, LensRamp> = {
   // TRAFFIC LIGHT (the only multi-hue ramp; red low end is a design mandate).
-  // { value0: #F45E53 vivid coral-red (worst), value100: #056E48 deep emerald (best) }
-  overall: [
-    { at: 0, hex: "#F45E53" },
-    { at: 50, hex: "#CE4D02" },
-    { at: 100, hex: "#056E48" },
-  ],
-  // VIOLET lens. { value0: #CE63E9 orchid (barriers), value100: #7629F1 electric indigo (accessible) }
-  accessibility: [
-    { at: 0, hex: "#CE63E9" },
-    { at: 50, hex: "#A844EA" },
-    { at: 100, hex: "#7629F1" },
-  ],
-  // CYAN→AZURE lens, the water register.
-  // { value0: #0E9EAF bright cyan (flood-prone), value100: #0263A8 deep azure (well-drained) }
-  drainage: [
-    { at: 0, hex: "#0E9EAF" },
-    { at: 50, hex: "#077FA8" },
-    { at: 100, hex: "#0263A8" },
-  ],
-  // GREEN lens, and the one ramp whose luminance direction is also literal:
-  // exposed asphalt is the bright end, canopy the dark end.
-  // { value0: #729D0D dry lime (exposed), value100: #07703F deep canopy (shaded) }
-  shade: [
-    { at: 0, hex: "#729D0D" },
-    { at: 50, hex: "#148918" },
-    { at: 100, hex: "#07703F" },
-  ],
-  // MAGENTA lens. Replaced rev 2's sand→copper: a warm rust high end painted the
-  // BEST bike streets in alarm-red, which reads as "bad" to anyone arriving from
-  // the overall lens. Magenta carries no good/bad prior and clears violet
-  // (accessibility) by ~25° of hue at these luminances.
-  // { value0: #EF599A pink (no/poor infra), value100: #B20795 deep magenta (protected) }
-  bike: [
-    { at: 0, hex: "#EF599A" },
-    { at: 50, hex: "#DF1194" },
-    { at: 100, hex: "#B20795" },
-  ],
+  // Reaches green by the 75th percentile rather than drifting through yellow: on
+  // a lightness-ordered ramp a yellow stop is an olive stop, and "nearly
+  // excellent" has to look like the good end.
+  // light: coral-red → rust → dark emerald.  dark: brick red → amber → mint.
+  overall: {
+    light: [
+      { at: 0, hex: "#FB574D" },
+      { at: 25, hex: "#CF4713" },
+      { at: 50, hex: "#95470D" },
+      { at: 75, hex: "#09542F" },
+      { at: 100, hex: "#043727" },
+    ],
+    dark: [
+      { at: 0, hex: "#C4171A" },
+      { at: 25, hex: "#DA4B15" },
+      { at: 50, hex: "#EC741B" },
+      { at: 75, hex: "#28D580" },
+      { at: 100, hex: "#30F1B6" },
+    ],
+  },
+  // VIOLET lens: orchid (barriers) → electric indigo (accessible).
+  accessibility: {
+    light: [
+      { at: 0, hex: "#D953FA" },
+      { at: 25, hex: "#B31EF1" },
+      { at: 50, hex: "#8416CB" },
+      { at: 75, hex: "#590EA2" },
+      { at: 100, hex: "#350775" },
+    ],
+    dark: [
+      { at: 0, hex: "#A417C2" },
+      { at: 25, hex: "#BB29F9" },
+      { at: 50, hex: "#B976FA" },
+      { at: 75, hex: "#C0A3FB" },
+      { at: 100, hex: "#CFC7FD" },
+    ],
+  },
+  // CYAN→AZURE lens, the water register: flood-prone → well-drained.
+  drainage: {
+    light: [
+      { at: 0, hex: "#1D9EAF" },
+      { at: 25, hex: "#168199" },
+      { at: 50, hex: "#0F6483" },
+      { at: 75, hex: "#08496B" },
+      { at: 100, hex: "#032F53" },
+    ],
+    dark: [
+      { at: 0, hex: "#106D78" },
+      { at: 25, hex: "#1888A2" },
+      { at: 50, hex: "#1FA4D3" },
+      { at: 75, hex: "#58BDFB" },
+      { at: 100, hex: "#ACD4FD" },
+    ],
+  },
+  // GREEN lens: dry lime (exposed asphalt) → deep canopy (shaded).
+  shade: {
+    light: [
+      { at: 0, hex: "#739D19" },
+      { at: 25, hex: "#4D8513" },
+      { at: 50, hex: "#246D0D" },
+      { at: 75, hex: "#09531B" },
+      { at: 100, hex: "#04381B" },
+    ],
+    dark: [
+      { at: 0, hex: "#4E6D0E" },
+      { at: 25, hex: "#528E15" },
+      { at: 50, hex: "#40B21C" },
+      { at: 75, hex: "#28D553" },
+      { at: 100, hex: "#30F58A" },
+    ],
+  },
+  // MAGENTA lens: pink (no/poor infra) → deep magenta (protected).
+  bike: {
+    light: [
+      { at: 0, hex: "#FB4B9C" },
+      { at: 25, hex: "#D81B8A" },
+      { at: 50, hex: "#A81375" },
+      { at: 75, hex: "#7B0B5D" },
+      { at: 100, hex: "#510543" },
+    ],
+    dark: [
+      { at: 0, hex: "#BD166D" },
+      { at: 25, hex: "#E21D91" },
+      { at: 50, hex: "#FB49B6" },
+      { at: 75, hex: "#FC86D2" },
+      { at: 100, hex: "#FDB5E8" },
+    ],
+  },
 };
 
-/** Width channel: lower score = thicker line (surfaces problems). Legend explains it. */
-const WIDTH_AT_0 = 6;
-const WIDTH_AT_100 = 2.5;
+/*
+ * Width channel: HIGHER score = thicker line, agreeing with colour and with the
+ * hero's height. Rev 7 ran 6px→2.5px the other way, a 2.4x spread that read as
+ * noise on a network whose streets already vary in apparent importance. 1.6→7px
+ * is 4.4x, and the extra 1.2px of absolute range is what makes the channel
+ * survive being glanced at rather than studied. The 1.6px floor is deliberate:
+ * a poor street must stay a drawn line, because it is still the answer to
+ * "which street needs work".
+ */
+const WIDTH_AT_0 = 1.6;
+const WIDTH_AT_100 = 7;
 
 function scoreProp(layer: ScoreLayer): string {
   return `score_${layer}`;
@@ -128,14 +220,74 @@ function rgbToHex(rgb: [number, number, number]): string {
   return (
     "#" +
     rgb
-      .map((c) => Math.round(c).toString(16).padStart(2, "0"))
+      .map((c) => Math.round(Math.max(0, Math.min(255, c))).toString(16).padStart(2, "0"))
       .join("")
   );
 }
 
-/** Sample a layer ramp at an arbitrary 0–100 value (used for legend swatches). */
-export function sampleRamp(layer: ScoreLayer, value: number): string {
-  const stops = RAMP[layer];
+/*
+ * CIELAB, mirroring MapLibre's own Color.lab getter EXACTLY — same D50 white
+ * point (0.96422 / 1 / 0.82521) and the same Bradford-adapted sRGB matrices it
+ * uses for `interpolate-lab`. Not a general colour library and not a place to
+ * be clever: its whole job is that sampleRamp() lands on the pixel the map
+ * paints, so the legend swatch and the line it explains cannot drift apart.
+ */
+const LAB_XN = 0.96422;
+const LAB_ZN = 0.82521;
+const LAB_T0 = 4 / 29;
+const LAB_T1 = 6 / 29;
+const LAB_T2 = 3 * LAB_T1 * LAB_T1;
+const LAB_T3 = LAB_T1 * LAB_T1 * LAB_T1;
+
+function srgbToLinear(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+function labF(t: number): number {
+  return t > LAB_T3 ? Math.cbrt(t) : t / LAB_T2 + LAB_T0;
+}
+
+function labFInv(t: number): number {
+  return t > LAB_T1 ? t * t * t : LAB_T2 * (t - LAB_T0);
+}
+
+function hexToLab(hex: string): [number, number, number] {
+  const [r, g, b] = hexToRgb(hex).map((c) => srgbToLinear(c / 255));
+  const y = labF(0.2225045 * r + 0.7168786 * g + 0.0606169 * b);
+  const x = labF((0.4360747 * r + 0.3850649 * g + 0.1430804 * b) / LAB_XN);
+  const z = labF((0.0139322 * r + 0.0971045 * g + 0.7141733 * b) / LAB_ZN);
+  return [Math.max(0, 116 * y - 16), 500 * (x - y), 200 * (y - z)];
+}
+
+function labToHex([l, a, bb]: [number, number, number]): string {
+  let y = (l + 16) / 116;
+  const x = LAB_XN * labFInv(y + a / 500);
+  const z = LAB_ZN * labFInv(y - bb / 200);
+  y = labFInv(y);
+  const toSrgb = (c: number) => {
+    const s = c <= 0.00304 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
+    return Math.max(0, Math.min(1, s)) * 255;
+  };
+  return rgbToHex([
+    toSrgb(3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
+    toSrgb(-0.9787684 * x + 1.9161415 * y + 0.033454 * z),
+    toSrgb(0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
+  ]);
+}
+
+/**
+ * Sample a layer ramp at an arbitrary 0–100 value, for the theme the reader is
+ * actually looking at. Used for legend swatches, the panel ink derivation, and
+ * the OG cards. Interpolates in CIELAB, not in raw sRGB: an sRGB lerp between
+ * two stops of different lightness dips through a desaturated middle, which is
+ * how rev 7's mid values ended up reading as mush.
+ */
+export function sampleRamp(
+  layer: ScoreLayer,
+  value: number,
+  theme: RampTheme = "light",
+): string {
+  const stops = RAMP[layer][theme];
   const v = Math.max(0, Math.min(100, value));
   let lo = stops[0];
   let hi = stops[stops.length - 1];
@@ -148,34 +300,47 @@ export function sampleRamp(layer: ScoreLayer, value: number): string {
   }
   const span = hi.at - lo.at || 1;
   const t = (v - lo.at) / span;
-  const a = hexToRgb(lo.hex);
-  const b = hexToRgb(hi.hex);
-  return rgbToHex([
+  const a = hexToLab(lo.hex);
+  const b = hexToLab(hi.hex);
+  return labToHex([
     a[0] + (b[0] - a[0]) * t,
     a[1] + (b[1] - a[1]) * t,
     a[2] + (b[2] - a[2]) * t,
   ]);
 }
 
-/** Representative line width for a 0–100 value (legend width cue + parity with map). */
+/**
+ * Representative line width for a 0–100 value (legend width cue + parity with
+ * the map). Grows with the score, like every other channel.
+ */
 export function widthForValue(value: number): number {
   const v = Math.max(0, Math.min(100, value));
   return WIDTH_AT_0 + (WIDTH_AT_100 - WIDTH_AT_0) * (v / 100);
 }
 
-/** MapLibre line-color expression for the active layer. */
-export function lineColorExpression(layer: ScoreLayer): ExpressionSpecification {
-  const stops = RAMP[layer];
+/**
+ * MapLibre line-color expression for the active layer on the active basemap.
+ *
+ * `interpolate-lab` rather than `interpolate`: MapLibre's plain interpolate
+ * lerps colour channels in gamma-encoded sRGB, which is not a perceptual space.
+ * The lab variant is MapLibre's own CIELAB path and is what sampleRamp mirrors.
+ */
+export function lineColorExpression(
+  layer: ScoreLayer,
+  theme: RampTheme = "light",
+): ExpressionSpecification {
+  const stops = RAMP[layer][theme];
   const prop = scoreProp(layer);
   return [
-    "interpolate",
+    "interpolate-lab",
     ["linear"],
     ["get", prop],
     ...stops.flatMap((s) => [s.at, s.hex] as [number, string]),
   ] as unknown as ExpressionSpecification;
 }
 
-/** MapLibre line-width expression: score-driven, thicker when the hover state is set. */
+/** MapLibre line-width expression: thicker with a HIGHER score (see the
+ *  direction rule at the top), and thicker again while hovered. */
 export function lineWidthExpression(layer: ScoreLayer): ExpressionSpecification {
   const prop = scoreProp(layer);
   const base: ExpressionSpecification = [
