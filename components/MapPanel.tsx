@@ -11,6 +11,7 @@ import {
   readMapPanelCollapsed,
   writeMapPanelCollapsed,
 } from "@/lib/map-panel-storage";
+import ExploreCta from "@/components/ExploreCta";
 import LayerSwitcher from "@/components/LayerSwitcher";
 import Legend from "@/components/Legend";
 import ProvenanceNote from "@/components/ProvenanceNote";
@@ -84,7 +85,7 @@ export default function MapPanel({
       data-map-panel
       data-panel-hydrated={hydrated ? "true" : "false"}
       aria-label={t("eyebrow")}
-      className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 rounded-[12px] p-4`}
+      className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex max-h-[calc(100%-3.25rem)] w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 overflow-y-auto rounded-[12px] p-4 pb-0`}
     >
       <header>
         <div className="flex items-start justify-between gap-2">
@@ -188,6 +189,11 @@ export default function MapPanel({
           />
         </div>
       </div>
+
+      {/* Outside the collapsible blocks on purpose: collapsing is how a visitor
+          asks for more map, and the invitation out of the map is exactly what a
+          visitor who never expands the panel would otherwise never see. */}
+      <ExploreCta />
     </section>
   );
 }
