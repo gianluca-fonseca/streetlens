@@ -23,7 +23,9 @@ console.log("real-data-era helper");
 const era = read("lib/real-data-era.ts");
 check("exports hideAuditedZeros", era.includes("export function hideAuditedZeros"));
 check("exports listRecentlyCvObserved", era.includes("export function listRecentlyCvObserved"));
-check("uses showDemoData gate", era.includes("showDemoData()"));
+// The era gate moved from a build-time env read to the resolved flag the caller
+// passes in, so the cookie switch can flip it live (test-demo-runtime-toggle).
+check("hideAuditedZeros gates on the resolved demo flag", era.includes("demoEnabled"));
 
 console.log("");
 console.log("landing composition surfaces");
@@ -33,7 +35,7 @@ check("Hero shows CV stats when audited hidden", hero.includes('t("stats.cvSegme
 check("Hero has CV segment empty state", hero.includes('t("segments.empty")'));
 
 const gap = read("components/landing/GapSection.tsx");
-check("GapSection drops stat3 when demo off", gap.includes("showDemoData()") && gap.includes('key: "3"'));
+check("GapSection drops stat3 when demo off", gap.includes("useDemoData()") && gap.includes('key: "3"'));
 
 const pilot = read("components/landing/PilotSection.tsx");
 check("PilotSection hides audited zeros", pilot.includes("auditedHidden") && pilot.includes('t("auditedEmpty")'));
