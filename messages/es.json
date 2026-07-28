@@ -1612,6 +1612,7 @@
     "meta": {
       "title": "{name} · {district}",
       "description": "Ficha de calle para {name} en {district}. Puntaje general {score}/100.",
+      "descriptionUnaudited": "Ficha de calle para {name} en {district}. Aún sin auditoría de campo, por lo que no tiene puntajes.",
       "notFoundTitle": "Calle no encontrada"
     },
     "chrome": {
@@ -1622,6 +1623,7 @@
     "eyebrow": "Ficha de calle",
     "demoNote": "Auditoría de demostración. Los datos de campo reales reemplazarán este corredor tramo a tramo desde agosto de 2026.",
     "scoresHeading": "Puntajes por capa",
+    "auditedEmpty": "Esta calle aún no ha sido auditada en campo, por lo que no tiene puntajes. Su geometría proviene de OpenStreetMap; la recolección de campo en San Antonio de Escazú comienza en agosto de 2026.",
     "provenanceHeading": "Procedencia",
     "assessmentHeading": "Evaluación",
     "assessmentNote": "Redactado por el modelo de cámara, en inglés. No es una auditoría de campo.",
@@ -1649,6 +1651,7 @@
     "og": {
       "eyebrow": "Ficha de calle",
       "overall": "General",
+      "unaudited": "Aún sin auditoría de campo. La recolección comienza en agosto de 2026.",
       "layers": {
         "accessibility": "Acceso",
         "drainage": "Drenaje",

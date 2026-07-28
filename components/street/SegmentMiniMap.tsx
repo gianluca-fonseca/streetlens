@@ -3,14 +3,19 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import type { LineString } from "geojson";
-import { sampleRamp } from "@/components/mapConfig";
+import { COMMUNITY_CASING, sampleRamp } from "@/components/mapConfig";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 const LIBERTY_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
 type SegmentMiniMapProps = Readonly<{
   geometry: LineString;
-  overallScore: number;
+  /**
+   * The overall score, or null when no audit stands behind this street. Null
+   * draws the neutral dashed casing the map already uses for unaudited
+   * segments: a ramp colour is itself a reading, and there is nothing to read.
+   */
+  overallScore: number | null;
 }>;
 
 /**
@@ -25,7 +30,10 @@ export default function SegmentMiniMap({ geometry, overallScore }: SegmentMiniMa
     const coordinates = geometry.coordinates;
     if (!container || coordinates.length < 2) return;
 
-    const lineColor = sampleRamp("overall", overallScore);
+    const audited = overallScore !== null;
+    const lineColor = audited
+      ? sampleRamp("overall", overallScore)
+      : COMMUNITY_CASING.color;
 
     const map = new maplibregl.Map({
       container,
@@ -55,7 +63,13 @@ export default function SegmentMiniMap({ geometry, overallScore }: SegmentMiniMa
         type: "line",
         source: "segment",
         layout: { "line-cap": "round", "line-join": "round" },
-        paint: { "line-color": lineColor, "line-width": 3.5 },
+        paint: {
+          "line-color": lineColor,
+          "line-width": 3.5,
+          // Dashed reads as provisional, the same signal the map gives an
+          // unaudited segment.
+          ...(audited ? {} : { "line-dasharray": [...COMMUNITY_CASING.dash] }),
+        },
       });
 
       const bounds = coordinates.reduce(

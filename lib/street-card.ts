@@ -8,6 +8,7 @@ import {
   splitCvObservations,
 } from "@/lib/cv-provenance";
 import type { PublicCvObservation } from "@/lib/map-payload";
+import { showDemoData } from "@/lib/demo-flag";
 import { getSegmentMapDetail } from "@/lib/segment-map-detail";
 import { getSegmentDetail } from "@/lib/segments";
 import type { CommunityReport, ScoreLayer } from "@/lib/types";
@@ -27,20 +28,36 @@ export type StreetCardData = {
   district: string;
   demo: boolean;
   geometry: LineString;
+  /**
+   * The five rubric figures. Meaningless unless `hasAudit` is true: an
+   * unaudited segment carries structural zeros, never measurements. Read
+   * `hasAudit` first, always.
+   */
   scores: Record<ScoreLayer, number>;
+  /**
+   * Whether a rubric audit actually stands behind `scores`. False in the
+   * real-data era, and false for a community or camera-only street in any era.
+   * The single guard against printing `0%` as though it were a measured
+   * failure.
+   */
+  hasAudit: boolean;
   provenance: StreetProvenanceLine[];
   assessment: string | null;
 };
 
-function hasMeasurableData(
+/**
+ * Whether a rubric audit backs this segment's scores.
+ *
+ * The audit block is the direct evidence, and a live Supabase row can carry
+ * scores with the observation detail fetched separately, so a positive figure
+ * counts too. Camera observations and community reports deliberately do NOT:
+ * they are real provenance, and they get their own sections on the card, but
+ * neither one produces a rubric score, so neither one may unlock the score grid.
+ */
+function hasAuditedScores(
   segment: NonNullable<Awaited<ReturnType<typeof getSegmentDetail>>>,
-  cv: PublicCvObservation[],
-  reports: CommunityReport[],
-  embedded: CommunityReport | null,
 ): boolean {
   if (segment.audit) return true;
-  if (cv.length > 0) return true;
-  if (reports.length > 0 || embedded) return true;
   const { overall, accessibility, drainage, shade, bike } = segment.scores;
   return [overall, accessibility, drainage, shade, bike].some(
     (v) => typeof v === "number" && Number.isFinite(v) && v > 0,
@@ -88,12 +105,23 @@ function provenanceLines(
   return lines;
 }
 
-/** Full street card payload, or null when the segment is unknown or empty. */
+/**
+ * Full street card payload, or null when the segment id is unknown.
+ *
+ * A street with nothing measured is still a street: it keeps its name, its
+ * district and its geometry, and the card says plainly that no field audit
+ * stands behind it yet. Only an id that resolves to no segment at all is a 404.
+ *
+ * @param demoEnabled The effective demo-data flag, resolved per request by the
+ * page with `demoDataEnabled()`. Defaults to the build-time default so the
+ * shared, CDN-cached surfaces (the OG image) never vary on one browser's cookie.
+ */
 export async function getStreetCard(
   segmentId: string,
   locale: string,
+  demoEnabled: boolean = showDemoData(),
 ): Promise<StreetCardData | null> {
-  const segment = await getSegmentDetail(segmentId);
+  const segment = await getSegmentDetail(segmentId, demoEnabled);
   if (!segment) return null;
 
   const detail = await getSegmentMapDetail(segmentId);
@@ -103,10 +131,6 @@ export async function getStreetCard(
   ];
   const { canonical } = splitCvObservations(detail.cv_observations);
 
-  if (!hasMeasurableData(segment, detail.cv_observations, detail.community_reports, detail.community_report)) {
-    return null;
-  }
-
   return {
     id: segment.id,
     name: segment.name,
@@ -114,6 +138,7 @@ export async function getStreetCard(
     demo: segment.demo,
     geometry: segment.geometry,
     scores: segment.scores,
+    hasAudit: hasAuditedScores(segment),
     provenance: provenanceLines(segment, canonical, reports, locale),
     assessment: canonical ? cvOverallAssessment(canonical.assessment) : null,
   };

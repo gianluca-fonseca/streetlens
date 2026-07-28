@@ -1612,6 +1612,7 @@
     "meta": {
       "title": "{name} · {district}",
       "description": "Street report card for {name} in {district}. Overall score {score}/100.",
+      "descriptionUnaudited": "Street report card for {name} in {district}. Not yet field-audited, so it carries no scores.",
       "notFoundTitle": "Street not found"
     },
     "chrome": {
@@ -1622,6 +1623,7 @@
     "eyebrow": "Street report card",
     "demoNote": "Demo audit. Real field data replaces this corridor by corridor from August 2026.",
     "scoresHeading": "Scores by layer",
+    "auditedEmpty": "This street has not been field-audited yet, so it carries no scores. Its geometry comes from OpenStreetMap; field collection in San Antonio de Escazú begins in August 2026.",
     "provenanceHeading": "Provenance",
     "assessmentHeading": "Assessment",
     "assessmentNote": "Written by the camera model, in English. Not a field audit.",
@@ -1649,6 +1651,7 @@
     "og": {
       "eyebrow": "Street report card",
       "overall": "Overall",
+      "unaudited": "Not yet field-audited. Field collection begins in August 2026.",
       "layers": {
         "accessibility": "Access",
         "drainage": "Drain",

@@ -57,28 +57,40 @@ export default async function StreetCard({ card }: StreetCardProps) {
         ) : null}
       </header>
 
-      <section className="mt-6">
-        <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-strong">
-          {t("scoresHeading")}
-        </h2>
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {LAYER_ORDER.map((layer) => (
-            <li
-              key={layer}
-              style={inkStyle(layer, card.scores[layer])}
-              className="rounded-[8px] border border-border bg-surface-elevated px-3 py-2.5"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-[12px] text-ink">{t(`layers.${layer}`)}</span>
-                <span className={`font-mono text-[14px] font-semibold ${panel.scoreInk}`}>
-                  {card.scores[layer]}
-                </span>
-              </div>
-              <Meter value={card.scores[layer]} />
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* The whole score apparatus hangs off one boolean. With no audit behind
+          this street there is no figure, no meter and no heading: a grid of
+          zeroed lenses would read as a street that failed every measure rather
+          than one nobody has measured. */}
+      {card.hasAudit ? (
+        <section className="mt-6">
+          <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-strong">
+            {t("scoresHeading")}
+          </h2>
+          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {LAYER_ORDER.map((layer) => (
+              <li
+                key={layer}
+                style={inkStyle(layer, card.scores[layer])}
+                className="rounded-[8px] border border-border bg-surface-elevated px-3 py-2.5"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-[12px] text-ink">{t(`layers.${layer}`)}</span>
+                  <span className={`font-mono text-[14px] font-semibold ${panel.scoreInk}`}>
+                    {card.scores[layer]}
+                  </span>
+                </div>
+                <Meter value={card.scores[layer]} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : (
+        <section className="mt-6">
+          <p className="rounded-[8px] border border-dashed border-border-strong bg-surface-sunken px-3 py-3 text-[13px] leading-relaxed text-neutral-strong">
+            {t("auditedEmpty")}
+          </p>
+        </section>
+      )}
 
       {card.provenance.length > 0 ? (
         <section className="mt-6">
@@ -126,7 +138,10 @@ export default async function StreetCard({ card }: StreetCardProps) {
         </h2>
         <div className="overflow-hidden rounded-[8px] border border-hairline bg-paper-sunken">
           <div className="h-[220px] sm:h-[280px]">
-            <StreetCardMap geometry={card.geometry} overallScore={card.scores.overall} />
+            <StreetCardMap
+              geometry={card.geometry}
+              overallScore={card.hasAudit ? card.scores.overall : null}
+            />
           </div>
         </div>
         <p className="mt-2 text-[12px] text-ink-muted">{t("mapHint")}</p>
