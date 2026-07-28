@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { OG_LOCALE, SITE_NAME, TITLE_TEMPLATE, siteMetadataBase } from "@/lib/site";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "../globals.css";
 
@@ -58,8 +59,38 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "metadata" });
 
   return {
-    title: t("title"),
+    // Resolved once, from lib/site.ts, so every relative canonical, hreflang
+    // and OG image URL below this layout composes against the same origin.
+    metadataBase: siteMetadataBase(),
+    title: {
+      // `default` covers any route that ships no title of its own; `template`
+      // suffixes the brand onto the ones that do, so a page only has to name
+      // itself. A page that already names the brand opts out with
+      // `title.absolute` (see buildPageMetadata).
+      default: t("title"),
+      template: TITLE_TEMPLATE,
+    },
     description: t("description"),
+    applicationName: SITE_NAME,
+    // Site-wide crawl posture. Nothing here is private; the pages that are
+    // (admin, per-submission status) opt out in their own segments.
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      locale: OG_LOCALE[locale],
+      title: t("title"),
+      description: t("description"),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("title"),
+      description: t("description"),
+    },
   };
 }
 
