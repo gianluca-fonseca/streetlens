@@ -28,7 +28,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "collect.status.meta" });
-  return { title: t("title"), description: t("description") };
+  return {
+    title: t("title"),
+    description: t("description"),
+    // One contributor's walk, addressed by uuid. There is nothing here for a
+    // search index, and a crawled status URL would expose a session id, so this
+    // route opts out. robots.txt disallows the prefix as well.
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function CollectStatusPage({

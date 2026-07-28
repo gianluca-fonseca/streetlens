@@ -3,6 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
 import { showDemoData } from "@/lib/demo-flag";
+import { MUNICIPALITY } from "@/lib/municipality";
+import { buildPageMetadata } from "@/lib/site";
 import AuditMap from "@/components/AuditMap";
 import DemoBanner from "@/components/DemoBanner";
 import MapChrome from "@/components/MapChrome";
@@ -15,11 +17,13 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "metadata" });
-  return {
-    title: t("title"),
-    description: t("description"),
-  };
+  const t = await getTranslations({ locale, namespace: "map.meta" });
+  return buildPageMetadata({
+    locale,
+    path: "/map",
+    title: t("title", { municipality: MUNICIPALITY.name }),
+    description: t("description", { municipality: MUNICIPALITY.name }),
+  });
 }
 
 export default async function MapPage({

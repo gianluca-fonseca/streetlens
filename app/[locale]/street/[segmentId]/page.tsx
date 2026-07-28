@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import StreetCard from "@/components/street/StreetCard";
 import StreetChrome from "@/components/street/StreetChrome";
+import { buildPageMetadata } from "@/lib/site";
 import { getStreetCard } from "@/lib/street-card";
 
 export const revalidate = 300;
@@ -28,20 +29,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     score: card.scores.overall,
   });
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: `/street/${segmentId}`,
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "article",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
-  };
+    ogType: "article",
+  });
 }
 
 export default async function StreetPage({ params }: PageProps) {

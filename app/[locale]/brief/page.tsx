@@ -6,6 +6,7 @@ import PrintButton from "@/components/civic/PrintButton";
 import { buildLeyBriefSummary } from "@/lib/ley-brief";
 import { MUNICIPALITY } from "@/lib/municipality";
 import { getSegments } from "@/lib/segments";
+import { buildPageMetadata } from "@/lib/site";
 import { LEY_7600_MIN_SCORE } from "@/lib/types";
 
 export const revalidate = 300;
@@ -17,10 +18,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "brief.meta" });
-  return {
+  return buildPageMetadata({
+    locale,
+    path: "/brief",
     title: t("title", { municipality: MUNICIPALITY.name }),
     description: t("description", { municipality: MUNICIPALITY.name }),
-  };
+  });
 }
 
 export default async function BriefPage({

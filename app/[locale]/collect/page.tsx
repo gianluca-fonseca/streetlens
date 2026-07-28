@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import CollectClient from "@/app/[locale]/collect/CollectClient";
 import { parseCollectDeepLink } from "@/lib/capture/collect-deep-link";
+import { buildPageMetadata } from "@/lib/site";
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "collect.meta" });
-  return { title: t("title"), description: t("description") };
+  return buildPageMetadata({
+    locale,
+    path: "/collect",
+    title: t("title"),
+    description: t("description"),
+  });
 }
 
 export default async function CollectPage({
