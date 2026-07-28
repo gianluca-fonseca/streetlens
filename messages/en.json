@@ -109,6 +109,7 @@
     "auditedLabel": "Audited",
     "scoresHeading": "Scores by layer",
     "breakdownHeading": "Rubric breakdown",
+    "fieldNoteLabel": "Field note",
     "photosHeading": "Photos",
     "photoPlaceholder": "Photo pending fieldwork",
     "photoHeld": "Camera frames held for review",
@@ -1625,6 +1626,9 @@
     "provenanceHeading": "Provenance",
     "assessmentHeading": "Assessment",
     "assessmentNote": "Written by the camera model, in English. Not a field audit.",
+    "observationsHeading": "Field observations",
+    "observationsNote": "What the audit crew answered for each rubric item, with the notes they wrote on the street.",
+    "fieldNoteLabel": "Field note",
     "mapHeading": "Location",
     "mapHint": "Open the full map to explore this segment in context.",
     "layers": {
