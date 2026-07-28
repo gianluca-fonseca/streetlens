@@ -1048,8 +1048,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate, a la par del caño.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, alongside the gutter.",
           "photos": []
         },
         {
@@ -2932,8 +2932,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -3264,8 +3264,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -3785,8 +3785,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
           "photos": []
         },
         {
@@ -4800,8 +4800,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -4971,8 +4971,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida, al final de la cuadra.",
+          "note_en": "Only a gravel shoulder, no built sidewalk, at the end of the block.",
           "photos": []
         },
         {
@@ -9826,8 +9826,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida, al final de la cuadra.",
+          "note_en": "Only a gravel shoulder, no built sidewalk, at the end of the block.",
           "photos": []
         },
         {
@@ -10699,8 +10699,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -11562,8 +11562,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -11909,14 +11909,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0070/sidewalk_present.jpg",
-              "taken_at": "2026-06-24T16:59:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -12620,14 +12615,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0074/sidewalk_present.jpg",
-              "taken_at": "2026-06-27T19:26:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -12976,8 +12966,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -13997,8 +13987,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
           "photos": []
         },
         {
@@ -17948,14 +17938,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0105/sidewalk_present.jpg",
-              "taken_at": "2026-06-15T19:53:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -18797,8 +18782,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -19324,8 +19309,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -20872,8 +20857,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -21541,9 +21526,14 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0126/sidewalk_present.jpg",
+              "taken_at": "2026-06-08T19:52:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -22058,8 +22048,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, frente al portón azul.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, in front of the blue gate.",
           "photos": []
         },
         {
@@ -22158,8 +22148,8 @@
           "label_es": "Iluminación pública",
           "layer": "overall",
           "response": 0.25,
-          "note": "Dos luminarias quemadas y la cuadra queda oscura, frente al portón azul.",
-          "note_en": "Two lamps burned out and the block goes dark, in front of the blue gate.",
+          "note": "Dos luminarias quemadas y la cuadra queda oscura, a la par del caño.",
+          "note_en": "Two lamps burned out and the block goes dark, alongside the gutter.",
           "photos": []
         },
         {
@@ -26461,8 +26451,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -26632,8 +26622,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -26969,8 +26959,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -29180,8 +29170,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -29517,8 +29507,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, frente al portón azul.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, in front of the blue gate.",
           "photos": []
         },
         {
@@ -29647,8 +29637,8 @@
           "label_es": "Carril o vía ciclista dedicada",
           "layer": "bike",
           "response": 0,
-          "note": "Sin ciclovía; la bicicleta comparte carril con los buses, frente al portón azul.",
-          "note_en": "No bike lane; a bicycle shares the lane with buses, in front of the blue gate.",
+          "note": "Sin ciclovía; la bicicleta comparte carril con los buses, a la altura de la pulpería.",
+          "note_en": "No bike lane; a bicycle shares the lane with buses, by the corner shop.",
           "photos": []
         },
         {
@@ -30386,9 +30376,14 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0178/sidewalk_present.jpg",
+              "taken_at": "2026-06-09T19:54:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -31573,9 +31568,14 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0185/sidewalk_present.jpg",
+              "taken_at": "2026-06-13T13:52:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -32754,9 +32754,14 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0192/sidewalk_present.jpg",
+              "taken_at": "2026-06-10T20:31:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -34985,14 +34990,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0205/sidewalk_present.jpg",
-              "taken_at": "2026-06-26T14:38:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate, en el costado sur.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, on the south side.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -35050,8 +35050,8 @@
           "label_es": "Sin evidencia de encharcamiento",
           "layer": "drainage",
           "response": 0.25,
-          "note": "Marca de agua en la pared a unos 20 cm del suelo, en el costado sur.",
-          "note_en": "Water line on the wall about 20 cm above the ground, on the south side.",
+          "note": "Marca de agua en la pared a unos 20 cm del suelo, en el costado norte.",
+          "note_en": "Water line on the wall about 20 cm above the ground, on the north side.",
           "photos": []
         },
         {
@@ -35493,8 +35493,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
           "photos": []
         },
         {
@@ -36528,8 +36528,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -36694,8 +36694,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -37031,8 +37031,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -42047,8 +42047,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, junto al poste del ICE.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, next to the utility pole.",
           "photos": []
         },
         {
@@ -42182,8 +42182,8 @@
           "label_es": "Separación del tráfico motorizado",
           "layer": "bike",
           "response": 0,
-          "note": "Hombro inexistente; el bus pasa rozando, junto al poste del ICE.",
-          "note_en": "No shoulder at all; buses pass within inches, next to the utility pole.",
+          "note": "Hombro inexistente; el bus pasa rozando, en el costado norte.",
+          "note_en": "No shoulder at all; buses pass within inches, on the north side.",
           "photos": []
         },
         {
@@ -42735,18 +42735,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0250/sidewalk_present.jpg",
-              "taken_at": "2026-06-18T13:24:00Z"
-            },
-            {
-              "storage_path": "demo/esc-sa-0250/sidewalk_present-2.jpg",
-              "taken_at": "2026-06-18T14:53:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate, en la curva.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, on the bend.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -42910,8 +42901,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -43603,8 +43594,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida, en el costado norte.",
+          "note_en": "Only a gravel shoulder, no built sidewalk, on the north side.",
           "photos": []
         },
         {
@@ -47211,8 +47202,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -47548,8 +47539,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
           "photos": []
         },
         {
@@ -47885,8 +47876,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, donde arranca la subida.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, where the climb begins.",
           "photos": []
         },
         {
@@ -47965,8 +47956,8 @@
           "label_es": "Cobertura de dosel arbóreo",
           "layer": "shade",
           "response": 0.59,
-          "note": "Árboles solo sobre un costado, donde arranca la subida.",
-          "note_en": "Trees on one side only, where the climb begins.",
+          "note": "Árboles solo sobre un costado, al final de la cuadra.",
+          "note_en": "Trees on one side only, at the end of the block.",
           "photos": []
         },
         {
@@ -48005,8 +47996,8 @@
           "label_es": "Carril o vía ciclista dedicada",
           "layer": "bike",
           "response": 0,
-          "note": "No existe ninguna facilidad ciclista en el tramo, al final de la cuadra.",
-          "note_en": "There is no cycling provision at all on this stretch, at the end of the block.",
+          "note": "No existe ninguna facilidad ciclista en el tramo, junto al poste del ICE.",
+          "note_en": "There is no cycling provision at all on this stretch, next to the utility pole.",
           "photos": []
         },
         {
@@ -48025,8 +48016,8 @@
           "label_es": "Calidad de la superficie ciclable",
           "layer": "bike",
           "response": 0,
-          "note": "Lastre suelto sobre el asfalto en la orilla, junto al poste del ICE.",
-          "note_en": "Loose gravel over the asphalt at the edge, next to the utility pole.",
+          "note": "Lastre suelto sobre el asfalto en la orilla, en la curva.",
+          "note_en": "Loose gravel over the asphalt at the edge, on the bend.",
           "photos": []
         }
       ]
@@ -49769,18 +49760,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0291/sidewalk_present.jpg",
-              "taken_at": "2026-06-22T15:33:00Z"
-            },
-            {
-              "storage_path": "demo/esc-sa-0291/sidewalk_present-2.jpg",
-              "taken_at": "2026-06-22T18:07:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate, en el costado norte.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, on the north side.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -49893,8 +49875,8 @@
           "label_es": "Seguridad en cruces",
           "layer": "overall",
           "response": 0,
-          "note": "Los carros bajan rápido y no hay reductor, en el costado norte.",
-          "note_en": "Cars come down fast and there is no speed hump, on the north side.",
+          "note": "Los carros bajan rápido y no hay reductor, a la altura de la pulpería.",
+          "note_en": "Cars come down fast and there is no speed hump, by the corner shop.",
           "photos": []
         },
         {
@@ -50296,8 +50278,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, cerca de la parada de bus.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, near the bus stop.",
           "photos": []
         },
         {
@@ -50426,8 +50408,8 @@
           "label_es": "Separación del tráfico motorizado",
           "layer": "bike",
           "response": 0,
-          "note": "Nada separa a la bicicleta del tráfico, cerca de la parada de bus.",
-          "note_en": "Nothing separates a bicycle from traffic, near the bus stop.",
+          "note": "Nada separa a la bicicleta del tráfico, junto al poste del ICE.",
+          "note_en": "Nothing separates a bicycle from traffic, next to the utility pole.",
           "photos": [
             {
               "storage_path": "demo/esc-sa-0294/bike_separation.jpg",
@@ -50808,8 +50790,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, a la par del caño.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, alongside the gutter.",
           "photos": []
         },
         {
@@ -50928,8 +50910,8 @@
           "label_es": "Carril o vía ciclista dedicada",
           "layer": "bike",
           "response": 0,
-          "note": "No existe ninguna facilidad ciclista en el tramo, a la par del caño.",
-          "note_en": "There is no cycling provision at all on this stretch, alongside the gutter.",
+          "note": "No existe ninguna facilidad ciclista en el tramo, al final de la cuadra.",
+          "note_en": "There is no cycling provision at all on this stretch, at the end of the block.",
           "photos": []
         },
         {
@@ -52691,8 +52673,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida, a la altura de la pulpería.",
+          "note_en": "Only a gravel shoulder, no built sidewalk, by the corner shop.",
           "photos": []
         },
         {
@@ -52866,8 +52848,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -54052,8 +54034,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -54398,8 +54380,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, a la par del caño.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, alongside the gutter.",
           "photos": []
         },
         {
@@ -54528,8 +54510,8 @@
           "label_es": "Carril o vía ciclista dedicada",
           "layer": "bike",
           "response": 0,
-          "note": "No existe ninguna facilidad ciclista en el tramo, a la par del caño.",
-          "note_en": "There is no cycling provision at all on this stretch, alongside the gutter.",
+          "note": "No existe ninguna facilidad ciclista en el tramo, cerca de la parada de bus.",
+          "note_en": "There is no cycling provision at all on this stretch, near the bus stop.",
           "photos": []
         },
         {
@@ -57016,9 +56998,18 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0333/sidewalk_present.jpg",
+              "taken_at": "2026-06-10T17:03:00Z"
+            },
+            {
+              "storage_path": "demo/esc-sa-0333/sidewalk_present-2.jpg",
+              "taken_at": "2026-06-10T14:00:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -58414,9 +58405,18 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0341/sidewalk_present.jpg",
+              "taken_at": "2026-06-29T14:27:00Z"
+            },
+            {
+              "storage_path": "demo/esc-sa-0341/sidewalk_present-2.jpg",
+              "taken_at": "2026-06-29T19:04:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -58760,8 +58760,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate, a la par del caño.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, alongside the gutter.",
           "photos": []
         },
         {
@@ -58800,8 +58800,8 @@
           "label_es": "Paso libre de obstáculos",
           "layer": "accessibility",
           "response": 0,
-          "note": "El hombro se corta donde arranca el muro, a la par del caño.",
-          "note_en": "The verge stops where the wall begins, alongside the gutter.",
+          "note": "El hombro se corta donde arranca el muro, en el costado sur.",
+          "note_en": "The verge stops where the wall begins, on the south side.",
           "photos": []
         },
         {
@@ -60112,9 +60112,18 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0351/sidewalk_present.jpg",
+              "taken_at": "2026-06-19T16:12:00Z"
+            },
+            {
+              "storage_path": "demo/esc-sa-0351/sidewalk_present-2.jpg",
+              "taken_at": "2026-06-19T13:21:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -64599,14 +64608,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0377/sidewalk_present.jpg",
-              "taken_at": "2026-06-22T20:42:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -68011,18 +68015,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0397/sidewalk_present.jpg",
-              "taken_at": "2026-06-08T18:12:00Z"
-            },
-            {
-              "storage_path": "demo/esc-sa-0397/sidewalk_present-2.jpg",
-              "taken_at": "2026-06-08T15:22:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -68533,8 +68528,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -69372,14 +69367,9 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": [
-            {
-              "storage_path": "demo/esc-sa-0405/sidewalk_present.jpg",
-              "taken_at": "2026-06-10T15:40:00Z"
-            }
-          ]
+          "note": "No hay acera; se camina por el caño o sobre el zacate, a la altura de la pulpería.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, by the corner shop.",
+          "photos": []
         },
         {
           "item_key": "sidewalk_width",
@@ -69467,8 +69457,8 @@
           "label_es": "Sombra al mediodía",
           "layer": "shade",
           "response": 0.75,
-          "note": "Sombra continua al mediodía, a la altura de la pulpería.",
-          "note_en": "Continuous shade at midday, by the corner shop.",
+          "note": "Sombra continua al mediodía, en la curva.",
+          "note_en": "Continuous shade at midday, on the bend.",
           "photos": []
         },
         {
@@ -69543,9 +69533,14 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, a la altura de la pulpería.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, by the corner shop.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0406/sidewalk_present.jpg",
+              "taken_at": "2026-06-10T18:16:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -69653,8 +69648,8 @@
           "label_es": "Seguridad en cruces",
           "layer": "overall",
           "response": 0.25,
-          "note": "Cruce sin demarcar y con poca visibilidad, a la altura de la pulpería.",
-          "note_en": "Unmarked crossing with poor sightlines, by the corner shop.",
+          "note": "Cruce sin demarcar y con poca visibilidad, al final de la cuadra.",
+          "note_en": "Unmarked crossing with poor sightlines, at the end of the block.",
           "photos": []
         },
         {
@@ -69673,8 +69668,8 @@
           "label_es": "Separación del tráfico motorizado",
           "layer": "bike",
           "response": 0,
-          "note": "Nada separa a la bicicleta del tráfico, al final de la cuadra.",
-          "note_en": "Nothing separates a bicycle from traffic, at the end of the block.",
+          "note": "Nada separa a la bicicleta del tráfico, en el costado sur.",
+          "note_en": "Nothing separates a bicycle from traffic, on the south side.",
           "photos": []
         },
         {
@@ -71797,8 +71792,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, en el costado sur.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, on the south side.",
           "photos": []
         },
         {
@@ -71907,8 +71902,8 @@
           "label_es": "Seguridad en cruces",
           "layer": "overall",
           "response": 0.25,
-          "note": "Cruce sin demarcar y con poca visibilidad, en el costado sur.",
-          "note_en": "Unmarked crossing with poor sightlines, on the south side.",
+          "note": "Cruce sin demarcar y con poca visibilidad, a la altura de la pulpería.",
+          "note_en": "Unmarked crossing with poor sightlines, by the corner shop.",
           "photos": []
         },
         {
@@ -71917,8 +71912,8 @@
           "label_es": "Carril o vía ciclista dedicada",
           "layer": "bike",
           "response": 0,
-          "note": "Sin ciclovía; la bicicleta comparte carril con los buses, a la altura de la pulpería.",
-          "note_en": "No bike lane; a bicycle shares the lane with buses, by the corner shop.",
+          "note": "Sin ciclovía; la bicicleta comparte carril con los buses, junto al poste del ICE.",
+          "note_en": "No bike lane; a bicycle shares the lane with buses, next to the utility pole.",
           "photos": []
         },
         {
@@ -73328,8 +73323,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -82268,8 +82263,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -85513,9 +85508,14 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0499/sidewalk_present.jpg",
+              "taken_at": "2026-06-27T13:22:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -87896,9 +87896,14 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
-          "photos": []
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
+          "photos": [
+            {
+              "storage_path": "demo/esc-sa-0513/sidewalk_present.jpg",
+              "taken_at": "2026-06-13T17:30:00Z"
+            }
+          ]
         },
         {
           "item_key": "sidewalk_width",
@@ -89452,8 +89457,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "Solo hay hombro de lastre, sin acera construida.",
+          "note_en": "Only a gravel shoulder, no built sidewalk.",
           "photos": []
         },
         {
@@ -89618,8 +89623,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate, a la par del caño.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, alongside the gutter.",
           "photos": []
         },
         {
@@ -89753,8 +89758,8 @@
           "label_es": "Separación del tráfico motorizado",
           "layer": "bike",
           "response": 0,
-          "note": "Hombro inexistente; el bus pasa rozando, a la par del caño.",
-          "note_en": "No shoulder at all; buses pass within inches, alongside the gutter.",
+          "note": "Hombro inexistente; el bus pasa rozando, donde arranca la subida.",
+          "note_en": "No shoulder at all; buses pass within inches, where the climb begins.",
           "photos": []
         },
         {
@@ -89789,8 +89794,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra, cerca de la parada de bus.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block, near the bus stop.",
           "photos": []
         },
         {
@@ -89829,8 +89834,8 @@
           "label_es": "Paso libre de obstáculos",
           "layer": "accessibility",
           "response": 0.25,
-          "note": "Toca caminar por el caño porque el hombro está ocupado, cerca de la parada de bus.",
-          "note_en": "You end up walking in the gutter because the verge is taken up, near the bus stop.",
+          "note": "Toca caminar por el caño porque el hombro está ocupado, al final de la cuadra.",
+          "note_en": "You end up walking in the gutter because the verge is taken up, at the end of the block.",
           "photos": []
         },
         {
@@ -89859,8 +89864,8 @@
           "label_es": "Estado de cordón y caño",
           "layer": "drainage",
           "response": 0,
-          "note": "El cordón está quebrado y desplazado por varios metros, al final de la cuadra.",
-          "note_en": "The curb is broken and displaced over several metres, at the end of the block.",
+          "note": "El cordón está quebrado y desplazado por varios metros, en el costado norte.",
+          "note_en": "The curb is broken and displaced over several metres, on the north side.",
           "photos": []
         },
         {
@@ -89929,8 +89934,8 @@
           "label_es": "Calidad de la superficie ciclable",
           "layer": "bike",
           "response": 0.25,
-          "note": "Lastre suelto sobre el asfalto en la orilla, en el costado norte.",
-          "note_en": "Loose gravel over the asphalt at the edge, on the north side.",
+          "note": "Lastre suelto sobre el asfalto en la orilla, a la altura de la pulpería.",
+          "note_en": "Loose gravel over the asphalt at the edge, by the corner shop.",
           "photos": []
         }
       ]
@@ -90292,8 +90297,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "La acera termina de golpe y no vuelve a aparecer en toda la cuadra.",
+          "note_en": "The sidewalk ends abruptly and never reappears along the block.",
           "photos": []
         },
         {
@@ -90971,8 +90976,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate, junto al poste del ICE.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge, next to the utility pole.",
           "photos": []
         },
         {
@@ -91041,8 +91046,8 @@
           "label_es": "Estado de cordón y caño",
           "layer": "drainage",
           "response": 0.5,
-          "note": "Cordón continuo, pero el caño acumula sedimento, junto al poste del ICE.",
-          "note_en": "Continuous curb, but the gutter collects silt, next to the utility pole.",
+          "note": "Cordón continuo, pero el caño acumula sedimento, en el costado norte.",
+          "note_en": "Continuous curb, but the gutter collects silt, on the north side.",
           "photos": []
         },
         {
@@ -91497,8 +91502,8 @@
           "label_es": "Acera presente",
           "layer": "accessibility",
           "response": 0,
-          "note": null,
-          "note_en": null,
+          "note": "No hay acera; se camina por el caño o sobre el zacate.",
+          "note_en": "No sidewalk; people walk in the gutter or on the grass verge.",
           "photos": []
         },
         {

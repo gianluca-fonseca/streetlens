@@ -689,6 +689,18 @@ const NOTE_PROBABILITY = { low: 0.4, mid: 0.24, high: 0.05, verge: 0.34 };
 const PHOTO_PROBABILITY = { low: 0.13, mid: 0.05, high: 0.012, verge: 0.1 };
 
 /**
+ * A missing sidewalk is the most consequential thing a crew can find on a
+ * segment, and it drags four accessibility items to zero at once. It gets
+ * written down far more often than a merely narrow one does, and without that
+ * the panel shows five bare zeros and no explanation.
+ */
+const NOTE_PROBABILITY_OVERRIDES = { sidewalk_present: { low: 0.78 } };
+
+function noteProbability(key, band) {
+  return NOTE_PROBABILITY_OVERRIDES[key]?.[band] ?? NOTE_PROBABILITY[band];
+}
+
+/**
  * Items that only mean something once a sidewalk exists. On a segment with no
  * acera the crew records the absence once, on `sidewalk_present`, and leaves
  * these blank. Writing "the slabs are broken" under a missing sidewalk is the
@@ -925,7 +937,7 @@ async function build() {
 
       let note = null;
       let noteEn = null;
-      if (band !== null && rand() < NOTE_PROBABILITY[band]) {
+      if (band !== null && rand() < noteProbability(item.key, band)) {
         ({ note, note_en: noteEn } = buildNote(item.key, band, rand, nextLocator));
         noteCount += 1;
       }
