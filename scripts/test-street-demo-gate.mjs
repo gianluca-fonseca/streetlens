@@ -21,6 +21,12 @@
  *     behind it, and never false while one is being published.
  *   - a street with no audit is still a street: getStreetCard returns a card,
  *     not null (which the page turns into a 404).
+ *
+ * The last two sections were added at the wave-2 merge, where this gate met the
+ * field notes. Neither branch could assert them alone: one had a card with no
+ * notes on it, the other had notes with no gate under them. They lock the thing
+ * the merge exists to prevent, which is a crew's prose surviving into an era the
+ * same page says was never audited, on the card or on the click-time endpoint.
  */
 
 import { execFileSync } from "node:child_process";
@@ -224,6 +230,131 @@ async function main() {
       `no segment publishes a figure in the real-data era (${sample.length} sampled)`,
       heldOff === sample.length,
       `${heldOff}/${sample.length}`,
+    );
+
+    /*
+     * The merge collision, locked.
+     *
+     * Neither branch could write this alone. The demo gate was built against a
+     * street card that carried five numbers; field notes were built against a
+     * card with no gate. Together they make a failure worse than the orphaned
+     * zero this suite already kills: a page that says in plain words that the
+     * street has never been field-audited, with a crew's prose sitting under
+     * it. A stray 0% is a bad reading. A stray field note is a false witness.
+     *
+     * Asserted on the serialized card, not on the fields the page happens to
+     * read, and against the note text held in the data file, so a future change
+     * that routes notes to the card by some other path still trips this.
+     */
+    console.log("");
+    console.log("merge guard — no simulated field note survives the era flip");
+    const notedId = Object.keys(auditsFile.audits).find((id) =>
+      auditsFile.audits[id].observations.some(
+        (o) =>
+          (typeof o.note === "string" && o.note.trim().length > 0) ||
+          (typeof o.note_en === "string" && o.note_en.trim().length > 0),
+      ),
+    );
+    check("the dataset still carries at least one field note", Boolean(notedId), notedId ?? "");
+    const notedAudit = auditsFile.audits[notedId];
+    const noteTexts = notedAudit.observations.flatMap((o) =>
+      [o.note, o.note_en].filter((v) => typeof v === "string" && v.trim().length > 0),
+    );
+
+    for (const locale of ["en", "es"]) {
+      const notedOn = await streetCard.getStreetCard(notedId, locale, true);
+      const notedOff = await streetCard.getStreetCard(notedId, locale, false);
+
+      check(
+        `${locale}: demo era publishes the crew's observations`,
+        notedOn.observations.length > 0 &&
+          notedOn.observations.some((o) => o.note !== null),
+        `(${notedOn.observations.filter((o) => o.note !== null).length} noted)`,
+      );
+      check(
+        `${locale}: demo era attributes them to a crew label`,
+        typeof notedOn.auditor === "string" && notedOn.auditor.length > 0,
+      );
+
+      check(
+        `${locale}: real-data era publishes no observation at all`,
+        notedOff.observations.length === 0,
+        `(${notedOff.observations.length})`,
+      );
+      check(`${locale}: real-data era carries no crew label`, notedOff.auditor === null);
+      // The card renders its observations section only when hasAudit is also
+      // true, so this is the render gate's premise as well as the data's.
+      check(`${locale}: real-data era hasAudit false`, notedOff.hasAudit === false);
+
+      const offCardWire = JSON.stringify(notedOff);
+      const leaked = noteTexts.filter((n) => offCardWire.includes(n));
+      check(
+        `${locale}: no note text anywhere on the real-data-era card`,
+        leaked.length === 0,
+        `(${noteTexts.length} checked)`,
+      );
+    }
+
+    // An observation may never outlive the audit that authorises it. This is
+    // the coupling the card's `hasAudit && observationGroups.length > 0` render
+    // gate states, asserted on the data so the two cannot drift apart.
+    let coupled = 0;
+    for (const id of sample) {
+      const [cOn, cOff] = await Promise.all([
+        streetCard.getStreetCard(id, "en", true),
+        streetCard.getStreetCard(id, "en", false),
+      ]);
+      const ok = (c) => c === null || c.observations.length === 0 || c.hasAudit === true;
+      if (ok(cOn) && ok(cOff) && cOff.observations.length === 0) coupled += 1;
+    }
+    check(
+      `an observation never outlives hasAudit, and never the demo era (${sample.length} sampled)`,
+      coupled === sample.length,
+      `${coupled}/${sample.length}`,
+    );
+
+    /*
+     * The detail route is the one surface where the two branches genuinely
+     * disagreed. It is CDN-cached and was deliberately left on the build-time
+     * default while it was an existence check; it now serves the audit body, so
+     * it resolves the era per request instead. This asserts the composition the
+     * route performs (cookie -> resolveDemoData -> getSegmentDetail) rather than
+     * booting Next, plus the wiring itself, because the regression to guard
+     * against is precisely someone restoring the bare default call.
+     */
+    console.log("");
+    console.log("merge guard — the detail route resolves the era it serves");
+    const demoFlag = require(path.join(BUILD_DIR, "lib", "demo-flag.js"));
+    const viaCookieOff = await segments.getSegmentDetail(
+      notedId,
+      demoFlag.resolveDemoData(demoFlag.DEMO_DATA_OFF),
+    );
+    const viaCookieOn = await segments.getSegmentDetail(
+      notedId,
+      demoFlag.resolveDemoData(demoFlag.DEMO_DATA_ON),
+    );
+    check("cookie 'off' serves no audit body", viaCookieOff.audit === null);
+    check("cookie 'on' serves the audit body", viaCookieOn.audit !== null);
+    check(
+      "cookie 'off' body carries no note text",
+      noteTexts.every((n) => !JSON.stringify(viaCookieOff).includes(n)),
+    );
+    const routeSource = readFileSync(
+      path.join(ROOT, "app", "api", "segments", "[id]", "detail", "route.ts"),
+      "utf8",
+    );
+    check(
+      "route passes a resolved era to getSegmentDetail",
+      /getSegmentDetail\(id,\s*demoEnabled\)/.test(routeSource) &&
+        !/getSegmentDetail\(id\)/.test(routeSource),
+    );
+    check(
+      "route varies on Cookie so a shared cache cannot cross the eras",
+      /Vary:\s*"Cookie"/.test(routeSource),
+    );
+    check(
+      "an explicit override is never written to a shared cache",
+      /private,\s*no-store/.test(routeSource),
     );
 
     console.log("");
