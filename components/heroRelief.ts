@@ -31,21 +31,21 @@ export const RELIEF_LAYER_ID = "segments-relief";
 /**
  * Corridor half-width in metres. Deliberately wider than a real street: at the
  * hero's settled zoom (~14.3, ≈8 m/px at Escazú's latitude) a true 10 m
- * right-of-way is a single pixel. 16 m half-width renders the corridor ~4 px
+ * right-of-way is a single pixel. 11 m half-width renders the corridor ~3 px
  * wide — a legible bar, still unmistakably the street network's geometry.
  */
-const CORRIDOR_HALF_WIDTH_M = 16;
+const CORRIDOR_HALF_WIDTH_M = 11;
 
 /** Sharp-bend miter guard: joins never extend past 2x the half-width. */
 const MITER_LIMIT = 2;
 
 /**
- * Height mapping, in abstract chart-metres: score 0 → 12 m (present but sunken
- * against its neighbours), score 100 → 252 m (≈30 px tall at the settled
+ * Height mapping, in abstract chart-metres: score 0 → 8 m (present but sunken
+ * against its neighbours), score 100 → 150 m (≈18 px tall at the settled
  * camera). Linear, so relative height reads as relative score.
  */
-const RELIEF_HEIGHT_AT_0 = 12;
-const RELIEF_HEIGHT_AT_100 = 252;
+const RELIEF_HEIGHT_AT_0 = 8;
+const RELIEF_HEIGHT_AT_100 = 150;
 
 /** MapLibre fill-extrusion height expression over `score_overall`. */
 export const reliefHeightExpression = [

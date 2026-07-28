@@ -104,8 +104,8 @@ const HERO_START: HeroCamera = {
   pitch: 0,
 };
 const HERO_END: HeroCamera = {
-  center: [-84.137, 9.915],
-  zoom: 14.25,
+  center: [-84.146, 9.907],
+  zoom: 13.95,
   bearing: -15,
   pitch: 55,
 };
@@ -272,7 +272,7 @@ function addReliefLayer(map: maplibregl.Map, data: SegmentCollection) {
         "fill-extrusion-color": lineColorExpression("overall"),
         "fill-extrusion-height": reliefHeightExpression,
         "fill-extrusion-base": 0,
-        "fill-extrusion-opacity": 0.88,
+        "fill-extrusion-opacity": 0.92,
       },
     });
   }
