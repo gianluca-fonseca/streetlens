@@ -8,7 +8,7 @@
  * explicit honesty note, because the demo dataset must never read as completed
  * real fieldwork.
  *
- * DIRECTION OF THE MODEL (this changed in bgsd-0018 — read before editing).
+ * DIRECTION OF THE MODEL (this changed in bgsd-0018; read before editing).
  * The generator used to invent a lens score from geography and then derive
  * plausible per-item answers from it, which meant the published score and the
  * observations under it did not agree: a segment could show 74 accessibility
@@ -145,7 +145,7 @@ const ITEM_TYPE = Object.fromEntries(
 );
 
 /* -------------------------------------------------------------- *
- * Field notes — real Costa Rican Spanish first, English alongside.
+ * Field notes: real Costa Rican Spanish first, English alongside.
  *
  * `note` carries the Spanish the crew would write; `note_en` is the English
  * rendering, mirroring the label_es / label_en pairing already on every
@@ -519,7 +519,7 @@ function bool(p, rand) {
 
 /**
  * Raw responses for one segment, in rubric order. Booleans are 0/1, percents
- * 0..100, everything else 0..4 — exactly the shapes `normalizeItem` expects.
+ * 0..100, everything else 0..4, exactly the shapes `normalizeItem` expects.
  */
 function observeSegment(feature) {
   const props = feature.properties;
@@ -631,7 +631,7 @@ function observeSegment(feature) {
 }
 
 /* -------------------------------------------------------------- *
- * The rollup — mirrors lib/capture/scoring.ts exactly.
+ * The rollup, mirroring lib/capture/scoring.ts exactly.
  * -------------------------------------------------------------- */
 function normalizeItem(key, raw) {
   switch (ITEM_TYPE[key]) {
@@ -1169,7 +1169,7 @@ async function main() {
     `[demo] scored ${stats.pilotSegments} pilot segments over ${stats.fieldDays} simulated field days (${stats.firstDay} to ${stats.lastDay}).`,
   );
   console.log(
-    `[demo] medians — overall ${m.overall}, accessibility ${m.accessibility}, drainage ${m.drainage}, shade ${m.shade}, bike ${m.bike}.`,
+    `[demo] medians: overall ${m.overall}, accessibility ${m.accessibility}, drainage ${m.drainage}, shade ${m.shade}, bike ${m.bike}.`,
   );
   console.log(
     `[demo] ${stats.failingLey7600} segments fail Ley 7600 (accessibility < 50).`,

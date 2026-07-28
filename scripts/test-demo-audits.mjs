@@ -8,7 +8,7 @@
  * 1. INCONSISTENCY. Someone clicks a segment showing 40 accessibility and reads
  *    the observations under it, and they do not add up to 40. So every published
  *    score is re-derived here from the published responses through the REAL
- *    rollup — `lensScoresFromItems` compiled out of lib/capture/scoring.ts, not
+ *    rollup: `lensScoresFromItems` compiled out of lib/capture/scoring.ts, not
  *    a copy of it. If the generator's mirror of that function ever drifts, this
  *    fails.
  *
@@ -90,7 +90,7 @@ function main() {
   console.log("\nprovenance");
   {
     check("demo: true", file.demo === true);
-    check("simulated: true — the data says so, not just the banner", file.simulated === true);
+    check("simulated: true (the data says so, not just the banner)", file.simulated === true);
     check(
       "the honesty note names the dataset as simulated",
       typeof file.note === "string" && /simulated/i.test(file.note),
