@@ -109,6 +109,7 @@
     "auditedLabel": "Auditado",
     "scoresHeading": "Puntajes por capa",
     "breakdownHeading": "Desglose de la rúbrica",
+    "fieldNoteLabel": "Nota de campo",
     "photosHeading": "Fotos",
     "photoPlaceholder": "Foto pendiente del trabajo de campo",
     "photoHeld": "Fotogramas de cámara en revisión",
@@ -1627,6 +1628,9 @@
     "provenanceHeading": "Procedencia",
     "assessmentHeading": "Evaluación",
     "assessmentNote": "Redactado por el modelo de cámara, en inglés. No es una auditoría de campo.",
+    "observationsHeading": "Observaciones de campo",
+    "observationsNote": "Lo que el equipo auditor respondió en cada ítem de la rúbrica, con las notas que escribió en la calle.",
+    "fieldNoteLabel": "Nota de campo",
     "mapHeading": "Ubicación",
     "mapHint": "Abre el mapa completo para explorar este segmento en contexto.",
     "layers": {

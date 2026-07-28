@@ -7,6 +7,11 @@ import {
   formatProvenanceDate,
   splitCvObservations,
 } from "@/lib/cv-provenance";
+import {
+  auditorLabel,
+  toFieldObservations,
+  type FieldObservation,
+} from "@/lib/field-notes";
 import type { PublicCvObservation } from "@/lib/map-payload";
 import { showDemoData } from "@/lib/demo-flag";
 import { getSegmentMapDetail } from "@/lib/segment-map-detail";
@@ -43,6 +48,14 @@ export type StreetCardData = {
   hasAudit: boolean;
   provenance: StreetProvenanceLine[];
   assessment: string | null;
+  /**
+   * The rubric answers the crew recorded, already resolved into `locale` (label
+   * and note both). Empty when the segment has no audit, which is every
+   * community/import segment and every segment read live from Supabase.
+   */
+  observations: FieldObservation[];
+  /** The crew label the observations are attributed to, e.g. `Equipo StreetLens B`. */
+  auditor: string | null;
 };
 
 /**
@@ -141,5 +154,7 @@ export async function getStreetCard(
     hasAudit: hasAuditedScores(segment),
     provenance: provenanceLines(segment, canonical, reports, locale),
     assessment: canonical ? cvOverallAssessment(canonical.assessment) : null,
+    observations: toFieldObservations(segment.audit?.observations, locale),
+    auditor: auditorLabel(segment.audit?.auditor),
   };
 }

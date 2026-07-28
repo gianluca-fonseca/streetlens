@@ -2,7 +2,9 @@ import { getTranslations } from "next-intl/server";
 import { LAYER_ORDER } from "@/components/mapConfig";
 import { meterWidth, rampInkVars } from "@/components/scoreColor";
 import panel from "@/components/ui/panel.module.css";
+import FieldNote from "@/components/FieldNote";
 import StreetShareActions from "@/components/street/StreetShareActions";
+import { groupFieldObservationsByLayer } from "@/lib/field-notes";
 import StreetCardMap from "@/components/street/StreetCardMap";
 import type { StreetCardData, StreetProvenanceKind } from "@/lib/street-card";
 import type { ScoreLayer } from "@/lib/segments";
@@ -34,6 +36,13 @@ type StreetCardProps = Readonly<{
 
 export default async function StreetCard({ card }: StreetCardProps) {
   const t = await getTranslations("street");
+  // Grouped by lens, in the map's canonical layer order. The page has room the
+  // popover does not, so it shows all five lenses at once rather than only the
+  // one a map click happened to be on.
+  const observationGroups = groupFieldObservationsByLayer(card.observations);
+  const noteLabel = card.auditor
+    ? `${t("fieldNoteLabel")} · ${card.auditor}`
+    : t("fieldNoteLabel");
 
   return (
     <article className={`mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10 ${panel.panelScope}`}>
@@ -91,6 +100,59 @@ export default async function StreetCard({ card }: StreetCardProps) {
           </p>
         </section>
       )}
+
+      {/* The answers behind the five numbers above, with the crew's prose on
+          the ones they wrote about. Sits directly under the scores on purpose:
+          a note is the reason for a score, and a reader should not have to
+          scroll past the provenance and the assessment to find out why a
+          street reads badly. */}
+      {observationGroups.length > 0 ? (
+        <section className="mt-6">
+          <h2 className="mb-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-strong">
+            {t("observationsHeading")}
+          </h2>
+          <p className="mb-3 text-[12.5px] leading-snug text-neutral-strong">
+            {t("observationsNote")}
+          </p>
+          <div className="space-y-4">
+            {observationGroups.map((group) => (
+              <div key={group.layer}>
+                <h3 className="mb-1.5 text-[12px] font-medium text-ink">
+                  {t(`layers.${group.layer}`)}
+                </h3>
+                <ul className="flex flex-col divide-y divide-border rounded-[8px] border border-border">
+                  {group.observations.map((o) => (
+                    <li
+                      key={o.item_key}
+                      style={inkStyle(group.layer, o.score)}
+                      className="px-3 py-2.5"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[13px] text-ink">{o.label}</span>
+                        <span className="flex shrink-0 items-center gap-2">
+                          <span aria-hidden="true" className={`${panel.meterTrack} w-14`}>
+                            <span
+                              className={panel.meterFill}
+                              style={{ width: meterWidth(o.score) }}
+                            />
+                          </span>
+                          <span
+                            className={`font-mono text-[13px] font-semibold ${panel.scoreInk}`}
+                          >
+                            {o.score}
+                            <span className="font-medium text-neutral-strong">/100</span>
+                          </span>
+                        </span>
+                      </div>
+                      <FieldNote label={noteLabel} note={o.note} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {card.provenance.length > 0 ? (
         <section className="mt-6">
