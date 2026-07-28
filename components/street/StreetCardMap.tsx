@@ -8,7 +8,8 @@ export default function StreetCardMap({
   overallScore,
 }: Readonly<{
   geometry: LineString;
-  overallScore: number;
+  /** Null when no audit stands behind this street; the line goes neutral. */
+  overallScore: number | null;
 }>) {
   return <SegmentMiniMap geometry={geometry} overallScore={overallScore} />;
 }

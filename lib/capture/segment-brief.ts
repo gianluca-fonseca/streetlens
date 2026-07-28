@@ -27,7 +27,13 @@ function bboxFromLine(geometry: LineString): [number, number, number, number] {
   return [west, south, east, north];
 }
 
-/** Bounded public lookup for QR deep links and status rollups. */
+/**
+ * Bounded public lookup for QR deep links and status rollups.
+ *
+ * Takes the build-time default demo flag on purpose: every field it returns is
+ * a real OpenStreetMap fact that survives the gate, and a printed QR poster
+ * cannot carry anyone's cookie.
+ */
 export async function getSegmentBrief(id: string): Promise<SegmentBrief | null> {
   if (!id || id.length > 64) return null;
   const detail = await getSegmentDetail(id);

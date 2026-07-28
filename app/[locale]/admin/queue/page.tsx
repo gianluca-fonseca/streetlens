@@ -25,10 +25,11 @@ export default async function AdminQueuePage({
   const t = await getTranslations({ locale, namespace: "admin.queue" });
 
   const { items, source } = await getPendingSubmissions();
+  const demoEnabled = await demoDataEnabled();
 
   let segmentCatalog = new Map<string, { name: string; district: string }>();
   try {
-    const collection = await getSegments(await demoDataEnabled());
+    const collection = await getSegments(demoEnabled);
     for (const f of collection.features) {
       segmentCatalog.set(f.properties.id, {
         name: f.properties.name,
@@ -105,7 +106,11 @@ export default async function AdminQueuePage({
       }
 
       const payload = item.payload as UpdateSegmentPayload;
-      const current = await getSegmentDetail(payload.segment_id);
+      // Per-request UI, so it takes the resolved flag like the catalog read
+      // above. The diff only shows name/highway/geometry, none of which the
+      // demo gate touches; passing it keeps one era per rendered page rather
+      // than two reads that could disagree.
+      const current = await getSegmentDetail(payload.segment_id, demoEnabled);
       return {
         id: item.id,
         type: "update_segment",

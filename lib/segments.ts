@@ -8,7 +8,8 @@
  *   - `getSegmentDetail()` -> SegmentDetail | null
  *   - `getStats()`         -> StreetStats { segments, km, coveragePct, heroPct }
  *
- * `getSegments` and `getStats` take the EFFECTIVE demo-data flag as an argument.
+ * `getSegments`, `getSegmentDetail` and `getStats` take the EFFECTIVE demo-data
+ * flag as an argument.
  * Next-side callers resolve it per request with `demoDataEnabled()` (cookie
  * override over build-time default) and pass it in; this module never reads the
  * cookie, so it stays importable from plain Node scripts. The default argument
@@ -231,6 +232,32 @@ function hideDemoScores(features: SegmentFeature[]): SegmentFeature[] {
       source: "import",
     },
   }));
+}
+
+/**
+ * The same erasure `hideDemoScores` applies to a map feature, applied to one
+ * segment's detail: the generated pilot audit disappears, the street does not.
+ *
+ * What survives is exactly what OpenStreetMap knows — name, district, road
+ * class, length, geometry — because none of it is a score. What goes is the
+ * simulated part: the five scores (zeroed, matching the scoreless shape a
+ * community/import segment already returns), the audit date, and the audit
+ * block carrying the auditor label and the per-item observations. `demo` drops
+ * to false because nothing demo-generated is being published for this segment
+ * any more, so `StreetCard` must not print the demo caveat over an empty card.
+ *
+ * The zeros here are a shape, never a reading. Every surface that renders this
+ * detail keys its scores off `audit`/`hasAudit`, not off the numbers, so a 0
+ * can never reach the page as a measured failure.
+ */
+function hideDemoAudit(detail: SegmentDetail): SegmentDetail {
+  return {
+    ...detail,
+    audited_at: "",
+    demo: false,
+    scores: { overall: 0, accessibility: 0, drainage: 0, shade: 0, bike: 0 },
+    audit: null,
+  };
 }
 
 async function readDemoAudits(): Promise<DemoAuditsFile> {
@@ -682,9 +709,19 @@ export async function getSegments(
   };
 }
 
-/** Full detail for one segment, or null if unknown. */
+/**
+ * Full detail for one segment, or null if unknown.
+ *
+ * @param demoEnabled The effective demo-data flag for this request, on the same
+ * terms as `getSegments`: the generated pilot audit is published only when it is
+ * true. Defaults to the build-time default for non-Next callers (scripts, smoke
+ * harnesses). Live Supabase rows are passed through untouched, exactly as
+ * `getSegments` does; this flag governs the generated demo dataset, not the
+ * database.
+ */
 export async function getSegmentDetail(
   id: string,
+  demoEnabled: boolean = showDemoData(),
 ): Promise<SegmentDetail | null> {
   const live = await liveScoreRows(id);
   if (live && live.length > 0) {
@@ -737,7 +774,11 @@ export async function getSegmentDetail(
   }
   const audit = audits.audits[id];
 
-  return {
+  // highway and length_m are read from the audits file in BOTH eras on purpose:
+  // the generator carries them straight off OpenStreetMap, so a road class and a
+  // length are geography rather than findings. hideDemoAudit below drops only
+  // what the rubric invented.
+  const detail: SegmentDetail = {
     id,
     name: feature.properties.name,
     district: feature.properties.district,
@@ -762,6 +803,8 @@ export async function getSegmentDetail(
         }
       : null,
   };
+
+  return demoEnabled ? detail : hideDemoAudit(detail);
 }
 
 /** Headline aggregate stats for the hero panel. */

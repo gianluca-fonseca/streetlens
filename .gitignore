@@ -55,6 +55,7 @@ next-env.d.ts
 # transient tsc→cjs build dirs used by the node test/smoke scripts
 /.smoke-build/
 /.test-build-*/
+/.test-tsconfig-*.json
   # Local anonymous-submission queue (DB fallback; never committed)
 data/pending-submissions.local.json
 
