@@ -78,7 +78,7 @@
     "scaleHint": "Más alto es mejor (0–100)",
     "community": "Comunitario (sin verificar)",
     "cameraObserved": "Observado por cámara",
-    "widthNote": "Las líneas más gruesas marcan los segmentos con menor puntaje.",
+    "widthNote": "Los puntajes más altos se dibujan más gruesos y resaltan más sobre el mapa.",
     "bins": {
       "poor": "Deficiente",
       "fair": "Regular",

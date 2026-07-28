@@ -78,7 +78,7 @@
     "scaleHint": "Higher is better (0–100)",
     "community": "Community (unverified)",
     "cameraObserved": "Camera-observed",
-    "widthNote": "Thicker lines mark lower-scoring segments.",
+    "widthNote": "Higher scores are drawn thicker and stand out more from the map.",
     "bins": {
       "poor": "Poor",
       "fair": "Fair",
