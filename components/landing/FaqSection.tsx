@@ -29,7 +29,7 @@ export default function FaqSection() {
         <SectionHeader index="08" eyebrow={t("eyebrow")} title={t("heading")} />
       </Measure>
 
-      <Measure width="text" className="mt-12">
+      <Measure width="text" className="mt-12 sm:mt-14">
         <div className="border-t border-hairline">
           {FAQ_ITEMS.map((key) => (
             <details key={key} className="group border-b border-hairline">

@@ -44,7 +44,7 @@ export default function PilotSection({
         />
       </Measure>
 
-      <Measure width="page" className="mt-14 sm:mt-16">
+      <Measure width="page" className="mt-12 sm:mt-14">
         <Figure
           id="figure-3"
           label={t("figure.label")}
@@ -63,7 +63,7 @@ export default function PilotSection({
         </Figure>
       </Measure>
 
-      <Measure width="text" className="mt-12">
+      <Measure width="text" className="mt-10">
         {auditedHidden ? (
           <p className="border-t border-hairline pt-6 font-mono text-[12.5px] leading-relaxed text-ink-muted">
             {t("auditedEmpty")}

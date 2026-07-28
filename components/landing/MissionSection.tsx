@@ -29,13 +29,13 @@ export default function MissionSection() {
         />
       </Measure>
 
-      <Measure width="text" className="mt-12">
+      <Measure width="text" className="mt-12 sm:mt-14">
         <div className="space-y-5 font-serif text-[1.08rem] leading-[1.6] text-ink">
           <p>{t("body.p1")}</p>
           <p>{t("body.p2")}</p>
         </div>
 
-        <dl className="mt-12 border-t border-hairline">
+        <dl className="mt-10 border-t border-hairline">
           {PRINCIPLES.map((key) => (
             <div key={key} className="border-b border-hairline py-6">
               <dt className="font-mono text-[11.5px] font-medium uppercase tracking-[0.12em] text-ink-muted">

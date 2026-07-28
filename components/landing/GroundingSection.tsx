@@ -28,7 +28,7 @@ export default function GroundingSection() {
       </Measure>
 
       {/* Five institutional citations as typographic text, not logos. */}
-      <Measure width="text" className="mt-12">
+      <Measure width="text" className="mt-12 sm:mt-14">
         <dl className="border-t border-hairline">
           {GROUNDING_ITEMS.map((key) => (
             <div

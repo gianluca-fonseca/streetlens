@@ -51,7 +51,7 @@ export default function GapSection({
         />
       </Measure>
 
-      <Measure width="text" className="mt-12">
+      <Measure width="text" className="mt-12 sm:mt-14">
         <p className="font-serif text-[1.08rem] leading-[1.7] text-ink">
           {t.rich("body", {
             ley: (chunks) => <Sidenote number={1}>{chunks}</Sidenote>,
@@ -60,7 +60,7 @@ export default function GapSection({
         </p>
       </Measure>
 
-      <Measure width="page" className="clear-both mt-14">
+      <Measure width="page" className="clear-both mt-10">
         <dl
           className={`grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline ${stats.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}
         >

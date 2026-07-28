@@ -42,7 +42,7 @@ export default function MethodSection() {
         />
       </Measure>
 
-      <Measure width="text" className="mt-12">
+      <Measure width="text" className="mt-12 sm:mt-14">
         <p className="font-serif text-[1.08rem] leading-[1.7] text-ink">
           {t.rich("body", {
             maps: (chunks) => <Sidenote number={3}>{chunks}</Sidenote>,
@@ -53,7 +53,7 @@ export default function MethodSection() {
 
       {/* Four grounding inputs: a hairline rubric, not cards. Unordered by design
           (no 01–04 index), so the grid carries the structure. */}
-      <Measure width="page" className="clear-both mt-14">
+      <Measure width="page" className="clear-both mt-10">
         <div className="grid gap-px overflow-hidden rounded-[4px] border border-hairline bg-hairline sm:grid-cols-2">
           {METHOD_ITEMS.map((key) => (
             <div key={key} className="bg-surface p-6 sm:p-7">
@@ -227,7 +227,7 @@ export default function MethodSection() {
         </Figure>
       </Measure>
 
-      <Measure width="outset" className="mt-12">
+      <Measure width="outset" className="mt-10">
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 border-t border-hairline pt-6 text-[13px]">
           <Link
             href="/method"

@@ -27,7 +27,7 @@ export default function RoadmapSection() {
         />
       </Measure>
 
-      <Measure width="text" className="mt-12">
+      <Measure width="text" className="mt-12 sm:mt-14">
         <ol className="border-t border-hairline">
           {ROADMAP_STEPS.map((key, i) => {
             const isNow = i === 0;

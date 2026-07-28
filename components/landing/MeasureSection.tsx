@@ -42,7 +42,7 @@ export default function MeasureSection() {
         />
       </Measure>
 
-      <Measure width="page" className="mt-14 sm:mt-16">
+      <Measure width="page" className="mt-12 sm:mt-14">
         <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2">
           {LENSES.map((lens) => (
             <figure key={lens.key}>
