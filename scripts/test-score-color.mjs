@@ -17,9 +17,12 @@
  *     provably readable without it.
  *
  * Plus the properties that make the derivation trustworthy rather than merely
- * compliant: hue is preserved (an accessibility score still reads blue, a bike
- * score still reads copper), a colour that already passes is returned
+ * compliant: hue is preserved (an accessibility score still reads violet, a
+ * bike score still reads magenta), a colour that already passes is returned
  * untouched, and the adjustment is the MINIMUM one that clears the bar.
+ *
+ * Rev 8 note: the ramp is now split per basemap, so every ramp assertion below
+ * compares the ink against the SAME half it was derived from.
  *
  * Exits 0 on PASS, 1 on any failure.
  */
@@ -50,34 +53,91 @@ function check(label, ok, detail = "") {
  * imported from the module under test: a snapshot that reads from the thing it
  * guards would pass no matter what anyone did to it.
  */
-// Rev 7 (#28). The owner lifted the seal to replace these values; this fixture
-// re-freezes the NEW table so it is the baseline going forward.
+// Rev 8. The owner lifted the seal again to make the spectrum legible; this
+// fixture re-freezes the NEW, theme-split table so it is the baseline going
+// forward. Regenerate with `node scripts/design-ramps.mjs --ts` if the
+// derivation changes — never by hand.
 const SEALED_RAMP = {
-  overall: [
-    { at: 0, hex: "#F45E53" },
-    { at: 50, hex: "#CE4D02" },
-    { at: 100, hex: "#056E48" },
-  ],
-  accessibility: [
-    { at: 0, hex: "#CE63E9" },
-    { at: 50, hex: "#A844EA" },
-    { at: 100, hex: "#7629F1" },
-  ],
-  drainage: [
-    { at: 0, hex: "#0E9EAF" },
-    { at: 50, hex: "#077FA8" },
-    { at: 100, hex: "#0263A8" },
-  ],
-  shade: [
-    { at: 0, hex: "#729D0D" },
-    { at: 50, hex: "#148918" },
-    { at: 100, hex: "#07703F" },
-  ],
-  bike: [
-    { at: 0, hex: "#EF599A" },
-    { at: 50, hex: "#DF1194" },
-    { at: 100, hex: "#B20795" },
-  ],
+  overall: {
+    light: [
+      { at: 0, hex: "#FB574D" },
+      { at: 25, hex: "#CF4713" },
+      { at: 50, hex: "#95470D" },
+      { at: 75, hex: "#09542F" },
+      { at: 100, hex: "#043727" },
+    ],
+    dark: [
+      { at: 0, hex: "#C4171A" },
+      { at: 25, hex: "#DA4B15" },
+      { at: 50, hex: "#EC741B" },
+      { at: 75, hex: "#28D580" },
+      { at: 100, hex: "#30F1B6" },
+    ],
+  },
+  accessibility: {
+    light: [
+      { at: 0, hex: "#D953FA" },
+      { at: 25, hex: "#B31EF1" },
+      { at: 50, hex: "#8416CB" },
+      { at: 75, hex: "#590EA2" },
+      { at: 100, hex: "#350775" },
+    ],
+    dark: [
+      { at: 0, hex: "#A417C2" },
+      { at: 25, hex: "#BB29F9" },
+      { at: 50, hex: "#B976FA" },
+      { at: 75, hex: "#C0A3FB" },
+      { at: 100, hex: "#CFC7FD" },
+    ],
+  },
+  drainage: {
+    light: [
+      { at: 0, hex: "#1D9EAF" },
+      { at: 25, hex: "#168199" },
+      { at: 50, hex: "#0F6483" },
+      { at: 75, hex: "#08496B" },
+      { at: 100, hex: "#032F53" },
+    ],
+    dark: [
+      { at: 0, hex: "#106D78" },
+      { at: 25, hex: "#1888A2" },
+      { at: 50, hex: "#1FA4D3" },
+      { at: 75, hex: "#58BDFB" },
+      { at: 100, hex: "#ACD4FD" },
+    ],
+  },
+  shade: {
+    light: [
+      { at: 0, hex: "#739D19" },
+      { at: 25, hex: "#4D8513" },
+      { at: 50, hex: "#246D0D" },
+      { at: 75, hex: "#09531B" },
+      { at: 100, hex: "#04381B" },
+    ],
+    dark: [
+      { at: 0, hex: "#4E6D0E" },
+      { at: 25, hex: "#528E15" },
+      { at: 50, hex: "#40B21C" },
+      { at: 75, hex: "#28D553" },
+      { at: 100, hex: "#30F58A" },
+    ],
+  },
+  bike: {
+    light: [
+      { at: 0, hex: "#FB4B9C" },
+      { at: 25, hex: "#D81B8A" },
+      { at: 50, hex: "#A81375" },
+      { at: 75, hex: "#7B0B5D" },
+      { at: 100, hex: "#510543" },
+    ],
+    dark: [
+      { at: 0, hex: "#BD166D" },
+      { at: 25, hex: "#E21D91" },
+      { at: 50, hex: "#FB49B6" },
+      { at: 75, hex: "#FC86D2" },
+      { at: 100, hex: "#FDB5E8" },
+    ],
+  },
 };
 
 const LAYERS = Object.keys(SEALED_RAMP);
@@ -159,6 +219,33 @@ function main() {
         "the sealed RAMP is byte-identical (scoreColor derives, never modifies)",
         same,
         same ? "" : JSON.stringify(M.RAMP),
+      );
+    }
+
+    // 1b. sampleRamp lands EXACTLY on a declared stop when asked for that
+    //     stop's value. Rev 8 samples through CIELAB (to mirror MapLibre's
+    //     `interpolate-lab`, so the legend swatch is the pixel the map paints),
+    //     and a round trip through a colour space is where an off-by-one white
+    //     point or a missing gamma step hides. If this drifts, every legend
+    //     swatch quietly stops matching its line.
+    {
+      let bad = 0;
+      let where = "";
+      for (const layer of LAYERS) {
+        for (const theme of ["light", "dark"]) {
+          for (const stop of SEALED_RAMP[layer][theme]) {
+            const got = M.sampleRamp(layer, stop.at, theme).toUpperCase();
+            if (got !== stop.hex) {
+              bad++;
+              if (!where) where = `${layer}.${theme}@${stop.at} ${stop.hex}→${got}`;
+            }
+          }
+        }
+      }
+      check(
+        "sampleRamp reproduces every declared stop exactly (CIELAB round trip)",
+        bad === 0,
+        bad ? `${bad} drifted, e.g. ${where}` : "",
       );
     }
 
@@ -268,9 +355,11 @@ function main() {
       let where = "";
       for (const layer of LAYERS) {
         for (let v = 0; v <= 100; v += 1) {
-          const base = M.sampleRamp(layer, v);
           const ink = S.rampInk(layer, v);
           for (const [name, hex] of [["light", ink.light], ["dark", ink.dark]]) {
+            // Rev 8: compare against the SAME half of the ramp the ink derives
+            // from, or "hue preserved" would be measuring the wrong basemap.
+            const base = M.sampleRamp(layer, v, name);
             const d = hueDelta(hueOf(base), hueOf(hex));
             const disp = (chromaOf(base) * d * Math.PI) / 180;
             if (disp > worst) {
@@ -290,14 +379,12 @@ function main() {
     // 6. A colour that already passes is returned untouched — no gratuitous
     //    drift away from the map for values that were fine to begin with.
     {
-      // overall@100, 5.58:1 on #f1f1f1. Re-anchored for rev 7: the old constant
-      // here was bike@100 #8A4B2D, which stopped being a ramp colour when the
-      // bike lens moved off copper. It kept passing (any compliant colour does),
-      // but it no longer proved anything about the shipped ramp. Under rev 7 the
-      // score-100 stops are the only ones already compliant as light ink — every
-      // other stop sits in the mid-luminance band the basemap requires and is
-      // lifted by readableInk, which is precisely why this module exists.
-      const already = "#056E48";
+      // overall@100 on the LIGHT half of the rev-8 ramp, 12.6:1 on #f1f1f1. It
+      // has to be a real shipped stop, or the check proves nothing about the
+      // ramp (any compliant colour passes). Under rev 8 the light half's good
+      // end clears AA on its own; the quiet end still does not, which is
+      // precisely why this module exists.
+      const already = "#043727";
       check(
         "readableInk leaves an already-compliant colour alone",
         S.readableInk(already, S.SURFACE_LIGHT) === already,
@@ -330,7 +417,7 @@ function main() {
             const r = S.contrastRatio(hex, bg);
             // Untouched colours may legitimately be far above the bar; only
             // ADJUSTED ones must land near it.
-            const base = M.sampleRamp(layer, v);
+            const base = M.sampleRamp(layer, v, key);
             if (S.contrastRatio(base, bg) >= target) continue;
             if (r > BOUND[key]) bad++;
             if (r - BOUND[key] > worst) {

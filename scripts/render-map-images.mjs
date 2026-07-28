@@ -25,38 +25,94 @@ const ROOT = join(__dirname, "..");
 const GEOJSON_PATH = join(ROOT, "data", "demo-segments.geojson");
 const OUT_DIR = join(ROOT, "public", "render");
 
-// --- RAMP: mirrors mapConfig.ts RAMP (3 stops per lens, high = good) ---------
+// --- RAMP: mirrors mapConfig.ts RAMP (rev 8: 5 stops per lens PER THEME) -----
+// Regenerate with `node scripts/design-ramps.mjs --ts`; never hand-edit.
 const RAMP = {
-  overall: [
-    { at: 0, hex: "#F45E53" },
-    { at: 50, hex: "#CE4D02" },
-    { at: 100, hex: "#056E48" },
-  ],
-  accessibility: [
-    { at: 0, hex: "#CE63E9" },
-    { at: 50, hex: "#A844EA" },
-    { at: 100, hex: "#7629F1" },
-  ],
-  drainage: [
-    { at: 0, hex: "#0E9EAF" },
-    { at: 50, hex: "#077FA8" },
-    { at: 100, hex: "#0263A8" },
-  ],
-  shade: [
-    { at: 0, hex: "#729D0D" },
-    { at: 50, hex: "#148918" },
-    { at: 100, hex: "#07703F" },
-  ],
-  bike: [
-    { at: 0, hex: "#EF599A" },
-    { at: 50, hex: "#DF1194" },
-    { at: 100, hex: "#B20795" },
-  ],
+  overall: {
+    light: [
+      { at: 0, hex: "#FB574D" },
+      { at: 25, hex: "#CF4713" },
+      { at: 50, hex: "#95470D" },
+      { at: 75, hex: "#09542F" },
+      { at: 100, hex: "#043727" },
+    ],
+    dark: [
+      { at: 0, hex: "#C4171A" },
+      { at: 25, hex: "#DA4B15" },
+      { at: 50, hex: "#EC741B" },
+      { at: 75, hex: "#28D580" },
+      { at: 100, hex: "#30F1B6" },
+    ],
+  },
+  accessibility: {
+    light: [
+      { at: 0, hex: "#D953FA" },
+      { at: 25, hex: "#B31EF1" },
+      { at: 50, hex: "#8416CB" },
+      { at: 75, hex: "#590EA2" },
+      { at: 100, hex: "#350775" },
+    ],
+    dark: [
+      { at: 0, hex: "#A417C2" },
+      { at: 25, hex: "#BB29F9" },
+      { at: 50, hex: "#B976FA" },
+      { at: 75, hex: "#C0A3FB" },
+      { at: 100, hex: "#CFC7FD" },
+    ],
+  },
+  drainage: {
+    light: [
+      { at: 0, hex: "#1D9EAF" },
+      { at: 25, hex: "#168199" },
+      { at: 50, hex: "#0F6483" },
+      { at: 75, hex: "#08496B" },
+      { at: 100, hex: "#032F53" },
+    ],
+    dark: [
+      { at: 0, hex: "#106D78" },
+      { at: 25, hex: "#1888A2" },
+      { at: 50, hex: "#1FA4D3" },
+      { at: 75, hex: "#58BDFB" },
+      { at: 100, hex: "#ACD4FD" },
+    ],
+  },
+  shade: {
+    light: [
+      { at: 0, hex: "#739D19" },
+      { at: 25, hex: "#4D8513" },
+      { at: 50, hex: "#246D0D" },
+      { at: 75, hex: "#09531B" },
+      { at: 100, hex: "#04381B" },
+    ],
+    dark: [
+      { at: 0, hex: "#4E6D0E" },
+      { at: 25, hex: "#528E15" },
+      { at: 50, hex: "#40B21C" },
+      { at: 75, hex: "#28D553" },
+      { at: 100, hex: "#30F58A" },
+    ],
+  },
+  bike: {
+    light: [
+      { at: 0, hex: "#FB4B9C" },
+      { at: 25, hex: "#D81B8A" },
+      { at: 50, hex: "#A81375" },
+      { at: 75, hex: "#7B0B5D" },
+      { at: 100, hex: "#510543" },
+    ],
+    dark: [
+      { at: 0, hex: "#BD166D" },
+      { at: 25, hex: "#E21D91" },
+      { at: 50, hex: "#FB49B6" },
+      { at: 75, hex: "#FC86D2" },
+      { at: 100, hex: "#FDB5E8" },
+    ],
+  },
 };
 
-// --- Width channel: mirrors mapConfig.ts (lower score = thicker line) ---------
-const WIDTH_AT_0 = 6;
-const WIDTH_AT_100 = 2.5;
+// --- Width channel: mirrors mapConfig.ts (HIGHER score = thicker line) --------
+const WIDTH_AT_0 = 1.6;
+const WIDTH_AT_100 = 7;
 
 // --- BASEMAP palette: mirrors mapConfig.ts BASEMAP ---------------------------
 const BASEMAP = {
@@ -96,12 +152,54 @@ function hexToRgb(hex) {
 function rgbToHex(rgb) {
   return (
     "#" +
-    rgb.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")
+    rgb
+      .map((c) => Math.round(Math.max(0, Math.min(255, c))).toString(16).padStart(2, "0"))
+      .join("")
   );
 }
-/** Linear sRGB lerp between the 3 ramp stops. */
-function sampleRamp(layer, value) {
-  const stops = RAMP[layer];
+
+// CIELAB, D50, mirroring mapConfig.ts (which in turn mirrors MapLibre's own
+// `interpolate-lab`). The rendered SVGs have to be the same picture the live
+// map draws, so they interpolate in the same space.
+const LAB_XN = 0.96422;
+const LAB_ZN = 0.82521;
+const LAB_T0 = 4 / 29;
+const LAB_T1 = 6 / 29;
+const LAB_T2 = 3 * LAB_T1 * LAB_T1;
+const LAB_T3 = LAB_T1 * LAB_T1 * LAB_T1;
+const labF = (t) => (t > LAB_T3 ? Math.cbrt(t) : t / LAB_T2 + LAB_T0);
+const labFInv = (t) => (t > LAB_T1 ? t * t * t : LAB_T2 * (t - LAB_T0));
+
+function hexToLab(hex) {
+  const [r, g, b] = hexToRgb(hex).map((c) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  const y = labF(0.2225045 * r + 0.7168786 * g + 0.0606169 * b);
+  const x = labF((0.4360747 * r + 0.3850649 * g + 0.1430804 * b) / LAB_XN);
+  const z = labF((0.0139322 * r + 0.0971045 * g + 0.7141733 * b) / LAB_ZN);
+  return [Math.max(0, 116 * y - 16), 500 * (x - y), 200 * (y - z)];
+}
+
+function labToHex([l, a, bb]) {
+  let y = (l + 16) / 116;
+  const x = LAB_XN * labFInv(y + a / 500);
+  const z = LAB_ZN * labFInv(y - bb / 200);
+  y = labFInv(y);
+  const toSrgb = (c) => {
+    const s = c <= 0.00304 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
+    return Math.max(0, Math.min(1, s)) * 255;
+  };
+  return rgbToHex([
+    toSrgb(3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
+    toSrgb(-0.9787684 * x + 1.9161415 * y + 0.033454 * z),
+    toSrgb(0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
+  ]);
+}
+
+/** CIELAB lerp between the 5 ramp stops of the requested theme. */
+function sampleRamp(layer, value, theme) {
+  const stops = RAMP[layer][theme];
   const v = Math.max(0, Math.min(100, value));
   let lo = stops[0];
   let hi = stops[stops.length - 1];
@@ -114,15 +212,15 @@ function sampleRamp(layer, value) {
   }
   const span = hi.at - lo.at || 1;
   const t = (v - lo.at) / span;
-  const a = hexToRgb(lo.hex);
-  const b = hexToRgb(hi.hex);
-  return rgbToHex([
+  const a = hexToLab(lo.hex);
+  const b = hexToLab(hi.hex);
+  return labToHex([
     a[0] + (b[0] - a[0]) * t,
     a[1] + (b[1] - a[1]) * t,
     a[2] + (b[2] - a[2]) * t,
   ]);
 }
-/** Representative line width for a 0–100 value (lower score = thicker). */
+/** Representative line width for a 0–100 value (higher score = thicker). */
 function widthForValue(value) {
   const v = Math.max(0, Math.min(100, value));
   return WIDTH_AT_0 + (WIDTH_AT_100 - WIDTH_AT_0) * (v / 100);
@@ -240,7 +338,7 @@ function renderSvg(opts) {
   const activePaths = activeFeatures
     .map((f) => {
       const score = f.properties[`score_${lens}`];
-      const color = sampleRamp(lens, score);
+      const color = sampleRamp(lens, score, theme);
       const w = r1(widthForValue(score));
       return `<path d="${pathData(f, project)}" stroke="${color}" stroke-width="${w}"/>`;
     })

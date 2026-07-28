@@ -92,10 +92,14 @@ for (const props of [
 console.log("\nsealed ramps — score colour encoding unchanged");
 {
   const norm = (h) => h.toLowerCase();
+  // Rev 8: RAMP is keyed lens → theme → stops, so both halves are flattened.
   const rampStops = Object.values(RAMP)
-    .flat()
+    .flatMap((lens) => [...lens.light, ...lens.dark])
     .map((s) => norm(s.hex));
-  check("overall ramp still has three stops", RAMP.overall.length === 3);
+  check(
+    "overall ramp still has five stops per theme",
+    RAMP.overall.light.length === 5 && RAMP.overall.dark.length === 5,
+  );
   check(
     "neutral casing is not a score-ramp colour",
     !rampStops.includes(norm(COMMUNITY_CASING.color)) &&
