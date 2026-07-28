@@ -79,7 +79,7 @@ export default function MapPanel({
       data-map-panel
       data-panel-hydrated={hydrated ? "true" : "false"}
       aria-label={t("eyebrow")}
-      className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 rounded-[12px] p-4`}
+      className={`${styles.glassPanel} ${styles.enter} pointer-events-auto flex max-h-[calc(100%-3.25rem)] w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-4 overflow-y-auto rounded-[12px] p-4 pb-0`}
     >
       <header>
         <div className="flex items-start justify-between gap-2">

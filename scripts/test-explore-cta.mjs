@@ -104,13 +104,25 @@ check(
   "the CTA sits outside every collapsible block",
   !/collapsibleInner[\s\S]*?<ExploreCta[\s\S]*?<\/div>/.test(panel),
 );
-// The left column also carries the 3D toggle above the contribute button, and
-// it has no scroll: every pixel the aside grows pushes that toggle down. The
-// footer goes full bleed and takes over the panel's own bottom padding so the
-// invitation costs the column ~44px instead of ~66px. Keep it that way.
+// The left column also carries the 3D toggle above the contribute button, so
+// every pixel the aside grows pushes that toggle down. The footer goes full
+// bleed and takes over the panel's own bottom padding, which is what keeps the
+// invitation to ~44px of column instead of ~66px.
 check(
   "the footer reclaims the panel's own bottom padding",
-  cta.includes("-mx-4") && cta.includes("-mb-4") && cta.includes("border-t"),
+  cta.includes("-mx-4") && cta.includes("border-t") && panel.includes("pb-0"),
+);
+// The aside caps its height and scrolls (Spanish overflows at 1440x900), so an
+// unpinned footer would scroll out of sight. Pinned, and opaque so the content
+// passing beneath it cannot ghost through the label.
+check(
+  "the aside is height budgeted and scrolls rather than pushing the column",
+  panel.includes("max-h-[calc(100%-3.25rem)]") &&
+    panel.includes("overflow-y-auto"),
+);
+check(
+  "the footer is pinned to the bottom of the scrolling aside, opaque",
+  cta.includes("sticky bottom-0") && cta.includes("bg-surface-elevated"),
 );
 
 console.log("");

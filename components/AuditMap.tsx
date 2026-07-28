@@ -866,9 +866,14 @@ export default function AuditMap({
         className="h-full w-full"
       />
 
-      {/* Top-left control cluster (thumb-reachable, stacked). */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start gap-3 p-3 sm:p-4">
-        <div className="pointer-events-none flex flex-col items-start gap-3">
+      {/* Top-left control cluster (thumb-reachable, stacked). The column is
+          height budgeted: it spans the plate (inset-0, h-full) and reserves the
+          bottom band for the contribute button, so the 3D toggle beneath the
+          aside can never be pushed under it. The aside itself absorbs the
+          overflow (it caps its own height and scrolls). Without the budget the
+          Spanish panel already buried the toggle at 1440x800. */}
+      <div className="pointer-events-none absolute inset-0 flex items-start gap-3 p-3 pb-16 sm:p-4 sm:pb-20">
+        <div className="pointer-events-none flex h-full flex-col items-start gap-3">
           {stats ? (
             <MapPanel
               stats={stats}
