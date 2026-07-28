@@ -12,6 +12,9 @@
  * Also checks the normalization and the overall composite against
  * scripts/generate-demo-audits.mjs, since the whole point of the shared rubric
  * is that a CV rollup and a human field audit mean the same thing by "72".
+ * The generator now runs items -> lens scores too, and
+ * scripts/test-demo-audits.mjs re-derives every published demo score through
+ * lensScoresFromItems, so the two directions are pinned from both ends.
  *
  * Exits 0 on PASS, 1 on any failure.
  */
@@ -101,7 +104,7 @@ function main() {
   const TR = require(path.join(BUILD_DIR, "capture", "track.js"));
 
   /* ---------------- Normalization ---------------- */
-  console.log("\nnormalization (mirrors generate-demo-audits.mjs itemResponse)");
+  console.log("\nnormalization (mirrors generate-demo-audits.mjs normalizeItem)");
   {
     check("boolean 1 -> 1", S.normalizeItemValue("sidewalk_present", 1) === 1);
     check("boolean 0 -> 0", S.normalizeItemValue("sidewalk_present", 0) === 0);
@@ -115,7 +118,7 @@ function main() {
   }
 
   /* ---------------- Overall composite ---------------- */
-  console.log("\noverall composite (generate-demo-audits.mjs:206-208)");
+  console.log("\noverall composite (generate-demo-audits.mjs lensScores)");
   {
     // accessibility 1.0, drainage 0.5, shade 0.0
     const normalized = {};
