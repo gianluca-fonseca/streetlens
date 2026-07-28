@@ -44,20 +44,31 @@ export default function Legend({
 
   return (
     <div>
-      <div className="mb-2 flex items-baseline justify-between gap-2">
+      {/* items-center below md so the 44px toggle and the scale hint centre
+          against each other; md+ keeps the original baseline alignment. */}
+      <div className="mb-2 flex items-center justify-between gap-2 md:items-baseline">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          // Measured at 390x844: the visible chip is 69.2x16.5 (es 77.5x16.5),
-          // a quarter of the 44px tap floor, and on a phone it is the only way
-          // to the colour key. The hit area is grown with a pseudo-element
-          // rather than padding because this row is `items-baseline`: any box
-          // growth here drags the "0–4" scale hint off its baseline with it.
-          // -inset-y-[14px] takes 16.5 to 44.5. Scoped `max-md` because at md+
-          // the legend is always open and this button is `pointer-events-none`,
-          // so the desktop layout is provably untouched.
-          className="relative flex items-center gap-1.5 max-md:after:absolute max-md:after:-inset-x-2 max-md:after:-inset-y-[14px] max-md:after:content-[''] md:pointer-events-none"
+          // Measured at 390x844: the visible chip was 69.2x16.5 (es 77.5x16.5),
+          // a quarter of the 44px tap floor, and on a phone this is the only
+          // route to the colour key.
+          //
+          // A pseudo-element hit band was tried first, to avoid disturbing the
+          // baseline-aligned row. It does not work here: the whole legend sits
+          // inside the aside's `.collapsibleInner`, which is `overflow: hidden`
+          // for the height animation, and with the legend closed this header IS
+          // essentially all of that box — so the band was clipped away above
+          // and below and only the visible 16.5px stayed tappable. That failure
+          // is invisible to getBoundingClientRect, which never reports a
+          // pseudo-element; it took a hit test to see.
+          //
+          // So the button takes a real 44px instead, and the row switches to
+          // items-center below md to keep it aligned with the scale hint. At
+          // md+ the legend is always open and this button is
+          // `pointer-events-none`, so the desktop layout is untouched.
+          className="flex items-center gap-1.5 max-md:min-h-[44px] md:pointer-events-none"
         >
           <h3 className="text-[11px] font-mono font-medium uppercase tracking-[0.16em] text-neutral-strong">
             {t("title")}

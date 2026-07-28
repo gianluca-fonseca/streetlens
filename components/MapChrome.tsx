@@ -22,7 +22,17 @@ export default function MapChrome() {
   const t = useTranslations("mapChrome");
 
   return (
-    <header className="flex shrink-0 items-center gap-3 border-b border-hairline bg-surface px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-4">
+    // `flex-wrap` is load-bearing at 360px in Spanish. The right cluster is
+    // shrink-0 and needed 333px there (the demo switch alone is 135px in
+    // Spanish against 110px in English); with the logo and the gap that is
+    // 363px inside a 336px content box, and the theme switcher's right edge
+    // measured 375px against a 360px header. The page reported no horizontal
+    // scroll only because the layout viewport had itself widened to 376px to
+    // absorb it, which is why both static sweeps missed it. Wrapping lets the
+    // cluster take its own row exactly where it does not fit; at 390px it
+    // still measures 363px inside 366px and stays on one row, so every
+    // viewport above the smallest is untouched.
+    <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-b border-hairline bg-surface px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] sm:flex-nowrap sm:px-4">
       <Link
         href="/"
         className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] shrink-0 items-center rounded-[2px] text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
@@ -32,7 +42,11 @@ export default function MapChrome() {
       <span className="hidden min-w-0 truncate text-[12.5px] text-ink-muted sm:inline">
         {t("tagline")}
       </span>
-      <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+      {/* gap-1.5 below sm buys back 4px, which is the difference between the
+          English cluster fitting on one row at 360px (334px inside a 336px box)
+          and wrapping for the sake of 2px. Spanish needs 355px there and wraps
+          regardless, which is the correct outcome for it. */}
+      <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-3">
         <Link
           href="/insights"
           className="hidden min-h-[32px] pointer-coarse:min-h-[44px] items-center rounded-[2px] px-2 text-[12px] font-medium text-ink-muted underline decoration-accent decoration-2 underline-offset-[4px] transition-colors hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
