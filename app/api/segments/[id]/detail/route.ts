@@ -21,6 +21,11 @@ export async function GET(
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
 
+  // Existence check only; the response body below carries community reports and
+  // CV observations, which are real in either era. Deliberately the build-time
+  // default rather than the cookie-resolved flag: this response is shared and
+  // CDN-cached (s-maxage below), so one browser's demo cookie must never vary
+  // what the next visitor is served.
   const segment = await getSegmentDetail(id);
   if (!segment) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });

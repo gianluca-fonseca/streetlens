@@ -19,6 +19,9 @@ export async function GET(
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
 
+  // Existence check only. Signed camera-evidence URLs are real work in either
+  // era, and the demo gate never removes a segment, so the build-time default
+  // is the right read here: whether a street exists must not depend on a cookie.
   const segment = await getSegmentDetail(id);
   if (!segment) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
