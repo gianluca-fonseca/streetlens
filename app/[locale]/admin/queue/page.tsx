@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegmentDetail, getSegments } from "@/lib/segments";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
 import { getPendingSubmissions } from "@/lib/submissions";
 import { getSessionReview } from "@/lib/capture/review-store";
 import { summarizeStreetNames } from "@/lib/capture/segment-label";
@@ -27,7 +28,7 @@ export default async function AdminQueuePage({
 
   let segmentCatalog = new Map<string, { name: string; district: string }>();
   try {
-    const collection = await getSegments();
+    const collection = await getSegments(await demoDataEnabled());
     for (const f of collection.features) {
       segmentCatalog.set(f.properties.id, {
         name: f.properties.name,

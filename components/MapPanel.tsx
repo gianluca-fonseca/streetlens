@@ -4,7 +4,7 @@ import { useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import type { ScoreLayer, StreetStats } from "@/lib/segments";
-import { showDemoData } from "@/lib/demo-flag";
+import { useDemoData } from "@/components/DemoDataProvider";
 import {
   defaultMapPanelCollapsed,
   readMapPanelCollapsed,
@@ -36,6 +36,7 @@ export default function MapPanel({
   onSelectLayer: (layer: ScoreLayer) => void;
 }>) {
   const t = useTranslations("panel");
+  const demoEnabled = useDemoData();
   const [expanded, setExpanded] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
@@ -117,7 +118,7 @@ export default function MapPanel({
             <p className="mt-1.5 font-display text-[0.95rem] leading-snug text-ink">
               {t("heroStat", { pct: stats.heroPct })}
             </p>
-            {showDemoData() && (
+            {demoEnabled && (
               <p className="mt-1 text-[11px] text-neutral-strong">
                 {t("heroDemoNote")}
               </p>

@@ -6,6 +6,7 @@ import PrintButton from "@/components/civic/PrintButton";
 import { buildLeyBriefSummary } from "@/lib/ley-brief";
 import { MUNICIPALITY } from "@/lib/municipality";
 import { getSegments } from "@/lib/segments";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
 import { LEY_7600_MIN_SCORE } from "@/lib/types";
 
 export const revalidate = 300;
@@ -31,7 +32,7 @@ export default async function BriefPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "brief" });
-  const segments = await getSegments();
+  const segments = await getSegments(await demoDataEnabled());
   const summary = buildLeyBriefSummary(segments);
 
   return (

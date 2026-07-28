@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { showDemoData } from "@/lib/demo-flag";
+import { useDemoData } from "@/components/DemoDataProvider";
 import Section from "@/components/ui/Section";
 import Measure from "@/components/ui/Measure";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -20,6 +20,7 @@ export default function GapSection({
   heroPct: number;
 }>) {
   const t = useTranslations("landing.gap");
+  const demoEnabled = useDemoData();
 
   const stats = [
     { key: "1", value: t("stat1Value"), label: t("stat1Label"), note: t("stat1Note") },
@@ -27,7 +28,7 @@ export default function GapSection({
     // stat3 is the pilot's own fail rate; with demo off it degrades to 0% and its
     // "demo figure" caveat no longer applies, so it drops. The two Costa Rican
     // anchors above are real and always keep their sourced notes.
-    ...(showDemoData()
+    ...(demoEnabled
       ? [
           {
             key: "3",

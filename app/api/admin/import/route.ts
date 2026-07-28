@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getSegments } from "@/lib/segments";
+import { showDemoData } from "@/lib/demo-flag";
 import { applyImportFeatures } from "@/lib/apply-submissions";
 import type { ImportFeature } from "@/lib/schemas";
 import {
@@ -61,7 +62,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "too_many" }, { status: 413 });
   }
 
-  const segments = await getSegments();
+  // Build-time default: only the id set is read here, which the demo era does
+  // not change, so an import dry-run must not depend on the demo switch.
+  const segments = await getSegments(showDemoData());
   const existingIds = new Set(segments.features.map((f) => f.properties.id));
   const evaluated = evaluateFeatures(raw, existingIds);
   const rows = evaluated.map((e) => e.row);

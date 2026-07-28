@@ -7,6 +7,7 @@ import { formatCvCoveragePct } from "@/lib/cv-provenance";
 import { AUTHOR_LINKEDIN, CUSP_URL, GITHUB_URL } from "@/lib/links";
 import { MUNICIPALITY } from "@/lib/municipality";
 import { getStats } from "@/lib/segments";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
 
 export const revalidate = 300;
 
@@ -31,7 +32,7 @@ export default async function PressPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "press" });
-  const stats = await getStats();
+  const stats = await getStats(await demoDataEnabled());
   const cvCoverage = formatCvCoveragePct(stats.cvCoveragePct, locale);
 
   return (

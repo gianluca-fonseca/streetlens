@@ -16,6 +16,7 @@ import { runSegmentDialogue } from "@/lib/capture/run-dialogue";
 import { RUBRIC_ITEM_KEYS } from "@/lib/capture/types";
 import { LENS_KEYS } from "@/lib/capture/scoring";
 import { getSegments } from "@/lib/segments";
+import { showDemoData } from "@/lib/demo-flag";
 import type { MatchSegment } from "@/lib/matching/types";
 import type { SegmentGeometryMeta } from "@/lib/capture/dialogue-spatial";
 import { listReviewDialogues } from "@/lib/capture/dialogue-store";
@@ -88,7 +89,9 @@ async function loadNetworkContext(segmentId: string): Promise<{
 }> {
   const nameById = new Map<string, string>();
   try {
-    const collection = await getSegments();
+    // Build-time default: this path uses ids, names, and geometry only, none of
+    // which the demo era touches, so it stays independent of the demo switch.
+    const collection = await getSegments(showDemoData());
     const network: MatchSegment[] = collection.features.map((f) => ({
       id: f.properties.id,
       coordinates: f.geometry.coordinates.map((c) => [c[0], c[1]] as [number, number]),

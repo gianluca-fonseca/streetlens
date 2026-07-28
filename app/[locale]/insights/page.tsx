@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getInsightsSnapshot } from "@/lib/insights-data";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
 import InsightsView from "@/components/insights/InsightsView";
 import DataDegradedBanner from "@/components/DataDegradedBanner";
 
@@ -27,7 +28,7 @@ export default async function InsightsPage({
 }>) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const data = await getInsightsSnapshot();
+  const data = await getInsightsSnapshot(await demoDataEnabled());
 
   return (
     <>

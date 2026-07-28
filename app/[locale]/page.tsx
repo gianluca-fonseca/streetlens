@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
+import { demoDataEnabled } from "@/lib/demo-flag-server";
 import Hero from "@/components/landing/Hero";
 import MissionSection from "@/components/landing/MissionSection";
 import MeasureSection from "@/components/landing/MeasureSection";
@@ -48,7 +49,11 @@ export default async function HomePage({
 
   // The StreetLens landing: the platform first, the Escazú pilot as the proof.
   // The hero holds the one live map; every other section uses rendered imagery.
-  const [segments, stats] = await Promise.all([getSegments(), getStats()]);
+  const demoEnabled = await demoDataEnabled();
+  const [segments, stats] = await Promise.all([
+    getSegments(demoEnabled),
+    getStats(demoEnabled),
+  ]);
 
   return (
     <main className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
