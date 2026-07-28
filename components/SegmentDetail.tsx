@@ -584,8 +584,15 @@ export default function SegmentDetail({
         <span className="h-1 w-10 rounded-full bg-border-strong" />
       </div>
 
-      <header className="flex items-start justify-between gap-3 border-b border-border px-4 pb-4 pt-0 md:pt-4">
-        <div className="min-w-0">
+      {/* On a phone the actions take their own row. Once the share buttons and
+          the close button grew to the 44px tap floor, the cluster went from
+          178px to 205px wide, which left the Spanish title column 139px of 390
+          and stacked the provenance chips 168px tall (121px before, and English
+          went 89 -> 105). Giving the title the full width puts the chips back on
+          one or two lines and the buttons somewhere comfortable. md+ keeps the
+          original single row, where there was never a shortage of width. */}
+      <header className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2.5 border-b border-border px-4 pb-4 pt-0 md:flex-nowrap md:pt-4">
+        <div className="min-w-0 max-md:w-full">
           <h2 className="font-display text-[1.05rem] font-semibold leading-tight text-ink">
             {segment.name}
           </h2>
@@ -638,7 +645,7 @@ export default function SegmentDetail({
             </span>
           ) : null}
         </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1 max-md:w-full max-md:justify-end">
           <StreetShareActions segmentId={segment.id} variant="panel" />
           <button
           type="button"
