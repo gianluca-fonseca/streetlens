@@ -14,8 +14,18 @@ const nextConfig: NextConfig = {
    * serverless bundle, and a missing background would fail the route rather than
    * quietly degrade it.
    */
+  /**
+   * The vendored Space Grotesk instances are read the same way, but by every
+   * card this site renders rather than only the landing one, so the second key
+   * is the looser of the two. Next matches these keys with picomatch in
+   * `contains` mode, so the doubled-star form catches all ten card routes (the
+   * eight brand cards, the landing relief card, and the per-street card) and
+   * still catches no page. Both keys are literal enough to be checked: after a
+   * build, the traced files are listed in the route's `.js.nft.json`.
+   */
   outputFileTracingIncludes: {
     "/[locale]/opengraph-image": ["./public/hero-relief.jpg"],
+    "**/opengraph-image**": ["./assets/fonts/*.ttf"],
   },
 };
 

@@ -102,6 +102,52 @@ export function brandOgImageMetadata(alt: string) {
   return { id: "card", alt, size: brandOgSize, contentType: brandOgContentType };
 }
 
+/*
+ * ── Type ──────────────────────────────────────────────────────────────────────
+ *
+ * The site is Space Grotesk (`app/[locale]/layout.tsx`, exposed as
+ * `--font-display` / `--font-sans`), so the cards are too. Satori cannot resolve
+ * a CSS family name: it has no font fallback chain and no access to the browser's
+ * font book, so `fontFamily: "system-ui"` was not a near miss, it was a different
+ * typeface on every card this site renders.
+ *
+ * The bytes are vendored at `assets/fonts/`, two static instances cut from
+ * Google Fonts' variable `SpaceGrotesk[wght].ttf` with fontTools at wght 400 and
+ * wght 700 (OFL, no reserved font name; the licence ships beside them). Three
+ * reasons for vendoring rather than resolving the font at build time:
+ *
+ *  - `next/font/google` emits a content-hashed `.woff2` under `.next/static/media`.
+ *    That path is not stable, and satori does not accept woff2 anyway.
+ *  - Fetching from fonts.gstatic.com during `next build` makes every build
+ *    depend on a third-party network round trip.
+ *  - The variable font's own default instance is wght 300 (Light). Handing satori
+ *    the variable file would have produced a *lighter* card than system-ui, since
+ *    satori renders the default instance and does not apply the wght axis. The
+ *    static instances are the only way to get a real 700.
+ *
+ * Read once per process and shared by both renderers. `readFile` throwing is the
+ * point: a missing font file fails the build loudly rather than letting satori
+ * fall back to its bundled Geist and ship the wrong typeface quietly.
+ */
+export const BRAND_FONT_FAMILY = "Space Grotesk";
+
+const FONT_DIR = path.join(process.cwd(), "assets", "fonts");
+
+type BrandFont = { name: string; data: Buffer; weight: 400 | 700; style: "normal" };
+
+let brandFonts: Promise<BrandFont[]> | null = null;
+
+export function loadBrandFonts(): Promise<BrandFont[]> {
+  brandFonts ??= Promise.all([
+    readFile(path.join(FONT_DIR, "SpaceGrotesk-Regular.ttf")),
+    readFile(path.join(FONT_DIR, "SpaceGrotesk-Bold.ttf")),
+  ]).then(([regular, bold]): BrandFont[] => [
+    { name: BRAND_FONT_FAMILY, data: regular, weight: 400, style: "normal" },
+    { name: BRAND_FONT_FAMILY, data: bold, weight: 700, style: "normal" },
+  ]);
+  return brandFonts;
+}
+
 const LENSES = ["accessibility", "drainage", "shade", "bike"] as const;
 
 /** Long meta descriptions read as copy, not a card. Trim on a word boundary. */
@@ -128,6 +174,7 @@ export async function renderBrandOgImage({
   );
   const municipality = getMunicipalityConfig();
   const eyebrow = `${SITE_NAME} · ${municipality.name[locale]}, ${municipality.region[locale]}`;
+  const fonts = await loadBrandFonts();
 
   return new ImageResponse(
     (
@@ -141,7 +188,7 @@ export async function renderBrandOgImage({
           padding: 64,
           background: "#0a0a0a",
           color: "#f1f1f1",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: BRAND_FONT_FAMILY,
         }}
       >
         {/* Takes the slack so a short title sits optically centred rather than
@@ -226,7 +273,7 @@ export async function renderBrandOgImage({
         </div>
       </div>
     ),
-    { ...brandOgSize },
+    { ...brandOgSize, fonts },
   );
 }
 
@@ -265,14 +312,25 @@ function reliefBackground(): Promise<string> {
 }
 
 /**
- * The scrim. A single left-to-right wash rather than a solid band, so the type
- * side is unambiguously legible while the relief keeps reading as one continuous
- * image across the frame. Held near-opaque through the text column, then
- * released fast, which is what leaves the dense pilot grid on the right at full
- * strength.
+ * The scrim, in two washes rather than one.
+ *
+ * The old card could get away with a single left-to-right wash held near-opaque
+ * (0.90) through the text column, because the render it sat on left the whole
+ * upper-left empty. The re-framed render has no empty quarter: the pilot network
+ * is centred and fills the frame, so a wash strong enough to carry type would
+ * have buried half the thing the card exists to show.
+ *
+ * So the type gets its contrast from where it is rather than from brute opacity.
+ * A gentle left wash separates the copy column from the corridors behind it, and
+ * a foot wash darkens the bottom third where the copy actually sits. They
+ * multiply where they overlap (the lower left, under the caveat) and they leave
+ * the upper middle and right, the dense downtown grid, close to full strength.
  */
-const RELIEF_SCRIM =
-  "linear-gradient(90deg, rgba(10,10,10,0.90) 0%, rgba(10,10,10,0.87) 46%, rgba(10,10,10,0.64) 64%, rgba(10,10,10,0.20) 86%, rgba(10,10,10,0.03) 100%)";
+const RELIEF_SIDE_SCRIM =
+  "linear-gradient(90deg, rgba(10,10,10,0.62) 0%, rgba(10,10,10,0.50) 38%, rgba(10,10,10,0.26) 62%, rgba(10,10,10,0.08) 85%, rgba(10,10,10,0.00) 100%)";
+
+const RELIEF_FOOT_SCRIM =
+  "linear-gradient(180deg, rgba(10,10,10,0.00) 0%, rgba(10,10,10,0.00) 34%, rgba(10,10,10,0.22) 50%, rgba(10,10,10,0.66) 70%, rgba(10,10,10,0.88) 88%, rgba(10,10,10,0.94) 100%)";
 
 /**
  * Break the headline on its own sentences instead of leaving it to the line
@@ -306,7 +364,7 @@ export async function renderReliefOgImage({
 }: ReliefOgInput): Promise<ImageResponse> {
   const municipality = getMunicipalityConfig();
   const place = `${municipality.name[locale]}, ${municipality.region[locale]}`;
-  const background = await reliefBackground();
+  const [background, fonts] = await Promise.all([reliefBackground(), loadBrandFonts()]);
 
   return new ImageResponse(
     (
@@ -317,7 +375,7 @@ export async function renderReliefOgImage({
           display: "flex",
           background: "#0a0a0a",
           color: "#f1f1f1",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: BRAND_FONT_FAMILY,
         }}
       >
         {/* The render is exactly the card's aspect ratio (1600x840 against
@@ -334,17 +392,20 @@ export async function renderReliefOgImage({
           height={brandOgSize.height}
           style={{ position: "absolute", top: 0, left: 0 }}
         />
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            display: "flex",
-            width: brandOgSize.width,
-            height: brandOgSize.height,
-            backgroundImage: RELIEF_SCRIM,
-          }}
-        />
+        {[RELIEF_SIDE_SCRIM, RELIEF_FOOT_SCRIM].map((wash) => (
+          <div
+            key={wash}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              display: "flex",
+              width: brandOgSize.width,
+              height: brandOgSize.height,
+              backgroundImage: wash,
+            }}
+          />
+        ))}
         <div
           style={{
             position: "relative",
@@ -374,13 +435,19 @@ export async function renderReliefOgImage({
             </div>
           </div>
 
+          {/* Copy sits as one block at the foot of the frame rather than spread
+              down the left edge. The re-framed render puts the dense downtown
+              grid across the upper middle and right, which is the brightest
+              thing in the image and exactly where the headline used to sit; drop
+              the copy below it and the two stop fighting, with no extra surface
+              and nothing added or removed. */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                maxWidth: 780,
-                fontSize: 51,
+                maxWidth: 900,
+                fontSize: 58,
                 fontWeight: 700,
                 lineHeight: 1.1,
                 letterSpacing: "-0.02em",
@@ -404,16 +471,24 @@ export async function renderReliefOgImage({
             >
               {clamp(line, 120)}
             </div>
-          </div>
 
-          {/* The image is the simulated pilot dataset. It says so, at the same
-              weight the landing page says it, and it is not optional. */}
-          <div style={{ display: "flex", maxWidth: 740, fontSize: 19, color: "#8f8f8f" }}>
-            {caveat}
+            {/* The image is the simulated pilot dataset. It says so, at the same
+                weight the landing page says it, and it is not optional. */}
+            <div
+              style={{
+                display: "flex",
+                maxWidth: 740,
+                marginTop: 26,
+                fontSize: 19,
+                color: "#9a9a9a",
+              }}
+            >
+              {caveat}
+            </div>
           </div>
         </div>
       </div>
     ),
-    { ...brandOgSize },
+    { ...brandOgSize, fonts },
   );
 }
