@@ -533,6 +533,27 @@ section[id] {
   animation: sl-settle-up var(--dur-slow) var(--ease-out-soft) backwards;
 }
 
+/* Document cue: the chevron under the street list drifts down ~3px and fades
+   back, 2.4s, so the mark reads as an invitation to keep scrolling rather than a
+   control waiting to be pressed. Slower than the live dot on purpose — the two
+   sit in the same viewport and must not read as one rhythm. Motion carries no
+   meaning here (the label does), so reduced motion stops it outright and rests
+   the chevron at full opacity. */
+.sl-scroll-cue {
+  animation: sl-cue-drift 2400ms var(--ease-out-soft) infinite;
+}
+@keyframes sl-cue-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(3px);
+    opacity: 1;
+  }
+}
+
 /* Card hover-lift: up one shadow tier + rise, leaves faster than it enters (enter
    200ms / leave 150ms). Dark also lifts the surface (dual-channel). No colored
    glow — transform + box-shadow + background-color only. */
@@ -613,6 +634,11 @@ section[id] {
   }
   .sl-live-dot {
     animation: none !important;
+  }
+  .sl-scroll-cue {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
   }
   .sl-card:hover {
     transform: none !important;

@@ -25,6 +25,13 @@ import { AUTHOR_LINKEDIN, CITY_REQUEST_URL, CUSP_URL, GITHUB_URL } from "@/lib/l
 
 const AuditMap = dynamic(() => import("@/components/AuditMap"), { ssr: false });
 
+/** How many streets the left-rail list shows. Six, not ten: the list is the
+ * rail's supporting evidence, not its subject, and at ten it ran past the map on
+ * desktop and turned the phone layout into a long scroll with no visible end —
+ * which is exactly what buried the document below. Six leaves the rail room for
+ * the cue that says the page continues. */
+const WORST_LIMIT = 6;
+
 /**
  * The platform hero (rev 6, u21 — the mcbroken restructure). A slim top banner
  * over a three-zone utility layout, map dominant: a LEFT rail (compact logo, a
@@ -149,6 +156,31 @@ function LegendChip() {
         </ul>
       ) : null}
     </div>
+  );
+}
+
+/** The document cue, at the foot of the left rail. The hero fills the viewport
+ * and reads as a finished object, so the manifesto under it is easy to miss
+ * entirely; this is the one mark that says the page keeps going. A plain hash
+ * anchor, so it works with JS off and inherits the smooth scroll `<main>` already
+ * declares — no scroll handler to keep in sync with the scroller. The chevron
+ * breathes downward; under reduced motion it simply holds still, because the
+ * label is what carries the meaning. */
+function ScrollCue({ label }: Readonly<{ label: string }>) {
+  return (
+    <a
+      href="#mission"
+      className="sl-hero-el group mt-4 inline-flex min-h-[44px] shrink-0 items-center justify-center gap-1.5 self-center rounded-[2px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface lg:self-start"
+      style={{ animationDelay: "760ms" }}
+    >
+      {label}
+      <ChevronDown
+        size={14}
+        strokeWidth={2}
+        aria-hidden="true"
+        className="sl-scroll-cue"
+      />
+    </a>
   );
 }
 
@@ -399,7 +431,7 @@ export default function Hero({
     }
     const worstStreets = [...byStreet.values()]
       .sort((a, b) => a.score - b.score)
-      .slice(0, 10);
+      .slice(0, WORST_LIMIT);
     const bikeMean = audited.length
       ? Math.round(
           audited.reduce((s, f) => s + f.properties.score_bike, 0) /
@@ -410,12 +442,14 @@ export default function Hero({
   }, [segments]);
 
   const cvObserved = useMemo(
-    () => (auditedHidden ? listRecentlyCvObserved(segments) : []),
+    () =>
+      auditedHidden ? listRecentlyCvObserved(segments).slice(0, WORST_LIMIT) : [],
     [auditedHidden, segments],
   );
 
   const cvWorst = useMemo(
-    () => (auditedHidden ? listWorstCvStreets(segments, { limit: 10 }) : []),
+    () =>
+      auditedHidden ? listWorstCvStreets(segments, { limit: WORST_LIMIT }) : [],
     [auditedHidden, segments],
   );
 
@@ -624,7 +658,8 @@ export default function Hero({
             )}
           </div>
 
-          {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}
+          {/* ── LEFT zone body: the worst-streets list, then the document cue
+               that closes the rail (and, on phones, the whole hero) ────── */}
           <div className="flex flex-col lg:col-start-1 lg:row-start-2 lg:min-h-0">
             <div className="shrink-0 text-center lg:text-left">
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
@@ -689,6 +724,7 @@ export default function Hero({
                 ))}
               </ul>
             )}
+            <ScrollCue label={t("scrollCue")} />
           </div>
         </div>
       </div>
