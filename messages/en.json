@@ -714,7 +714,8 @@
         "methodQuestion": "How does StreetLens work?",
         "methodLink": "Method",
         "platform": "Open the platform",
-        "insightsLink": "Insights"
+        "insightsLink": "Insights",
+        "origin": "Costa Rica"
       },
       "segments": {
         "title": "Lowest-scoring streets",

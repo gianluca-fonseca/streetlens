@@ -14,6 +14,7 @@ import { listWorstCvStreets } from "@/lib/insights";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import { useTheme } from "@/components/ThemeProvider";
+import FlagCR from "@/components/ui/FlagCR";
 import Logo from "@/components/ui/Logo";
 import ProvenanceNote from "@/components/ProvenanceNote";
 import StatFigure from "@/components/ui/StatFigure";
@@ -44,6 +45,13 @@ function Banner() {
   return (
     <div className="w-full border-b border-transparent bg-ink-display text-paper dark:border-hairline dark:bg-paper-white dark:text-ink">
       <div className="mx-auto flex max-w-[1400px] items-center gap-x-4 px-[max(1rem,env(safe-area-inset-left))] py-2.5 text-[13px] leading-snug sm:px-6">
+        {/* Pilot-origin marker. Sits opposite the theme switcher so the centred
+            utility line keeps its balance; hidden below sm, where the banner
+            already wraps and every pixel is spoken for. */}
+        <span className="hidden shrink-0 items-center gap-1.5 sm:inline-flex">
+          <FlagCR className="h-3 w-5 shrink-0 rounded-[1px]" />
+          <span className="font-medium tracking-tight">{t("origin")}</span>
+        </span>
         <span className="flex flex-1 flex-wrap items-center justify-center gap-x-5 gap-y-1 text-center">
           <span className="inline-flex items-center gap-1.5">
             {t("methodQuestion")}

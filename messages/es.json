@@ -714,7 +714,8 @@
         "methodQuestion": "¿Cómo funciona StreetLens?",
         "methodLink": "Método",
         "platform": "Abrir la plataforma",
-        "insightsLink": "Indicadores"
+        "insightsLink": "Indicadores",
+        "origin": "Costa Rica"
       },
       "segments": {
         "title": "Calles con menor puntuación",
