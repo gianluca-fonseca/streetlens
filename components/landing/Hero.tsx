@@ -492,12 +492,18 @@ export default function Hero({
                 It is drawn as an SVG, not set as an emoji — the emoji falls back
                 to the letters "CR" on several platforms and the bands need to
                 stay crisp at this size. Decorative here, since the chip's own
-                text carries the country to a screen reader. */}
+                text carries the country to a screen reader.
+
+                The line is too long for the narrow rail and wraps; `items-start`
+                keeps the flag on the FIRST line where it belongs, instead of
+                floating to the optical centre of a two-line block. The copy binds
+                "Costa Rica" with a non-breaking space, so the only break point is
+                the comma and "Rica" can never orphan. */}
             <p
-              className="sl-hero-el mt-4 inline-flex items-center gap-1.5 rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted"
+              className="sl-hero-el mt-4 inline-flex items-start gap-1.5 rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase leading-[1.35] tracking-[0.1em] text-ink-muted"
               style={{ animationDelay: "160ms" }}
             >
-              <FlagCR decorative className="h-3 w-5 shrink-0 rounded-[1px]" />
+              <FlagCR decorative className="mt-[2px] h-3 w-5 shrink-0 rounded-[1px]" />
               {t("pilot")}
             </p>
             <h1

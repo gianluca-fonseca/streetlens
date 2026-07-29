@@ -92,8 +92,14 @@ for (const loc of ["en", "es"]) {
   );
   check(
     `${loc}: the pilot chip still names the country`,
-    /costa rica/i.test(heroMsgs(loc).pilot),
+    /costa rica/i.test(heroMsgs(loc).pilot.replace(/\s+/g, " ")),
     JSON.stringify(heroMsgs(loc).pilot),
+  );
+  // The chip wraps in the narrow rail, and "Rica" alone on line two next to a
+  // flag reads as a layout bug. The bind is the fix, so it is part of the copy.
+  check(
+    `${loc}: "Costa Rica" is bound against an orphan break`,
+    heroMsgs(loc).pilot.includes("Costa Rica"),
   );
 }
 
