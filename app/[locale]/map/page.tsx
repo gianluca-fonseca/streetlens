@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
 import { demoDataEnabled } from "@/lib/demo-flag-server";
+import { mapReliefView } from "@/lib/map-relief-server";
 import { MUNICIPALITY } from "@/lib/municipality";
 import { buildPageMetadata } from "@/lib/site";
 import AuditMap from "@/components/AuditMap";
@@ -38,6 +39,10 @@ export default async function MapPage({
   setRequestLocale(locale);
 
   const demoEnabled = await demoDataEnabled();
+  // Resolved on the server, from a cookie, for one reason: the "3D view" control
+  // is rendered in this page's HTML, so this is the only place its state can be
+  // known before the browser paints it. See lib/map-relief.ts.
+  const relief = await mapReliefView();
   const [segments, stats] = await Promise.all([
     getSegments(demoEnabled),
     getStats(demoEnabled),
@@ -57,6 +62,8 @@ export default async function MapPage({
           stats={stats}
           openContributeOnMount={openContribute}
           initialSegmentId={initialSegmentId}
+          reliefEnabled={relief.relief}
+          reliefAnimate={relief.animate}
         />
       </main>
     </div>

@@ -29,9 +29,18 @@ check("AuditMap listens for outside pointerdown while a segment is open",
   audit.includes('addEventListener("pointerdown", onPointerDown') &&
   audit.includes("queryRenderedFeatures") &&
   audit.includes("handleClose()"));
+// The layer set here has to be the SAME one the click handler selects from, or
+// a tap lands on a segment the outside-tap handler does not recognise and the
+// panel closes a heartbeat before the click reopens it. Since bgsd-0018 that set
+// is APP_SELECT_LAYER_IDS, which adds the extruded relief volume to the flat
+// pair: on /map the volume is the street's visible body, so a tap on it must
+// count as a tap on a segment.
 check("AuditMap skips close when the hit is on an interactive segment layer",
-  audit.includes("layers: INTERACTIVE_LAYER_IDS") &&
+  audit.includes("layers: APP_SELECT_LAYER_IDS.filter((id) => map.getLayer(id))") &&
   audit.includes("if (features.length > 0) return"));
+check("that layer set covers the extruded relief, not just the flat lines",
+  /const APP_SELECT_LAYER_IDS = \[[^\]]*RELIEF_LAYER_ID[^\]]*\]/s.test(audit) &&
+  /const APP_SELECT_LAYER_IDS = \[[^\]]*LINE_LAYER_ID[^\]]*\]/s.test(audit));
 check("SegmentDetail is marked for hit-testing exclusion",
   detail.includes('data-segment-detail'));
 check("SegmentDetail keeps role=dialog and adds aria-modal",
