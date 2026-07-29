@@ -9,13 +9,28 @@
  * switch.
  *
  * ORIGIN RESOLUTION, in order:
- *   1. `NEXT_PUBLIC_SITE_URL` — set this to the real public domain once a domain
- *      exists. It wins over everything.
- *   2. `VERCEL_PROJECT_PRODUCTION_URL` / `NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL`
- *      — injected by Vercel on every deployment and always points at the
- *      PRODUCTION host, not the per-commit preview host. That is what a
- *      canonical tag wants.
- *   3. `http://localhost:3000` — dev fallback. Never reached on Vercel.
+ *   1. `NEXT_PUBLIC_SITE_URL` — an explicit override. A fork, a self-host, or a
+ *      staging box that owns its own domain sets this and it wins over
+ *      everything below.
+ *   2. A Vercel deployment that is NOT production (`VERCEL_ENV` is "preview" or
+ *      "development") resolves to its OWN host via `VERCEL_URL`. A preview that
+ *      declared the production canonical would be asking a crawler to index
+ *      streetlens.org from a build nobody shipped.
+ *   3. `VERCEL_PROJECT_PRODUCTION_URL` / `NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL`
+ *      — injected by Vercel and pointing at the project's production domain,
+ *      which is `streetlens.org` once the domain is attached to the project.
+ *   4. `PRODUCTION_ORIGIN` — the literal below. Reached by any production build
+ *      (`next build` / `next start`) with no Vercel environment around it, which
+ *      is what bakes the right canonical into the prerendered pages and the
+ *      static OG cards.
+ *   5. `http://localhost:3000` — `next dev` only.
+ *
+ * WHY THE LITERAL IS HERE AND NOWHERE ELSE. Steps 1-3 are configuration, so a
+ * preview resolves to itself and a fork resolves to its own domain. But a
+ * canonical origin that exists ONLY as a dashboard setting is one unset variable
+ * away from a production build publishing `http://localhost:3000` in every
+ * `og:image`, and nothing on screen would change. The default belongs in the one
+ * file that already owns the origin; the metadata test locks it.
  *
  * Read at call time rather than frozen into a module constant, so a test can
  * exercise several origins in one process.
@@ -61,8 +76,21 @@ export const OG_LOCALE: Readonly<Record<Locale, string>> = {
   es: "es_CR",
 };
 
+/**
+ * The canonical public origin of StreetLens. The production domain, and the
+ * default any production build falls back to. See the resolution order at the
+ * top of this file for when it is and is not reached.
+ */
+export const PRODUCTION_ORIGIN = "https://streetlens.org";
+
 function stripTrailingSlashes(value: string): string {
   return value.replace(/\/+$/, "");
+}
+
+/** `host` or `https://host/` in, `https://host` out. Empty string if neither. */
+function asOrigin(value: string | undefined): string {
+  const bare = stripTrailingSlashes((value ?? "").trim().replace(/^https?:\/\//, ""));
+  return bare ? `https://${bare}` : "";
 }
 
 /** The public origin of this deployment, without a trailing slash. */
@@ -70,14 +98,22 @@ export function siteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (explicit) return stripTrailingSlashes(explicit);
 
-  const vercelHost = (
-    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ??
-    process.env.VERCEL_PROJECT_PRODUCTION_URL
-  )?.trim();
-  if (vercelHost) {
-    const bare = stripTrailingSlashes(vercelHost.replace(/^https?:\/\//, ""));
-    if (bare) return `https://${bare}`;
+  // A preview or a Vercel dev deployment answers for itself. `VERCEL_URL` is the
+  // per-deployment host, so each preview gets its own canonical and none of them
+  // claims to be the production site.
+  const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV;
+  if (vercelEnv && vercelEnv !== "production") {
+    const self = asOrigin(process.env.NEXT_PUBLIC_VERCEL_URL ?? process.env.VERCEL_URL);
+    if (self) return self;
   }
+
+  const productionHost = asOrigin(
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ??
+      process.env.VERCEL_PROJECT_PRODUCTION_URL,
+  );
+  if (productionHost) return productionHost;
+
+  if (process.env.NODE_ENV === "production") return PRODUCTION_ORIGIN;
 
   return "http://localhost:3000";
 }

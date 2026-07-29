@@ -41,7 +41,14 @@ const ROOT = path.resolve(__dirname, "..");
 const APP = path.join(ROOT, "app", "[locale]");
 
 const site = await import(path.join(ROOT, "lib", "site.ts"));
-const { PUBLIC_ROUTES, SITE_LOCALES, buildPageMetadata, siteUrl, disallowedCrawlPaths } = site;
+const {
+  PRODUCTION_ORIGIN,
+  PUBLIC_ROUTES,
+  SITE_LOCALES,
+  buildPageMetadata,
+  siteUrl,
+  disallowedCrawlPaths,
+} = site;
 
 const failures = [];
 function check(label, ok, detail = "") {
@@ -96,6 +103,93 @@ check("siteUrl() carries no trailing slash", !siteUrl().endsWith("/"));
     /https:\/\//.test(read(path.join(APP, r.dir, "page.tsx"))),
   ).map((r) => r.path);
   check("no page hardcodes an absolute URL", offenders.length === 0, JSON.stringify(offenders));
+}
+
+/*
+ * The resolution chain itself. `siteUrl()` reads env at call time, so each case
+ * below is the whole origin-relevant environment, applied and then restored.
+ * These exist because every one of them is a silent failure: a preview that
+ * canonicalises to production asks a crawler to index a build nobody shipped,
+ * and a production build that falls through to localhost puts `localhost:3000`
+ * in every `og:image` with nothing on screen to show for it.
+ */
+{
+  const ORIGIN_ENV = [
+    "NEXT_PUBLIC_SITE_URL",
+    "VERCEL_ENV",
+    "NEXT_PUBLIC_VERCEL_ENV",
+    "VERCEL_URL",
+    "NEXT_PUBLIC_VERCEL_URL",
+    "VERCEL_PROJECT_PRODUCTION_URL",
+    "NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL",
+    "NODE_ENV",
+  ];
+  const saved = Object.fromEntries(ORIGIN_ENV.map((k) => [k, process.env[k]]));
+
+  function originUnder(env) {
+    for (const key of ORIGIN_ENV) delete process.env[key];
+    for (const [key, value] of Object.entries(env)) process.env[key] = value;
+    return siteUrl();
+  }
+
+  check(
+    "PRODUCTION_ORIGIN is the streetlens.org apex over https, no trailing slash",
+    PRODUCTION_ORIGIN === "https://streetlens.org",
+    PRODUCTION_ORIGIN,
+  );
+
+  const cases = [
+    {
+      label: "NEXT_PUBLIC_SITE_URL overrides everything, trailing slash trimmed",
+      env: {
+        NEXT_PUBLIC_SITE_URL: "https://staging.example.org/",
+        VERCEL_ENV: "production",
+        VERCEL_PROJECT_PRODUCTION_URL: "streetlens.org",
+        NODE_ENV: "production",
+      },
+      expected: "https://staging.example.org",
+    },
+    {
+      label: "a preview deployment canonicalises to ITSELF, not to production",
+      env: {
+        VERCEL_ENV: "preview",
+        VERCEL_URL: "streetlens-git-abc123.vercel.app",
+        VERCEL_PROJECT_PRODUCTION_URL: "streetlens.org",
+        NODE_ENV: "production",
+      },
+      expected: "https://streetlens-git-abc123.vercel.app",
+    },
+    {
+      label: "the production deployment resolves to the project's production domain",
+      env: {
+        VERCEL_ENV: "production",
+        VERCEL_URL: "streetlens-xyz789.vercel.app",
+        VERCEL_PROJECT_PRODUCTION_URL: "streetlens.org",
+        NODE_ENV: "production",
+      },
+      expected: "https://streetlens.org",
+    },
+    {
+      label: "a production build with no Vercel environment falls back to streetlens.org",
+      env: { NODE_ENV: "production" },
+      expected: PRODUCTION_ORIGIN,
+    },
+    {
+      label: "`next dev` stays on localhost",
+      env: { NODE_ENV: "development" },
+      expected: "http://localhost:3000",
+    },
+  ];
+
+  for (const { label, env, expected } of cases) {
+    const actual = originUnder(env);
+    check(label, actual === expected, `${actual} (expected ${expected})`);
+  }
+
+  for (const key of ORIGIN_ENV) {
+    if (saved[key] === undefined) delete process.env[key];
+    else process.env[key] = saved[key];
+  }
 }
 
 console.log("\n2. Every public route declares its own metadata\n");
