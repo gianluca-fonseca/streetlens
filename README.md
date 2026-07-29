@@ -13,7 +13,7 @@ Cleaner, more livable cities for everyone start with streets you can measure.
 
 <br/>
 
-<img src="public/hero-relief.jpg" alt="The Escazú pilot street network drawn as a 3D relief: each audited street extruded to a height and coloured by its overall score, against a near-black basemap" width="94%">
+<img src="public/hero-relief.jpg" alt="The whole Escazú pilot street network drawn as a 3D relief, centred in frame: each audited street extruded to a height and coloured by its overall score, against a near-black basemap of the Central Valley" width="94%">
 
 <sub>Every audited street in the Escazú pilot, extruded and coloured by its overall score: taller and greener is a better street. Height is a chart, not terrain, and the scores are demo figures over real OpenStreetMap geometry, not real measurements.</sub>
 
