@@ -143,6 +143,27 @@ check(
   /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.sl-scroll-cue\s*\{[\s\S]*?animation: none/.test(css),
   "(motion carries no meaning here; the label does)",
 );
+// The cue lives at the bottom edge of the parallax plate, and the plate drifts
+// DOWN while the document below it stays put and paints on top. So the hero's
+// foot must out-measure the drift, or the cue is simply covered — which is what
+// happened on phones before this clearance was set. Both numbers are read from
+// source, so raising the drift without raising the padding fails here.
+const drift = Number(
+  css.match(/@keyframes sl-parallax-drift[\s\S]*?translateY\((\d+)px\)/)?.[1] ?? NaN,
+);
+check("the plate's drift distance is declared", Number.isFinite(drift), `${drift}px`);
+const heroSection = hero.match(/<section className="([^"]*pb-[^"]*)"/)?.[1] ?? "";
+/** Tailwind bottom padding → px: `pb-28` is 28×4, `pb-[6.5rem]` is 6.5×16. */
+const paddings = [...heroSection.matchAll(/pb-(?:\[([\d.]+)rem\]|(\d+))/g)].map(
+  ([, rem, step]) => (rem ? Number(rem) * 16 : Number(step) * 4),
+);
+check("the hero section declares bottom padding", paddings.length > 0, heroSection);
+check(
+  "every breakpoint's foot clears the drift",
+  paddings.length > 0 && paddings.every((px) => px >= drift),
+  `pb=[${paddings.join(", ")}]px vs ${drift}px drift`,
+);
+
 for (const loc of ["en", "es"]) {
   check(
     `${loc}: scrollCue is set`,

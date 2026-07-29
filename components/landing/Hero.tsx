@@ -458,7 +458,13 @@ export default function Hero({
   const openPlatform = () => router.push("/map");
 
   return (
-    <section className="pb-10 sm:pb-14 lg:pb-16">
+    // The foot of this section must clear the plate's parallax drift. The plate
+    // translates down up to 88px (sl-parallax-drift) while the document below it
+    // stays put and paints ABOVE it, so whatever sits at the plate's bottom edge
+    // slides under the next band at full drift. That was harmless while the edge
+    // held nothing but the tail of a scrolling list; the document cue lives there
+    // now, and was being covered outright on phones. 88px of drift + a gap.
+    <section className="pb-[6.5rem] sm:pb-28 lg:pb-28">
       <Banner />
       {/* The plate plane: counter-drifts under the document on scroll (CSS
           scroll-driven, progressive, reduced-motion off). The banner stays in
