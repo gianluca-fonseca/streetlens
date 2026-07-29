@@ -269,13 +269,13 @@ console.log("\nrule 4 — every channel points the same way (higher score = more
     WIDTH_AT_100 / WIDTH_AT_0 >= 3 && WIDTH_AT_100 - WIDTH_AT_0 >= 4,
     `${(WIDTH_AT_100 / WIDTH_AT_0).toFixed(1)}x, ${(WIDTH_AT_100 - WIDTH_AT_0).toFixed(1)}px`,
   );
-  // The hero relief is the third channel and must not disagree with the other
+  // The score relief is the third channel and must not disagree with the other
   // two. Read from its own source rather than duplicating the constants.
-  const relief = readFileSync(`${ROOT}components/heroRelief.ts`, "utf8");
+  const relief = readFileSync(`${ROOT}components/scoreRelief.ts`, "utf8");
   const h0 = Number(/RELIEF_HEIGHT_AT_0 = ([\d.]+);/.exec(relief)?.[1]);
   const h100 = Number(/RELIEF_HEIGHT_AT_100 = ([\d.]+);/.exec(relief)?.[1]);
   check(
-    `hero relief height grows with the score too (${h0} → ${h100} m)`,
+    `score relief height grows with the score too (${h0} → ${h100} m)`,
     Number.isFinite(h0) && Number.isFinite(h100) && h100 > h0,
   );
 }

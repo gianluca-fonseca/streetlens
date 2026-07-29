@@ -12,7 +12,7 @@ import type { ScoreLayer } from "@/lib/segments";
  *   colour  a better street carries more contrast against the page it sits on
  *           (darker on the light basemap, brighter on the dark one)
  *   width   a better street is THICKER          (widthForValue, below)
- *   height  a better street is TALLER           (components/heroRelief.ts)
+ *   height  a better street is TALLER           (components/scoreRelief.ts)
  *
  * Rev 7 had width running the other way ("lower score = thicker, to surface the
  * problems") while the landing relief made the best streets the tallest. Both
