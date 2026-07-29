@@ -495,6 +495,21 @@ export default function Hero({
 
           {/* ── CENTER zone: the live map plate (z0 frame) + chips (z10) ── */}
           <div className="sl-hero-map flex min-w-0 flex-col lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-full">
+            {/* Plate label. The relief is a reading of ONE place, and nothing on
+                the map said which — the pilot chip naming Escazú sits in the left
+                rail, far from the frame, and drops below it entirely on phones.
+                An instrument label: place, a rule across the dead space, and the
+                encoding note. Same mono register as the captions under the map,
+                so the frame reads as one labelled object. */}
+            <div className="mb-2 flex items-center gap-3 px-1">
+              <h2 className="shrink-0 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-display">
+                {t("map.place")}
+              </h2>
+              <span aria-hidden="true" className="h-px min-w-4 flex-1 bg-hairline" />
+              <p className="hidden shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted sm:block">
+                {t("map.placeNote")}
+              </p>
+            </div>
             <div className="min-h-0 flex-1 rounded-[4px] border border-hairline bg-paper p-2 sm:p-3">
               <div
                 data-map-moving={mapMoving ? "true" : "false"}

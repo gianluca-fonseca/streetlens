@@ -743,7 +743,9 @@
       "map": {
         "live": "Mapa en vivo",
         "relief": "La altura es un gráfico, no el terreno: más alto significa mejor puntaje general.",
-        "affordance": "Arrastra para desplazar. Mantén ⌘ o Ctrl para hacer zoom. Toca un segmento para abrirlo en la plataforma."
+        "affordance": "Arrastra para desplazar. Mantén ⌘ o Ctrl para hacer zoom. Toca un segmento para abrirlo en la plataforma.",
+        "place": "Escazú, Costa Rica",
+        "placeNote": "La red vial del piloto"
       },
       "openSource": "El código es público: ver o contribuir"
     },

@@ -743,7 +743,9 @@
       "map": {
         "live": "Live map",
         "relief": "Height is a chart, not terrain: taller means a higher overall score.",
-        "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform."
+        "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform.",
+        "place": "Escazú, Costa Rica",
+        "placeNote": "The pilot street network"
       },
       "openSource": "The code is public: view / contribute"
     },
