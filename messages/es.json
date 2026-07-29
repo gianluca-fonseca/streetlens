@@ -698,9 +698,11 @@
     "meta": {
       "title": "StreetLens: toda calle puede medirse",
       "description": "Toda calle puede medirse. Casi ninguna se mide. StreetLens es un instrumento de campo de código abierto que puntúa la accesibilidad, el drenaje, la sombra y la infraestructura ciclista de las aceras, segmento a segmento. Ahora mide Escazú, Costa Rica, con datos de demostración hasta que el trabajo de campo comience en agosto de 2026.",
-      "ogAlt": "StreetLens: un instrumento de campo de código abierto que puntúa la accesibilidad, el drenaje, la sombra y la infraestructura ciclista de las aceras, segmento a segmento.",
+      "ogAlt": "La red vial de Escazú dibujada como un relieve 3D: cada calle auditada extruida a una altura y coloreada según su puntuación general, bajo la marca StreetLens.",
       "ogTitle": "Toda calle puede medirse. Casi ninguna se mide.",
-      "ogDescription": "Un instrumento de campo de código abierto para la calle: accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento. Ahora en Escazú, Costa Rica."
+      "ogDescription": "Un instrumento de campo de código abierto para la calle: accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento. Ahora en Escazú, Costa Rica.",
+      "ogCardLine": "Accesibilidad, drenaje, sombra e infraestructura ciclista, puntuadas segmento a segmento.",
+      "ogCardCaveat": "Puntuaciones de demostración sobre geometría real de OpenStreetMap. No son mediciones reales."
     },
     "hero": {
       "wordmark": "StreetLens",

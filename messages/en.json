@@ -698,9 +698,11 @@
     "meta": {
       "title": "StreetLens: every street can be measured",
       "description": "Every street can be measured. Most never are. StreetLens is an open-source field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure, segment by segment. Now measuring Escazú, Costa Rica, on demo data until fieldwork begins in August 2026.",
-      "ogAlt": "StreetLens: an open-source field instrument that scores sidewalk accessibility, drainage, shade, and bike infrastructure segment by segment.",
+      "ogAlt": "The Escazú street network drawn as a 3D relief: each audited street extruded to a height and coloured by its overall score, under the StreetLens wordmark.",
       "ogTitle": "Every street can be measured. Most never are.",
-      "ogDescription": "An open-source field instrument for the street: accessibility, drainage, shade, and bike infrastructure, scored segment by segment. Now measuring Escazú, Costa Rica."
+      "ogDescription": "An open-source field instrument for the street: accessibility, drainage, shade, and bike infrastructure, scored segment by segment. Now measuring Escazú, Costa Rica.",
+      "ogCardLine": "Accessibility, drainage, shade, and bike infrastructure, scored segment by segment.",
+      "ogCardCaveat": "Demo scores over real OpenStreetMap geometry. Not real measurements."
     },
     "hero": {
       "wordmark": "StreetLens",

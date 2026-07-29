@@ -13,6 +13,8 @@
  * the instrument and the method, never a claimed field result.
  */
 
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 // Ground is #0a0a0a: sample the DARK half of the ramp (mapConfig rev 8).
 import { sampleRamp } from "@/components/mapConfig";
@@ -220,6 +222,189 @@ export async function renderBrandOgImage({
           </div>
           <div style={{ display: "flex", fontSize: 28, fontWeight: 700, color: "#ff2d8a" }}>
             {SITE_NAME}
+          </div>
+        </div>
+      </div>
+    ),
+    { ...brandOgSize },
+  );
+}
+
+/*
+ * ── The site-wide card ────────────────────────────────────────────────────────
+ *
+ * The landing card is the same frame as above with the instrument itself behind
+ * it: the landing hero's extruded score relief, captured from the running app
+ * and committed at `public/hero-relief.jpg`. Everything else is subtraction. At
+ * the size a share card is actually seen (a thumbnail beside a message) a stat
+ * grid, a lens legend and three lines of copy are noise and none of it is read,
+ * so this card carries a small wordmark, one title, one supporting line, and the
+ * honesty caveat. The per-route cards above keep the lens row; the per-street
+ * cards keep their numbers. This one is the image.
+ */
+
+/**
+ * The relief render as a data URI.
+ *
+ * Read off disk rather than fetched: every `opengraph-image` route on this site
+ * prerenders (`generateImageMetadata` runs during page-data collection, before
+ * a request exists), so there is no origin to fetch from at the moment the card
+ * is drawn, and the read happens once at BUILD time rather than per request. The
+ * asset is 1600x630-proportioned and about 275 KB, so the base64 string it
+ * becomes is a build-time cost and never a response-time one.
+ *
+ * Cached in a module-level promise so a build that renders both locales reads
+ * and encodes the file once.
+ */
+let reliefDataUri: Promise<string> | null = null;
+function reliefBackground(): Promise<string> {
+  reliefDataUri ??= readFile(path.join(process.cwd(), "public", "hero-relief.jpg")).then(
+    (bytes) => `data:image/jpeg;base64,${bytes.toString("base64")}`,
+  );
+  return reliefDataUri;
+}
+
+/**
+ * The scrim. A single left-to-right wash rather than a solid band, so the type
+ * side is unambiguously legible while the relief keeps reading as one continuous
+ * image across the frame. Held near-opaque through the text column, then
+ * released fast, which is what leaves the dense pilot grid on the right at full
+ * strength.
+ */
+const RELIEF_SCRIM =
+  "linear-gradient(90deg, rgba(10,10,10,0.90) 0%, rgba(10,10,10,0.87) 46%, rgba(10,10,10,0.64) 64%, rgba(10,10,10,0.20) 86%, rgba(10,10,10,0.03) 100%)";
+
+/**
+ * Break the headline on its own sentences instead of leaving it to the line
+ * breaker. Both locales' `ogTitle` is two short sentences, and letting the
+ * measured width decide where they break stranded a two-word fragment on a
+ * third line in English. Splitting on the sentence boundary gives the same
+ * break in every locale whatever the font metrics do, and a one-sentence title
+ * is simply one line that still wraps if it has to.
+ */
+function headlineLines(title: string): string[] {
+  return title
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export type ReliefOgInput = Readonly<{
+  locale: Locale;
+  title: string;
+  /** The single supporting line. */
+  line: string;
+  /** The honesty caveat, in the landing page's own register. */
+  caveat: string;
+}>;
+
+export async function renderReliefOgImage({
+  locale,
+  title,
+  line,
+  caveat,
+}: ReliefOgInput): Promise<ImageResponse> {
+  const municipality = getMunicipalityConfig();
+  const place = `${municipality.name[locale]}, ${municipality.region[locale]}`;
+  const background = await reliefBackground();
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          background: "#0a0a0a",
+          color: "#f1f1f1",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        {/* The render is exactly the card's aspect ratio (1600x840 against
+            1200x630), so it fills the frame with nothing cropped away. */}
+        <img
+          src={background}
+          alt=""
+          width={brandOgSize.width}
+          height={brandOgSize.height}
+          style={{ position: "absolute", top: 0, left: 0 }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            display: "flex",
+            width: brandOgSize.width,
+            height: brandOgSize.height,
+            backgroundImage: RELIEF_SCRIM,
+          }}
+        />
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            width: "100%",
+            height: "100%",
+            padding: 64,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "baseline" }}>
+            <div style={{ display: "flex", fontSize: 27, fontWeight: 700, color: "#ff2d8a" }}>
+              {SITE_NAME}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                marginLeft: 14,
+                fontSize: 19,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#a3a3a3",
+              }}
+            >
+              {place}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                maxWidth: 780,
+                fontSize: 51,
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.02em",
+                marginBottom: 24,
+              }}
+            >
+              {headlineLines(title).map((sentence) => (
+                <div key={sentence} style={{ display: "flex" }}>
+                  {sentence}
+                </div>
+              ))}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                maxWidth: 620,
+                fontSize: 26,
+                lineHeight: 1.35,
+                color: "#d4d4d4",
+              }}
+            >
+              {clamp(line, 120)}
+            </div>
+          </div>
+
+          {/* The image is the simulated pilot dataset. It says so, at the same
+              weight the landing page says it, and it is not optional. */}
+          <div style={{ display: "flex", maxWidth: 740, fontSize: 19, color: "#8f8f8f" }}>
+            {caveat}
           </div>
         </div>
       </div>

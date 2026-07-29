@@ -1,13 +1,18 @@
 /**
  * Site-default social card. Serves the landing page, and any route below
- * `[locale]` that does not ship its own `opengraph-image`. The landing card
- * uses the punchier `ogTitle`/`ogDescription` pair rather than the tab title.
+ * `[locale]` that does not ship its own `opengraph-image`.
+ *
+ * This is the one card most people ever see, so it is the one that carries the
+ * instrument: the extruded score relief behind a scrim, the punchier `ogTitle`
+ * over it, one supporting line, and the demo caveat. `renderReliefOgImage` reads
+ * the committed render off disk at build time; this route prerenders, so nothing
+ * here runs on a request.
  */
 import type { Locale } from "@/i18n/routing";
 import {
   brandOgImageMetadata,
   brandOgStrings,
-  renderBrandOgImage,
+  renderReliefOgImage,
   resolveOgLocale,
 } from "@/lib/og-brand";
 
@@ -26,9 +31,10 @@ export async function generateImageMetadata({ params }: OgProps) {
 export default async function Image({ params }: OgProps) {
   const locale = resolveOgLocale(await params);
   const strings = await brandOgStrings(locale, NAMESPACE);
-  return renderBrandOgImage({
+  return renderReliefOgImage({
     locale,
     title: strings.ogTitle,
-    subtitle: strings.ogDescription,
+    line: strings.ogCardLine,
+    caveat: strings.ogCardCaveat,
   });
 }
