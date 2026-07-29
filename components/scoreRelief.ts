@@ -1,10 +1,14 @@
 import type { ExpressionSpecification } from "maplibre-gl";
 // Type-only import (same discipline as mapConfig): erased at build time, so
 // lib/segments' fs usage never reaches the client bundle.
-import type { SegmentCollection, SegmentFeature } from "@/lib/segments";
+import type {
+  ScoreLayer,
+  SegmentCollection,
+  SegmentFeature,
+} from "@/lib/segments";
 
 /*
- * Hero score relief — the landing map's 3D signature.
+ * Score relief — the network's third axis, on the landing hero AND on `/map`.
  *
  * Each score-carrying street is expanded into a corridor polygon and extruded
  * to a height driven by `score_overall`: a good street stands, a bad street
@@ -24,11 +28,15 @@ import type { SegmentCollection, SegmentFeature } from "@/lib/segments";
  * draws (audited, or camera-observed with canonical scores) are extruded;
  * unaudited community/import segments keep their flat dashed casing. In the
  * real-data era with no published audits every `score_overall` is 0, so the
- * relief collection is simply empty — no invented heights, no orphaned bars.
+ * relief collection is simply empty. No invented heights, no orphaned bars, and
+ * on `/map` with the demo data off that empty stage is the honest reading: the
+ * flat plan is still drawn underneath, there is simply nothing scored to stand
+ * up yet.
  *
- * Scope: hero variant only. The /map app surface never adds this source or
- * layer, and nothing here touches the sealed RAMP, the line expressions, or
- * the terrain/building 3D mode (u8).
+ * Scope: this file builds geometry and nothing else. It is shared verbatim by
+ * the landing hero and the `/map` instrument (they differ only in camera and in
+ * whether the volumes are clickable), and nothing here touches the sealed RAMP
+ * or the line expressions.
  */
 
 export const RELIEF_SOURCE_ID = "segments-relief";
@@ -53,12 +61,28 @@ const MITER_LIMIT = 2;
 const RELIEF_HEIGHT_AT_0 = 8;
 const RELIEF_HEIGHT_AT_100 = 150;
 
-/** MapLibre fill-extrusion height expression over `score_overall`. */
-export const reliefHeightExpression = [
-  "+",
-  RELIEF_HEIGHT_AT_0,
-  ["*", (RELIEF_HEIGHT_AT_100 - RELIEF_HEIGHT_AT_0) / 100, ["get", "score_overall"]],
-] as unknown as ExpressionSpecification;
+/**
+ * MapLibre fill-extrusion height expression for a lens.
+ *
+ * Both dimensional channels follow the SAME lens, which is the only coherent
+ * answer once `/map`'s lens switcher can drive the relief: a volume painted
+ * from the drainage ramp but sized by the overall score would be showing the
+ * reader two different numbers on one mark. On the hero this is always
+ * `overall`, since the hero never switches lenses.
+ */
+export function reliefHeightExpression(
+  layer: ScoreLayer = "overall",
+): ExpressionSpecification {
+  return [
+    "+",
+    RELIEF_HEIGHT_AT_0,
+    [
+      "*",
+      (RELIEF_HEIGHT_AT_100 - RELIEF_HEIGHT_AT_0) / 100,
+      ["get", `score_${layer}`],
+    ],
+  ] as unknown as ExpressionSpecification;
+}
 
 /** Mirrors mapConfig's COMMUNITY_SOURCES routing (kept private there). */
 const COMMUNITY_SOURCES = new Set(["community", "import"]);
@@ -68,6 +92,11 @@ const COMMUNITY_SOURCES = new Set(["community", "import"]);
  * exactly the features the 2D score ramp draws, and only when they carry a
  * non-zero overall score (a zero-height slab is noise, and in the real-data
  * era zero means "not audited yet", which must not render as data).
+ *
+ * `score_overall` remains the gate even though the relief can now be drawn on
+ * any lens, because the question it answers is "has this street been audited at
+ * all", not "how does it do on drainage". A street audited into a genuine 0 on
+ * one lens is data and stands as a low slab; a street with no audit is absent.
  */
 function carriesScore(f: SegmentFeature): boolean {
   const p = f.properties;
@@ -76,7 +105,20 @@ function carriesScore(f: SegmentFeature): boolean {
   return (p.cv_count ?? 0) > 0;
 }
 
-type ReliefProperties = { id: string; score_overall: number };
+/** Every lens's score travels with the volume, so switching the lens is a
+ *  repaint rather than a rebuild of the whole corridor collection. */
+const SCORE_KEYS = [
+  "score_overall",
+  "score_accessibility",
+  "score_drainage",
+  "score_shade",
+  "score_bike",
+] as const;
+
+type ReliefProperties = { id: string } & Record<
+  (typeof SCORE_KEYS)[number],
+  number
+>;
 type ReliefFeature = GeoJSON.Feature<GeoJSON.Polygon, ReliefProperties>;
 export type ReliefCollection = GeoJSON.FeatureCollection<
   GeoJSON.Polygon,
@@ -166,12 +208,18 @@ export function buildReliefCollection(
       CORRIDOR_HALF_WIDTH_M,
     );
     if (!ring) continue;
+    const properties = { id: f.properties.id } as ReliefProperties;
+    for (const key of SCORE_KEYS) properties[key] = f.properties[key] ?? 0;
     features.push({
       type: "Feature",
-      properties: {
-        id: f.properties.id,
-        score_overall: f.properties.score_overall,
-      },
+      // `promoteId: "id"` on the source lifts this into the feature id, so a
+      // segment's hover and selected state addresses its volume and its line
+      // with one call. The property is kept as well: MapLibre hands the
+      // promoted id back on `feature.id`, but the click handler resolves the
+      // full segment from the collection by property and should not depend on
+      // which of the two the hit came through.
+      id: f.properties.id,
+      properties,
       geometry: { type: "Polygon", coordinates: [ring] },
     });
   }
