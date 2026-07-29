@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 // same half the dark basemap paints (mapConfig rev 8).
 import { sampleRamp } from "@/components/mapConfig";
 import type { Locale } from "@/i18n/routing";
+import { BRAND_FONT_FAMILY, loadBrandFonts } from "@/lib/og-brand";
 import { getStreetCard } from "@/lib/street-card";
 
 export const runtime = "nodejs";
@@ -19,6 +20,10 @@ export default async function OgImage({ params }: OgProps) {
   const { locale, segmentId } = await params;
   const card = await getStreetCard(segmentId, locale);
   const t = await getTranslations({ locale, namespace: "street.og" });
+  // The same vendored Space Grotesk the other nine cards draw with. Satori has
+  // no font fallback chain, so this is the whole typographic contract for the
+  // card: without it every street report renders in satori's bundled Geist.
+  const fonts = await loadBrandFonts();
 
   if (!card) {
     return new ImageResponse(
@@ -33,13 +38,13 @@ export default async function OgImage({ params }: OgProps) {
             background: "#0a0a0a",
             color: "#f1f1f1",
             fontSize: 36,
-            fontFamily: "system-ui, sans-serif",
+            fontFamily: BRAND_FONT_FAMILY,
           }}
         >
           StreetLens
         </div>
       ),
-      { ...size },
+      { ...size, fonts },
     );
   }
 
@@ -61,7 +66,7 @@ export default async function OgImage({ params }: OgProps) {
           padding: 64,
           background: "#0a0a0a",
           color: "#f1f1f1",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: BRAND_FONT_FAMILY,
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -176,6 +181,6 @@ export default async function OgImage({ params }: OgProps) {
         </div>
       </div>
     ),
-    { ...size },
+    { ...size, fonts },
   );
 }
