@@ -360,17 +360,19 @@ function addReliefLayer(
         "fill-extrusion-color": lineColorExpression(layer, theme),
         "fill-extrusion-height": reliefHeightExpression(layer),
         "fill-extrusion-base": 0,
-        // The volume answers to selection and hover the way the flat casing
-        // does. It is the street's body on `/map`, so a segment that is picked
-        // must not go quiet just because the reader is looking at it in 3D.
-        "fill-extrusion-opacity": [
-          "case",
-          ["boolean", ["feature-state", "selected"], false],
-          1,
-          ["boolean", ["feature-state", "hover"], false],
-          0.99,
-          0.92,
-        ] as unknown as ExpressionSpecification,
+        // CONSTANT, and it has to be. The 2D layers above express selection as
+        // a `line-opacity` feature-state case, but `fill-extrusion-opacity` is
+        // not a data-driven property in MapLibre: handing it an expression does
+        // not degrade, it makes the style validator REJECT THE WHOLE LAYER, and
+        // because addLayer reports that through the map's `error` event rather
+        // than throwing, the relief simply never appears and nothing says why.
+        //
+        // The selection affordance is not lost: hover and selected state are
+        // still mirrored onto this source (setSegmentState), so a pointer that
+        // lands on the volume lights the street's flat casing underneath it,
+        // and the state survives the era flip. Height and colour stay purely
+        // the score, which is the encoding this layer exists to carry.
+        "fill-extrusion-opacity": 0.92,
       },
     });
   }
