@@ -101,6 +101,17 @@ const PROBE = () => {
   const probe = {
     calls: [],
     pitch: [],
+    /*
+     * MapLibre reports an invalid addSource/addLayer through the map's `error`
+     * EVENT rather than by throwing, and AuditMap's error handler swallows
+     * anything raised after the style has loaded (it exists to swap in the
+     * fallback basemap). A rejected layer therefore just silently never appears.
+     * That is exactly how a data expression on `fill-extrusion-opacity`, which
+     * MapLibre does not support, removed the relief from BOTH surfaces without a
+     * single console message. Anything naming our own sources or layers is a
+     * hard failure here.
+     */
+    mapErrors: [],
     found: false,
     t0: performance.now(),
     reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -147,6 +158,10 @@ const PROBE = () => {
         return original(opts, ...rest);
       };
     }
+    map.on("error", (e) => {
+      const msg = String(e?.error?.message ?? e?.error ?? e);
+      if (/segments/.test(msg)) probe.mapErrors.push(msg.slice(0, 240));
+    });
     map.on("pitch", () => {
       probe.pitch.push({
         at: Math.round(performance.now() - probe.t0),
@@ -180,10 +195,23 @@ async function readState(page) {
         hasSource: Boolean(map.getSource(source)),
         hasLayer: Boolean(map.getLayer(layer)),
         visibility,
+        // Deduped by segment id on purpose: `querySourceFeatures` returns a
+        // copy per tile a feature crosses, so the raw length overcounts a long
+        // street and would make "how much of the network extrudes" a fiction.
         reliefFeatures: map.getSource(source)
-          ? map.querySourceFeatures(source).length
+          ? new Set(
+              map.querySourceFeatures(source).map((f) => String(f.id ?? f.properties?.id)),
+            ).size
           : 0,
-        lineFeatures: map.querySourceFeatures("segments").length,
+        lineFeatures: new Set(
+          map.querySourceFeatures("segments").map((f) => f.properties?.id),
+        ).size,
+        scoredLines: new Set(
+          map
+            .querySourceFeatures("segments")
+            .filter((f) => (f.properties?.score_overall ?? 0) > 0)
+            .map((f) => f.properties?.id),
+        ).size,
         pitch: Number(map.getPitch().toFixed(2)),
         bearing: Number(map.getBearing().toFixed(2)),
         zoom: Number(map.getZoom().toFixed(2)),
@@ -199,6 +227,7 @@ async function readState(page) {
         reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
         cookie: document.cookie,
         calls: probe.calls,
+        mapErrors: [...new Set(probe.mapErrors)],
         pitchSamples: probe.pitch,
         pitchAtAttach: probe.pitchAtAttach,
         attachedAt: Math.round(probe.attachedAt ?? -1),
@@ -220,9 +249,8 @@ async function newPage(browser, { cookies = [], viewport, reducedMotion } = {}) 
   });
   await context.addInitScript(PROBE);
   if (cookies.length) {
-    await context.addCookies(
-      cookies.map((c) => ({ ...c, url: BASE, path: "/" })),
-    );
+    // `url` alone; Playwright rejects url and path together.
+    await context.addCookies(cookies.map((c) => ({ ...c, url: BASE })));
   }
   const page = await context.newPage();
   const sink = { errors: [], preexisting: [] };
@@ -366,6 +394,11 @@ async function main() {
     await screenshot(page, "en-light-settled");
 
     check(
+      "MapLibre accepted our sources and layers (no swallowed style error)",
+      settled.mapErrors.length === 0,
+      settled.mapErrors.join(" | "),
+    );
+    check(
       "the relief source and layer exist on /map",
       settled.hasSource && settled.hasLayer,
     );
@@ -443,22 +476,28 @@ async function main() {
     note(`desktop 1440x900, relief ON — pan/zoom frames: ${JSON.stringify(perf.reliefPanZoom)}`);
 
     // The lens switcher must re-height AND recolour the volumes, not just lines.
+    // Scoped to the SCORE-LAYER group on purpose: the page also carries a
+    // theme radiogroup, and picking blind by index selected a theme swatch,
+    // which recoloured the relief without ever changing the lens.
+    const lens = (name) =>
+      page.locator('[role="radiogroup"]').filter({ hasText: "Overall" })
+        .getByRole("radio", { name, exact: true });
     const beforeLens = await readState(page);
-    await page.locator('[role="radio"]').nth(2).click(); // drainage
+    await lens("Drainage").click();
     await page.waitForTimeout(900);
     const afterLens = await readState(page);
     await screenshot(page, "en-light-lens-drainage");
     check(
       "the lens switcher re-heights the relief onto the new lens",
-      afterLens.heightExpr.includes("score_drainage") &&
-        beforeLens.heightExpr.includes("score_overall"),
-      afterLens.heightExpr,
+      (afterLens.heightExpr ?? "").includes("score_drainage") &&
+        (beforeLens.heightExpr ?? "").includes("score_overall"),
+      afterLens.heightExpr ?? "no relief layer",
     );
     check(
       "the lens switcher recolours the relief too",
       afterLens.colorExpr !== beforeLens.colorExpr,
     );
-    await page.locator('[role="radio"]').nth(0).click();
+    await lens("Overall").click();
     await page.waitForTimeout(600);
 
     // A CLICK ON THE VOLUME OPENS THE REPORT CARD.
@@ -496,6 +535,20 @@ async function main() {
     // THE CONTROL, BOTH WAYS.
     console.log("\nthe control tells the truth in both directions");
     const toggle = page.locator("button[aria-pressed]").first();
+    // Where the reader was standing when they reached for the control. The
+    // camera has been panned and zoomed by the perf pass above, which is the
+    // realistic case: turning the view off must give them back THIS frame, not
+    // the one the page happened to open on.
+    // Read it with the camera genuinely at rest, or the comparison measures the
+    // tail of the previous interaction rather than what the toggle did.
+    await page.evaluate(
+      () =>
+        new Promise((r) =>
+          window.__reliefMap.isMoving() ? window.__reliefMap.once("idle", r) : r(),
+        ),
+    );
+    await page.waitForTimeout(300);
+    const beforeToggle = await readState(page);
     await toggle.click();
     await page.waitForTimeout(1200);
     const off = await readState(page);
@@ -511,10 +564,12 @@ async function main() {
       `aria-pressed=${off.togglePressed}`,
     );
     check(
-      "off returns to the flat map's own framing, not somewhere else",
-      Math.abs(off.zoom - 13.4) < 0.05 &&
-        Math.abs(off.center[0] - settled.center[0]) < 0.001,
-      `zoom=${off.zoom} center=${off.center.join(", ")}`,
+      "turning it off is a RETURN, not a relocation (only the pitch moves)",
+      Math.abs(off.zoom - beforeToggle.zoom) < 0.01 &&
+        Math.abs(off.center[0] - beforeToggle.center[0]) < 0.0005 &&
+        Math.abs(off.center[1] - beforeToggle.center[1]) < 0.0005 &&
+        Math.abs(off.bearing) < 0.5,
+      `zoom ${beforeToggle.zoom}→${off.zoom}, centre ${beforeToggle.center.join(",")}→${off.center.join(",")}`,
     );
     check(
       "the off choice is persisted immediately",
@@ -730,10 +785,22 @@ async function main() {
     await page.waitForTimeout(3000);
     const s = await readState(page);
     await screenshot(page, "en-demo-off-relief-on");
+    /*
+     * "Almost nothing", not "nothing". The real era is not empty: the live
+     * store still carries a handful of camera-observed streets with canonical
+     * scores, and those are real data, so they SHOULD stand. What must hold is
+     * that the extruded set is exactly the scored set, with nothing invented to
+     * fill the stage out.
+     */
     check(
-      "with nothing audited, nothing is extruded",
-      s.reliefFeatures === 0,
-      `${s.reliefFeatures} volumes`,
+      "the extruded set is exactly the genuinely scored set",
+      s.reliefFeatures === s.scoredLines,
+      `${s.reliefFeatures} volumes vs ${s.scoredLines} scored streets`,
+    );
+    check(
+      "with almost nothing audited, almost nothing stands up",
+      s.reliefFeatures / Math.max(1, s.lineFeatures) < 0.01,
+      `${s.reliefFeatures} of ${s.lineFeatures} streets extrude`,
     );
     check(
       "the flat plan is still drawn, so the stage reads as empty rather than broken",
@@ -804,18 +871,51 @@ async function main() {
     await page.goto(`${BASE}/en/map`, { waitUntil: "domcontentloaded", timeout: 60_000 });
     await waitForMap(page);
     await page.waitForTimeout(2800);
-    const cover = await page.evaluate(
-      ({ layer }) => {
+    /*
+     * Occlusion is the question, so the pitched frame is measured against a
+     * FLAT one at the same centre and zoom. A grid sweep alone cannot answer
+     * it: a short street with no grid point on it counts as unreachable at any
+     * pitch, so the raw percentage understates reachability everywhere. The
+     * flat pass is that floor, and the gap between the two is what pitch
+     * actually costs the reader.
+     */
+    const sweep = await page.evaluate(
+      async ({ layer, pitch }) => {
         const map = window.__reliefMap;
+        const settle = () =>
+          new Promise((r) => (map.isMoving() ? map.once("idle", r) : setTimeout(r, 400)));
+        map.jumpTo({ pitch });
+        await settle();
         const rect = map.getCanvas().getBoundingClientRect();
-        // Sample the canvas on a grid and count how many DISTINCT streets are
-        // reachable by a click, versus how many are drawn at all. Occlusion
-        // that hides a street entirely is the failure mode to catch.
         const drawn = new Set(
           map.queryRenderedFeatures({ layers: [layer] }).map((f) => String(f.id)),
         );
         const reachable = new Set();
-        const step = 12;
+        const step = 6;
+        for (let x = step; x < rect.width; x += step) {
+          for (let y = step; y < rect.height; y += step) {
+            for (const f of map.queryRenderedFeatures([x, y], { layers: [layer] })) {
+              reachable.add(String(f.id));
+            }
+          }
+        }
+        return { drawn: drawn.size, reachable: reachable.size };
+      },
+      { layer: RELIEF_LAYER, pitch: SETTLED_PITCH },
+    );
+    const flatSweep = await page.evaluate(
+      async ({ layer }) => {
+        const map = window.__reliefMap;
+        const settle = () =>
+          new Promise((r) => (map.isMoving() ? map.once("idle", r) : setTimeout(r, 400)));
+        map.jumpTo({ pitch: 0 });
+        await settle();
+        const rect = map.getCanvas().getBoundingClientRect();
+        const drawn = new Set(
+          map.queryRenderedFeatures({ layers: [layer] }).map((f) => String(f.id)),
+        );
+        const reachable = new Set();
+        const step = 6;
         for (let x = step; x < rect.width; x += step) {
           for (let y = step; y < rect.height; y += step) {
             for (const f of map.queryRenderedFeatures([x, y], { layers: [layer] })) {
@@ -827,13 +927,24 @@ async function main() {
       },
       { layer: RELIEF_LAYER },
     );
-    const ratio = cover.drawn ? cover.reachable / cover.drawn : 0;
+    const ratio = sweep.drawn ? sweep.reachable / sweep.drawn : 0;
+    const flatRatio = flatSweep.drawn ? flatSweep.reachable / flatSweep.drawn : 0;
     check(
-      "at 45 degrees, essentially every drawn street is still clickable",
-      ratio > 0.9,
-      `${cover.reachable}/${cover.drawn} reachable on a 12px grid (${(ratio * 100).toFixed(1)}%)`,
+      "pitching to 45 costs the reader almost no reachability versus flat",
+      ratio >= flatRatio - 0.05,
+      `${(ratio * 100).toFixed(1)}% at 45° vs ${(flatRatio * 100).toFixed(1)}% flat, same frame, 6px grid`,
     );
-    perf.legibility = { ...cover, ratio: Number(ratio.toFixed(3)) };
+    check(
+      "a street standing behind a tall one is still findable",
+      ratio > 0.85,
+      `${sweep.reachable}/${sweep.drawn} reachable at 45°`,
+    );
+    perf.legibility = {
+      pitched: { ...sweep, ratio: Number(ratio.toFixed(3)) },
+      flat: { ...flatSweep, ratio: Number(flatRatio.toFixed(3)) },
+    };
+    await page.evaluate((p) => window.__reliefMap.jumpTo({ pitch: p }), SETTLED_PITCH);
+    await page.waitForTimeout(500);
     await screenshot(page, "en-legibility-at-45");
     allErrors.push(...sink.errors);
     allPreexisting.push(...sink.preexisting);
@@ -851,6 +962,11 @@ async function main() {
     await page.waitForTimeout(4200);
     const s = await readState(page);
     await screenshot(page, "en-landing-hero-unchanged");
+    check(
+      "the hero's style is accepted too (the generalisation did not break it)",
+      s.mapErrors.length === 0,
+      s.mapErrors.join(" | "),
+    );
     check(
       "the hero still carries its relief",
       s.hasLayer && s.visibility === "visible" && s.reliefFeatures > 0,
