@@ -15,6 +15,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import { useTheme } from "@/components/ThemeProvider";
 import FlagCR from "@/components/ui/FlagCR";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 import Logo from "@/components/ui/Logo";
 import ProvenanceNote from "@/components/ProvenanceNote";
 import StatFigure from "@/components/ui/StatFigure";
@@ -45,13 +46,12 @@ function Banner() {
   return (
     <div className="w-full border-b border-transparent bg-ink-display text-paper dark:border-hairline dark:bg-paper-white dark:text-ink">
       <div className="mx-auto flex max-w-[1400px] items-center gap-x-4 px-[max(1rem,env(safe-area-inset-left))] py-2.5 text-[13px] leading-snug sm:px-6">
-        {/* Pilot-origin marker. Sits opposite the theme switcher so the centred
-            utility line keeps its balance; hidden below sm, where the banner
-            already wraps and every pixel is spoken for. */}
-        <span className="hidden shrink-0 items-center gap-1.5 sm:inline-flex">
-          <FlagCR className="h-3 w-5 shrink-0 rounded-[1px]" />
-          <span className="font-medium tracking-tight">{t("origin")}</span>
-        </span>
+        {/* The site is bilingual and, until now, the landing was the one surface
+            that never said so: every other chrome (map, street, insights) pairs
+            the language switch with the theme switch. It takes the left seat the
+            origin marker used to hold, so the centred utility line keeps the
+            balance a lone right-hand control would cost it. */}
+        <LocaleSwitcher className="shrink-0" />
         <span className="flex flex-1 flex-wrap items-center justify-center gap-x-5 gap-y-1 text-center">
           <span className="inline-flex items-center gap-1.5">
             {t("methodQuestion")}
@@ -453,10 +453,17 @@ export default function Hero({
                 </span>
               </a>
             </div>
+            {/* Pilot chip. The flag leads the line it already names, rather than
+                repeating "Costa Rica" on a second row: one object, one reading.
+                It is drawn as an SVG, not set as an emoji — the emoji falls back
+                to the letters "CR" on several platforms and the bands need to
+                stay crisp at this size. Decorative here, since the chip's own
+                text carries the country to a screen reader. */}
             <p
-              className="sl-hero-el mt-4 inline-flex items-center rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted"
+              className="sl-hero-el mt-4 inline-flex items-center gap-1.5 rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted"
               style={{ animationDelay: "160ms" }}
             >
+              <FlagCR decorative className="h-3 w-5 shrink-0 rounded-[1px]" />
               {t("pilot")}
             </p>
             <h1

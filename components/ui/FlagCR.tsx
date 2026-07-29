@@ -5,14 +5,25 @@
  *
  * Bands run 1:1:2:1:1 from the top: blue, white, red, white, blue. The hairline
  * frame is what keeps the white bands from dissolving into a paper background.
+ *
+ * Pass `decorative` where the surrounding text already names the country (the
+ * hero's pilot chip does): the flag then leaves the accessibility tree entirely
+ * instead of making a screen reader say "Costa Rica" twice in one breath.
  */
-export default function FlagCR({ className }: { className?: string }) {
+export default function FlagCR({
+  className,
+  decorative = false,
+}: {
+  className?: string;
+  decorative?: boolean;
+}) {
   return (
     <svg
       viewBox="0 0 30 18"
       className={className}
-      role="img"
-      aria-label="Costa Rica"
+      {...(decorative
+        ? { "aria-hidden": true }
+        : { role: "img", "aria-label": "Costa Rica" })}
       focusable="false"
     >
       <rect width="30" height="18" fill="#002B7F" />
