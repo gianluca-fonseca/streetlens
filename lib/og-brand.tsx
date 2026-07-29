@@ -321,7 +321,12 @@ export async function renderReliefOgImage({
         }}
       >
         {/* The render is exactly the card's aspect ratio (1600x840 against
-            1200x630), so it fills the frame with nothing cropped away. */}
+            1200x630), so it fills the frame with nothing cropped away.
+            `next/image` has nothing to do here: this tree is rendered by satori
+            into a PNG, not by a browser, and satori understands a plain <img>
+            with a data URI and nothing else. There is no LCP and no bandwidth to
+            optimise, so the rule the disable silences does not apply. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={background}
           alt=""
