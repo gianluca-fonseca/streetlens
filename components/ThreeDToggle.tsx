@@ -5,11 +5,22 @@ import { Box } from "lucide-react";
 import styles from "@/components/ui/zen.module.css";
 
 /**
- * Small 3D view toggle — design-direction compliant micro-control that sits
- * near the layer switcher. Not a neumorphic surface: a single 8px panel with a
- * 1px border (≥3:1) plus a clear on/off background step, one Lucide icon at the
- * shared stroke weight, and a text label (never icon-only). 3D is presentational
- * (terrain + pitch + buildings); it changes no data or scores.
+ * The map's single dimensional-view toggle — design-direction compliant
+ * micro-control that sits near the layer switcher. Not a neumorphic surface: a
+ * single 8px panel with a 1px border (≥3:1) plus a clear on/off background step,
+ * one Lucide icon at the shared stroke weight, and a text label (never
+ * icon-only).
+ *
+ * "3D view" means ONE thing: the score relief, the network's quality standing
+ * up off the plan, over a pitched camera. It used to mean DEM terrain plus
+ * building extrusions, which is a different picture wearing the same words; the
+ * relief kept the label and the terrain mode was retired (see the dimensional
+ * view block in AuditMap.tsx for the reasoning). It still changes no data and no
+ * scores: it decides whether the score is drawn as height as well as colour and
+ * width.
+ *
+ * `active` is seeded from a server-resolved cookie, so this button's very first
+ * render already tells the truth about what the map is doing.
  */
 export default function ThreeDToggle({
   active,

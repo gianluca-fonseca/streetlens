@@ -12,13 +12,9 @@ import type {
 } from "@/lib/segments";
 import {
   BASEMAP,
-  BUILDINGS,
   COMMUNITY_CASING,
   COMMUNITY_LAYER_FILTER,
-  HILLSHADE_LAYER_ID,
-  HILLSHADE_PAINT,
   RAMP_LAYER_FILTER,
-  TERRAIN,
   communityWidthExpression,
   lineColorExpression,
   lineWidthExpression,
@@ -29,7 +25,8 @@ import {
   RELIEF_SOURCE_ID,
   buildReliefCollection,
   reliefHeightExpression,
-} from "@/components/heroRelief";
+} from "@/components/scoreRelief";
+import { writeMapReliefPreference } from "@/lib/map-relief";
 import { parseFeatureProps } from "@/lib/parse-feature-props";
 import { useTheme } from "@/components/ThemeProvider";
 import { readStoredPreference, resolveTheme } from "@/lib/theme";
@@ -54,6 +51,18 @@ const GLOW_LAYER_ID = "segments-glow";
 const COMMUNITY_LAYER_ID = "segments-community";
 /** Layers that respond to hover / click (score ramp + neutral community casing). */
 const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID];
+/**
+ * What a click on `/map` may land on. The relief volume is the street's visible
+ * body whenever the dimensional view is on, so it selects the same segment the
+ * flat line under it does — reaching the thin base line must never be the price
+ * of opening a report card. A hidden layer is skipped by MapLibre's own hit
+ * testing, so with the relief off this collapses back to the 2D pair.
+ */
+const APP_SELECT_LAYER_IDS = [
+  LINE_LAYER_ID,
+  COMMUNITY_LAYER_ID,
+  RELIEF_LAYER_ID,
+];
 
 /**
  * The app's RESOLVED theme right now, read straight from the theme store's own
@@ -128,6 +137,44 @@ const HERO_END: HeroCamera = {
  */
 const HERO_FLY_DELAY_MS = 300;
 const HERO_FLY_DURATION_MS = 2400;
+
+/**
+ * `/map` camera signature — the same establishing idea as the hero, retuned for
+ * something people READ rather than watch.
+ *
+ * Three deliberate differences from HERO_START/HERO_END, all in the same
+ * direction (less cinema, more instrument):
+ *
+ *  • BEARING STAYS 0. The hero can afford a -15° rotation because it is a
+ *    picture. On the instrument, north-up is orientation the reader gets for
+ *    free, and spending it buys nothing they can use.
+ *  • PITCH 45, NOT 55. Height has to stay readable without swallowing the
+ *    network behind it, and the trade is monotone: every degree of pitch buys
+ *    apparent height and costs visible ground plan. Measured at 390x844 and at
+ *    1440x900, 55° compresses the far half of the canton into roughly the top
+ *    quarter of the canvas and stacks distant streets behind the tall
+ *    (well-scoring) ones; 45° keeps the ground plan legible while the tallest
+ *    bars still stand clearly off it. 45 is also comfortably inside the 60°
+ *    coarse-pointer cap, so phones get the identical frame rather than a
+ *    clamped one.
+ *  • THE CENTRE AND SETTLED ZOOM ARE THE MAP'S OWN. ESCAZU_CENTER at
+ *    INITIAL_ZOOM is the framing the flat map already opens on, so turning the
+ *    relief off returns the reader to exactly where they were, not to a
+ *    different place. Only the pitch and half a zoom step move.
+ *
+ * The move resolves from a flatter overview into that settled frame and STOPS.
+ * A tool that keeps drifting under the reader cannot be read.
+ */
+const MAP_RELIEF_START = { zoom: 12.9, pitch: 0 };
+const MAP_RELIEF_END = { zoom: INITIAL_ZOOM, pitch: 45 };
+/**
+ * Shorter than the hero's 300 + 2400. The landing page is asking for five
+ * seconds of attention and earning them; `/map` was opened to answer a
+ * question, so the opening move should establish the third axis and get out of
+ * the way. 250 + 1800 still reads as one continuous settle rather than a cut.
+ */
+const MAP_RELIEF_FLY_DELAY_MS = 250;
+const MAP_RELIEF_FLY_DURATION_MS = 1800;
 
 /**
  * Recolour Liberty into the calm zen basemap, keeping its labels.
@@ -270,21 +317,34 @@ function addDataLayers(
 }
 
 /**
- * Hero-only: the extruded score relief (see heroRelief.ts for the contract).
- * Added on TOP of the layer stack so each volume owns its footprint; the flat
- * 2D ramp lines stay underneath as the ground plan and as the whole story
- * wherever nothing is extruded (real-data era, unaudited casings). The app
- * surface never calls this.
+ * The extruded score relief (see scoreRelief.ts for the contract). Added on TOP
+ * of the layer stack so each volume owns its footprint; the flat 2D ramp lines
+ * stay underneath as the ground plan and as the whole story wherever nothing is
+ * extruded (real-data era, unaudited casings).
+ *
+ * Shared by the hero and `/map`. `visible` is what makes it shareable: the
+ * layer is always CREATED, and the "3D view" control flips its visibility
+ * rather than adding and removing it. That keeps the delegated click/hover
+ * listeners bound to a layer id that always exists, makes toggling instant
+ * (no re-extrusion, no source re-upload), and costs nothing when off, because
+ * MapLibre neither draws nor hit-tests an invisible layer. Building the
+ * corridor collection for ~1.5k segments is a few milliseconds, so paying it
+ * once up front is cheaper than a stutter on the first toggle.
  */
 function addReliefLayer(
   map: maplibregl.Map,
   data: SegmentCollection,
+  layer: ScoreLayer,
   theme: RampTheme,
+  visible: boolean,
 ) {
   if (!map.getSource(RELIEF_SOURCE_ID)) {
     map.addSource(RELIEF_SOURCE_ID, {
       type: "geojson",
       data: buildReliefCollection(data),
+      // Mirrors the segment source, so one segment id addresses its line AND
+      // its volume and `setSegmentState` can light both from a single hover.
+      promoteId: "id",
     });
   }
   if (!map.getLayer(RELIEF_LAYER_ID)) {
@@ -292,17 +352,88 @@ function addReliefLayer(
       id: RELIEF_LAYER_ID,
       type: "fill-extrusion",
       source: RELIEF_SOURCE_ID,
+      layout: { visibility: visible ? "visible" : "none" },
       paint: {
-        // The SAME overall ramp as the 2D lines, on the same basemap — one
-        // encoding, three axes: colour, width, and now height, all agreeing
-        // that more presence means a better score.
-        "fill-extrusion-color": lineColorExpression("overall", theme),
-        "fill-extrusion-height": reliefHeightExpression,
+        // The SAME ramp as the 2D lines, on the same lens and the same
+        // basemap — one encoding, three axes: colour, width, and now height,
+        // all agreeing that more presence means a better score.
+        "fill-extrusion-color": lineColorExpression(layer, theme),
+        "fill-extrusion-height": reliefHeightExpression(layer),
         "fill-extrusion-base": 0,
-        "fill-extrusion-opacity": 0.92,
+        // The volume answers to selection and hover the way the flat casing
+        // does. It is the street's body on `/map`, so a segment that is picked
+        // must not go quiet just because the reader is looking at it in 3D.
+        "fill-extrusion-opacity": [
+          "case",
+          ["boolean", ["feature-state", "selected"], false],
+          1,
+          ["boolean", ["feature-state", "hover"], false],
+          0.99,
+          0.92,
+        ] as unknown as ExpressionSpecification,
       },
     });
   }
+}
+
+/**
+ * Set a feature state on the segment source AND its relief mirror, so hover and
+ * selection read the same on the flat line and on the volume standing over it.
+ * Guarded per source: the relief mirror is absent until the layer is created,
+ * and `setFeatureState` on a missing source throws.
+ */
+function setSegmentState(
+  map: maplibregl.Map,
+  id: string,
+  state: Record<string, boolean>,
+) {
+  for (const source of [SOURCE_ID, RELIEF_SOURCE_ID]) {
+    if (!map.getSource(source)) continue;
+    try {
+      map.setFeatureState({ source, id }, state);
+    } catch {
+      /* source present but not yet parsed; the next paint re-applies */
+    }
+  }
+}
+
+/** What a resolved click carries: the segment's real properties and its real
+ *  LineString, wherever the pointer actually landed. */
+type SegmentHit = {
+  properties: Record<string, unknown>;
+  geometry: GeoJSON.Geometry;
+};
+
+/**
+ * Decide which segment a click meant, given everything under the pointer.
+ *
+ * A click over an extruded street returns BOTH the relief volume and the flat
+ * line beneath it. The volume wins, because it is the thing the reader can see
+ * and aimed at; without this rule, clicking the visible body of a tall street
+ * could select whatever thin line happened to be reported first.
+ *
+ * The relief's own properties are only an id and the five scores, so the hit is
+ * resolved back to the real segment feature in the live collection: the detail
+ * panel gets the same rubric answers, field notes and geometry it gets from a
+ * 2D click, and the relief needs no second copy of the payload to stay correct.
+ * A volume with no matching segment (mid-era-flip, for one frame) resolves to
+ * nothing rather than to a half-populated panel.
+ */
+function resolveSegmentHit(
+  features: maplibregl.MapGeoJSONFeature[] | undefined,
+  segments: SegmentCollection,
+): SegmentHit | null {
+  if (!features?.length) return null;
+  const volume = features.find((f) => f.layer.id === RELIEF_LAYER_ID);
+  if (volume) {
+    const id = String(volume.id ?? (volume.properties as { id?: string }).id);
+    const segment = segments.features.find((f) => f.properties.id === id);
+    return segment
+      ? { properties: segment.properties as unknown as Record<string, unknown>, geometry: segment.geometry }
+      : null;
+  }
+  const flat = features[0];
+  return { properties: flat.properties, geometry: flat.geometry };
 }
 
 /** Repaint the data layers for a score layer; glow is data-only + dark-only. */
@@ -326,14 +457,17 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
   } catch {
     /* layers not ready yet */
   }
-  // The hero relief is always the `overall` lens, but it still has to follow
-  // the theme: its ramp half changes when the basemap under it does.
+  // The relief is repainted in the SAME call as the lines, so the lens switcher
+  // and the theme can never leave the volumes describing one thing while the
+  // ground plan under them describes another. Height moves with colour for the
+  // same reason: on `/map` "drainage" has to mean drainage on every channel.
   if (map.getLayer(RELIEF_LAYER_ID)) {
     try {
+      map.setPaintProperty(RELIEF_LAYER_ID, "fill-extrusion-color", color);
       map.setPaintProperty(
         RELIEF_LAYER_ID,
-        "fill-extrusion-color",
-        lineColorExpression("overall", theme),
+        "fill-extrusion-height",
+        reliefHeightExpression(layer),
       );
     } catch {
       /* not ready */
@@ -342,170 +476,55 @@ function applyLayer(map: maplibregl.Map, layer: ScoreLayer, dark: boolean) {
 }
 
 /* ------------------------------------------------------------------ *
- * 3D mode (u8) — presentational only. These helpers add DEM terrain,
- * always-on hillshade, and OSM building extrusions. They never touch the
- * score data layers, the RAMP, or the line color/width expressions.
+ * The dimensional view — ONE control, ONE meaning.
+ *
+ * "3D view" on `/map` means the SCORE RELIEF: the network's own quality
+ * standing up off the plan, over a pitched camera. It used to mean something
+ * else entirely (DEM terrain + hillshade + OSM building extrusions, u8), and
+ * the two could not both keep the name.
+ *
+ * The relief won the label, and the terrain mode was retired rather than folded
+ * in, for three reasons that all point the same way:
+ *
+ *  1. ONE OF THEM CARRIES DATA. The relief IS the score, on a third axis, using
+ *     the same sealed ramp as the lines. Hillshade and building boxes are
+ *     scenery: they add no information this instrument exists to convey, and on
+ *     a pitched frame the building volumes compete with the score volumes for
+ *     exactly the reading the page is for.
+ *  2. THE RELIEF IS NOW THE DEFAULT VIEW, and folding terrain in would put a
+ *     third-party DEM fetch (an S3 bucket with no SLA) on the default path of
+ *     the product's main page, for every visitor, on every first load.
+ *  3. IT TAKES A WHOLE BUG CLASS WITH IT. With no terrain there is no center
+ *     altitude to lose, so the "zoom-in blanks the map in 3D" failure that
+ *     `clampCenterToTerrain` existed to paper over cannot occur.
+ *
+ * What is left is presentational in the same narrow sense u8 claimed: this
+ * toggle changes no data and no scores, it only decides whether the score is
+ * drawn as height as well as colour and width.
  * ------------------------------------------------------------------ */
 
-/** First road-ish line layer id, so hillshade can be inserted beneath roads. */
-function firstRoadLayerId(map: maplibregl.Map): string | undefined {
-  const layers = map.getStyle()?.layers ?? [];
-  for (const layer of layers) {
-    if (
-      layer.type === "line" &&
-      /road|highway|street|bridge|tunnel|transportation|motorway|trunk|primary|secondary/i.test(
-        layer.id,
-      )
-    ) {
-      return layer.id;
-    }
-  }
-  return undefined;
-}
-
-/** The building extrusion layer present in the active style, if any. */
-function buildingLayerId(map: maplibregl.Map): string | undefined {
-  return BUILDINGS.layerIdCandidates.find((id) => map.getLayer(id));
-}
-
-/** Add the DEM source + always-on hillshade, and prime the (hidden) building
- * extrusions. Hillshade sits beneath roads so it never fights the score ramps. */
-function setupTerrain(map: maplibregl.Map, dark: boolean) {
-  if (!map.getSource(TERRAIN.sourceId)) {
-    map.addSource(TERRAIN.sourceId, {
-      type: "raster-dem",
-      tiles: [...TERRAIN.tiles],
-      encoding: TERRAIN.encoding,
-      tileSize: TERRAIN.tileSize,
-      maxzoom: TERRAIN.maxzoom,
-      attribution: TERRAIN.attribution,
-    });
-  }
-  if (!map.getLayer(HILLSHADE_LAYER_ID)) {
-    map.addLayer(
-      {
-        id: HILLSHADE_LAYER_ID,
-        type: "hillshade",
-        source: TERRAIN.sourceId,
-        layout: { visibility: "none" },
-        paint: { ...(dark ? HILLSHADE_PAINT.dark : HILLSHADE_PAINT.light) },
-      },
-      firstRoadLayerId(map),
-    );
-  }
-  // Reuse the style's building extrusion layer: mute it, coalesce heights, and
-  // keep it hidden until 3D is enabled.
-  const bid = buildingLayerId(map);
-  if (bid) {
-    try {
-      map.setPaintProperty(
-        bid,
-        "fill-extrusion-color",
-        dark ? BUILDINGS.color.dark : BUILDINGS.color.light,
-      );
-      map.setPaintProperty(bid, "fill-extrusion-height", BUILDINGS.heightExpression);
-      map.setPaintProperty(bid, "fill-extrusion-base", BUILDINGS.baseExpression);
-      map.setPaintProperty(bid, "fill-extrusion-opacity", BUILDINGS.opacity);
-      map.setLayoutProperty(bid, "visibility", "none");
-    } catch {
-      /* style lacks the extrusion paint props; skip buildings */
-    }
-  }
-}
-
-/** Threshold (m) past which the map center is considered detached from the DEM
- * surface and in need of a re-clamp. Healthy deviation is a few metres of numeric
- * noise; a sunk camera sits hundreds of metres below the terrain. */
-const CENTER_ELEVATION_TOLERANCE_M = 30;
-
 /**
- * Re-clamp the map center onto the terrain surface.
+ * Show or hide the dimensional view: the relief volumes plus the pitched
+ * camera, which move together because either alone is incoherent (a pitched
+ * empty plan, or volumes viewed from straight overhead).
  *
- * Root cause of the "zoom-in blanks the map in 3D" defect: when 3D is enabled
- * (or 3D is toggled on already zoomed in) before the center's Terrarium DEM tile
- * has loaded, MapLibre cannot resolve the center elevation and leaves the
- * transform's center altitude pinned at 0 (sea level). Escazú's terrain is
- * ~1500 m; with the center stuck at sea level, the fixed-altitude camera under
- * 60° pitch descends *below* the real terrain surface on any animated `easeTo`
- * zoom (the `+`/`-` controls, double-click) once it crosses the DEM source
- * maxzoom, so the frame renders nothing — a persistent white canvas that never
- * recovers. Smooth wheel zoom escapes this because its gesture handler freezes
- * elevation during the move and re-clamps when the DEM has settled.
- *
- * The fix mirrors that gesture-end behaviour for the animated path: once the DEM
- * has real data, nudge the center (a no-op position set) so MapLibre re-clamps
- * the center altitude to the loaded surface. Guarded by a tolerance so it is a
- * no-op in the healthy case and never loops on its own `setCenter`.
+ * Off returns the reader to the flat map's own framing — same centre, same
+ * zoom, north up — so turning it off is a return rather than a relocation.
  */
-function clampCenterToTerrain(map: maplibregl.Map) {
-  if (!map.getTerrain()) return; // 2D — nothing to clamp
-  const center = map.getCenter();
-  const ground = map.queryTerrainElevation(center);
-  // `queryTerrainElevation` reads 0 (not null) while the DEM tile is still
-  // loading; comparing against the equally-0 center altitude keeps us from
-  // clamping to a phantom sea-level surface. We simply retry on the next idle.
-  if (ground == null) return;
-  const centerElevation =
-    (map.transform as unknown as { elevation?: number }).elevation ?? 0;
-  if (Math.abs(centerElevation - ground) > CENTER_ELEVATION_TOLERANCE_M) {
-    // Re-setting the current center forces MapLibre to re-derive the center
-    // altitude from the now-loaded DEM, lifting the camera back above ground.
-    map.setCenter(center);
+function applyReliefView(map: maplibregl.Map, on: boolean) {
+  if (map.getLayer(RELIEF_LAYER_ID)) {
+    map.setLayoutProperty(RELIEF_LAYER_ID, "visibility", on ? "visible" : "none");
   }
-}
-
-/** Toggle presentational 3D: terrain + eased pitch + building extrusions. */
-function applyThreeD(map: maplibregl.Map, on: boolean, dark: boolean) {
-  const bid = buildingLayerId(map);
-  if (on) {
-    setupTerrain(map, dark);
-    map.setTerrain({
-      source: TERRAIN.sourceId,
-      exaggeration: TERRAIN.exaggeration,
-    });
-    if (map.getLayer(HILLSHADE_LAYER_ID)) {
-      map.setLayoutProperty(HILLSHADE_LAYER_ID, "visibility", "visible");
-    }
-    if (bid) map.setLayoutProperty(bid, "visibility", "visible");
-    map.easeTo({ pitch: 60, duration: 900, essential: true });
-    // The DEM tile for the center may still be loading; clamp the center onto
-    // the terrain as soon as it settles so subsequent animated zooms keep the
-    // camera above ground instead of blanking the canvas.
-    clampCenterToTerrain(map);
-  } else {
-    map.setTerrain(null);
-    if (map.getLayer(HILLSHADE_LAYER_ID)) {
-      map.setLayoutProperty(HILLSHADE_LAYER_ID, "visibility", "none");
-    }
-    if (bid) map.setLayoutProperty(bid, "visibility", "none");
-    map.easeTo({ pitch: 0, bearing: 0, duration: 700, essential: true });
+  if (prefersReducedMotion()) {
+    map.jumpTo({ pitch: on ? MAP_RELIEF_END.pitch : 0, bearing: on ? map.getBearing() : 0 });
+    return;
   }
-}
-
-/** Re-tint the always-on hillshade + building extrusions on theme change. */
-function applyThreeDTheme(map: maplibregl.Map, dark: boolean) {
-  if (map.getLayer(HILLSHADE_LAYER_ID)) {
-    const paint = dark ? HILLSHADE_PAINT.dark : HILLSHADE_PAINT.light;
-    for (const [prop, value] of Object.entries(paint)) {
-      try {
-        map.setPaintProperty(HILLSHADE_LAYER_ID, prop, value);
-      } catch {
-        /* not ready */
-      }
-    }
-  }
-  const bid = buildingLayerId(map);
-  if (bid) {
-    try {
-      map.setPaintProperty(
-        bid,
-        "fill-extrusion-color",
-        dark ? BUILDINGS.color.dark : BUILDINGS.color.light,
-      );
-    } catch {
-      /* not ready */
-    }
-  }
+  map.easeTo({
+    pitch: on ? MAP_RELIEF_END.pitch : 0,
+    bearing: on ? map.getBearing() : 0,
+    duration: 700,
+    essential: true,
+  });
 }
 
 export type AuditMapVariant = "app" | "hero";
@@ -521,6 +540,8 @@ export default function AuditMap({
   onMoveStateChange,
   openContributeOnMount = false,
   initialSegmentId,
+  reliefEnabled = false,
+  reliefAnimate = false,
 }: Readonly<{
   segments: SegmentCollection;
   stats?: StreetStats;
@@ -540,6 +561,13 @@ export default function AuditMap({
   openContributeOnMount?: boolean;
   /** Deep-link: focus and open the detail panel for this segment id on load. */
   initialSegmentId?: string;
+  /** App surface: open in the extruded dimensional view. Resolved on the SERVER
+   *  from the `sl_map_relief` cookie so the control's first paint is already the
+   *  truth (see lib/map-relief.ts). The hero manages its relief itself. */
+  reliefEnabled?: boolean;
+  /** App surface: this visitor has not seen the establishing move yet, so play
+   *  it once. ANDed with the client's own `prefers-reduced-motion` check. */
+  reliefAnimate?: boolean;
 }>) {
   const t = useTranslations("map");
   // The instrument follows the APP theme (#27), not the OS. `resolved` collapses
@@ -560,7 +588,10 @@ export default function AuditMap({
   const activeLayer = controlledLayer ?? internalLayer;
   const [selected, setSelected] = useState<SegmentProperties | null>(null);
   const [mapReady, setMapReady] = useState(false);
-  const [threeD, setThreeD] = useState(false);
+  // Seeded from the server-resolved cookie, so the toggle's very first render —
+  // the one in the HTML, before any JS runs — already matches what the map is
+  // about to do. No default-then-correct flicker, and no hydration mismatch.
+  const [relief, setRelief] = useState(reliefEnabled);
   // Transient cooperative-gesture hint (shown on a raw wheel over the hero map).
   const [wheelHint, setWheelHint] = useState(false);
   // App surface only: true while the map is panning/zooming so the over-tile chrome
@@ -598,6 +629,10 @@ export default function AuditMap({
   const onMoveRef = useRef(onMoveStateChange);
   const initialSegmentRef = useRef(initialSegmentId);
   const focusedSegmentRef = useRef(false);
+  // Read once, inside the create-the-map-once effect, like every other variant
+  // flag here. Both are server-resolved and fixed for the life of the mount.
+  const reliefEnabledRef = useRef(reliefEnabled);
+  const reliefAnimateRef = useRef(reliefAnimate);
   useEffect(() => {
     activeLayerRef.current = activeLayer;
     segmentsRef.current = segments;
@@ -631,20 +666,35 @@ export default function AuditMap({
 
     const hero = isHeroRef.current;
     const heroLive = hero && interactiveRef.current;
-    // Cap pitch on touch / narrow viewports to bound horizon DEM-tile fetches
-    // in 3D (research: mobile ≈60°, desktop 70°). The hero clears it too: its
-    // settled camera is HERO_END.pitch = 55, inside the 60 coarse-pointer cap.
-    // (It used to say the hero "never leaves pitch 0", which stopped being true
-    // when the pitched relief landed.)
+    // Cap pitch on touch / narrow viewports (research: mobile ≈60°, desktop
+    // 70°). Both settled cameras clear it: the hero's HERO_END.pitch is 55 and
+    // the map's MAP_RELIEF_END.pitch is 45, so a phone gets the frame the
+    // desktop gets rather than a clamped one.
     const coarsePointer =
       window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 640;
     const maxPitch = coarsePointer ? 60 : 70;
+
+    // App surface: does this visitor get the relief, and do they get the move?
+    // The server already decided both from the cookie; the client's only
+    // addition is reduced motion, which the server cannot see.
+    const reliefOn = !hero && reliefEnabledRef.current;
+    const reliefMoves = reliefOn && reliefAnimateRef.current && !prefersReducedMotion();
 
     const map = new maplibregl.Map({
       container,
       style: LIBERTY_STYLE_URL,
       center: hero ? HERO_START.center : ESCAZU_CENTER,
-      zoom: hero ? HERO_START.zoom : INITIAL_ZOOM,
+      // A returning visitor (and anyone on reduced motion) opens ON the settled
+      // frame rather than being placed at the start of a move that will not
+      // play. Only the animating first arrival starts from the flat overview.
+      zoom: hero
+        ? HERO_START.zoom
+        : reliefMoves
+          ? MAP_RELIEF_START.zoom
+          : reliefOn
+            ? MAP_RELIEF_END.zoom
+            : INITIAL_ZOOM,
+      pitch: !hero && reliefOn && !reliefMoves ? MAP_RELIEF_END.pitch : 0,
       bearing: hero ? HERO_START.bearing : 0,
       maxPitch,
       attributionControl: { compact: true },
@@ -655,7 +705,9 @@ export default function AuditMap({
     });
     mapRef.current = map;
     // The read-only hero has no map chrome. The app surface keeps the nav
-    // control; visualizePitch renders the rotate/pitch dial used by 3D mode.
+    // control; visualizePitch renders the rotate/pitch dial, which now earns its
+    // place — the map's default view is pitched, so the dial is both a live
+    // readout of the tilt and the way back to north-up.
     if (!hero) {
       map.addControl(
         new maplibregl.NavigationControl({ visualizePitch: true }),
@@ -682,10 +734,17 @@ export default function AuditMap({
       const dark = resolvedDark();
       muteBasemap(map, dark);
       addDataLayers(map, segmentsRef.current, dark ? "dark" : "light");
-      // The landing hero carries the extruded score relief; /map never does.
-      if (hero) addReliefLayer(map, segmentsRef.current, dark ? "dark" : "light");
+      // Both surfaces carry the extruded score relief now. The hero's is always
+      // on; the map's is created either way and starts hidden when this visitor
+      // has turned it off, so the control can flip it without a rebuild.
+      addReliefLayer(
+        map,
+        segmentsRef.current,
+        activeLayerRef.current,
+        dark ? "dark" : "light",
+        hero || reliefOn,
+      );
       paintedSegmentsRef.current = segmentsRef.current;
-      // DEM + hillshade load lazily when 3D is toggled on (applyThreeD).
 
       // Apply the current active layer + dark-mode glow.
       applyLayer(map, activeLayerRef.current, dark);
@@ -717,54 +776,71 @@ export default function AuditMap({
         }
       }
 
-      // Whenever the map settles in 3D, ensure the center is clamped onto the
-      // DEM surface. This catches the initial "enabled before DEM loaded" race
-      // and recovers from any transient underground camera an animated zoom may
-      // produce while its DEM tiles are still in flight. No-op in 2D (and in the
-      // hero, which never enables 3D).
-      map.on("idle", () => clampCenterToTerrain(map));
+      // The map's own establishing move: a flatter overview resolving into the
+      // settled pitched frame, once, and then it holds. `easeTo` rather than the
+      // hero's `flyTo` because the centre does not move — a flyTo's zoom-out-and-
+      // back arc would be motion describing a journey that is not being made.
+      if (reliefMoves) {
+        window.setTimeout(() => {
+          map.easeTo({
+            zoom: MAP_RELIEF_END.zoom,
+            pitch: MAP_RELIEF_END.pitch,
+            duration: MAP_RELIEF_FLY_DURATION_MS,
+            essential: true,
+          });
+        }, MAP_RELIEF_FLY_DELAY_MS);
+      }
+      // Mark the move as seen the moment the view is established, whether it
+      // was animated or jumped to. This is also what writes the preference for
+      // a first-time visitor, so a reload opens straight on the settled frame.
+      if (reliefOn) writeMapReliefPreference(true);
 
-      map.on("mousemove", INTERACTIVE_LAYER_IDS, (e) => {
+      // Hover: on the app the relief volume is part of the same street as the
+      // line under it, so a hit on either lights BOTH (setSegmentState mirrors
+      // the state onto the relief source). The hero keeps the 2D pair only —
+      // its relief hover is a plain cursor affordance, further down.
+      const hoverLayers = hero ? INTERACTIVE_LAYER_IDS : APP_SELECT_LAYER_IDS;
+      map.on("mousemove", hoverLayers, (e) => {
         const f = e.features?.[0];
         if (!f) return;
         map.getCanvas().style.cursor = "pointer";
         const id = String(f.id ?? (f.properties as SegmentProperties).id);
         if (hoveredIdRef.current && hoveredIdRef.current !== id) {
-          map.setFeatureState(
-            { source: SOURCE_ID, id: hoveredIdRef.current },
-            { hover: false },
-          );
+          setSegmentState(map, hoveredIdRef.current, { hover: false });
         }
         hoveredIdRef.current = id;
-        map.setFeatureState({ source: SOURCE_ID, id }, { hover: true });
+        setSegmentState(map, id, { hover: true });
       });
-      map.on("mouseleave", INTERACTIVE_LAYER_IDS, () => {
+      map.on("mouseleave", hoverLayers, () => {
         map.getCanvas().style.cursor = "";
         if (hoveredIdRef.current) {
-          map.setFeatureState(
-            { source: SOURCE_ID, id: hoveredIdRef.current },
-            { hover: false },
-          );
+          setSegmentState(map, hoveredIdRef.current, { hover: false });
           hoveredIdRef.current = null;
         }
       });
 
       // Read-only hero has no selection popover; the app surface keeps it.
       if (!hero) {
-        map.on("click", INTERACTIVE_LAYER_IDS, (e) => {
-          const f = e.features?.[0];
-          if (!f) return;
+        map.on("click", APP_SELECT_LAYER_IDS, (e) => {
+          // ONE handler across the flat pair and the relief, rather than a
+          // separate relief listener: a click over an extruded street hits the
+          // volume AND the line beneath it, and two independent handlers would
+          // both fire and race to set the selection. Resolving here makes the
+          // winner explicit — the volume is what the reader can actually see,
+          // so it wins when it is present.
+          const hit = resolveSegmentHit(e.features, segmentsRef.current);
+          if (!hit) return;
           // maplibre serializes community_report/community_reports to JSON
           // strings at the worker boundary; normalize them here so both the ramp
           // and the community casing layer hand SegmentDetail well-formed props.
-          const props = parseFeatureProps(f.properties);
+          const props = parseFeatureProps(hit.properties);
           // Gate for the contribution flow: swallow the click while tracing,
           // and route it to the correction form while picking a segment.
           const contrib = contributeRef.current;
           const cmode = contrib.modeRef.current;
           if (cmode === "trace") return;
           if (cmode === "select") {
-            const geom = f.geometry;
+            const geom = hit.geometry;
             const coordinates =
               geom.type === "LineString"
                 ? (geom.coordinates as [number, number][])
@@ -772,7 +848,7 @@ export default function AuditMap({
             contrib.pickSegment({ id: props.id, name: props.name, coordinates });
             return;
           }
-          selectFeature(map, props, f.geometry);
+          selectFeature(map, props, hit.geometry);
           setSelected(props);
         });
         // Drop the over-tile glass chrome to solid while the map is in motion, then
@@ -817,10 +893,11 @@ export default function AuditMap({
   }, []);
 
   // Re-theme the instrument whenever the APP theme resolves differently (#27):
-  // basemap palette, hillshade, building tints. No matchMedia listener of its
-  // own any more — that listener was what let the OS override the switcher. A
-  // live OS flip still lands here, because while the preference is "system" the
-  // theme store re-resolves and re-renders us, which changes `dark`.
+  // the basemap palette. No matchMedia listener of its own any more — that
+  // listener was what let the OS override the switcher. A live OS flip still
+  // lands here, because while the preference is "system" the theme store
+  // re-resolves and re-renders us, which changes `dark`. The relief's own ramp
+  // half is re-applied by the applyLayer effect below, which `dark` also drives.
   //
   // `mapReady` is a dependency, not just `dark`: the theme can settle before the
   // style finishes loading, and these calls no-op until the map is ready.
@@ -828,7 +905,6 @@ export default function AuditMap({
     const map = mapRef.current;
     if (!map || !readyRef.current) return;
     muteBasemap(map, dark);
-    applyThreeDTheme(map, dark);
   }, [dark, mapReady]);
 
   // Repaint the data layers when the active score layer — or the theme, which
@@ -855,13 +931,24 @@ export default function AuditMap({
     if (!source) return;
     paintedSegmentsRef.current = segments;
     source.setData(segments);
-    // The hero relief derives from the same collection, so it flips eras in
-    // the same effect — otherwise the volumes would keep the previous era's
-    // heights over freshly-swapped lines.
+    // The relief derives from the same collection, so it flips eras in the same
+    // effect — otherwise the volumes would keep the previous era's heights over
+    // freshly-swapped lines.
     const reliefSource = map.getSource(RELIEF_SOURCE_ID) as
       | maplibregl.GeoJSONSource
       | undefined;
     if (reliefSource) reliefSource.setData(buildReliefCollection(segments));
+    // `setData` clears every feature-state on the source it touches, which is
+    // what carries the hovered and selected casings. The era flip is a data
+    // swap, not a deselection: the panel stays open on the same street, so its
+    // casing has to stay lit under it. Re-assert both, on both sources, for the
+    // ids we still consider live.
+    if (selectedIdRef.current) {
+      setSegmentState(map, selectedIdRef.current, { selected: true });
+    }
+    if (hoveredIdRef.current) {
+      setSegmentState(map, hoveredIdRef.current, { hover: true });
+    }
   }, [segments, mapReady]);
 
   // Cooperative wheel gating (research §4): a plain wheel over the embedded hero
@@ -893,19 +980,23 @@ export default function AuditMap({
     };
   }, [heroInteractive, mapReady]);
 
-  const handleToggleThreeD = (next: boolean) => {
-    setThreeD(next);
+  /**
+   * The one dimensional-view switch. React state and the map move together in
+   * the same call, and the choice is persisted immediately, so the control can
+   * never claim one thing while the canvas shows another — on this paint, on a
+   * reload, or on the next navigation into `/map`.
+   */
+  const handleToggleRelief = (next: boolean) => {
+    setRelief(next);
+    writeMapReliefPreference(next);
     const map = mapRef.current;
-    if (map && readyRef.current) applyThreeD(map, next, dark);
+    if (map && readyRef.current) applyReliefView(map, next);
   };
 
   const handleClose = () => {
     const map = mapRef.current;
     if (map && selectedIdRef.current) {
-      map.setFeatureState(
-        { source: SOURCE_ID, id: selectedIdRef.current },
-        { selected: false },
-      );
+      setSegmentState(map, selectedIdRef.current, { selected: false });
       selectedIdRef.current = null;
     }
     setSelected(null);
@@ -932,8 +1023,13 @@ export default function AuditMap({
           e.clientX - rect.left,
           e.clientY - rect.top,
         );
+        // Same layer set the click handler selects from, or a tap on an
+        // extruded street would read as "outside" and close the panel a
+        // heartbeat before the click reopened it. Filtered to layers that
+        // actually exist, because `queryRenderedFeatures` errors on an
+        // unknown id and the relief is absent on a fallback style.
         const features = map.queryRenderedFeatures(point, {
-          layers: INTERACTIVE_LAYER_IDS,
+          layers: APP_SELECT_LAYER_IDS.filter((id) => map.getLayer(id)),
         });
         if (features.length > 0) return;
       }
@@ -1034,7 +1130,7 @@ export default function AuditMap({
               onSelectLayer={setActiveLayer}
             />
           ) : null}
-          <ThreeDToggle active={threeD} onToggle={handleToggleThreeD} />
+          <ThreeDToggle active={relief} onToggle={handleToggleRelief} />
         </div>
       </div>
 
@@ -1074,13 +1170,10 @@ export default function AuditMap({
     geometry: GeoJSON.Geometry,
   ) {
     if (selectedIdRef.current) {
-      map.setFeatureState(
-        { source: SOURCE_ID, id: selectedIdRef.current },
-        { selected: false },
-      );
+      setSegmentState(map, selectedIdRef.current, { selected: false });
     }
     selectedIdRef.current = props.id;
-    map.setFeatureState({ source: SOURCE_ID, id: props.id }, { selected: true });
+    setSegmentState(map, props.id, { selected: true });
 
     // Smooth fly-to: fit the segment clear of the chrome. On phones the detail is
     // a bottom sheet, so we frame the segment into the upper map band (big bottom
