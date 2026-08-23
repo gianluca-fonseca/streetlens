@@ -90,3 +90,7 @@ data/pending-submissions.local.json
 
 # Upstream response cache for scripts/build-schools.mjs
 .cache/
+
+# School admin overlays + uploaded photos (runtime data)
+data/school-*.local.json
+data/school-media/

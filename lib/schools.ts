@@ -60,6 +60,10 @@ export type SchoolProperties = {
   level: SchoolLevel | null;
   district: string | null;
   locality: string | null;
+  /** Road + barrio + town, reverse-geocoded from the final position. Costa Rica
+   *  has no street numbering to navigate by, so this is what a driver reads off
+   *  a sign — and how a coordinate on the wrong block gets noticed. */
+  address: string | null;
   mep_code: string | null;
   mep_circuit: string | null;
   mep_region: string | null;
