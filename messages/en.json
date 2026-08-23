@@ -86,6 +86,31 @@
       "excellent": "Excellent"
     }
   },
+  "schools": {
+    "toggleLabel": "Schools",
+    "sector": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "level": {
+      "preschool": "Preschool",
+      "primary": "Primary",
+      "preschool_primary": "Preschool + primary",
+      "secondary": "Secondary",
+      "basica_general": "General basic",
+      "adult": "Adult education"
+    },
+    "district": "District",
+    "locality": "Locality",
+    "mepCode": "MEP code",
+    "circuit": "Circuit",
+    "alsoHere": "Also at this site",
+    "website": "School website",
+    "close": "Close school details",
+    "provenanceMepOsm": "MEP register, positioned on the OpenStreetMap campus ({delta} m from the registry point).",
+    "provenanceMepOnly": "MEP register. No mapped campus yet, so the pin is the registry's own surveyed point.",
+    "provenanceOsmOnly": "From OpenStreetMap. Not a separate row in the MEP register."
+  },
   "panel": {
     "eyebrow": "Escazú pilot",
     "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",

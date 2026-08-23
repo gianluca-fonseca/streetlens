@@ -494,3 +494,98 @@ export const BASEMAP = {
     labelHalo: "#0a0a0a",
   },
 } as const;
+
+/* ------------------------------------------------------------------ *
+ * School pins (the "Escuela Segura" overlay)
+ *
+ * Schools are an OVERLAY on the score map, not a sixth lens, so they must be
+ * readable without spending any of the page's chroma budget. The sealed score
+ * RAMP and the flash pink are the only strong colour on this product (see the
+ * BASEMAP note below), and a school pin that arrived in its own hue would put a
+ * sixth colour family next to five that already encode a number — the reader
+ * would look for the value it encodes and there isn't one.
+ *
+ * So the pins separate by FORM, in the page's own ink:
+ *
+ *   public school    SOLID ink disc, paper ring
+ *   private school   HOLLOW disc (paper fill, ink ring)
+ *
+ * Filled-vs-hollow survives greyscale, every kind of colour blindness, and a
+ * phone in sunlight, which colour alone would not. The paper-coloured ring is
+ * what keeps a pin legible where it lands on a dark score line: it is the same
+ * device the basemap already uses for label haloes.
+ * ------------------------------------------------------------------ */
+
+export const SCHOOL_PIN = {
+  light: {
+    /** Public: solid disc. Near-ink rather than pure black, matching label ink. */
+    fill: "#3d3d3d",
+    /** Private: the disc reads as an outline against the page. */
+    hollow: "#fafafa",
+    ring: "#fafafa",
+    stroke: "#3d3d3d",
+    label: "#3d3d3d",
+    labelHalo: "#fafafa",
+  },
+  dark: {
+    fill: "#d8d8d8",
+    hollow: "#0a0a0a",
+    ring: "#0a0a0a",
+    stroke: "#d8d8d8",
+    label: "#d8d8d8",
+    labelHalo: "#0a0a0a",
+  },
+} as const;
+
+/**
+ * Pin radius by zoom. Small enough at canton zoom that 33 pins read as a
+ * distribution rather than a blanket over the network, and large enough by
+ * street zoom to be a comfortable tap target.
+ */
+export const schoolRadiusExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  11,
+  3,
+  13.5,
+  5,
+  16,
+  8,
+] as unknown as ExpressionSpecification;
+
+/** Solid for a public school, paper-filled (so it reads hollow) for a private one. */
+export function schoolFillExpression(theme: RampTheme): ExpressionSpecification {
+  const pin = SCHOOL_PIN[theme];
+  return [
+    "case",
+    ["==", ["get", "sector"], "public"],
+    pin.fill,
+    pin.hollow,
+  ] as unknown as ExpressionSpecification;
+}
+
+/**
+ * Ring colour. A public pin takes the paper ring that lifts it off a score line;
+ * a private pin's ring IS its ink, because the ring is the whole mark.
+ */
+export function schoolRingExpression(theme: RampTheme): ExpressionSpecification {
+  const pin = SCHOOL_PIN[theme];
+  return [
+    "case",
+    ["==", ["get", "sector"], "public"],
+    pin.ring,
+    pin.stroke,
+  ] as unknown as ExpressionSpecification;
+}
+
+/** Ring width, matched to the radius ramp so the mark keeps its proportions. */
+export const schoolRingWidthExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  11,
+  1.2,
+  16,
+  2.2,
+] as unknown as ExpressionSpecification;

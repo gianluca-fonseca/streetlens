@@ -10,14 +10,20 @@ import type {
   SegmentProperties,
   StreetStats,
 } from "@/lib/segments";
+import type { SchoolCollection, SchoolProperties } from "@/lib/schools";
 import {
   BASEMAP,
   COMMUNITY_CASING,
   COMMUNITY_LAYER_FILTER,
   RAMP_LAYER_FILTER,
+  SCHOOL_PIN,
   communityWidthExpression,
   lineColorExpression,
   lineWidthExpression,
+  schoolFillExpression,
+  schoolRadiusExpression,
+  schoolRingExpression,
+  schoolRingWidthExpression,
 } from "@/components/mapConfig";
 import type { RampTheme } from "@/components/mapConfig";
 import {
@@ -27,12 +33,14 @@ import {
   reliefHeightExpression,
 } from "@/components/scoreRelief";
 import { writeMapReliefPreference } from "@/lib/map-relief";
+import { readSchoolsOverlay, writeSchoolsOverlay } from "@/lib/schools-overlay";
 import { parseFeatureProps } from "@/lib/parse-feature-props";
 import { useTheme } from "@/components/ThemeProvider";
 import { readStoredPreference, resolveTheme } from "@/lib/theme";
 import MapPanel from "@/components/MapPanel";
 import ThreeDToggle from "@/components/ThreeDToggle";
 import SegmentDetail from "@/components/SegmentDetail";
+import SchoolDetail from "@/components/SchoolDetail";
 import ContributeUI from "@/components/contribute/ContributeUI";
 import { useContribute } from "@/components/contribute/useContribute";
 import { cn } from "@/components/ui/cn";
@@ -49,6 +57,9 @@ const SOURCE_ID = "segments";
 const LINE_LAYER_ID = "segments-line";
 const GLOW_LAYER_ID = "segments-glow";
 const COMMUNITY_LAYER_ID = "segments-community";
+const SCHOOLS_SOURCE_ID = "schools";
+const SCHOOLS_LAYER_ID = "schools-pin";
+const SCHOOLS_LABEL_LAYER_ID = "schools-label";
 /** Layers that respond to hover / click (score ramp + neutral community casing). */
 const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID];
 /**
@@ -316,6 +327,134 @@ function addDataLayers(
   }
 }
 
+/* ------------------------------------------------------------------ *
+ * The schools overlay (the "Escuela Segura" view).
+ *
+ * Added LAST, so the pins sit on top of the score lines and on top of the
+ * relief volumes. That order is the argument: a school pin is a place, and the
+ * scored street it lands on is the thing being judged around it, so the pin has
+ * to stay findable while the network under it changes lens, theme, and height.
+ *
+ * The layers are always CREATED and toggled by `visibility`, matching the relief
+ * layer's contract — the delegated click and hover listeners bind once to an id
+ * that always exists, and flipping the overlay costs nothing but a layout
+ * property. MapLibre neither draws nor hit-tests an invisible layer, so an
+ * overlay that is off cannot steal a click from the street beneath it.
+ * ------------------------------------------------------------------ */
+
+function addSchoolLayers(
+  map: maplibregl.Map,
+  data: SchoolCollection,
+  theme: RampTheme,
+  visible: boolean,
+) {
+  if (!data.features.length) return;
+  const pin = SCHOOL_PIN[theme];
+
+  if (!map.getSource(SCHOOLS_SOURCE_ID)) {
+    map.addSource(SCHOOLS_SOURCE_ID, {
+      type: "geojson",
+      data: data as unknown as GeoJSON.FeatureCollection,
+      promoteId: "id",
+    });
+  }
+
+  if (!map.getLayer(SCHOOLS_LAYER_ID)) {
+    map.addLayer({
+      id: SCHOOLS_LAYER_ID,
+      type: "circle",
+      source: SCHOOLS_SOURCE_ID,
+      layout: { visibility: visible ? "visible" : "none" },
+      paint: {
+        "circle-radius": schoolRadiusExpression,
+        "circle-color": schoolFillExpression(theme),
+        "circle-stroke-color": schoolRingExpression(theme),
+        "circle-stroke-width": schoolRingWidthExpression,
+        "circle-opacity": 1,
+      },
+    });
+  }
+
+  // Names arrive only once the reader is close enough for a name to be an
+  // answer rather than clutter. Below that zoom the pins are a distribution,
+  // which is the reading the canton-wide frame is for.
+  if (!map.getLayer(SCHOOLS_LABEL_LAYER_ID)) {
+    map.addLayer({
+      id: SCHOOLS_LABEL_LAYER_ID,
+      type: "symbol",
+      source: SCHOOLS_SOURCE_ID,
+      minzoom: 14.2,
+      layout: {
+        visibility: visible ? "visible" : "none",
+        "text-field": ["get", "display_name"],
+        "text-size": 11,
+        "text-offset": [0, 1.1],
+        "text-anchor": "top",
+        "text-max-width": 9,
+        // A label that cannot be placed is dropped rather than moved: a school
+        // name floating away from its pin is worse than no name.
+        "text-allow-overlap": false,
+        "text-optional": true,
+      },
+      paint: {
+        "text-color": pin.label,
+        "text-halo-color": pin.labelHalo,
+        "text-halo-width": 1.4,
+      },
+    });
+  }
+}
+
+/** Re-ink the pins and their labels for the basemap now under them. */
+function applySchoolTheme(map: maplibregl.Map, theme: RampTheme) {
+  if (!map.getLayer(SCHOOLS_LAYER_ID)) return;
+  const pin = SCHOOL_PIN[theme];
+  try {
+    map.setPaintProperty(SCHOOLS_LAYER_ID, "circle-color", schoolFillExpression(theme));
+    map.setPaintProperty(
+      SCHOOLS_LAYER_ID,
+      "circle-stroke-color",
+      schoolRingExpression(theme),
+    );
+    map.setPaintProperty(SCHOOLS_LABEL_LAYER_ID, "text-color", pin.label);
+    map.setPaintProperty(SCHOOLS_LABEL_LAYER_ID, "text-halo-color", pin.labelHalo);
+  } catch {
+    /* layers not ready yet */
+  }
+}
+
+/** Show or hide the overlay. Both layers move together — a floating school name
+ *  over hidden pins is not a state this map has. */
+function applySchoolsVisible(map: maplibregl.Map, on: boolean) {
+  for (const id of [SCHOOLS_LAYER_ID, SCHOOLS_LABEL_LAYER_ID]) {
+    if (map.getLayer(id)) {
+      map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+    }
+  }
+}
+
+/**
+ * maplibre serializes non-primitive feature properties to JSON strings at the
+ * worker boundary, so `programmes` arrives as a string. Same hazard
+ * lib/parse-feature-props.ts exists for on the segment side, and the same
+ * contract: never throw, degrade to an empty list.
+ */
+function parseSchoolProps(raw: Record<string, unknown> | null | undefined): SchoolProperties {
+  const p = (raw ?? {}) as Record<string, unknown>;
+  let programmes = p.programmes;
+  if (typeof programmes === "string") {
+    try {
+      programmes = JSON.parse(programmes);
+    } catch {
+      programmes = [];
+    }
+  }
+  return {
+    ...(p as unknown as SchoolProperties),
+    programmes: Array.isArray(programmes) ? programmes : [],
+  };
+}
+
 /**
  * The extruded score relief (see scoreRelief.ts for the contract). Added on TOP
  * of the layer stack so each volume owns its footprint; the flat 2D ramp lines
@@ -421,6 +560,11 @@ type SegmentHit = {
  * A volume with no matching segment (mid-era-flip, for one frame) resolves to
  * nothing rather than to a half-populated panel.
  */
+/** Drop the selected casing, wherever the selection came from. */
+function clearSelectedCasing(map: maplibregl.Map, id: string | null) {
+  if (id) setSegmentState(map, id, { selected: false });
+}
+
 function resolveSegmentHit(
   features: maplibregl.MapGeoJSONFeature[] | undefined,
   segments: SegmentCollection,
@@ -533,6 +677,7 @@ export type AuditMapVariant = "app" | "hero";
 
 export default function AuditMap({
   segments,
+  schools,
   stats,
   variant = "app",
   activeLayer: controlledLayer,
@@ -546,6 +691,9 @@ export default function AuditMap({
   reliefAnimate = false,
 }: Readonly<{
   segments: SegmentCollection;
+  /** The canton's schools. Absent on the hero, which is a backdrop, not an
+   *  instrument — a pin nobody can click is decoration. */
+  schools?: SchoolCollection;
   stats?: StreetStats;
   variant?: AuditMapVariant;
   /** Externally controlled score layer (hero / scrollytelling). */
@@ -594,6 +742,11 @@ export default function AuditMap({
   // the one in the HTML, before any JS runs — already matches what the map is
   // about to do. No default-then-correct flicker, and no hydration mismatch.
   const [relief, setRelief] = useState(reliefEnabled);
+  // The overlay's default is ON (see lib/schools-overlay.ts). The stored
+  // preference is read after mount, because localStorage is not available while
+  // this renders on the server.
+  const [schoolsOn, setSchoolsOn] = useState(true);
+  const [selectedSchool, setSelectedSchool] = useState<SchoolProperties | null>(null);
   // Transient cooperative-gesture hint (shown on a raw wheel over the hero map).
   const [wheelHint, setWheelHint] = useState(false);
   // App surface only: true while the map is panning/zooming so the over-tile chrome
@@ -615,6 +768,8 @@ export default function AuditMap({
   const selectedIdRef = useRef<string | null>(null);
   const hoveredIdRef = useRef<string | null>(null);
   const segmentsRef = useRef(segments);
+  const schoolsRef = useRef(schools);
+  const schoolsOnRef = useRef(schoolsOn);
   // The collection currently drawn by the source, so a re-render that did not
   // change the data never re-sets it (setData drops feature-state, which is what
   // carries the selected and hovered casings).
@@ -638,6 +793,8 @@ export default function AuditMap({
   useEffect(() => {
     activeLayerRef.current = activeLayer;
     segmentsRef.current = segments;
+    schoolsRef.current = schools;
+    schoolsOnRef.current = schoolsOn;
     contributeRef.current = contribute;
     isHeroRef.current = isHero;
     flyOnLoadRef.current = flyOnLoad;
@@ -746,6 +903,16 @@ export default function AuditMap({
         dark ? "dark" : "light",
         hero || reliefOn,
       );
+      // Pins last, so they sit above both the flat ramp and the relief volumes.
+      // The hero gets none: it is a backdrop, and its taps open /map wholesale.
+      if (!hero && schoolsRef.current) {
+        addSchoolLayers(
+          map,
+          schoolsRef.current,
+          dark ? "dark" : "light",
+          schoolsOnRef.current,
+        );
+      }
       paintedSegmentsRef.current = segmentsRef.current;
 
       // Apply the current active layer + dark-mode glow.
@@ -830,6 +997,15 @@ export default function AuditMap({
           // both fire and race to set the selection. Resolving here makes the
           // winner explicit — the volume is what the reader can actually see,
           // so it wins when it is present.
+          // Yield to a school pin under the same point (see the pin handler
+          // below). Queried rather than tracked, so the two handlers cannot
+          // disagree about what the reader is looking at.
+          if (
+            map.getLayer(SCHOOLS_LAYER_ID) &&
+            map.queryRenderedFeatures(e.point, { layers: [SCHOOLS_LAYER_ID] }).length
+          ) {
+            return;
+          }
           const hit = resolveSegmentHit(e.features, segmentsRef.current);
           if (!hit) return;
           // maplibre serializes community_report/community_reports to JSON
@@ -853,6 +1029,25 @@ export default function AuditMap({
           selectFeature(map, props, hit.geometry);
           setSelected(props);
         });
+        // A pin sits ON TOP of the street it belongs to, so a tap over one hits
+        // both. The pin wins — it is the mark the reader aimed at — and the
+        // segment handler above bails out when it sees one under the point.
+        map.on("click", SCHOOLS_LAYER_ID, (e) => {
+          const f = e.features?.[0];
+          if (!f) return;
+          if (contributeRef.current.modeRef.current !== "idle") return;
+          clearSelectedCasing(map, selectedIdRef.current);
+          selectedIdRef.current = null;
+          setSelected(null);
+          setSelectedSchool(parseSchoolProps(f.properties));
+        });
+        map.on("mousemove", SCHOOLS_LAYER_ID, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", SCHOOLS_LAYER_ID, () => {
+          map.getCanvas().style.cursor = "";
+        });
+
         // Drop the over-tile glass chrome to solid while the map is in motion, then
         // restore on idle (same perf swap the interactive hero applies to its chips).
         map.on("movestart", () => setMapMoving(true));
@@ -916,6 +1111,30 @@ export default function AuditMap({
     if (!map || !readyRef.current) return;
     applyLayer(map, activeLayer, dark);
   }, [activeLayer, dark, mapReady]);
+
+  // The pins carry no score, so only the theme moves them: their ink and their
+  // ring are the page's own, and the page just changed which one that is.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !readyRef.current) return;
+    applySchoolTheme(map, dark ? "dark" : "light");
+  }, [dark, mapReady]);
+
+  // Hydrate the remembered overlay choice. Runs once, after mount, because
+  // localStorage does not exist while this component renders on the server.
+  useEffect(() => {
+    const stored = readSchoolsOverlay();
+    if (stored === null) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- storage read on mount
+    setSchoolsOn(stored);
+  }, []);
+
+  // Overlay visibility, mirrored onto the map.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !readyRef.current) return;
+    applySchoolsVisible(map, schoolsOn);
+  }, [schoolsOn, mapReady]);
 
   // Push a NEW segment collection into the live source. The map is created once
   // and seeded from a ref, so without this the GeoJSON MapLibre holds is frozen
@@ -995,25 +1214,42 @@ export default function AuditMap({
     if (map && readyRef.current) applyReliefView(map, next);
   };
 
+  /**
+   * Turning the overlay off also closes an open school card. It is done here
+   * rather than in the visibility effect because it is a consequence of the
+   * READER's choice, not of the map's state: the card would otherwise describe
+   * a pin they can no longer see, and clicking away from it — the usual way out
+   * — would have nothing to click away from.
+   */
+  const handleToggleSchools = (next: boolean) => {
+    setSchoolsOn(next);
+    writeSchoolsOverlay(next);
+    if (!next) setSelectedSchool(null);
+  };
+
   const handleClose = () => {
     const map = mapRef.current;
-    if (map && selectedIdRef.current) {
-      setSegmentState(map, selectedIdRef.current, { selected: false });
+    if (map) {
+      clearSelectedCasing(map, selectedIdRef.current);
       selectedIdRef.current = null;
     }
     setSelected(null);
   };
 
-  // Outside-tap dismissal: any pointer down outside the detail panel closes it.
-  // Map hits on another segment are left to the layer click handler so the
-  // selection switches without a close-then-reopen flicker.
+  // Outside-tap dismissal: any pointer down outside the open card closes it.
+  // Map hits on another segment or another school pin are left to the layer
+  // click handlers, so the selection switches without a close-then-reopen
+  // flicker. One effect covers both cards because only one is ever open.
   useEffect(() => {
-    if (!selected) return;
+    if (!selected && !selectedSchool) return;
 
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target;
       if (!(target instanceof Node)) return;
-      if (document.querySelector("[data-segment-detail]")?.contains(target)) {
+      if (
+        document.querySelector("[data-segment-detail]")?.contains(target) ||
+        document.querySelector("[data-school-detail]")?.contains(target)
+      ) {
         return;
       }
 
@@ -1031,18 +1267,21 @@ export default function AuditMap({
         // actually exist, because `queryRenderedFeatures` errors on an
         // unknown id and the relief is absent on a fallback style.
         const features = map.queryRenderedFeatures(point, {
-          layers: APP_SELECT_LAYER_IDS.filter((id) => map.getLayer(id)),
+          layers: [...APP_SELECT_LAYER_IDS, SCHOOLS_LAYER_ID].filter((id) =>
+            map.getLayer(id),
+          ),
         });
         if (features.length > 0) return;
       }
 
       handleClose();
+      setSelectedSchool(null);
     };
 
     document.addEventListener("pointerdown", onPointerDown, { capture: true });
     return () =>
       document.removeEventListener("pointerdown", onPointerDown, { capture: true });
-  }, [selected]);
+  }, [selected, selectedSchool]);
 
   if (isHero) {
     // Read-only backdrop OR the interactive platform embed. The informational
@@ -1130,6 +1369,16 @@ export default function AuditMap({
               stats={stats}
               activeLayer={activeLayer}
               onSelectLayer={setActiveLayer}
+              schoolCounts={
+                schools?.features.length
+                  ? {
+                      public: schools.metadata.counts.public,
+                      private: schools.metadata.counts.private,
+                    }
+                  : null
+              }
+              schoolsOn={schoolsOn}
+              onToggleSchools={handleToggleSchools}
             />
           ) : null}
           <ThreeDToggle active={relief} onToggle={handleToggleRelief} />
@@ -1155,6 +1404,29 @@ export default function AuditMap({
               segment={selected}
               activeLayer={activeLayer}
               onClose={handleClose}
+            />
+          </div>
+        </>
+      ) : null}
+
+      {/* School card: same bottom-sheet-on-phone / top-right-popover-on-desktop
+          placement as the segment detail, because they are the same gesture's
+          answer and only one is ever open. */}
+      {selectedSchool ? (
+        <>
+          <button
+            type="button"
+            onClick={() => setSelectedSchool(null)}
+            aria-hidden="true"
+            tabIndex={-1}
+            data-school-scrim
+            className="absolute inset-0 z-20 bg-[rgba(0,0,0,0.32)] md:hidden"
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center p-3 md:inset-x-auto md:bottom-auto md:right-4 md:top-4 md:block md:p-0">
+            <SchoolDetail
+              key={selectedSchool.id}
+              school={selectedSchool}
+              onClose={() => setSelectedSchool(null)}
             />
           </div>
         </>

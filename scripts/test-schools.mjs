@@ -1,0 +1,189 @@
+#!/usr/bin/env node
+/**
+ * test-schools.mjs
+ *
+ * Locks the school roster and its map overlay.
+ *
+ * The data half is the part that matters most: this file is what a partner
+ * proposal is built on, so the checks are about PROVENANCE, not shape. Every
+ * pin has to say where its coordinate came from, every registry row has to be
+ * reachable from a pin, and the two judgement calls the build script makes
+ * (a mis-filed canton, a school that moved out in 2016) have to stay argued in
+ * the metadata rather than quietly applied.
+ */
+
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
+
+const failures = [];
+function check(label, ok, detail = "") {
+  console.log(`  [${ok ? "ok " : "FAIL"}] ${label}${detail ? ` ${detail}` : ""}`);
+  if (!ok) failures.push(label);
+}
+const read = (p) => readFileSync(path.join(ROOT, p), "utf8");
+
+console.log("roster (data/schools.geojson)");
+const schools = JSON.parse(read("data/schools.geojson"));
+const feats = schools.features;
+const meta = schools.metadata;
+
+check("is a FeatureCollection with pins", schools.type === "FeatureCollection" && feats.length > 0,
+  `${feats.length} sites`);
+check("counts in metadata match the features",
+  meta.counts.sites === feats.length &&
+  meta.counts.public === feats.filter((f) => f.properties.sector === "public").length &&
+  meta.counts.private === feats.filter((f) => f.properties.sector === "private").length,
+  `${meta.counts.public} public / ${meta.counts.private} private`);
+
+check("every pin carries both sectors' worth of coverage",
+  meta.counts.public > 0 && meta.counts.private > 0);
+
+// Escazú canton bbox, from OSM relation 4071270. A pin outside it is either a
+// bad registry coordinate or a matcher that reached across the canton line, and
+// both are the kind of error that would be quoted at a partner as fact.
+const BBOX = { minLat: 9.8595, minLon: -84.1859, maxLat: 9.9727, maxLon: -84.1206 };
+const stray = feats.filter(({ geometry: g }) => {
+  const [lon, lat] = g.coordinates;
+  return lat < BBOX.minLat || lat > BBOX.maxLat || lon < BBOX.minLon || lon > BBOX.maxLon;
+});
+check("every pin falls inside the canton bbox", stray.length === 0,
+  stray.map((f) => f.properties.name).join(", "));
+
+check("every pin has a point geometry with finite coordinates",
+  feats.every(
+    (f) =>
+      f.geometry.type === "Point" &&
+      f.geometry.coordinates.length === 2 &&
+      f.geometry.coordinates.every(Number.isFinite),
+  ));
+
+check("ids are unique and mirrored onto properties",
+  new Set(feats.map((f) => f.id)).size === feats.length &&
+  feats.every((f) => f.id === f.properties.id));
+
+check("sector is always one of the two registers",
+  feats.every((f) => f.properties.sector === "public" || f.properties.sector === "private"));
+
+check("every pin declares where its coordinate came from",
+  feats.every((f) => f.properties.position_source === "osm" || f.properties.position_source === "mep"));
+
+check("an OSM-positioned pin reports how far it moved from the registry point",
+  feats
+    .filter((f) => f.properties.position_source === "osm" && f.properties.registry === "mep")
+    .every((f) => Number.isFinite(f.properties.position_delta_m)));
+
+// The matcher's whole risk is reaching too far and fusing two schools. The
+// closest two distinct sites in the canton sit ~96 m apart, so a delta near the
+// 400 m ceiling means a pin was dragged onto a neighbour's campus.
+const farMatches = feats.filter((f) => (f.properties.position_delta_m ?? 0) > 150);
+check("no pin was dragged more than 150 m onto an OSM campus", farMatches.length === 0,
+  farMatches.map((f) => `${f.properties.name} ${f.properties.position_delta_m}m`).join(", "));
+
+check("registry rows are all reachable from some pin",
+  feats.reduce((n, f) => n + f.properties.programmes.length, 0) === meta.counts.registry_rows,
+  `${meta.counts.registry_rows} rows across ${feats.length} pins`);
+
+check("a pin's own MEP code is one of its programmes",
+  feats
+    .filter((f) => f.properties.registry === "mep")
+    .every((f) => f.properties.programmes.some((p) => p.code === f.properties.mep_code)));
+
+check("an OSM-only pin explains itself",
+  feats
+    .filter((f) => f.properties.registry === "osm")
+    .every((f) => typeof f.properties.registry_note === "string" && f.properties.registry_note.length > 20));
+
+check("display names are cased, not the register's caps",
+  feats.every((f) => f.properties.display_name && f.properties.display_name !== f.properties.name.toUpperCase()
+    || !/[A-Z]{4,}/.test(f.properties.name)));
+
+check("level is never invented — it is a known value or null",
+  feats.every((f) =>
+    f.properties.level === null ||
+    ["preschool", "primary", "preschool_primary", "secondary", "basica_general", "adult"].includes(
+      f.properties.level,
+    )));
+
+console.log("");
+console.log("provenance (the argument a partner can check)");
+check("both upstream sources are named", meta.sources.length >= 2 &&
+  meta.sources.some((s) => s.id === "mep-sigmep") &&
+  meta.sources.some((s) => s.id === "osm"));
+check("OSM's licence is stated", meta.sources.some((s) => s.licence === "ODbL"));
+check("every excluded registry row carries its reason",
+  meta.excluded.length > 0 && meta.excluded.every((e) => e.why && e.why.length > 40));
+check("every rejected OSM feature carries its reason",
+  meta.osm_rejected.length > 0 && meta.osm_rejected.every((e) => e.why && e.why.length > 40));
+
+const build = read("scripts/build-schools.mjs");
+check("the roster is regenerable, not hand-maintained",
+  meta.generated_by === "scripts/build-schools.mjs" &&
+  build.includes("MEP_CEPUBCR_1") && build.includes("MEP_CEPRIVCR_1"));
+check("the two judgement calls live in the script, not in the data",
+  build.includes("EXCLUDE") && build.includes("OSM_ONLY_ADMIT") && build.includes("OSM_ONLY_REJECT"));
+
+console.log("");
+console.log("overlay wiring");
+const audit = read("components/AuditMap.tsx");
+const config = read("components/mapConfig.ts");
+const toggle = read("components/SchoolsToggle.tsx");
+const card = read("components/SchoolDetail.tsx");
+
+check("pins separate by FORM, so they survive greyscale and CVD",
+  /schoolFillExpression/.test(config) &&
+  /"=="\s*,\s*\["get",\s*"sector"\],\s*"public"/.test(config));
+check("pins spend no chroma — they take the page's own ink",
+  /fill: "#3d3d3d"/.test(config) && /fill: "#d8d8d8"/.test(config));
+check("the overlay is created once and toggled by visibility",
+  audit.includes("applySchoolsVisible") &&
+  audit.includes('setLayoutProperty(id, "visibility"'));
+// Compared at the CALL SITES inside onLoad, not at the definitions: MapLibre
+// stacks layers in the order they are added, so what puts a pin over a relief
+// volume is which invocation runs second.
+const onLoadBody = audit.slice(audit.indexOf("const onLoad = ()"));
+check("pins are added AFTER the relief so they stay on top",
+  onLoadBody.indexOf("addSchoolLayers(\n") > onLoadBody.indexOf("addReliefLayer(\n") &&
+  onLoadBody.indexOf("addReliefLayer(\n") > -1);
+check("a pin click wins over the segment under it",
+  audit.includes("queryRenderedFeatures(e.point, { layers: [SCHOOLS_LAYER_ID] })"));
+check("maplibre's JSON-stringified properties are parsed back",
+  audit.includes("parseSchoolProps") && audit.includes("JSON.parse(programmes)"));
+check("the overlay choice is remembered",
+  audit.includes("readSchoolsOverlay") && audit.includes("writeSchoolsOverlay") &&
+  read("lib/schools-overlay.ts").includes("localStorage"));
+check("schools are a switch, not a sixth lens in the radiogroup",
+  !read("components/LayerSwitcher.tsx").includes("school") &&
+  toggle.includes('type="checkbox"'));
+check("the key names both pin forms in text, never colour alone",
+  /\[\s*"public",[\s\S]*?\[\s*"private",/.test(toggle) &&
+  toggle.includes("t(`sector.${sector}`)"));
+check("the card is a dialog and closes on Escape",
+  card.includes('role="dialog"') && card.includes('aria-modal="true"') &&
+  card.includes('e.key === "Escape"'));
+check("the card states its provenance rather than hiding it",
+  card.includes("provenanceMepOsm") && card.includes("provenanceMepOnly") &&
+  card.includes("provenanceOsmOnly"));
+
+console.log("");
+console.log("i18n parity for the schools namespace");
+for (const locale of ["en", "es"]) {
+  const m = JSON.parse(read(`messages/${locale}.json`));
+  check(`${locale}: schools namespace exists`, Boolean(m.schools));
+  check(`${locale}: both sectors are labelled`,
+    Boolean(m.schools?.sector?.public && m.schools?.sector?.private));
+  check(`${locale}: every level the data uses has a label`,
+    feats.every((f) => f.properties.level === null || Boolean(m.schools?.level?.[f.properties.level])));
+  check(`${locale}: the OSM-distance string interpolates the delta`,
+    (m.schools?.provenanceMepOsm ?? "").includes("{delta}"));
+}
+
+console.log("");
+if (failures.length) {
+  console.log(`FAIL — ${failures.length} check(s): ${failures.join("; ")}`);
+  process.exit(1);
+}
+console.log("PASS — schools roster and overlay");

@@ -35,8 +35,12 @@ check("AuditMap listens for outside pointerdown while a segment is open",
 // is APP_SELECT_LAYER_IDS, which adds the extruded relief volume to the flat
 // pair: on /map the volume is the street's visible body, so a tap on it must
 // count as a tap on a segment.
+// The set is spread rather than named literally since the schools overlay
+// joined it: a tap on a school pin is a tap on a mark, not on the page, so it
+// must not close the open card either. Asserted on the two things that matter —
+// the app's select set is in there, and it is filtered to layers that exist.
 check("AuditMap skips close when the hit is on an interactive segment layer",
-  audit.includes("layers: APP_SELECT_LAYER_IDS.filter((id) => map.getLayer(id))") &&
+  /layers: \[\.\.\.APP_SELECT_LAYER_IDS,[^\]]*\]\.filter\(\(id\) =>\s*map\.getLayer\(id\),?\s*\)/s.test(audit) &&
   audit.includes("if (features.length > 0) return"));
 check("that layer set covers the extruded relief, not just the flat lines",
   /const APP_SELECT_LAYER_IDS = \[[^\]]*RELIEF_LAYER_ID[^\]]*\]/s.test(audit) &&

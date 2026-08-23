@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
+import { getSchools } from "@/lib/schools";
 import { demoDataEnabled } from "@/lib/demo-flag-server";
 import { mapReliefView } from "@/lib/map-relief-server";
 import { MUNICIPALITY } from "@/lib/municipality";
@@ -43,9 +44,10 @@ export default async function MapPage({
   // is rendered in this page's HTML, so this is the only place its state can be
   // known before the browser paints it. See lib/map-relief.ts.
   const relief = await mapReliefView();
-  const [segments, stats] = await Promise.all([
+  const [segments, stats, schools] = await Promise.all([
     getSegments(demoEnabled),
     getStats(demoEnabled),
+    getSchools(),
   ]);
   const openContribute = contribute === "1";
   const initialSegmentId = segment?.trim() || undefined;
@@ -59,6 +61,7 @@ export default async function MapPage({
       <main className="relative min-h-0 flex-1 overflow-hidden">
         <AuditMap
           segments={segments}
+          schools={schools}
           stats={stats}
           openContributeOnMount={openContribute}
           initialSegmentId={initialSegmentId}

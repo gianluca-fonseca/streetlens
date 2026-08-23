@@ -86,6 +86,31 @@
       "excellent": "Excelente"
     }
   },
+  "schools": {
+    "toggleLabel": "Centros educativos",
+    "sector": {
+      "public": "Público",
+      "private": "Privado"
+    },
+    "level": {
+      "preschool": "Preescolar",
+      "primary": "Primaria",
+      "preschool_primary": "Preescolar y primaria",
+      "secondary": "Secundaria",
+      "basica_general": "Básica general",
+      "adult": "Educación de adultos"
+    },
+    "district": "Distrito",
+    "locality": "Poblado",
+    "mepCode": "Código MEP",
+    "circuit": "Circuito",
+    "alsoHere": "También en este sitio",
+    "website": "Sitio del centro",
+    "close": "Cerrar detalles del centro",
+    "provenanceMepOsm": "Registro del MEP, ubicado sobre el campus de OpenStreetMap (a {delta} m del punto del registro).",
+    "provenanceMepOnly": "Registro del MEP. El campus aún no está mapeado, así que el punto es el del propio registro.",
+    "provenanceOsmOnly": "Tomado de OpenStreetMap. No aparece como fila propia en el registro del MEP."
+  },
   "panel": {
     "eyebrow": "Piloto de Escazú",
     "heroStat": "{pct}% de los segmentos auditados incumplen los mínimos de accesibilidad de la Ley 7600",
