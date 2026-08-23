@@ -220,7 +220,8 @@
       "import": "Importación masiva",
       "ops": "Operaciones",
       "logout": "Cerrar sesión",
-      "publicMap": "Mapa público"
+      "publicMap": "Mapa público",
+      "schools": "Centros"
     },
     "login": {
       "title": "Acceso de administración",

@@ -220,7 +220,8 @@
       "import": "Bulk import",
       "ops": "Pipeline ops",
       "logout": "Log out",
-      "publicMap": "Public map"
+      "publicMap": "Public map",
+      "schools": "Schools"
     },
     "login": {
       "title": "Admin access",
