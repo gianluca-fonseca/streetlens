@@ -21,6 +21,7 @@ import {
 import { MUNICIPALITY } from "@/lib/municipality";
 import { buildPageMetadata } from "@/lib/site";
 import CivicChrome from "@/components/civic/CivicChrome";
+import { SealLockup } from "@/components/schools/EscuelaSeguraSeal";
 
 export const revalidate = 300;
 
@@ -170,6 +171,22 @@ export default async function SchoolsPage({
               <p className="text-[13px] leading-relaxed text-neutral-strong">{row.body}</p>
             </article>
           ))}
+        </div>
+
+        {/* The mark, beside the body that awards it. The lockup is the argument
+            in visual form: we measure, someone else certifies. */}
+        <div className="mt-4 border-y border-border py-8">
+          <SealLockup
+            size={150}
+            state="awarded"
+            municipality={`Cantón de ${MUNICIPALITY.name}`}
+            validUntil={new Date().getFullYear() + 2}
+            awardedByLabel={t("sealAwardedBy")}
+            verifiedByLabel={t("sealVerifiedBy")}
+          />
+          <p className="mt-5 max-w-[54ch] text-[12px] leading-relaxed text-neutral-strong">
+            {t("sealNote")}
+          </p>
         </div>
 
         <div className="mt-2 flex flex-col gap-2">

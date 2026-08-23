@@ -289,6 +289,35 @@ console.log("the precomputed walkshed matches the standard");
 }
 
 console.log("");
+console.log("the seal");
+{
+  const comp = read("components/schools/EscuelaSeguraSeal.tsx");
+  const script = read("scripts/render-seal.mjs");
+  const svg = read("docs/assets/escuela-segura-seal-light.svg");
+
+  // The component ships on the site and the script feeds slides. Two drawings
+  // of one mark drift; these checks are what keep them the same mark.
+  const bars = (src) => [...src.matchAll(/y:\s*(\d+),\s*half:\s*([\d.]+),\s*w:\s*([\d.]+)/g)]
+    .map((m) => m.slice(1).join("/"));
+  check("the component and the export draw the same crossing",
+    bars(comp).length === 4 && bars(comp).join("|") === bars(script).join("|"),
+    bars(comp).join(" "));
+  check("both place the validity band identically",
+    /y1="130"[\s\S]{0,260}y="142"/.test(comp) && /y1="130"[\s\S]{0,260}y="142"/.test(script));
+
+  // A seal is a PASS mark. Minting failing variants would turn certification
+  // into a shaming badge, which is both cruel and self-defeating.
+  check("only two states exist, and neither names a failing tier",
+    /SealState = "awarded" \| "pending"/.test(comp) &&
+    !/critico|en_riesgo/.test(comp.replace(/sealStateFor[\s\S]{0,160}/, "")));
+  check("the seal expires", /VIGENTE/.test(comp) && /validUntil/.test(comp));
+  check("the awarding body is a labelled slot, not a drawn logo",
+    /awardedBy/.test(comp) && /logo del ente/i.test(comp) && !/purdy/i.test(comp));
+  check("the exported SVG is well-formed and self-coloured",
+    svg.startsWith("<svg") && svg.trimEnd().endsWith("</svg>") && !svg.includes("currentColor"));
+}
+
+console.log("");
 if (failures.length) {
   console.log(`FAIL — ${failures.length} check(s): ${failures.join("; ")}`);
   process.exit(1);

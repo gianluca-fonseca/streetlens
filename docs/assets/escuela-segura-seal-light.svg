@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" fill="none" stroke="#111111" role="img" aria-label="Escuela Segura · Cantón de Escazú">
+  <title>Escuela Segura · Cantón de Escazú</title>
+  <defs>
+    <path id="top" d="M 26 100 A 74 74 0 0 1 174 100"/>
+    <path id="bottom" d="M 30 100 A 70 70 0 0 0 170 100"/>
+  </defs>
+  <circle cx="100" cy="100" r="96" stroke-width="3" opacity="1"/>
+  <circle cx="100" cy="100" r="88" stroke-width="0.75" opacity="0.5"/>
+  
+  <g fill="#111111" stroke="none">
+    <text font-size="15" font-weight="600" letter-spacing="3.2" font-family="'Space Grotesk', system-ui, sans-serif">
+      <textPath href="#top" startOffset="50%" text-anchor="middle">ESCUELA SEGURA</textPath>
+    </text>
+    <text font-size="8.5" letter-spacing="2.1" opacity="0.72" font-family="'IBM Plex Mono', ui-monospace, monospace">
+      <textPath href="#bottom" startOffset="50%" text-anchor="middle">CANTÓN DE ESCAZÚ</textPath>
+    </text>
+  </g>
+  <g stroke-linecap="round">
+    <line x1="70" y1="120" x2="130" y2="120" stroke-width="7.6" opacity="1"/>
+    <line x1="76" y1="109" x2="124" y2="109" stroke-width="6.3" opacity="1"/>
+    <line x1="81.5" y1="99" x2="118.5" y2="99" stroke-width="5.2" opacity="1"/>
+    <line x1="86.5" y1="90" x2="113.5" y2="90" stroke-width="4.2" opacity="1"/>
+  </g>
+  <circle cx="100" cy="69" r="7.5" fill="#111111" stroke="none" opacity="1"/>
+  <line x1="74" y1="130" x2="126" y2="130" stroke-width="0.75" opacity="0.45"/>
+  <text x="100" y="142" text-anchor="middle" font-size="10" letter-spacing="1.6" fill="#111111" stroke="none" opacity="0.72" font-family="'IBM Plex Mono', ui-monospace, monospace">VIGENTE 2028</text>
+</svg>

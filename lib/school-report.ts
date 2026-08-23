@@ -16,7 +16,7 @@
  * Layering, innermost first:
  *   data/schools.geojson      the MEP register (generated, read-only)
  *   data/school-zones.json    walkshed membership (generated, read-only)
- *   getSegments()             the current reading of every street
+ *   getSegments(demoEnabled)  the current reading of every street
  *   school-store overlays     profile, override, assessment (human, editable)
  */
 
