@@ -109,7 +109,27 @@
     "close": "Close school details",
     "provenanceMepOsm": "MEP register, positioned on the OpenStreetMap campus ({delta} m from the registry point).",
     "provenanceMepOnly": "MEP register. No mapped campus yet, so the pin is the registry's own surveyed point.",
-    "provenanceOsmOnly": "From OpenStreetMap. Not a separate row in the MEP register."
+    "provenanceOsmOnly": "From OpenStreetMap. Not a separate row in the MEP register.",
+    "sealLabel": "Escuela Segura",
+    "tier": {
+      "sin_datos": "Awaiting data",
+      "critico": "Critical",
+      "en_riesgo": "At risk",
+      "en_progreso": "Improving",
+      "escuela_segura": "Escuela Segura"
+    },
+    "complianceLabel": "Walk meeting Ley 7600",
+    "scoreLabel": "School Score",
+    "awaitingData": "Only {pct} of the walk to this school has been surveyed. Too little to publish a rating we would stand behind.",
+    "gapNote": "{count, plural, one {# street} other {# streets}} still to record · {metres} m",
+    "zoneLabel": "School zone",
+    "gateRing": "Gate ring · 150 m",
+    "walkRing": "Walk ring · 400 m",
+    "coverageLabel": "Zone surveyed",
+    "priorityLabel": "Intervention priority",
+    "overriddenLabel": "Published figure set by hand",
+    "assessmentModel": "Written by the model from the figures above",
+    "assessmentHuman": "Written by the team"
   },
   "panel": {
     "eyebrow": "Escazú pilot",

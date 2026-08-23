@@ -109,7 +109,27 @@
     "close": "Cerrar detalles del centro",
     "provenanceMepOsm": "Registro del MEP, ubicado sobre el campus de OpenStreetMap (a {delta} m del punto del registro).",
     "provenanceMepOnly": "Registro del MEP. El campus aún no está mapeado, así que el punto es el del propio registro.",
-    "provenanceOsmOnly": "Tomado de OpenStreetMap. No aparece como fila propia en el registro del MEP."
+    "provenanceOsmOnly": "Tomado de OpenStreetMap. No aparece como fila propia en el registro del MEP.",
+    "sealLabel": "Escuela Segura",
+    "tier": {
+      "sin_datos": "Sin datos suficientes",
+      "critico": "Crítico",
+      "en_riesgo": "En riesgo",
+      "en_progreso": "En progreso",
+      "escuela_segura": "Escuela Segura"
+    },
+    "complianceLabel": "Trayecto que cumple la Ley 7600",
+    "scoreLabel": "Puntaje escolar",
+    "awaitingData": "Solo se ha relevado el {pct} del trayecto a este centro. Es muy poco para publicar una calificación que podamos sostener.",
+    "gapNote": "{count, plural, one {# calle} other {# calles}} por registrar · {metres} m",
+    "zoneLabel": "Zona escolar",
+    "gateRing": "Anillo del portón · 150 m",
+    "walkRing": "Anillo de trayecto · 400 m",
+    "coverageLabel": "Zona relevada",
+    "priorityLabel": "Prioridad de intervención",
+    "overriddenLabel": "Cifra publicada fijada a mano",
+    "assessmentModel": "Redactado por el modelo a partir de las cifras anteriores",
+    "assessmentHuman": "Redactado por el equipo"
   },
   "panel": {
     "eyebrow": "Piloto de Escazú",

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { ExternalLink, X } from "lucide-react";
 import type { SchoolProperties } from "@/lib/schools";
+import type { SchoolZoneWire } from "@/lib/school-map";
 import styles from "@/components/ui/zen.module.css";
 
 /**
@@ -22,9 +23,13 @@ import styles from "@/components/ui/zen.module.css";
  */
 export default function SchoolDetail({
   school,
+  zone,
   onClose,
 }: Readonly<{
   school: SchoolProperties;
+  /** The zone reading, when the school has one. Absent means no walkshed was
+   *  computed for it, which is a build state, not a score. */
+  zone?: SchoolZoneWire | null;
   onClose: () => void;
 }>) {
   const t = useTranslations("schools");
@@ -87,6 +92,8 @@ export default function SchoolDetail({
         </button>
       </header>
 
+      {zone ? <ZoneReading zone={zone} /> : null}
+
       {rows.length > 0 && (
         <dl className="flex flex-col gap-1 border-y border-border py-2.5">
           {rows.map((r) => (
@@ -136,6 +143,86 @@ export default function SchoolDetail({
           <ExternalLink size={12} strokeWidth={2} aria-hidden="true" />
           {t("website")}
         </a>
+      )}
+    </section>
+  );
+}
+
+/**
+ * The zone reading: the seal tier, the legal compliance bar, and the diagnostic
+ * score, in that order.
+ *
+ * The order is the argument. A tier is what a parent or a partner acts on; the
+ * compliance share is what makes the tier defensible ("this much of the walk is
+ * legal" beats "we scored it 54"); and the 0–100 is the engineering handle that
+ * says what to fix. Leading with the number would invert that.
+ *
+ * A school with too little coverage shows the missing metres instead of a
+ * grey score. An empty state that says "we have not looked yet, here is how
+ * much is left" is useful; one that says "—" is just a hole.
+ */
+function ZoneReading({ zone }: Readonly<{ zone: SchoolZoneWire }>) {
+  const t = useTranslations("schools");
+  const pct = (v: number) => `${Math.round(100 * v)}%`;
+  const scored = typeof zone.score === "number" && zone.compliance !== null;
+
+  return (
+    <section className="flex flex-col gap-2.5 border-y border-border py-3">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-strong">
+          {t("sealLabel")}
+        </p>
+        <span
+          data-tier={zone.tier}
+          className="rounded-[4px] border border-border-strong bg-surface-sunken px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-ink"
+        >
+          {t(`tier.${zone.tier}`)}
+        </span>
+      </div>
+
+      {scored ? (
+        <>
+          <div>
+            <div className="mb-1 flex items-baseline justify-between gap-2">
+              <span className="text-[11.5px] text-neutral-strong">{t("complianceLabel")}</span>
+              <span className="font-mono text-[12px] font-medium text-ink">
+                {pct(zone.compliance!)}
+              </span>
+            </div>
+            {/* A plain proportional bar, not a gauge: the quantity is a share of
+                a walk, and a share reads as a length. */}
+            <div className="h-[6px] w-full overflow-hidden rounded-[3px] bg-surface-sunken">
+              <span
+                className="block h-full rounded-[3px] bg-accent"
+                style={{ width: `${Math.round(100 * zone.compliance!)}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-[11.5px] text-neutral-strong">{t("scoreLabel")}</span>
+            <span className="font-mono text-[1.05rem] font-medium leading-none text-ink">
+              {zone.score}
+              <span className="text-[11px] text-neutral-strong">/100</span>
+            </span>
+          </div>
+        </>
+      ) : (
+        <p className="font-mono text-[11.5px] leading-relaxed text-neutral-strong">
+          {t("awaitingData", { pct: pct(zone.coverage) })}
+        </p>
+      )}
+
+      {/* The capture backlog. Present whether or not the school is scored,
+          because it is what changes the answer either way. */}
+      {zone.gap_ids.length > 0 && (
+        <p className="flex flex-wrap items-baseline gap-x-1.5 border-t border-border pt-2 text-[11px] leading-snug text-neutral-strong">
+          <span className="inline-block h-[3px] w-4 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+          {t("gapNote", {
+            count: zone.gap_ids.length,
+            metres: Math.round(zone.gap_length_m),
+          })}
+        </p>
       )}
     </section>
   );

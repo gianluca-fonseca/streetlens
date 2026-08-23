@@ -11,12 +11,16 @@ import type {
   StreetStats,
 } from "@/lib/segments";
 import type { SchoolCollection, SchoolProperties } from "@/lib/schools";
+import type { SchoolZoneCollection, SchoolZoneWire } from "@/lib/school-map";
 import {
   BASEMAP,
   COMMUNITY_CASING,
   COMMUNITY_LAYER_FILTER,
   RAMP_LAYER_FILTER,
+  SCHOOL_GAP_CASING,
+  schoolGapWidthExpression,
   SCHOOL_PIN,
+  SCHOOL_ZONE_PAINT,
   communityWidthExpression,
   lineColorExpression,
   lineWidthExpression,
@@ -24,6 +28,7 @@ import {
   schoolRadiusExpression,
   schoolRingExpression,
   schoolRingWidthExpression,
+  zonePulse,
 } from "@/components/mapConfig";
 import type { RampTheme } from "@/components/mapConfig";
 import {
@@ -60,6 +65,11 @@ const COMMUNITY_LAYER_ID = "segments-community";
 const SCHOOLS_SOURCE_ID = "schools";
 const SCHOOLS_LAYER_ID = "schools-pin";
 const SCHOOLS_LABEL_LAYER_ID = "schools-label";
+const ZONES_SOURCE_ID = "school-zones";
+const ZONE_FILL_LAYER_ID = "school-zone-fill";
+const ZONE_LINE_LAYER_ID = "school-zone-line";
+/** The capture backlog, drawn from the segments source by id filter. */
+const GAP_LAYER_ID = "school-gaps";
 /** Layers that respond to hover / click (score ramp + neutral community casing). */
 const INTERACTIVE_LAYER_IDS = [LINE_LAYER_ID, COMMUNITY_LAYER_ID];
 /**
@@ -341,6 +351,130 @@ function addDataLayers(
  * property. MapLibre neither draws nor hit-tests an invisible layer, so an
  * overlay that is off cannot steal a click from the street beneath it.
  * ------------------------------------------------------------------ */
+
+/*
+ * The zone rings and the capture backlog.
+ *
+ * Added BEFORE the school pins so the stack reads bottom-up as: scored streets,
+ * the zone wash, the backlog, then the pin. The pin has to stay on top — it is
+ * the thing a reader aims at — and the backlog has to sit above the score ramp,
+ * because a street nobody has recorded is not a low score and must not be
+ * readable as one.
+ *
+ * The gap layer draws from the SEGMENTS source by id filter rather than from a
+ * source of its own. The geometry is already on the page; shipping it twice
+ * would double the heaviest payload the map loads to say something an id list
+ * already says.
+ */
+function addZoneLayers(
+  map: maplibregl.Map,
+  data: SchoolZoneCollection,
+  theme: RampTheme,
+  visible: boolean,
+) {
+  if (!data.zones.length) return;
+  const pal = SCHOOL_ZONE_PAINT[theme];
+  const vis = visible ? "visible" : "none";
+
+  if (!map.getSource(ZONES_SOURCE_ID)) {
+    map.addSource(ZONES_SOURCE_ID, {
+      type: "geojson",
+      data: data.rings as GeoJSON.FeatureCollection,
+    });
+  }
+
+  if (!map.getLayer(ZONE_FILL_LAYER_ID)) {
+    map.addLayer({
+      id: ZONE_FILL_LAYER_ID,
+      type: "fill",
+      source: ZONES_SOURCE_ID,
+      // Only the walk ring is washed. Filling the gate ring as well would double
+      // the tint at the centre of every zone and read as a hotspot, which is the
+      // opposite of what a small radius means.
+      filter: ["==", ["get", "ring"], "walk"],
+      layout: { visibility: vis },
+      paint: { "fill-color": pal.ringFill },
+    });
+  }
+
+  if (!map.getLayer(ZONE_LINE_LAYER_ID)) {
+    map.addLayer({
+      id: ZONE_LINE_LAYER_ID,
+      type: "line",
+      source: ZONES_SOURCE_ID,
+      layout: { visibility: vis, "line-join": "round" },
+      paint: {
+        "line-color": [
+          "case",
+          ["==", ["get", "ring"], "gate"],
+          pal.gateRing,
+          pal.ring,
+        ] as unknown as ExpressionSpecification,
+        "line-width": [
+          "case",
+          ["==", ["get", "ring"], "gate"],
+          1,
+          1.6,
+        ] as unknown as ExpressionSpecification,
+        // The gate ring is dashed and quiet; the walk ring is the one that
+        // pulses, because it is the boundary the score is actually about.
+        "line-dasharray": [
+          "case",
+          ["==", ["get", "ring"], "gate"],
+          ["literal", [2, 2]],
+          ["literal", [1, 0]],
+        ] as unknown as ExpressionSpecification,
+        "line-opacity": 0.6,
+      },
+    });
+  }
+
+  if (!map.getLayer(GAP_LAYER_ID)) {
+    map.addLayer({
+      id: GAP_LAYER_ID,
+      type: "line",
+      source: SOURCE_ID,
+      filter: gapFilter(data.all_gap_ids),
+      layout: { visibility: vis, "line-cap": "round", "line-join": "round" },
+      paint: {
+        "line-color": pal.gap,
+        "line-width": schoolGapWidthExpression,
+        "line-dasharray": SCHOOL_GAP_CASING.dash,
+        "line-opacity": 0.9,
+      },
+    });
+  }
+}
+
+/** Draw only the segments nobody has recorded yet. */
+function gapFilter(ids: string[]): ExpressionSpecification {
+  return ["in", ["get", "id"], ["literal", ids]] as unknown as ExpressionSpecification;
+}
+
+/** Re-ink the zone marks for the basemap now under them. */
+function applyZoneTheme(map: maplibregl.Map, theme: RampTheme) {
+  if (!map.getLayer(ZONE_LINE_LAYER_ID)) return;
+  const pal = SCHOOL_ZONE_PAINT[theme];
+  try {
+    map.setPaintProperty(ZONE_FILL_LAYER_ID, "fill-color", pal.ringFill);
+    map.setPaintProperty(
+      ZONE_LINE_LAYER_ID,
+      "line-color",
+      ["case", ["==", ["get", "ring"], "gate"], pal.gateRing, pal.ring] as unknown as ExpressionSpecification,
+    );
+    map.setPaintProperty(GAP_LAYER_ID, "line-color", pal.gap);
+  } catch {
+    /* not ready */
+  }
+}
+
+function applyZonesVisible(map: maplibregl.Map, on: boolean) {
+  for (const id of [ZONE_FILL_LAYER_ID, ZONE_LINE_LAYER_ID, GAP_LAYER_ID]) {
+    if (map.getLayer(id)) {
+      map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+    }
+  }
+}
 
 function addSchoolLayers(
   map: maplibregl.Map,
@@ -685,6 +819,7 @@ export type AuditMapVariant = "app" | "hero";
 export default function AuditMap({
   segments,
   schools,
+  schoolZones,
   stats,
   variant = "app",
   activeLayer: controlledLayer,
@@ -701,6 +836,8 @@ export default function AuditMap({
   /** The canton's schools. Absent on the hero, which is a backdrop, not an
    *  instrument — a pin nobody can click is decoration. */
   schools?: SchoolCollection;
+  /** Zone rings, per-school readings, and the capture backlog. */
+  schoolZones?: SchoolZoneCollection;
   stats?: StreetStats;
   variant?: AuditMapVariant;
   /** Externally controlled score layer (hero / scrollytelling). */
@@ -754,6 +891,7 @@ export default function AuditMap({
   // this renders on the server.
   const [schoolsOn, setSchoolsOn] = useState(true);
   const [selectedSchool, setSelectedSchool] = useState<SchoolProperties | null>(null);
+  const [selectedZone, setSelectedZone] = useState<SchoolZoneWire | null>(null);
   // Transient cooperative-gesture hint (shown on a raw wheel over the hero map).
   const [wheelHint, setWheelHint] = useState(false);
   // App surface only: true while the map is panning/zooming so the over-tile chrome
@@ -776,6 +914,7 @@ export default function AuditMap({
   const hoveredIdRef = useRef<string | null>(null);
   const segmentsRef = useRef(segments);
   const schoolsRef = useRef(schools);
+  const zonesRef = useRef(schoolZones);
   const schoolsOnRef = useRef(schoolsOn);
   // The collection currently drawn by the source, so a re-render that did not
   // change the data never re-sets it (setData drops feature-state, which is what
@@ -801,6 +940,7 @@ export default function AuditMap({
     activeLayerRef.current = activeLayer;
     segmentsRef.current = segments;
     schoolsRef.current = schools;
+    zonesRef.current = schoolZones;
     schoolsOnRef.current = schoolsOn;
     contributeRef.current = contribute;
     isHeroRef.current = isHero;
@@ -910,6 +1050,9 @@ export default function AuditMap({
         dark ? "dark" : "light",
         hero || reliefOn,
       );
+      if (!hero && zonesRef.current) {
+        addZoneLayers(map, zonesRef.current, dark ? "dark" : "light", schoolsOnRef.current);
+      }
       // Pins last, so they sit above both the flat ramp and the relief volumes.
       // The hero gets none: it is a backdrop, and its taps open /map wholesale.
       if (!hero && schoolsRef.current) {
@@ -1046,7 +1189,29 @@ export default function AuditMap({
           clearSelectedCasing(map, selectedIdRef.current);
           selectedIdRef.current = null;
           setSelected(null);
-          setSelectedSchool(parseSchoolProps(f.properties));
+          const props = parseSchoolProps(f.properties);
+          setSelectedSchool(props);
+          setSelectedZone(
+            zonesRef.current?.zones.find((z) => z.school_id === props.id) ?? null,
+          );
+        });
+        // The wash is a tap target too: on a phone the ring is a much larger
+        // thing to hit than an 8px pin, and it means the same school.
+        map.on("click", ZONE_FILL_LAYER_ID, (e) => {
+          if (contributeRef.current.modeRef.current !== "idle") return;
+          const schoolId = e.features?.[0]?.properties?.school_id;
+          if (typeof schoolId !== "string") return;
+          const school = schoolsRef.current?.features.find(
+            (f) => f.properties.id === schoolId,
+          );
+          if (!school) return;
+          clearSelectedCasing(map, selectedIdRef.current);
+          selectedIdRef.current = null;
+          setSelected(null);
+          setSelectedSchool(school.properties);
+          setSelectedZone(
+            zonesRef.current?.zones.find((z) => z.school_id === schoolId) ?? null,
+          );
         });
         map.on("mousemove", SCHOOLS_LAYER_ID, () => {
           map.getCanvas().style.cursor = "pointer";
@@ -1125,6 +1290,7 @@ export default function AuditMap({
     const map = mapRef.current;
     if (!map || !readyRef.current) return;
     applySchoolTheme(map, dark ? "dark" : "light");
+    applyZoneTheme(map, dark ? "dark" : "light");
   }, [dark, mapReady]);
 
   // Hydrate the remembered overlay choice. Runs once, after mount, because
@@ -1136,11 +1302,50 @@ export default function AuditMap({
     setSchoolsOn(stored);
   }, []);
 
+  /*
+   * The zone pulse.
+   *
+   * One requestAnimationFrame driver for every ring rather than one per school:
+   * thirty-three independent timers would drift out of phase within seconds and
+   * turn a slow heartbeat into visual noise. In sync they read as one
+   * instrument breathing, which is the intent.
+   *
+   * Stops entirely when the overlay is off (nothing to animate) and when the
+   * reader has asked for reduced motion — a pulsing boundary is decoration to
+   * anyone who cannot tolerate movement, and the ring says the same thing
+   * standing still.
+   */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady || !schoolsOn) return;
+    if (prefersReducedMotion()) {
+      if (map.getLayer(ZONE_LINE_LAYER_ID)) {
+        map.setPaintProperty(ZONE_LINE_LAYER_ID, "line-opacity", 0.6);
+      }
+      return;
+    }
+    let raf = 0;
+    const started = performance.now();
+    const tick = (now: number) => {
+      if (map.getLayer(ZONE_LINE_LAYER_ID)) {
+        const t = zonePulse(now - started);
+        // Shallow on purpose: 0.34 → 0.85 is visible at a glance and invisible
+        // once you are reading the streets underneath it.
+        map.setPaintProperty(ZONE_LINE_LAYER_ID, "line-opacity", 0.34 + 0.51 * t);
+        map.setPaintProperty(ZONE_FILL_LAYER_ID, "fill-opacity", 0.72 + 0.28 * t);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [schoolsOn, mapReady]);
+
   // Overlay visibility, mirrored onto the map.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !readyRef.current) return;
     applySchoolsVisible(map, schoolsOn);
+    applyZonesVisible(map, schoolsOn);
   }, [schoolsOn, mapReady]);
 
   // Push a NEW segment collection into the live source. The map is created once
@@ -1231,7 +1436,10 @@ export default function AuditMap({
   const handleToggleSchools = (next: boolean) => {
     setSchoolsOn(next);
     writeSchoolsOverlay(next);
-    if (!next) setSelectedSchool(null);
+    if (!next) {
+      setSelectedSchool(null);
+      setSelectedZone(null);
+    }
   };
 
   const handleClose = () => {
@@ -1283,6 +1491,7 @@ export default function AuditMap({
 
       handleClose();
       setSelectedSchool(null);
+      setSelectedZone(null);
     };
 
     document.addEventListener("pointerdown", onPointerDown, { capture: true });
@@ -1423,7 +1632,10 @@ export default function AuditMap({
         <>
           <button
             type="button"
-            onClick={() => setSelectedSchool(null)}
+            onClick={() => {
+              setSelectedSchool(null);
+              setSelectedZone(null);
+            }}
             aria-hidden="true"
             tabIndex={-1}
             data-school-scrim
@@ -1433,7 +1645,11 @@ export default function AuditMap({
             <SchoolDetail
               key={selectedSchool.id}
               school={selectedSchool}
-              onClose={() => setSelectedSchool(null)}
+              zone={selectedZone}
+              onClose={() => {
+                setSelectedSchool(null);
+                setSelectedZone(null);
+              }}
             />
           </div>
         </>

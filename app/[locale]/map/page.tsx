@@ -3,6 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
 import { getSchools } from "@/lib/schools";
+import { getSchoolReports } from "@/lib/school-report";
+import { toSchoolZoneCollection } from "@/lib/school-map";
 import { demoDataEnabled } from "@/lib/demo-flag-server";
 import { mapReliefView } from "@/lib/map-relief-server";
 import { MUNICIPALITY } from "@/lib/municipality";
@@ -44,11 +46,15 @@ export default async function MapPage({
   // is rendered in this page's HTML, so this is the only place its state can be
   // known before the browser paints it. See lib/map-relief.ts.
   const relief = await mapReliefView();
-  const [segments, stats, schools] = await Promise.all([
+  const [segments, stats, schools, reports] = await Promise.all([
     getSegments(demoEnabled),
     getStats(demoEnabled),
     getSchools(),
+    getSchoolReports(demoEnabled),
   ]);
+  // Reduced to the map wire here rather than in the client: the contribution
+  // table is several hundred rows the browser would download and never render.
+  const schoolZones = toSchoolZoneCollection(reports);
   const openContribute = contribute === "1";
   const initialSegmentId = segment?.trim() || undefined;
 
@@ -62,6 +68,7 @@ export default async function MapPage({
         <AuditMap
           segments={segments}
           schools={schools}
+          schoolZones={schoolZones}
           stats={stats}
           openContributeOnMount={openContribute}
           initialSegmentId={initialSegmentId}

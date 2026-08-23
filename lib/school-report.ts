@@ -160,6 +160,9 @@ export type PublishedReading = {
 
 export type SchoolReport = {
   school: SchoolProperties;
+  /** The pin's coordinate. Carried on the report so every consumer that needs
+   *  to draw or route to the school does not have to re-open the roster. */
+  center: [number, number];
   /** Register values with the admin's profile edits applied. */
   display_name: string;
   address: string | null;
@@ -252,6 +255,7 @@ export async function getSchoolReports(demoEnabled: boolean): Promise<SchoolRepo
 
     return {
       school,
+      center: feature.geometry.coordinates,
       display_name: profile?.display_name?.trim() || school.display_name,
       address: profile?.address?.trim() || school.address,
       profile,

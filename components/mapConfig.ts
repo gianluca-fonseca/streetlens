@@ -589,3 +589,107 @@ export const schoolRingWidthExpression = [
   16,
   2.2,
 ] as unknown as ExpressionSpecification;
+
+/* ------------------------------------------------------------------ *
+ * School zones, and the capture backlog inside them
+ *
+ * Three marks, and they answer three different questions:
+ *
+ *   the RING          where the zone ends. A drawn circle at the walk radius,
+ *                     pulsing slowly so it reads as a live boundary rather than
+ *                     a printed one. It is a MARKER, not the measurement: the
+ *                     score comes from the walkshed, and streets inside the ring
+ *                     the walkshed cannot reach are simply not drawn as members.
+ *   a ZONE STREET     a street the score is actually computed from. Painted on
+ *                     the normal score ramp, because it IS a scored street —
+ *                     nothing about being near a school changes its reading.
+ *   a GAP             a street inside the zone that nobody has recorded yet.
+ *                     This is the one that has to shout: it is the field
+ *                     backlog, the thing a camera should be pointed at next,
+ *                     and the reason a school reads `sin datos`.
+ *
+ * The gap takes the accent — the only place in the product where flash pink is
+ * spent on data rather than on an active control. It earns the exception: a gap
+ * is not a score on a scale, it is an absence, and it must never be mistaken for
+ * a low reading. Dashed, so it also reads as provisional, and moving, so it
+ * reads as an instruction rather than a state.
+ * ------------------------------------------------------------------ */
+
+export const SCHOOL_ZONE_PAINT = {
+  light: {
+    ring: "#c0106b",
+    ringFill: "rgba(192, 16, 107, 0.055)",
+    gateRing: "#111111",
+    gap: "#f0268c",
+  },
+  dark: {
+    ring: "#ff4fa3",
+    ringFill: "rgba(255, 79, 163, 0.09)",
+    gateRing: "#f2f2f2",
+    gap: "#ff4fa3",
+  },
+} as const;
+
+/** Dashed: an unrecorded street is an instruction, not a reading. */
+export const SCHOOL_GAP_CASING = {
+  dash: [1.4, 1.2] as [number, number],
+} as const;
+
+/**
+ * Gap width by zoom. Thin at canton scale and thick at street scale, because
+ * the two zooms are two different questions. Zoomed out, thirty-three backlogs
+ * at once only need to say WHERE the work is, and a fat casing at that density
+ * swamps the score ramp it is supposed to sit beside. Zoomed in, the reader is
+ * planning a route down one street and the mark has to be unmissable.
+ */
+export const schoolGapWidthExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  11,
+  1.8,
+  14,
+  3.4,
+  16,
+  5,
+] as unknown as ExpressionSpecification;
+
+/**
+ * The pulse. One shared driver rather than a CSS animation, because these are
+ * WebGL layers and there is no element to animate.
+ *
+ * Deliberately slow (a ~2.6 s cycle) and shallow: a fast or high-contrast pulse
+ * on a map the reader is trying to study is an irritant, and thirty-three of
+ * them at once would be unusable. Returns 0..1.
+ */
+export const ZONE_PULSE_PERIOD_MS = 2600;
+
+export function zonePulse(elapsedMs: number): number {
+  return 0.5 - 0.5 * Math.cos((2 * Math.PI * elapsedMs) / ZONE_PULSE_PERIOD_MS);
+}
+
+/**
+ * A geodesic circle as a GeoJSON polygon.
+ *
+ * A MapLibre `circle` layer sizes in PIXELS, so it would stay the same size on
+ * screen as the reader zooms — the ring would silently stop meaning 400 metres,
+ * which is the one thing it exists to say. A polygon is in world coordinates and
+ * therefore keeps its promise at every zoom.
+ */
+export function geodesicCircle(
+  center: [number, number],
+  radiusM: number,
+  steps = 72,
+): [number, number][] {
+  const [lon, lat] = center;
+  const latRad = (lat * Math.PI) / 180;
+  // Degrees per metre, corrected for latitude on the longitude axis.
+  const dLat = radiusM / 111_320;
+  const dLon = radiusM / (111_320 * Math.cos(latRad));
+  const ring: [number, number][] = [];
+  for (let i = 0; i <= steps; i++) {
+    const a = (2 * Math.PI * i) / steps;
+    ring.push([lon + dLon * Math.cos(a), lat + dLat * Math.sin(a)]);
+  }
+  return ring;
+}
