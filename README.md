@@ -42,6 +42,8 @@ Cleaner, more livable cities for everyone start with streets you can measure.
 
 StreetLens is an open-source, bilingual platform that measures the quality of city streets one segment at a time: how accessible the sidewalk is, how well it drains, how much shade it carries, and whether you can ride a bike on it. The pilot audits the cantón of **Escazú, Costa Rica**, starting August 2026.
 
+Its first application is **[Escuela Segura](docs/school-score.md)**: a published standard for the streets around a school, and a rating for all 33 centros educativos in the canton. Same pipeline, same rubric, same segment scores — aggregated over the streets a child actually walks to reach class. Nothing new is measured; what changes is the question being asked of the measurements.
+
 Three ideas hold it together.
 
 - **Street quality is not just pavement.** A street is where infrastructure, daily life, and community intersect, and it decides who a city actually serves. Walkability breaks down into parts you can measure, so we measure them.
@@ -50,9 +52,17 @@ Three ideas hold it together.
 
 The whole platform is public: the code, the rubric, and the scoring method, open for anyone to read, run, or fork.
 
+### Escuela Segura
+
+A child's route to class is public infrastructure, and almost nowhere is it measured. The **[school standard](docs/school-score.md)** rates the walk, not the school: two rings of walking distance around every gate (150 m and 400 m, measured along the street network rather than as a circle), scored from the segment readings already on the map, with the tier anchored to Ley 7600 compliance.
+
+Two rules do the heavy lifting. Below 60% of the walk surveyed, a school publishes **no rating at all** — today that holds back 19 of 33 schools, and saying so is the point. And a single lethal segment inside the gate ring caps a school regardless of its average, because a mean is very good at hiding one bad block.
+
+The seal is designed to be awarded by a convening body rather than by us, the way Bandera Azul works. See [`docs/school-score.md`](docs/school-score.md) for the full standard, the calibration note, and what is deliberately not in the rating yet.
+
 ### Sobre StreetLens
 
-StreetLens es una plataforma abierta y bilingüe que mide la calidad de las calles, segmento por segmento: accesibilidad de la acera, drenaje, sombra e infraestructura ciclista. El plan piloto audita el cantón de **Escazú, Costa Rica**, a partir de agosto de 2026. El código, la rúbrica y el método de puntuación son públicos. Hoy el mapa muestra datos de demostración claramente etiquetados sobre geometría real de calles; ningún número es una medición real hasta que comienza el trabajo de campo.
+StreetLens es una plataforma abierta y bilingüe que mide la calidad de las calles, segmento por segmento: accesibilidad de la acera, drenaje, sombra e infraestructura ciclista. El plan piloto audita el cantón de **Escazú, Costa Rica**, a partir de agosto de 2026. Su primera aplicación es **Escuela Segura**: un estándar publicado para las calles alrededor de cada centro educativo del cantón, calificadas según el trayecto que un niño realmente camina. El código, la rúbrica y el método de puntuación son públicos. Hoy el mapa muestra datos de demostración claramente etiquetados sobre geometría real de calles; ningún número es una medición real hasta que comienza el trabajo de campo.
 
 ---
 
@@ -103,6 +113,8 @@ The path from a walked street to a public score is deliberately honest about wha
 2. **Geotagged photo.** Each image is a labeled example: rubric item, response, and picture.
 3. **Rubric score.** 0 to 100 per lens, versioned, published with its formula.
 4. **Open map and data.** Public map, GeoJSON and CSV exports, sidewalk geometry contributed back to OpenStreetMap.
+
+The same rubric feeds the school standard. A school's rating is an aggregation of these per-segment lens scores over its walkshed, re-weighted for a walking child (accessibility 45%, drainage 20%, shade 20%, bike 15%) with gate-ring streets counted double. No school-specific measurement exists, deliberately: a second rubric would double the surface a partner has to trust and would let a school's rating disagree with the streets drawn beneath it. See [`docs/school-score.md`](docs/school-score.md).
 
 Every audit trains the next one. The photos accumulate into a labeled-imagery corpus that, over time, is meant to train a computer-vision and machine-learning pipeline reading sidewalk condition straight from a photo, so future audits score faster than the last. Today a vision model can pre-score filmed streets through the [CV data-collection funnel](docs/cv-funnel.md), but its output is a proposal only: a person verifies every reading before it reaches the map. That loop, and the line between today and the roadmap, is Plate 3. The rubric items, the scoring formula, and the demo-versus-real line are laid out in [`docs/method.md`](docs/method.md).
 

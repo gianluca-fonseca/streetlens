@@ -11,6 +11,11 @@ code it describes.
   and its 15 items, the 0-to-100 scale and legend bins, the sealed color and
   width encoding, and the Ley 7600 accessibility minimums. Read this to
   understand what every number on the map means.
+- **[school-score.md](school-score.md)**. The Escuela Segura standard. How the
+  zone around a school is defined (walking distance, not a radius), how the
+  segment scores already on the map aggregate into a rating, the coverage gate
+  and the gate veto that protect the seal, and what is deliberately not in the
+  rating yet. Read this to understand the platform's first application.
 - **[architecture.md](architecture.md)**. How the app is built. Routing, the
   frozen data adapter (`lib/segments.ts`), the MapLibre map layer, the static
   render pipeline, the contribution flow, and the planned Supabase schema. Read
