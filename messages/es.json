@@ -1926,5 +1926,68 @@
       "insights": "Abrir indicadores →",
       "map": "Abrir el mapa →"
     }
+  },
+  "schoolsPage": {
+    "meta": {
+      "title": "Escuela Segura · {municipality}",
+      "description": "Cada centro educativo de {municipality}, calificado según las calles que los niños realmente caminan para llegar. Un estándar publicado, anclado a la Ley 7600, con la evidencia detrás de cada calificación."
+    },
+    "eyebrow": "Escuela Segura",
+    "title": "Calificamos el trayecto, no la escuela",
+    "standfirst": "La ruta de un niño a clases es infraestructura pública, y en {municipality} nadie la ha medido. Estos son todos los centros del cantón, calificados según las calles dentro de su propia zona de caminata, contra un estándar que cualquiera puede revisar.",
+    "why": {
+      "title": "Por qué empezar por las zonas escolares",
+      "equity": {
+        "title": "Los niños con menos opciones son los que más caminan",
+        "body": "Una familia con carro puede rodear una acera que no existe. Una familia sin carro no puede, y sus hijos caminan o pedalean la misma cuadra rota dos veces al día, todos los días de clase. Arreglar las calles alrededor de las escuelas públicas llega justo a los hogares que no tienen cómo esquivar el problema."
+      },
+      "precedent": {
+        "title": "Un cantón es una plantilla, no un final",
+        "body": "En Costa Rica hay más de cuatro mil centros educativos. El punto de hacer Escazú bien no es Escazú: es dejar un estándar, un método y un instrumento que cualquier cantón pueda adoptar sin inventarlo de nuevo. Si uno sale bien, el resto es repetición."
+      },
+      "tractable": {
+        "title": "La solución suele ser pequeña y concreta",
+        "body": "Casi nada de lo que vuelve peligroso un trayecto escolar es una obra de corredor. Es un paso peatonal que nunca se pintó, una rampa que muere en el cordón, un desagüe que inunda la única acera. Nombrarlos, escuela por escuela, convierte un problema abrumador en una lista financiable."
+      }
+    },
+    "standard": {
+      "title": "El estándar",
+      "zoneTitle": "La zona es un trayecto, no un radio",
+      "zoneBody": "Dos anillos, ambos medidos sobre la red vial y no en línea recta: el anillo del portón a {gate} m y la zona de caminata a {walk} m, unos cinco minutos al paso de un niño. Las calles del portón cuentan doble. Un círculo dibujado en el mapa incluiría calles al otro lado de la autopista por las que ningún niño ha caminado a clases.",
+      "scoreTitle": "Dos cifras, dos funciones",
+      "scoreBody": "La categoría sale del cumplimiento de la Ley 7600: qué proporción del trayecto ponderado alcanza el mínimo legal de accesibilidad. De eso depende el sello, y es defendible frente a un ministerio. El puntaje 0–100 va debajo como diagnóstico de qué hay que arreglar.",
+      "coverageTitle": "Sin evidencia no hay calificación",
+      "coverageBody": "Por debajo del {minCoverage}% del trayecto relevado, un centro se publica como Sin datos suficientes: sin categoría y sin número. Una calificación verde calculada sobre tres calles observadas es peor que no calificar, y hoy esa regla frena a buena parte del cantón.",
+      "vetoTitle": "Una sola cuadra letal limita al centro",
+      "vetoBody": "Un solo tramo dentro del anillo del portón por debajo del piso de seguridad limita al centro a Crítico, diga lo que diga su promedio. Un promedio es muy bueno escondiendo una mala cuadra, y un sello ganado así no valdría nada.",
+      "sealTitle": "El sello se gana, se verifica y vence",
+      "sealBody": "Escuela Segura exige {minSeal}% de cobertura, ningún veto de portón, un trayecto conforme y al menos una auditoría humana en campo, no solo una pasada de cámara. Dura {months} meses. StreetLens mide; el sello lo otorga un ente convocante, como funciona Bandera Azul."
+    },
+    "tiersTitle": "La escalera",
+    "leaderboardTitle": "Todos los centros del cantón",
+    "leaderboardNote": "Ordenados por la proporción del trayecto que cumple la Ley 7600. Los centros sin cobertura suficiente quedan al final sin posición, porque eso es un juicio sobre nosotros y no sobre ellos.",
+    "priorityTitle": "Dónde rinde más una intervención",
+    "priorityNote": "Déficit × niños expuestos × cuánto de la solución cae en el anillo del portón, que es el barato. No es simplemente la lista de los peores: el peor centro no es automáticamente donde mejor rinde la plata.",
+    "backlogTitle": "Lo que todavía falta registrar",
+    "backlogNote": "Calles dentro de una zona escolar por las que ninguna cámara ha pasado. Este es el trabajo de campo pendiente, y es la razón honesta de que tantos centros aparezcan como Sin datos.",
+    "columns": {
+      "school": "Centro",
+      "sector": "Sector",
+      "tier": "Categoría",
+      "compliance": "Ley 7600",
+      "score": "Puntaje",
+      "coverage": "Relevado",
+      "toRecord": "Por registrar",
+      "priority": "Prioridad"
+    },
+    "openMap": "Ver las zonas en el mapa",
+    "provenanceTitle": "De dónde salen las cifras",
+    "provenanceBody": "El padrón es el registro del propio MEP. Los puntajes de calle salen del mismo pipeline de captura que califica cada calle del cantón: estar cerca de una escuela no cambia cómo se mide una calle. La calificación escolar es una agregación de esos puntajes sobre la zona de caminata, y se recalcula en cada carga, así que se mueve apenas entra dato nuevo de campo.",
+    "crashNote": "El historial de choques e incidentes todavía no forma parte de la calificación. Se lleva en la fórmula con peso cero para que su ausencia quede dicha y no supuesta; incorporar una fuente de siniestralidad es lo siguiente que haría más fuertes estas calificaciones.",
+    "statSchools": "Centros",
+    "statScored": "Calificados",
+    "statAwaiting": "Sin datos",
+    "statToRecord": "Por registrar",
+    "home": "Inicio"
   }
 }
