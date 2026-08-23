@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { getSegments, getStats } from "@/lib/segments";
+import { getSchoolReports, summarizeSchools } from "@/lib/school-report";
 import { demoDataEnabled } from "@/lib/demo-flag-server";
 import { buildPageMetadata } from "@/lib/site";
 import Hero from "@/components/landing/Hero";
+import SchoolSafetySection from "@/components/landing/SchoolSafetySection";
 import MissionSection from "@/components/landing/MissionSection";
 import MeasureSection from "@/components/landing/MeasureSection";
 import GapSection from "@/components/landing/GapSection";
@@ -50,13 +52,15 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // The StreetLens landing: the platform first, the Escazú pilot as the proof.
+  // The StreetLens landing: school safety first, the instrument as the proof.
   // The hero holds the one live map; every other section uses rendered imagery.
   const demoEnabled = await demoDataEnabled();
-  const [segments, stats] = await Promise.all([
+  const [segments, stats, reports] = await Promise.all([
     getSegments(demoEnabled),
     getStats(demoEnabled),
+    getSchoolReports(demoEnabled),
   ]);
+  const schoolSummary = summarizeSchools(reports);
 
   return (
     <main className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
@@ -66,6 +70,9 @@ export default async function HomePage({
           document (see .sl-parallax-plate in globals.css), so everything after
           the hero must paint above it. */}
       <div className="relative z-[1]">
+        {/* The use case before the instrument: a street-quality score is a
+            capability, and a capability does not tell anyone why to care. */}
+        <SchoolSafetySection locale={locale} summary={schoolSummary} />
         <MissionSection />
         <MeasureSection />
         <GapSection heroPct={stats.heroPct} />

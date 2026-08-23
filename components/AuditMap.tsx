@@ -829,6 +829,7 @@ export default function AuditMap({
   onMoveStateChange,
   openContributeOnMount = false,
   initialSegmentId,
+  initialSchoolId,
   reliefEnabled = false,
   reliefAnimate = false,
 }: Readonly<{
@@ -855,6 +856,8 @@ export default function AuditMap({
   openContributeOnMount?: boolean;
   /** Deep-link: focus and open the detail panel for this segment id on load. */
   initialSegmentId?: string;
+  /** Deep-link from the leaderboard: open this school's card and fly to it. */
+  initialSchoolId?: string;
   /** App surface: open in the extruded dimensional view. Resolved on the SERVER
    *  from the `sl_map_relief` cookie so the control's first paint is already the
    *  truth (see lib/map-relief.ts). The hero manages its relief itself. */
@@ -931,6 +934,8 @@ export default function AuditMap({
   const onActivateRef = useRef(onSegmentActivate);
   const onMoveRef = useRef(onMoveStateChange);
   const initialSegmentRef = useRef(initialSegmentId);
+  const initialSchoolRef = useRef(initialSchoolId);
+  const focusedSchoolRef = useRef(false);
   const focusedSegmentRef = useRef(false);
   // Read once, inside the create-the-map-once effect, like every other variant
   // flag here. Both are server-resolved and fixed for the life of the mount.
@@ -1301,6 +1306,31 @@ export default function AuditMap({
     // eslint-disable-next-line react-hooks/set-state-in-effect -- storage read on mount
     setSchoolsOn(stored);
   }, []);
+
+  /*
+   * Deep link from the leaderboard: open this school and frame its zone.
+   *
+   * Runs after `mapReady` rather than inside the load handler because the card
+   * is React state and the fly-to needs a live map; the ref guard makes it a
+   * once-per-mount effect so a later re-render cannot yank the reader back to a
+   * school they have already navigated away from.
+   */
+  useEffect(() => {
+    const map = mapRef.current;
+    const id = initialSchoolRef.current;
+    if (!map || !mapReady || !id || focusedSchoolRef.current) return;
+    const school = schools?.features.find((f) => f.properties.id === id);
+    if (!school) return;
+    focusedSchoolRef.current = true;
+    setSelectedSchool(school.properties);
+    setSelectedZone(schoolZones?.zones.find((z) => z.school_id === id) ?? null);
+    map.easeTo({
+      center: school.geometry.coordinates,
+      zoom: 15.4,
+      duration: prefersReducedMotion() ? 0 : 900,
+      essential: true,
+    });
+  }, [mapReady, schools, schoolZones]);
 
   /*
    * The zone pulse.

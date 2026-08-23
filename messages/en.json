@@ -753,8 +753,8 @@
     "hero": {
       "wordmark": "StreetLens",
       "byCusp": "by CUSP",
-      "question": "How good are our streets?",
-      "subtitle": "Cleaner, more livable cities for everyone start with streets you can measure.",
+      "question": "How safe is the walk to school?",
+      "subtitle": "Every child's route to class is public infrastructure. In Escazú we measured all 33 of them, street by street, against a standard anyone can check.",
       "pilot": "Pilot program · Escazú, Costa Rica",
       "scrollCue": "Keep reading",
       "requestCity": "Want this for your city? Request it",
@@ -795,6 +795,29 @@
         "placeNote": "The pilot street network"
       },
       "openSource": "The code is public: view / contribute"
+    },
+    "schoolSafety": {
+      "eyebrow": "Escuela Segura",
+      "title": "A seal for the streets around a school",
+      "body": "Bandera Azul works because the standard is public, the verification is independent, and the seal expires. Escuela Segura is built the same way, on one question: what share of the walk to this school meets Ley 7600? StreetLens measures it from the streets themselves. The seal is awarded by a convening body, not by us.",
+      "statSchools": "Schools mapped",
+      "statRated": "Rated so far",
+      "statAwaiting": "Awaiting survey",
+      "statGap": "Streets still to record",
+      "pointOne": {
+        "title": "The children with the least choice walk the most",
+        "body": "A family with a car can drive around a missing sidewalk. A family without one cannot. Fixing school streets reaches the households with no way around the problem."
+      },
+      "pointTwo": {
+        "title": "One canton, then the country",
+        "body": "Costa Rica has more than four thousand schools. Escazú is not the goal, it is the template: a standard and an instrument the next canton can adopt without inventing either."
+      },
+      "pointThree": {
+        "title": "No rating without evidence",
+        "body": "Below 60% of the walk surveyed, a school publishes no score at all. Most of the canton sits there today, and saying so is the point."
+      },
+      "ctaStandard": "Read the standard",
+      "ctaMap": "Open the zones on the map"
     },
     "mission": {
       "eyebrow": "The mission",

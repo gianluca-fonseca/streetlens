@@ -753,8 +753,8 @@
     "hero": {
       "wordmark": "StreetLens",
       "byCusp": "por CUSP",
-      "question": "¿Qué tan buenas son nuestras calles?",
-      "subtitle": "Ciudades más limpias y habitables para todas las personas empiezan con calles que se pueden medir.",
+      "question": "¿Qué tan seguro es el camino a la escuela?",
+      "subtitle": "La ruta de cada niño a clases es infraestructura pública. En Escazú medimos las 33, calle por calle, contra un estándar que cualquiera puede revisar.",
       "pilot": "Programa piloto · Escazú, Costa Rica",
       "scrollCue": "Seguir leyendo",
       "requestCity": "¿Quieres esto para tu ciudad? Solicítalo",
@@ -795,6 +795,29 @@
         "placeNote": "La red vial del piloto"
       },
       "openSource": "El código es público: ver o contribuir"
+    },
+    "schoolSafety": {
+      "eyebrow": "Escuela Segura",
+      "title": "Un sello para las calles alrededor de una escuela",
+      "body": "Bandera Azul funciona porque el estándar es público, la verificación es independiente y el sello vence. Escuela Segura se construye igual, sobre una pregunta: ¿qué proporción del trayecto a este centro cumple la Ley 7600? StreetLens lo mide desde las calles mismas. El sello lo otorga un ente convocante, no nosotros.",
+      "statSchools": "Centros mapeados",
+      "statRated": "Calificados",
+      "statAwaiting": "Sin relevamiento",
+      "statGap": "Calles por registrar",
+      "pointOne": {
+        "title": "Los niños con menos opciones son los que más caminan",
+        "body": "Una familia con carro puede rodear una acera que falta. Una familia sin carro no. Arreglar las calles escolares llega a los hogares que no tienen cómo esquivar el problema."
+      },
+      "pointTwo": {
+        "title": "Un cantón, y después el país",
+        "body": "Costa Rica tiene más de cuatro mil centros educativos. Escazú no es la meta, es la plantilla: un estándar y un instrumento que el siguiente cantón puede adoptar sin inventar ninguno de los dos."
+      },
+      "pointThree": {
+        "title": "Sin evidencia no hay calificación",
+        "body": "Por debajo del 60% del trayecto relevado, un centro no publica puntaje. Hoy la mayor parte del cantón está ahí, y decirlo es justamente el punto."
+      },
+      "ctaStandard": "Leer el estándar",
+      "ctaMap": "Ver las zonas en el mapa"
     },
     "mission": {
       "eyebrow": "La misión",

@@ -35,10 +35,10 @@ export default async function MapPage({
   searchParams,
 }: Readonly<{
   params: Promise<{ locale: Locale }>;
-  searchParams: Promise<{ contribute?: string; segment?: string }>;
+  searchParams: Promise<{ contribute?: string; segment?: string; school?: string }>;
 }>) {
   const { locale } = await params;
-  const { contribute, segment } = await searchParams;
+  const { contribute, segment, school } = await searchParams;
   setRequestLocale(locale);
 
   const demoEnabled = await demoDataEnabled();
@@ -57,6 +57,7 @@ export default async function MapPage({
   const schoolZones = toSchoolZoneCollection(reports);
   const openContribute = contribute === "1";
   const initialSegmentId = segment?.trim() || undefined;
+  const initialSchoolId = school?.trim() || undefined;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -72,6 +73,7 @@ export default async function MapPage({
           stats={stats}
           openContributeOnMount={openContribute}
           initialSegmentId={initialSegmentId}
+          initialSchoolId={initialSchoolId}
           reliefEnabled={relief.relief}
           reliefAnimate={relief.animate}
         />
