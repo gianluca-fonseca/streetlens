@@ -1,0 +1,861 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "title": "Escazú schools — field collection route",
+    "generated_by": "scripts/build-school-route.mjs",
+    "ordering": "nearest-neighbour + 2-opt on straight-line distance; a visiting order, not a driving route",
+    "legs": [
+      {
+        "title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stops": 10,
+        "straight_line_km": 4.51
+      },
+      {
+        "title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stops": 10,
+        "straight_line_km": 5.14
+      },
+      {
+        "title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stops": 13,
+        "straight_line_km": 7.82
+      }
+    ]
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "school-100517-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.141322,
+          9.896587
+        ]
+      },
+      "properties": {
+        "school_id": "school-100517-00",
+        "name": "El Carmen",
+        "sector": "public",
+        "mep_code": "100517-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104681-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.139892,
+          9.902779
+        ]
+      },
+      "properties": {
+        "school_id": "school-104681-00",
+        "name": "C.T.P. de Escazú",
+        "sector": "public",
+        "mep_code": "104681-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100628-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.134466,
+          9.904545
+        ]
+      },
+      "properties": {
+        "school_id": "school-100628-00",
+        "name": "Juan XXIII",
+        "sector": "public",
+        "mep_code": "100628-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200056-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140659,
+          9.912703
+        ]
+      },
+      "properties": {
+        "school_id": "school-200056-00",
+        "name": "Centro Educativo Greenland School",
+        "sector": "private",
+        "mep_code": "200056-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200055-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140888,
+          9.915877
+        ]
+      },
+      "properties": {
+        "school_id": "school-200055-00",
+        "name": "Jardín Infantil Sorpresitas",
+        "sector": "private",
+        "mep_code": "200055-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104023-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.13796,
+          9.914786
+        ]
+      },
+      "properties": {
+        "school_id": "school-104023-00",
+        "name": "Liceo de Escazú",
+        "sector": "public",
+        "mep_code": "104023-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100613-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.138173,
+          9.915443
+        ]
+      },
+      "properties": {
+        "school_id": "school-100613-00",
+        "name": "Benjamín Herrera Angulo",
+        "sector": "public",
+        "mep_code": "100613-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200054-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.138781,
+          9.917258
+        ]
+      },
+      "properties": {
+        "school_id": "school-200054-00",
+        "name": "Colegio Nuestra Señora del Pilar",
+        "sector": "private",
+        "mep_code": "200054-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200053-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.137213,
+          9.919432
+        ]
+      },
+      "properties": {
+        "school_id": "school-200053-00",
+        "name": "Centro Educativo Garabatos Instituto Preescolar",
+        "sector": "private",
+        "mep_code": "200053-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 9
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100519-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.130212,
+          9.919641
+        ]
+      },
+      "properties": {
+        "school_id": "school-100519-00",
+        "name": "Bello Horizonte",
+        "sector": "public",
+        "mep_code": "100519-00",
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stop": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200058-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.12814,
+          9.927621
+        ]
+      },
+      "properties": {
+        "school_id": "school-200058-00",
+        "name": "Centro Educativo Saint Augustine College",
+        "sector": "private",
+        "mep_code": "200058-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200062-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.128443,
+          9.929339
+        ]
+      },
+      "properties": {
+        "school_id": "school-200062-00",
+        "name": "Integral Kallpa",
+        "sector": "private",
+        "mep_code": "200062-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104805-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.135395,
+          9.929608
+        ]
+      },
+      "properties": {
+        "school_id": "school-104805-00",
+        "name": "I.E.G.B. Pbro. Yanuario Quesada",
+        "sector": "public",
+        "mep_code": "104805-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200060-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.136001,
+          9.927758
+        ]
+      },
+      "properties": {
+        "school_id": "school-200060-00",
+        "name": "Hometwo Montessori",
+        "sector": "private",
+        "mep_code": "200060-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205255-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.141415,
+          9.924626
+        ]
+      },
+      "properties": {
+        "school_id": "school-205255-00",
+        "name": "Centro Educativo Kids World Montessori (Escazu)",
+        "sector": "private",
+        "mep_code": "205255-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100552-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140626,
+          9.91906
+        ]
+      },
+      "properties": {
+        "school_id": "school-100552-00",
+        "name": "República de Venezuela",
+        "sector": "public",
+        "mep_code": "100552-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-105542-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.143074,
+          9.917405
+        ]
+      },
+      "properties": {
+        "school_id": "school-105542-00",
+        "name": "CONED Escazú",
+        "sector": "public",
+        "mep_code": "105542-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-osm-way-1303988283-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147209,
+          9.914864
+        ]
+      },
+      "properties": {
+        "school_id": "school-osm-way-1303988283",
+        "name": "Jardín de Niños Corazón de Jesús",
+        "sector": "public",
+        "mep_code": null,
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100536-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147998,
+          9.914643
+        ]
+      },
+      "properties": {
+        "school_id": "school-100536-00",
+        "name": "Corazón de Jesús",
+        "sector": "public",
+        "mep_code": "100536-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 9
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100518-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.159223,
+          9.903983
+        ]
+      },
+      "properties": {
+        "school_id": "school-100518-00",
+        "name": "David Marín Hidalgo",
+        "sector": "public",
+        "mep_code": "100518-00",
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stop": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205422-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.14967,
+          9.926571
+        ]
+      },
+      "properties": {
+        "school_id": "school-205422-00",
+        "name": "Centro Educativo Kinder Pandas Daycare",
+        "sector": "private",
+        "mep_code": "205422-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200057-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147178,
+          9.930231
+        ]
+      },
+      "properties": {
+        "school_id": "school-200057-00",
+        "name": "Centro Educativo Arandú / Centro Educativo Arandú School",
+        "sector": "private",
+        "mep_code": "200057-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205203-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.149367,
+          9.931262
+        ]
+      },
+      "properties": {
+        "school_id": "school-205203-00",
+        "name": "Centro Educativo True North Personalized Learning School",
+        "sector": "private",
+        "mep_code": "205203-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200061-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.153177,
+          9.93295
+        ]
+      },
+      "properties": {
+        "school_id": "school-200061-00",
+        "name": "Jardín Infantil Integral Borboleta e Itskatzú Educación Integral",
+        "sector": "private",
+        "mep_code": "200061-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100559-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.159054,
+          9.944419
+        ]
+      },
+      "properties": {
+        "school_id": "school-100559-00",
+        "name": "Guachipelín",
+        "sector": "public",
+        "mep_code": "100559-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200066-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.1648,
+          9.950648
+        ]
+      },
+      "properties": {
+        "school_id": "school-200066-00",
+        "name": "Colegio Santa María (Saint Mary High School)",
+        "sector": "private",
+        "mep_code": "200066-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205510-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.164588,
+          9.952213
+        ]
+      },
+      "properties": {
+        "school_id": "school-205510-00",
+        "name": "Centro Educativo Royal International Education",
+        "sector": "private",
+        "mep_code": "205510-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200063-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.166564,
+          9.95516
+        ]
+      },
+      "properties": {
+        "school_id": "school-200063-00",
+        "name": "Lighthouse International School",
+        "sector": "private",
+        "mep_code": "200063-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200068-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.169559,
+          9.956642
+        ]
+      },
+      "properties": {
+        "school_id": "school-200068-00",
+        "name": "Washington School",
+        "sector": "private",
+        "mep_code": "200068-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 9
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200069-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.174557,
+          9.960007
+        ]
+      },
+      "properties": {
+        "school_id": "school-200069-00",
+        "name": "West College / West Primary",
+        "sector": "private",
+        "mep_code": "200069-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205395-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.177537,
+          9.961919
+        ]
+      },
+      "properties": {
+        "school_id": "school-205395-00",
+        "name": "Centro Educativo Kipos",
+        "sector": "private",
+        "mep_code": "205395-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 11
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200064-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.173112,
+          9.96141
+        ]
+      },
+      "properties": {
+        "school_id": "school-200064-00",
+        "name": "Escuela Vista del Monte (Mount View School)",
+        "sector": "private",
+        "mep_code": "200064-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 12
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200067-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.15915,
+          9.953543
+        ]
+      },
+      "properties": {
+        "school_id": "school-200067-00",
+        "name": "Blue Valley School (Colegio Valle Azul)",
+        "sector": "private",
+        "mep_code": "200067-00",
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stop": 13
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "leg-1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.141322,
+            9.896587
+          ],
+          [
+            -84.139892,
+            9.902779
+          ],
+          [
+            -84.134466,
+            9.904545
+          ],
+          [
+            -84.140659,
+            9.912703
+          ],
+          [
+            -84.140888,
+            9.915877
+          ],
+          [
+            -84.13796,
+            9.914786
+          ],
+          [
+            -84.138173,
+            9.915443
+          ],
+          [
+            -84.138781,
+            9.917258
+          ],
+          [
+            -84.137213,
+            9.919432
+          ],
+          [
+            -84.130212,
+            9.919641
+          ]
+        ]
+      },
+      "properties": {
+        "leg": 1,
+        "leg_title": "San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio",
+        "stops": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "leg-2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.12814,
+            9.927621
+          ],
+          [
+            -84.128443,
+            9.929339
+          ],
+          [
+            -84.135395,
+            9.929608
+          ],
+          [
+            -84.136001,
+            9.927758
+          ],
+          [
+            -84.141415,
+            9.924626
+          ],
+          [
+            -84.140626,
+            9.91906
+          ],
+          [
+            -84.143074,
+            9.917405
+          ],
+          [
+            -84.147209,
+            9.914864
+          ],
+          [
+            -84.147998,
+            9.914643
+          ],
+          [
+            -84.159223,
+            9.903983
+          ]
+        ]
+      },
+      "properties": {
+        "leg": 2,
+        "leg_title": "Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard",
+        "stops": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "leg-3",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.14967,
+            9.926571
+          ],
+          [
+            -84.147178,
+            9.930231
+          ],
+          [
+            -84.149367,
+            9.931262
+          ],
+          [
+            -84.153177,
+            9.93295
+          ],
+          [
+            -84.159054,
+            9.944419
+          ],
+          [
+            -84.1648,
+            9.950648
+          ],
+          [
+            -84.164588,
+            9.952213
+          ],
+          [
+            -84.166564,
+            9.95516
+          ],
+          [
+            -84.169559,
+            9.956642
+          ],
+          [
+            -84.174557,
+            9.960007
+          ],
+          [
+            -84.177537,
+            9.961919
+          ],
+          [
+            -84.173112,
+            9.96141
+          ],
+          [
+            -84.15915,
+            9.953543
+          ]
+        ]
+      },
+      "properties": {
+        "leg": 3,
+        "leg_title": "San Rafael / San Antonio — San Rafael, Laureles, San Antonio",
+        "stops": 13
+      }
+    }
+  ]
+}

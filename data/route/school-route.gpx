@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="streetlens/build-school-route" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Escazú schools — field collection route</name>
+    <desc>Every centro educativo in the canton, 33 sites, grouped into 3 driving legs. Roster from the MEP SIGMEP register; see data/schools.geojson for per-site provenance.</desc>
+  </metadata>
+  <wpt lat="9.953543" lon="-84.159150">
+    <name>Blue Valley School (Colegio Valle Azul)</name>
+    <desc>Privado · MEP 200067-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.930231" lon="-84.147178">
+    <name>Centro Educativo Arandú / Centro Educativo Arandú School</name>
+    <desc>Privado · MEP 200057-00 · LAURELES</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.919432" lon="-84.137213">
+    <name>Centro Educativo Garabatos Instituto Preescolar</name>
+    <desc>Privado · MEP 200053-00 · SAN MIGUEL</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.912703" lon="-84.140659">
+    <name>Centro Educativo Greenland School</name>
+    <desc>Privado · MEP 200056-00 · SAN ANTONIO</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.924626" lon="-84.141415">
+    <name>Centro Educativo Kids World Montessori (Escazu)</name>
+    <desc>Privado · MEP 205255-00 · SAN MIGUEL</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.926571" lon="-84.149670">
+    <name>Centro Educativo Kinder Pandas Daycare</name>
+    <desc>Privado · MEP 205422-00 · SAN RAFAEL</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.961919" lon="-84.177537">
+    <name>Centro Educativo Kipos</name>
+    <desc>Privado · MEP 205395-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.952213" lon="-84.164588">
+    <name>Centro Educativo Royal International Education</name>
+    <desc>Privado · MEP 205510-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.927621" lon="-84.128140">
+    <name>Centro Educativo Saint Augustine College</name>
+    <desc>Privado · MEP 200058-00 · BELO HORIZONTE</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.931262" lon="-84.149367">
+    <name>Centro Educativo True North Personalized Learning School</name>
+    <desc>Privado · MEP 205203-00 · SAN ANTONIO</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.917258" lon="-84.138781">
+    <name>Colegio Nuestra Señora del Pilar</name>
+    <desc>Privado · MEP 200054-00 · SAN MIGUEL</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.950648" lon="-84.164800">
+    <name>Colegio Santa María (Saint Mary High School)</name>
+    <desc>Privado · MEP 200066-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.961410" lon="-84.173112">
+    <name>Escuela Vista del Monte (Mount View School)</name>
+    <desc>Privado · MEP 200064-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.927758" lon="-84.136001">
+    <name>Hometwo Montessori</name>
+    <desc>Privado · MEP 200060-00 · MAYNARD</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.929339" lon="-84.128443">
+    <name>Integral Kallpa</name>
+    <desc>Privado · MEP 200062-00 · TREJOS MONTEALEGRE</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.932950" lon="-84.153177">
+    <name>Jardín Infantil Integral Borboleta e Itskatzú Educación Integral</name>
+    <desc>Privado · MEP 200061-00 · SAN RAFAEL</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.915877" lon="-84.140888">
+    <name>Jardín Infantil Sorpresitas</name>
+    <desc>Privado · MEP 200055-00 · ESCAZÚ</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.955160" lon="-84.166564">
+    <name>Lighthouse International School</name>
+    <desc>Privado · MEP 200063-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.956642" lon="-84.169559">
+    <name>Washington School</name>
+    <desc>Privado · MEP 200068-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.960007" lon="-84.174557">
+    <name>West College / West Primary</name>
+    <desc>Privado · MEP 200069-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.919641" lon="-84.130212">
+    <name>Bello Horizonte</name>
+    <desc>Público · MEP 100519-00 · BELO HORIZONTE</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.915443" lon="-84.138173">
+    <name>Benjamín Herrera Angulo</name>
+    <desc>Público · MEP 100613-00 · SAN MIGUEL</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.902779" lon="-84.139892">
+    <name>C.T.P. de Escazú</name>
+    <desc>Público · MEP 104681-00 · CHIVERRAL</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.917405" lon="-84.143074">
+    <name>CONED Escazú</name>
+    <desc>Público · MEP 105542-00 · ESCAZÚ</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.914643" lon="-84.147998">
+    <name>Corazón de Jesús</name>
+    <desc>Público · MEP 100536-00 · CORAZÓN DE JESÚS</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.903983" lon="-84.159223">
+    <name>David Marín Hidalgo</name>
+    <desc>Público · MEP 100518-00 · BEBEDERO</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.896587" lon="-84.141322">
+    <name>El Carmen</name>
+    <desc>Público · MEP 100517-00 · EL CARMEN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.944419" lon="-84.159054">
+    <name>Guachipelín</name>
+    <desc>Público · MEP 100559-00 · GUACHIPELÍN</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.929608" lon="-84.135395">
+    <name>I.E.G.B. Pbro. Yanuario Quesada</name>
+    <desc>Público · MEP 104805-00 · MAYNARD</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.914864" lon="-84.147209">
+    <name>Jardín de Niños Corazón de Jesús</name>
+    <desc>Público</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.904545" lon="-84.134466">
+    <name>Juan XXIII</name>
+    <desc>Público · MEP 100628-00 · SAN ANTONIO</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.914786" lon="-84.137960">
+    <name>Liceo de Escazú</name>
+    <desc>Público · MEP 104023-00 · SANTA TERESA</desc>
+    <sym>School</sym>
+  </wpt>
+  <wpt lat="9.919060" lon="-84.140626">
+    <name>República de Venezuela</name>
+    <desc>Público · MEP 100552-00 · ESCAZÚ</desc>
+    <sym>School</sym>
+  </wpt>
+  <rte>
+    <name>Leg 1 - San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio</name>
+    <rtept lat="9.896587" lon="-84.141322"><name>1. El Carmen</name></rtept>
+    <rtept lat="9.902779" lon="-84.139892"><name>2. C.T.P. de Escazú</name></rtept>
+    <rtept lat="9.904545" lon="-84.134466"><name>3. Juan XXIII</name></rtept>
+    <rtept lat="9.912703" lon="-84.140659"><name>4. Centro Educativo Greenland School</name></rtept>
+    <rtept lat="9.915877" lon="-84.140888"><name>5. Jardín Infantil Sorpresitas</name></rtept>
+    <rtept lat="9.914786" lon="-84.137960"><name>6. Liceo de Escazú</name></rtept>
+    <rtept lat="9.915443" lon="-84.138173"><name>7. Benjamín Herrera Angulo</name></rtept>
+    <rtept lat="9.917258" lon="-84.138781"><name>8. Colegio Nuestra Señora del Pilar</name></rtept>
+    <rtept lat="9.919432" lon="-84.137213"><name>9. Centro Educativo Garabatos Instituto Preescolar</name></rtept>
+    <rtept lat="9.919641" lon="-84.130212"><name>10. Bello Horizonte</name></rtept>
+  </rte>
+  <rte>
+    <name>Leg 2 - Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard</name>
+    <rtept lat="9.927621" lon="-84.128140"><name>1. Centro Educativo Saint Augustine College</name></rtept>
+    <rtept lat="9.929339" lon="-84.128443"><name>2. Integral Kallpa</name></rtept>
+    <rtept lat="9.929608" lon="-84.135395"><name>3. I.E.G.B. Pbro. Yanuario Quesada</name></rtept>
+    <rtept lat="9.927758" lon="-84.136001"><name>4. Hometwo Montessori</name></rtept>
+    <rtept lat="9.924626" lon="-84.141415"><name>5. Centro Educativo Kids World Montessori (Escazu)</name></rtept>
+    <rtept lat="9.919060" lon="-84.140626"><name>6. República de Venezuela</name></rtept>
+    <rtept lat="9.917405" lon="-84.143074"><name>7. CONED Escazú</name></rtept>
+    <rtept lat="9.914864" lon="-84.147209"><name>8. Jardín de Niños Corazón de Jesús</name></rtept>
+    <rtept lat="9.914643" lon="-84.147998"><name>9. Corazón de Jesús</name></rtept>
+    <rtept lat="9.903983" lon="-84.159223"><name>10. David Marín Hidalgo</name></rtept>
+  </rte>
+  <rte>
+    <name>Leg 3 - San Rafael / San Antonio — San Rafael, Laureles, San Antonio</name>
+    <rtept lat="9.926571" lon="-84.149670"><name>1. Centro Educativo Kinder Pandas Daycare</name></rtept>
+    <rtept lat="9.930231" lon="-84.147178"><name>2. Centro Educativo Arandú / Centro Educativo Arandú School</name></rtept>
+    <rtept lat="9.931262" lon="-84.149367"><name>3. Centro Educativo True North Personalized Learning School</name></rtept>
+    <rtept lat="9.932950" lon="-84.153177"><name>4. Jardín Infantil Integral Borboleta e Itskatzú Educación Integral</name></rtept>
+    <rtept lat="9.944419" lon="-84.159054"><name>5. Guachipelín</name></rtept>
+    <rtept lat="9.950648" lon="-84.164800"><name>6. Colegio Santa María (Saint Mary High School)</name></rtept>
+    <rtept lat="9.952213" lon="-84.164588"><name>7. Centro Educativo Royal International Education</name></rtept>
+    <rtept lat="9.955160" lon="-84.166564"><name>8. Lighthouse International School</name></rtept>
+    <rtept lat="9.956642" lon="-84.169559"><name>9. Washington School</name></rtept>
+    <rtept lat="9.960007" lon="-84.174557"><name>10. West College / West Primary</name></rtept>
+    <rtept lat="9.961919" lon="-84.177537"><name>11. Centro Educativo Kipos</name></rtept>
+    <rtept lat="9.961410" lon="-84.173112"><name>12. Escuela Vista del Monte (Mount View School)</name></rtept>
+    <rtept lat="9.953543" lon="-84.159150"><name>13. Blue Valley School (Colegio Valle Azul)</name></rtept>
+  </rte>
+</gpx>

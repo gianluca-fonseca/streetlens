@@ -186,6 +186,43 @@ for (const locale of ["en", "es"]) {
 }
 
 console.log("");
+console.log("field route (data/route/)");
+const route = JSON.parse(read("data/route/school-route.geojson"));
+const gpx = read("data/route/school-route.gpx");
+const sheet = read("data/route/SCHOOL-ROUTE.md");
+const routeStops = route.features.filter((f) => f.geometry.type === "Point");
+
+// The one failure mode that actually costs a field day: a school quietly
+// missing from the sheet the driver is holding.
+check("every school is on the route exactly once",
+  routeStops.length === feats.length &&
+  new Set(routeStops.map((f) => f.properties.school_id)).size === feats.length,
+  `${routeStops.length} stops for ${feats.length} schools`);
+check("every school has a GPX waypoint",
+  (gpx.match(/<wpt /g) ?? []).length === feats.length);
+check("the GPX is well-formed enough to carry a route per leg",
+  gpx.startsWith("<?xml") && gpx.includes("</gpx>") &&
+  (gpx.match(/<rte>/g) ?? []).length === route.metadata.legs.length);
+check("stop numbers within a leg are 1..n with no gaps",
+  route.metadata.legs.every((_, li) => {
+    const inLeg = routeStops.filter((f) => f.properties.leg === li + 1)
+      .map((f) => f.properties.stop).sort((a, b) => a - b);
+    return inLeg.every((n, i) => n === i + 1);
+  }));
+// A one-stop "leg" is what a pure longest-hop cut produces, and it is a plan
+// nobody drives. Balance is the property, not the specific split.
+check("no leg is trivially small",
+  route.metadata.legs.every((l) => l.stops >= 3),
+  route.metadata.legs.map((l) => l.stops).join("/"));
+check("the sheet says the order is not a driving route",
+  /visiting order, not a driving route/i.test(sheet));
+check("every leg gets Google Maps links on the sheet",
+  (sheet.match(/google\.com\/maps\/dir\//g) ?? []).length >= route.metadata.legs.length);
+check("the route is regenerable from the roster",
+  route.metadata.generated_by === "scripts/build-school-route.mjs" &&
+  read("scripts/build-school-route.mjs").includes("data\", \"schools.geojson"));
+
+console.log("");
 if (failures.length) {
   console.log(`FAIL — ${failures.length} check(s): ${failures.join("; ")}`);
   process.exit(1);
