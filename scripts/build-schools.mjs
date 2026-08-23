@@ -237,10 +237,12 @@ const KEEP_UPPER = /^(?:[IVXLCDM]{2,}|[A-Z](?:\.[A-Z])+\.?|CINDEA|CONED|MEP|IEGB
 function displayName(raw) {
   let openers = true;
   return (raw ?? "")
-    .split(/(\s+|[()/])/)
+    .split(/(\s+|[()/-])/)
     .map((tok) => {
-      if (!tok.trim() || /^[()/]$/.test(tok)) {
-        if (/^[(/]$/.test(tok)) openers = true;
+      if (!tok.trim() || /^[()/-]$/.test(tok)) {
+        // A bracket, a slash, or a hyphen opens a new name ("CINDEA
+        // Escazú-Juan XXIII"), so the token after it capitalises again.
+        if (/^[(/-]$/.test(tok)) openers = true;
         return tok;
       }
       if (KEEP_UPPER.test(tok)) {

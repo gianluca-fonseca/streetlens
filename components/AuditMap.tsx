@@ -387,6 +387,13 @@ function addSchoolLayers(
       layout: {
         visibility: visible ? "visible" : "none",
         "text-field": ["get", "display_name"],
+        // Pinned to a stack the basemap actually serves. MapLibre's default is
+        // ["Open Sans Regular","Arial Unicode MS Regular"], which OpenFreeMap's
+        // Liberty glyph endpoint 404s — the labels silently never draw and the
+        // console fills with failed glyph ranges. Liberty serves Noto Sans in
+        // Regular / Bold / Italic; bold is what separates a school name from the
+        // street names it sits among.
+        "text-font": ["Noto Sans Bold"],
         "text-size": 11,
         "text-offset": [0, 1.1],
         "text-anchor": "top",

@@ -150,6 +150,10 @@ check("pins are added AFTER the relief so they stay on top",
   onLoadBody.indexOf("addReliefLayer(\n") > -1);
 check("a pin click wins over the segment under it",
   audit.includes("queryRenderedFeatures(e.point, { layers: [SCHOOLS_LAYER_ID] })"));
+// MapLibre's default font stack is not served by the Liberty glyph endpoint, so
+// an unpinned text-font means labels that never draw and a console full of 404s.
+check("the label font is pinned to a stack the basemap serves",
+  /"text-font": \["Noto Sans (Regular|Bold|Italic)"\]/.test(audit));
 check("maplibre's JSON-stringified properties are parsed back",
   audit.includes("parseSchoolProps") && audit.includes("JSON.parse(programmes)"));
 check("the overlay choice is remembered",
