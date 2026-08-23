@@ -1,0 +1,1314 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "title": "Centros educativos del cantón de Escazú",
+    "generated_by": "scripts/build-schools.mjs",
+    "canton": "Escazú",
+    "canton_osm_relation": 4071270,
+    "counts": {
+      "sites": 33,
+      "public": 13,
+      "private": 20,
+      "registry_rows": 35,
+      "positioned_from_osm": 27
+    },
+    "sources": [
+      {
+        "id": "mep-sigmep",
+        "name": "SIGMEP — Sistema de Información Geográfica, Ministerio de Educación Pública de Costa Rica",
+        "services": [
+          "MEP_CEPUBCR_1",
+          "MEP_CEPRIVCR_1"
+        ],
+        "url": "https://sig.mep.go.cr/server/rest/services",
+        "role": "roster, sector, district, MEP code"
+      },
+      {
+        "id": "osm",
+        "name": "OpenStreetMap contributors",
+        "licence": "ODbL",
+        "role": "campus centroid refinement, canton boundary"
+      }
+    ],
+    "excluded": [
+      {
+        "code": "200028-00",
+        "name": "INSTITUTO DR. JAIM WEIZMAN",
+        "why": "MEP files it under canton Escazú, but its registry coordinate (9.9347, -84.1189) falls ~2 km east of the canton line, and OSM puts the school on Boulevard Rohrmoser in Pavas, canton San José. The CANTON field is wrong, not the geometry."
+      }
+    ],
+    "osm_rejected": [
+      {
+        "ref": "way/172346243",
+        "why": "Country Day School moved to San Rafael de Alajuela in 2016 (MEP registers it there, canton Alajuela). The Escazú site is now the Centro Cívico Municipal. The OSM feature is stale."
+      }
+    ]
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "school-200067-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.15915,
+          9.953543
+        ]
+      },
+      "properties": {
+        "id": "school-200067-00",
+        "name": "BLUE VALLEY SCHOOL (COLEGIO VALLE AZUL)",
+        "display_name": "Blue Valley School (Colegio Valle Azul)",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "200067-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200067-00",
+            "name": "BLUE VALLEY SCHOOL (COLEGIO VALLE AZUL)",
+            "display_name": "Blue Valley School (Colegio Valle Azul)",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/32909685",
+        "osm_name": "Escuela Blue Valley",
+        "website": "http://www.bluevalley.ed.cr",
+        "position_source": "osm",
+        "position_delta_m": 84,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200057-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147178,
+          9.930231
+        ]
+      },
+      "properties": {
+        "id": "school-200057-00",
+        "name": "CENTRO EDUCATIVO ARANDÚ / CENTRO EDUCATIVO ARANDÚ SCHOOL",
+        "display_name": "Centro Educativo Arandú / Centro Educativo Arandú School",
+        "sector": "private",
+        "level": "basica_general",
+        "district": "SAN RAFAEL",
+        "locality": "LAURELES",
+        "mep_code": "200057-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200057-00",
+            "name": "CENTRO EDUCATIVO ARANDÚ / CENTRO EDUCATIVO ARANDÚ SCHOOL",
+            "display_name": "Centro Educativo Arandú / Centro Educativo Arandú School",
+            "level": "basica_general"
+          }
+        ],
+        "osm_ref": "way/1390268839",
+        "osm_name": "Arandú",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 22,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200053-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.137213,
+          9.919432
+        ]
+      },
+      "properties": {
+        "id": "school-200053-00",
+        "name": "CENTRO EDUCATIVO GARABATOS INSTITUTO PREESCOLAR",
+        "display_name": "Centro Educativo Garabatos Instituto Preescolar",
+        "sector": "private",
+        "level": null,
+        "district": "ESCAZÚ",
+        "locality": "SAN MIGUEL",
+        "mep_code": "200053-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200053-00",
+            "name": "CENTRO EDUCATIVO GARABATOS INSTITUTO PREESCOLAR",
+            "display_name": "Centro Educativo Garabatos Instituto Preescolar",
+            "level": null
+          }
+        ],
+        "osm_ref": null,
+        "osm_name": null,
+        "website": null,
+        "position_source": "mep",
+        "position_delta_m": null,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200056-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140659,
+          9.912703
+        ]
+      },
+      "properties": {
+        "id": "school-200056-00",
+        "name": "CENTRO EDUCATIVO GREENLAND SCHOOL",
+        "display_name": "Centro Educativo Greenland School",
+        "sector": "private",
+        "level": null,
+        "district": "SAN ANTONIO",
+        "locality": "SAN ANTONIO",
+        "mep_code": "200056-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200056-00",
+            "name": "CENTRO EDUCATIVO GREENLAND SCHOOL",
+            "display_name": "Centro Educativo Greenland School",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/1304127802",
+        "osm_name": "Greenland Montessori",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 9,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205255-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.141415,
+          9.924626
+        ]
+      },
+      "properties": {
+        "id": "school-205255-00",
+        "name": "CENTRO EDUCATIVO KIDS WORLD MONTESSORI (ESCAZU)",
+        "display_name": "Centro Educativo Kids World Montessori (Escazu)",
+        "sector": "private",
+        "level": null,
+        "district": "ESCAZÚ",
+        "locality": "SAN MIGUEL",
+        "mep_code": "205255-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "205255-00",
+            "name": "CENTRO EDUCATIVO KIDS WORLD MONTESSORI (ESCAZU)",
+            "display_name": "Centro Educativo Kids World Montessori (Escazu)",
+            "level": null
+          }
+        ],
+        "osm_ref": null,
+        "osm_name": null,
+        "website": null,
+        "position_source": "mep",
+        "position_delta_m": null,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205422-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.14967,
+          9.926571
+        ]
+      },
+      "properties": {
+        "id": "school-205422-00",
+        "name": "CENTRO EDUCATIVO KINDER PANDAS DAYCARE",
+        "display_name": "Centro Educativo Kinder Pandas Daycare",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "SAN RAFAEL",
+        "mep_code": "205422-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "205422-00",
+            "name": "CENTRO EDUCATIVO KINDER PANDAS DAYCARE",
+            "display_name": "Centro Educativo Kinder Pandas Daycare",
+            "level": null
+          }
+        ],
+        "osm_ref": null,
+        "osm_name": null,
+        "website": null,
+        "position_source": "mep",
+        "position_delta_m": null,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205395-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.177537,
+          9.961919
+        ]
+      },
+      "properties": {
+        "id": "school-205395-00",
+        "name": "CENTRO EDUCATIVO KIPOS",
+        "display_name": "Centro Educativo Kipos",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "205395-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "205395-00",
+            "name": "CENTRO EDUCATIVO KIPOS",
+            "display_name": "Centro Educativo Kipos",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/1356014493",
+        "osm_name": "Kipos",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 46,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205510-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.164588,
+          9.952213
+        ]
+      },
+      "properties": {
+        "id": "school-205510-00",
+        "name": "CENTRO EDUCATIVO ROYAL INTERNATIONAL EDUCATION",
+        "display_name": "Centro Educativo Royal International Education",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "205510-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "205510-00",
+            "name": "CENTRO EDUCATIVO ROYAL INTERNATIONAL EDUCATION",
+            "display_name": "Centro Educativo Royal International Education",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/325089581",
+        "osm_name": "Complejo Educativo Royal",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 12,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200058-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.12814,
+          9.927621
+        ]
+      },
+      "properties": {
+        "id": "school-200058-00",
+        "name": "CENTRO EDUCATIVO SAINT AUGUSTINE COLLEGE",
+        "display_name": "Centro Educativo Saint Augustine College",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "BELO HORIZONTE",
+        "mep_code": "200058-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200058-00",
+            "name": "CENTRO EDUCATIVO SAINT AUGUSTINE COLLEGE",
+            "display_name": "Centro Educativo Saint Augustine College",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/1068068289",
+        "osm_name": "Escuela San Augustín",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 61,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205203-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.149367,
+          9.931262
+        ]
+      },
+      "properties": {
+        "id": "school-205203-00",
+        "name": "CENTRO EDUCATIVO TRUE NORTH PERSONALIZED LEARNING SCHOOL",
+        "display_name": "Centro Educativo True North Personalized Learning School",
+        "sector": "private",
+        "level": "basica_general",
+        "district": "SAN ANTONIO",
+        "locality": "SAN ANTONIO",
+        "mep_code": "205203-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "205203-00",
+            "name": "CENTRO EDUCATIVO TRUE NORTH PERSONALIZED LEARNING SCHOOL",
+            "display_name": "Centro Educativo True North Personalized Learning School",
+            "level": "basica_general"
+          }
+        ],
+        "osm_ref": "node/13238919489",
+        "osm_name": "True North",
+        "website": "https://truenorthcr.education/",
+        "position_source": "osm",
+        "position_delta_m": 14,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200054-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.138781,
+          9.917258
+        ]
+      },
+      "properties": {
+        "id": "school-200054-00",
+        "name": "COLEGIO NUESTRA SEÑORA DEL PILAR",
+        "display_name": "Colegio Nuestra Señora del Pilar",
+        "sector": "private",
+        "level": null,
+        "district": "ESCAZÚ",
+        "locality": "SAN MIGUEL",
+        "mep_code": "200054-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200054-00",
+            "name": "COLEGIO NUESTRA SEÑORA DEL PILAR",
+            "display_name": "Colegio Nuestra Señora del Pilar",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/172346242",
+        "osm_name": "Colegio Nuestra Señora del Pilar",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 8,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200066-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.1648,
+          9.950648
+        ]
+      },
+      "properties": {
+        "id": "school-200066-00",
+        "name": "COLEGIO SANTA MARÍA (SAINT MARY HIGH SCHOOL)",
+        "display_name": "Colegio Santa María (Saint Mary High School)",
+        "sector": "private",
+        "level": "secondary",
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "200066-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200066-00",
+            "name": "COLEGIO SANTA MARÍA (SAINT MARY HIGH SCHOOL)",
+            "display_name": "Colegio Santa María (Saint Mary High School)",
+            "level": "secondary"
+          }
+        ],
+        "osm_ref": "way/325089367",
+        "osm_name": "Escuela Saint Mary",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 36,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200064-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.173112,
+          9.96141
+        ]
+      },
+      "properties": {
+        "id": "school-200064-00",
+        "name": "ESCUELA VISTA DEL MONTE (MOUNT VIEW SCHOOL)",
+        "display_name": "Escuela Vista del Monte (Mount View School)",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "200064-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200064-00",
+            "name": "ESCUELA VISTA DEL MONTE (MOUNT VIEW SCHOOL)",
+            "display_name": "Escuela Vista del Monte (Mount View School)",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/389910713",
+        "osm_name": "Escuela Mount View",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 18,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200060-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.136001,
+          9.927758
+        ]
+      },
+      "properties": {
+        "id": "school-200060-00",
+        "name": "HOMETWO MONTESSORI",
+        "display_name": "Hometwo Montessori",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "MAYNARD",
+        "mep_code": "200060-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200060-00",
+            "name": "HOMETWO MONTESSORI",
+            "display_name": "Hometwo Montessori",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/1303602675",
+        "osm_name": "Hometwo Montessori",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 6,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200062-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.128443,
+          9.929339
+        ]
+      },
+      "properties": {
+        "id": "school-200062-00",
+        "name": "INTEGRAL KALLPA",
+        "display_name": "Integral Kallpa",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "TREJOS MONTEALEGRE",
+        "mep_code": "200062-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200062-00",
+            "name": "INTEGRAL KALLPA",
+            "display_name": "Integral Kallpa",
+            "level": null
+          }
+        ],
+        "osm_ref": null,
+        "osm_name": null,
+        "website": null,
+        "position_source": "mep",
+        "position_delta_m": null,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200061-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.153177,
+          9.93295
+        ]
+      },
+      "properties": {
+        "id": "school-200061-00",
+        "name": "JARDÍN INFANTIL INTEGRAL BORBOLETA E ITSKATZÚ EDUCACIÓN INTEGRAL",
+        "display_name": "Jardín Infantil Integral Borboleta e Itskatzú Educación Integral",
+        "sector": "private",
+        "level": "preschool",
+        "district": "SAN RAFAEL",
+        "locality": "SAN RAFAEL",
+        "mep_code": "200061-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200061-00",
+            "name": "JARDÍN INFANTIL INTEGRAL BORBOLETA E ITSKATZÚ EDUCACIÓN INTEGRAL",
+            "display_name": "Jardín Infantil Integral Borboleta e Itskatzú Educación Integral",
+            "level": "preschool"
+          }
+        ],
+        "osm_ref": "way/1303508414",
+        "osm_name": "Kinder Itskatzu",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 15,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200055-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140888,
+          9.915877
+        ]
+      },
+      "properties": {
+        "id": "school-200055-00",
+        "name": "JARDÍN INFANTIL SORPRESITAS",
+        "display_name": "Jardín Infantil Sorpresitas",
+        "sector": "private",
+        "level": "preschool",
+        "district": "ESCAZÚ",
+        "locality": "ESCAZÚ",
+        "mep_code": "200055-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200055-00",
+            "name": "JARDÍN INFANTIL SORPRESITAS",
+            "display_name": "Jardín Infantil Sorpresitas",
+            "level": "preschool"
+          }
+        ],
+        "osm_ref": "node/4522518848",
+        "osm_name": "Kinder Sorpresita",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 3,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200063-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.166564,
+          9.95516
+        ]
+      },
+      "properties": {
+        "id": "school-200063-00",
+        "name": "LIGHTHOUSE INTERNATIONAL SCHOOL",
+        "display_name": "Lighthouse International School",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "200063-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200063-00",
+            "name": "LIGHTHOUSE INTERNATIONAL SCHOOL",
+            "display_name": "Lighthouse International School",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/707485948",
+        "osm_name": "Escuela Lighthouse Internacional",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 59,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200068-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.169559,
+          9.956642
+        ]
+      },
+      "properties": {
+        "id": "school-200068-00",
+        "name": "WASHINGTON SCHOOL",
+        "display_name": "Washington School",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "200068-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200068-00",
+            "name": "WASHINGTON SCHOOL",
+            "display_name": "Washington School",
+            "level": null
+          }
+        ],
+        "osm_ref": null,
+        "osm_name": null,
+        "website": null,
+        "position_source": "mep",
+        "position_delta_m": null,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200069-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.174557,
+          9.960007
+        ]
+      },
+      "properties": {
+        "id": "school-200069-00",
+        "name": "WEST COLLEGE / WEST PRIMARY",
+        "display_name": "West College / West Primary",
+        "sector": "private",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "200069-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "200069-00",
+            "name": "WEST COLLEGE / WEST PRIMARY",
+            "display_name": "West College / West Primary",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/1302600363",
+        "osm_name": "West College",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 79,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100519-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.130212,
+          9.919641
+        ]
+      },
+      "properties": {
+        "id": "school-100519-00",
+        "name": "BELLO HORIZONTE",
+        "display_name": "Bello Horizonte",
+        "sector": "public",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "BELO HORIZONTE",
+        "mep_code": "100519-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100519-00",
+            "name": "BELLO HORIZONTE",
+            "display_name": "Bello Horizonte",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/223090084",
+        "osm_name": "Escuela Bello Horizonte",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 39,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100613-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.138173,
+          9.915443
+        ]
+      },
+      "properties": {
+        "id": "school-100613-00",
+        "name": "BENJAMÍN HERRERA ANGULO",
+        "display_name": "Benjamín Herrera Angulo",
+        "sector": "public",
+        "level": "preschool_primary",
+        "district": "SAN ANTONIO",
+        "locality": "SAN MIGUEL",
+        "mep_code": "100613-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100613-00",
+            "name": "BENJAMÍN HERRERA ANGULO",
+            "display_name": "Benjamín Herrera Angulo",
+            "level": "preschool_primary"
+          }
+        ],
+        "osm_ref": "way/304797014",
+        "osm_name": "Escuela Benjamín Herrera Angulo",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 47,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104681-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.139892,
+          9.902779
+        ]
+      },
+      "properties": {
+        "id": "school-104681-00",
+        "name": "C.T.P. DE ESCAZÚ",
+        "display_name": "C.T.P. de Escazú",
+        "sector": "public",
+        "level": "secondary",
+        "district": "SAN ANTONIO",
+        "locality": "CHIVERRAL",
+        "mep_code": "104681-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "104681-00",
+            "name": "C.T.P. DE ESCAZÚ",
+            "display_name": "C.T.P. de Escazú",
+            "level": "secondary"
+          }
+        ],
+        "osm_ref": "way/325094393",
+        "osm_name": "Colegio Técnico Profesional de Escazú",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 7,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-105542-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.143074,
+          9.917405
+        ]
+      },
+      "properties": {
+        "id": "school-105542-00",
+        "name": "CONED ESCAZÚ",
+        "display_name": "CONED Escazú",
+        "sector": "public",
+        "level": "adult",
+        "district": "ESCAZÚ",
+        "locality": "ESCAZÚ",
+        "mep_code": "105542-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "105542-00",
+            "name": "CONED ESCAZÚ",
+            "display_name": "CONED Escazú",
+            "level": "adult"
+          }
+        ],
+        "osm_ref": null,
+        "osm_name": null,
+        "website": null,
+        "position_source": "mep",
+        "position_delta_m": null,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100536-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147998,
+          9.914643
+        ]
+      },
+      "properties": {
+        "id": "school-100536-00",
+        "name": "CORAZÓN DE JESÚS",
+        "display_name": "Corazón de Jesús",
+        "sector": "public",
+        "level": null,
+        "district": "ESCAZÚ",
+        "locality": "CORAZÓN DE JESÚS",
+        "mep_code": "100536-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100536-00",
+            "name": "CORAZÓN DE JESÚS",
+            "display_name": "Corazón de Jesús",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/325092580",
+        "osm_name": "Escuela Corazón de Jesús",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 39,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100518-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.159223,
+          9.903983
+        ]
+      },
+      "properties": {
+        "id": "school-100518-00",
+        "name": "DAVID MARÍN HIDALGO",
+        "display_name": "David Marín Hidalgo",
+        "sector": "public",
+        "level": null,
+        "district": "SAN ANTONIO",
+        "locality": "BEBEDERO",
+        "mep_code": "100518-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100518-00",
+            "name": "DAVID MARÍN HIDALGO",
+            "display_name": "David Marín Hidalgo",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/707387970",
+        "osm_name": "Escuela David Marín",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 92,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100517-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.141322,
+          9.896587
+        ]
+      },
+      "properties": {
+        "id": "school-100517-00",
+        "name": "EL CARMEN",
+        "display_name": "El Carmen",
+        "sector": "public",
+        "level": null,
+        "district": "SAN ANTONIO",
+        "locality": "EL CARMEN",
+        "mep_code": "100517-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100517-00",
+            "name": "EL CARMEN",
+            "display_name": "El Carmen",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/482536594",
+        "osm_name": "Escuela El Carmen",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 22,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100559-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.159054,
+          9.944419
+        ]
+      },
+      "properties": {
+        "id": "school-100559-00",
+        "name": "GUACHIPELÍN",
+        "display_name": "Guachipelín",
+        "sector": "public",
+        "level": null,
+        "district": "SAN RAFAEL",
+        "locality": "GUACHIPELÍN",
+        "mep_code": "100559-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100559-00",
+            "name": "GUACHIPELÍN",
+            "display_name": "Guachipelín",
+            "level": null
+          }
+        ],
+        "osm_ref": "way/325089020",
+        "osm_name": "Escuela Guachipelín",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 34,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104805-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.135395,
+          9.929608
+        ]
+      },
+      "properties": {
+        "id": "school-104805-00",
+        "name": "I.E.G.B. PBRO. YANUARIO QUESADA",
+        "display_name": "I.E.G.B. Pbro. Yanuario Quesada",
+        "sector": "public",
+        "level": "basica_general",
+        "district": "SAN RAFAEL",
+        "locality": "MAYNARD",
+        "mep_code": "104805-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "104805-00",
+            "name": "I.E.G.B. PBRO. YANUARIO QUESADA",
+            "display_name": "I.E.G.B. Pbro. Yanuario Quesada",
+            "level": "basica_general"
+          }
+        ],
+        "osm_ref": "way/391621254",
+        "osm_name": "Escuela Yanuario Quesada",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 37,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-osm-way-1303988283",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147209,
+          9.914864
+        ]
+      },
+      "properties": {
+        "id": "school-osm-way-1303988283",
+        "name": "Jardín de Niños Corazón de Jesús",
+        "display_name": "Jardín de Niños Corazón de Jesús",
+        "sector": "public",
+        "level": "preschool",
+        "district": "Escazú",
+        "locality": null,
+        "mep_code": null,
+        "mep_circuit": null,
+        "mep_region": null,
+        "programmes": [],
+        "osm_ref": "way/1303988283",
+        "osm_name": "Jardín de Niños Corazón de Jesús",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": null,
+        "registry": "osm",
+        "registry_note": "Jardín de Niños Corazón de Jesús — the MEP preschool annex ~70 m from Escuela Corazón de Jesús, tagged operator=MEP / operator:type=public in OSM. The register folds it into the escuela's row; it is its own site."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100628-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.134466,
+          9.904545
+        ]
+      },
+      "properties": {
+        "id": "school-100628-00",
+        "name": "JUAN XXIII",
+        "display_name": "Juan XXIII",
+        "sector": "public",
+        "level": null,
+        "district": "SAN ANTONIO",
+        "locality": "SAN ANTONIO",
+        "mep_code": "100628-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100628-00",
+            "name": "JUAN XXIII",
+            "display_name": "Juan XXIII",
+            "level": null
+          },
+          {
+            "code": "100629-00",
+            "name": "J.N. JUAN XXIII",
+            "display_name": "J.N. Juan XXIII",
+            "level": "preschool"
+          },
+          {
+            "code": "105154-01",
+            "name": "CINDEA ESCAZÚ-JUAN XXIII",
+            "display_name": "CINDEA Escazú-juan XXIII",
+            "level": "adult"
+          }
+        ],
+        "osm_ref": "way/325094472",
+        "osm_name": "Escuela Juan XXIII",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 14,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104023-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.13796,
+          9.914786
+        ]
+      },
+      "properties": {
+        "id": "school-104023-00",
+        "name": "LICEO DE ESCAZÚ",
+        "display_name": "Liceo de Escazú",
+        "sector": "public",
+        "level": "secondary",
+        "district": "SAN ANTONIO",
+        "locality": "SANTA TERESA",
+        "mep_code": "104023-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "104023-00",
+            "name": "LICEO DE ESCAZÚ",
+            "display_name": "Liceo de Escazú",
+            "level": "secondary"
+          }
+        ],
+        "osm_ref": "way/172346248",
+        "osm_name": "Liceo de Escazú",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 44,
+        "registry": "mep",
+        "registry_note": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100552-00",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140626,
+          9.91906
+        ]
+      },
+      "properties": {
+        "id": "school-100552-00",
+        "name": "REPÚBLICA DE VENEZUELA",
+        "display_name": "República de Venezuela",
+        "sector": "public",
+        "level": null,
+        "district": "ESCAZÚ",
+        "locality": "ESCAZÚ",
+        "mep_code": "100552-00",
+        "mep_circuit": "CIRCUITO 03",
+        "mep_region": "DIRECCIÓN REGIONAL SAN JOSÉ OESTE",
+        "programmes": [
+          {
+            "code": "100552-00",
+            "name": "REPÚBLICA DE VENEZUELA",
+            "display_name": "República de Venezuela",
+            "level": null
+          },
+          {
+            "code": "105154-00",
+            "name": "CINDEA ESCAZÚ",
+            "display_name": "CINDEA Escazú",
+            "level": "adult"
+          }
+        ],
+        "osm_ref": "way/172346245",
+        "osm_name": "Escuela República de Venezuela",
+        "website": null,
+        "position_source": "osm",
+        "position_delta_m": 18,
+        "registry": "mep",
+        "registry_note": null
+      }
+    }
+  ]
+}

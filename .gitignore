@@ -87,3 +87,6 @@ data/pending-submissions.local.json
 # time (scripts/seed-u2-fixture.mjs); the local review JSON is shared with u30.
 /public/u2-fixture-frame.jpg
 /data/capture-frame-tombstones.local.json
+
+# Upstream response cache for scripts/build-schools.mjs
+.cache/
