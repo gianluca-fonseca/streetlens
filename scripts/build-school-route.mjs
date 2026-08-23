@@ -172,6 +172,12 @@ const stops = schools.features.map((f) => ({
   locality: f.properties.locality,
   mep: f.properties.mep_code,
   address: f.properties.address,
+  level: f.properties.level,
+  // Hosted programmes at the same address. Worth showing a driver: it is the
+  // difference between one stop and three registry entries captured at once.
+  alsoHere: f.properties.programmes
+    .filter((pr) => pr.code !== f.properties.mep_code)
+    .map((pr) => pr.display_name),
   lonlat: f.geometry.coordinates,
 }));
 
@@ -206,14 +212,17 @@ const legs = [0, ...hops].map((from, i) => {
   // first, so the sheet reads in the vocabulary the driver already uses.
   const byDistrict = new Map();
   for (const s of legStops) byDistrict.set(s.district, (byDistrict.get(s.district) ?? 0) + 1);
-  const names = [...byDistrict.entries()].sort((a, b) => b[1] - a[1]).map(([d]) => titled(d));
-  const localities = [...new Set(legStops.map((s) => s.locality).filter(Boolean))]
-    .slice(0, 3)
-    .map(titled);
-  return {
-    title: `${names.join(" / ")}${localities.length ? ` — ${localities.join(", ")}` : ""}`,
-    stops: legStops,
-  };
+  // Name a leg the way a driver would: where it starts and where it ends. The
+  // full district roll-call was accurate and unusable — "San Antonio / Escazú /
+  // San Rafael — El Carmen, Chiverral, San Antonio" is not something you read
+  // at a traffic light. The dominant district rides along as the subtitle.
+  const where = (s) => titled(s.locality ?? s.district ?? s.name);
+  const span = `${where(legStops[0])} → ${where(legStops.at(-1))}`;
+  const districts = [...byDistrict.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 2)
+    .map(([d]) => titled(d));
+  return { title: span, districts, stops: legStops };
 });
 
 const covered = legs.reduce((n, l) => n + l.stops.length, 0);
@@ -265,6 +274,7 @@ const routeGeo = {
     ordering: "nearest-neighbour + 2-opt on straight-line distance; a visiting order, not a driving route",
     legs: legs.map((l) => ({
       title: l.title,
+      districts: l.districts,
       stops: l.stops.length,
       straight_line_km: Number((legLength(l.stops) / 1000).toFixed(2)),
     })),
@@ -279,12 +289,19 @@ const routeGeo = {
           school_id: s.id,
           name: s.name,
           sector: s.sector,
+          level: s.level,
           mep_code: s.mep,
+          also_here: s.alsoHere,
           address: s.address,
           waze: wazeLink(s),
+          maps: mapsPin(s),
           leg: li + 1,
           leg_title: l.title,
           stop: i + 1,
+          // Straight-line hop from the previous stop on this leg. Not the road
+          // distance — it is the "how far is the next one" a driver actually
+          // asks, at the accuracy that question deserves.
+          hop_from_previous_m: i === 0 ? null : Math.round(haversine(l.stops[i - 1].lonlat, s.lonlat)),
         },
       })),
     ),
@@ -327,7 +344,7 @@ const md = [
 for (const [li, l] of legs.filter((x) => x.stops.length).entries()) {
   md.push(`## Leg ${li + 1} — ${l.title}`);
   md.push("");
-  md.push(`${l.stops.length} stops · ${(legLength(l.stops) / 1000).toFixed(1)} km straight-line`);
+  md.push(`${l.districts.join(" / ")} · ${l.stops.length} stops · ${(legLength(l.stops) / 1000).toFixed(1)} km straight-line`);
   md.push("");
   md.push("| # | School | Sector | Address | Coordinates | Navigate |");
   md.push("| --: | --- | --- | --- | --- | --- |");

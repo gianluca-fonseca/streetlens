@@ -18,9 +18,9 @@ leg at once, if you would rather see it as one line.
 Files: `school-route.gpx` (waypoints + one route per leg, for OsmAnd / Gaia /
 Garmin), `school-route.geojson` (the same thing for a map).
 
-## Leg 1 — San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio
+## Leg 1 — El Carmen → Belo Horizonte
 
-10 stops · 4.5 km straight-line
+San Antonio / Escazú · 10 stops · 4.5 km straight-line
 
 | # | School | Sector | Address | Coordinates | Navigate |
 | --: | --- | --- | --- | --- | --- |
@@ -39,9 +39,9 @@ Garmin), `school-route.geojson` (the same thing for a map).
 
 1. [El Carmen → Bello Horizonte (10 stops)](https://www.google.com/maps/dir/9.896587,-84.141322/9.902779,-84.139892/9.904545,-84.134466/9.912703,-84.140659/9.915877,-84.140888/9.914786,-84.137960/9.915443,-84.138173/9.917258,-84.138781/9.919432,-84.137213/9.919641,-84.130212)
 
-## Leg 2 — Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard
+## Leg 2 — Belo Horizonte → Bebedero
 
-10 stops · 5.1 km straight-line
+Escazú / San Rafael · 10 stops · 5.1 km straight-line
 
 | # | School | Sector | Address | Coordinates | Navigate |
 | --: | --- | --- | --- | --- | --- |
@@ -60,9 +60,9 @@ Garmin), `school-route.geojson` (the same thing for a map).
 
 1. [Centro Educativo Saint Augustine College → David Marín Hidalgo (10 stops)](https://www.google.com/maps/dir/9.927621,-84.128140/9.929339,-84.128443/9.929608,-84.135395/9.927758,-84.136001/9.924626,-84.141415/9.919060,-84.140626/9.917405,-84.143074/9.914864,-84.147209/9.914643,-84.147998/9.903983,-84.159223)
 
-## Leg 3 — San Rafael / San Antonio — San Rafael, Laureles, San Antonio
+## Leg 3 — San Rafael → Guachipelín
 
-13 stops · 7.8 km straight-line
+San Rafael / San Antonio · 13 stops · 7.8 km straight-line
 
 | # | School | Sector | Address | Coordinates | Navigate |
 | --: | --- | --- | --- | --- | --- |

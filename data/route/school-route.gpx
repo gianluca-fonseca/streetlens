@@ -170,7 +170,7 @@
     <sym>School</sym>
   </wpt>
   <rte>
-    <name>Leg 1 - San Antonio / Escazú / San Rafael — El Carmen, Chiverral, San Antonio</name>
+    <name>Leg 1 - El Carmen → Belo Horizonte</name>
     <rtept lat="9.896587" lon="-84.141322"><name>1. El Carmen</name></rtept>
     <rtept lat="9.902779" lon="-84.139892"><name>2. C.T.P. de Escazú</name></rtept>
     <rtept lat="9.904545" lon="-84.134466"><name>3. Juan XXIII</name></rtept>
@@ -183,7 +183,7 @@
     <rtept lat="9.919641" lon="-84.130212"><name>10. Bello Horizonte</name></rtept>
   </rte>
   <rte>
-    <name>Leg 2 - Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard</name>
+    <name>Leg 2 - Belo Horizonte → Bebedero</name>
     <rtept lat="9.927621" lon="-84.128140"><name>1. Centro Educativo Saint Augustine College</name></rtept>
     <rtept lat="9.929339" lon="-84.128443"><name>2. Integral Kallpa</name></rtept>
     <rtept lat="9.929608" lon="-84.135395"><name>3. I.E.G.B. Pbro. Yanuario Quesada</name></rtept>
@@ -196,7 +196,7 @@
     <rtept lat="9.903983" lon="-84.159223"><name>10. David Marín Hidalgo</name></rtept>
   </rte>
   <rte>
-    <name>Leg 3 - San Rafael / San Antonio — San Rafael, Laureles, San Antonio</name>
+    <name>Leg 3 - San Rafael → Guachipelín</name>
     <rtept lat="9.926571" lon="-84.149670"><name>1. Centro Educativo Kinder Pandas Daycare</name></rtept>
     <rtept lat="9.930231" lon="-84.147178"><name>2. Centro Educativo Arandú / Centro Educativo Arandú School</name></rtept>
     <rtept lat="9.931262" lon="-84.149367"><name>3. Centro Educativo True North Personalized Learning School</name></rtept>

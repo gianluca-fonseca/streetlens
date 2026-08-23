@@ -1,0 +1,1151 @@
+<title>Escazú School Run Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=swap">
+<style>
+  /* ── Tokens ───────────────────────────────────────────────────────────────
+     StreetLens's own palette (app/globals.css), not a new one. Light is the
+     base; dark redefines only the tokens, once for the OS preference (guarded
+     so an explicit light choice still wins) and once for the explicit stamp. */
+  :root {
+    --paper: #fafafa;
+    --plate: #ffffff;
+    --sunken: #f1f1f1;
+    --ink: #111111;
+    --ink-muted: #5c5c5c;
+    --ink-faint: #9a9a9a;
+    --hairline: #e4e4e4;
+    --hairline-strong: #d2d2d2;
+    /* The one signal. Deep magenta because it has to carry TEXT on white and
+       still clear AA; the map's brighter #f0268c is a graphic-only value. */
+    --accent: #c0106b;
+    --accent-ink: #ffffff;
+    --accent-quiet: #fdeaf3;
+
+    --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --font-serif: "Newsreader", ui-serif, Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0a0a0a;
+      --plate: #141414;
+      --sunken: #050505;
+      --ink: #f2f2f2;
+      --ink-muted: #a3a3a3;
+      --ink-faint: #666666;
+      --hairline: #262626;
+      --hairline-strong: #363636;
+      --accent: #ff4fa3;
+      --accent-ink: #0a0a0a;
+      --accent-quiet: #2a0f1d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0a0a0a;
+    --plate: #141414;
+    --sunken: #050505;
+    --ink: #f2f2f2;
+    --ink-muted: #a3a3a3;
+    --ink-faint: #666666;
+    --hairline: #262626;
+    --hairline-strong: #363636;
+    --accent: #ff4fa3;
+    --accent-ink: #0a0a0a;
+    --accent-quiet: #2a0f1d;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .sheet {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  @media (min-width: 40rem) { .sheet { padding: 3rem 1.5rem 5rem; } }
+
+  /* ── Masthead ─────────────────────────────────────────────────────────── */
+  .masthead { display: flex; flex-direction: column; gap: 1rem; }
+  .eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 6vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .standfirst {
+    margin: 0;
+    max-width: 34em;
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin: 0;
+    padding: 1rem 0;
+    border-block: 1px solid var(--hairline);
+  }
+  .figures div { display: flex; flex-direction: column; gap: 0.15rem; }
+  .figures dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 1.375rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .figures dt {
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    color: var(--ink-muted);
+  }
+
+  .note {
+    margin: 0;
+    padding: 0.875rem 1rem;
+    background: var(--sunken);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+  .note strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Key: the same two marks the map draws ────────────────────────────── */
+  .key { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; }
+  .key span { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--ink-muted); }
+
+  .disc {
+    width: 11px; height: 11px; border-radius: 50%;
+    flex: none;
+    border: 1.5px solid var(--ink);
+  }
+  .disc.public { background: var(--ink); }
+  .disc.private { background: var(--plate); }
+
+  /* ── Legs ─────────────────────────────────────────────────────────────── */
+  .leg { display: flex; flex-direction: column; gap: 0; }
+  .leg-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.75rem;
+    padding: 0.75rem 0;
+    margin-bottom: 0.5rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+  .leg-n {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .leg-head h2 {
+    margin: 0;
+    flex: 1 1 auto;
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .leg-stats {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+
+  ol.stops { list-style: none; margin: 0; padding: 0; }
+
+  /* The connector carries the hop to the next stop — the second thing a driver
+     wants after "which one", and true information rather than a divider. */
+  .hop {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.375rem 0 0.375rem 1.125rem;
+  }
+  .hop::before {
+    content: "";
+    width: 1px;
+    align-self: stretch;
+    min-height: 1.25rem;
+    background: var(--hairline-strong);
+  }
+  .hop span {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+  }
+
+  .stop {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 0 0.75rem;
+    padding: 0.875rem;
+    background: var(--plate);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+  }
+  @media (min-width: 34rem) {
+    .stop { grid-template-columns: 2.25rem 1fr auto; align-items: start; }
+  }
+
+  .marker { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding-top: 0.1rem; }
+  .num {
+    font-family: var(--font-mono);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .body { min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+  .body h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .addr { margin: 0; font-size: 0.875rem; line-height: 1.4; color: var(--ink-muted); }
+  .meta {
+    margin: 0.15rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--ink-muted);
+  }
+  .meta .dot { color: var(--ink-faint); }
+  .sector { text-transform: uppercase; letter-spacing: 0.08em; }
+  .sector.public { color: var(--ink); font-weight: 600; }
+  .also {
+    margin: 0.25rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--ink-muted);
+    padding-left: 0.625rem;
+    border-left: 2px solid var(--hairline-strong);
+  }
+  .coords { margin: 0.15rem 0 0; }
+  .coords code {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    user-select: all;
+  }
+
+  /* The control the whole page exists to deliver. Full width on a phone,
+     because that is the hand it will be tapped with. */
+  .go {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  @media (min-width: 34rem) {
+    .go { grid-column: auto; margin-top: 0; flex-direction: column; width: 6rem; }
+    /* Keep the controls at their own height rather than stretching to the row.
+       A taller row (one with hosted programmes listed) would otherwise grow its
+       buttons, and a column of buttons that change size row to row reads as a
+       layout accident. */
+    .go a { flex: 0 0 auto; }
+  }
+
+  .go a {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 0.875rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    transition: background-color 120ms ease, border-color 120ms ease;
+  }
+  .waze { background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); }
+  .waze:hover { background: var(--ink); border-color: var(--ink); color: var(--plate); }
+  .maps { background: transparent; color: var(--ink); border: 1px solid var(--hairline-strong); }
+  .maps:hover { border-color: var(--ink); }
+
+  .leg-foot { margin-top: 0.875rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: baseline; }
+  .leg-foot p { margin: 0; font-size: 0.75rem; color: var(--ink-muted); }
+  .leg-foot a { color: var(--accent); font-size: 0.8125rem; font-weight: 500; text-decoration: none; border-bottom: 1px solid currentColor; }
+  .leg-foot a:hover { color: var(--ink); }
+
+  footer {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+  footer p { margin: 0; font-size: 0.8125rem; line-height: 1.55; color: var(--ink-muted); }
+  footer code { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink); }
+
+  a:focus-visible, code:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+  @media print {
+    .go a, .leg-head { break-inside: avoid; }
+    .stop { break-inside: avoid; }
+  }
+</style>
+
+<div class="sheet">
+  <header class="masthead">
+    <p class="eyebrow">StreetLens · Cantón de Escazú · Field collection</p>
+    <h1>Every school in Escazú, in the order to drive them</h1>
+    <p class="standfirst">
+      33 centros educativos from the MEP register, cut into 3 afternoons.
+      Tap Waze on a row and it starts navigating to that school. When you finish
+      recording, tap the next one.
+    </p>
+    <dl class="figures">
+      <div><dd>33</dd><dt>Schools</dt></div>
+      <div><dd>13 / 20</dd><dt>Público / privado</dt></div>
+      <div><dd>17.5</dd><dt>km between stops</dt></div>
+    </dl>
+    <div class="key">
+      <span><i class="disc public"></i>Público (MEP)</span>
+      <span><i class="disc private"></i>Privado</span>
+    </div>
+    <p class="note">
+      <strong>This is a visiting order, not a driving route.</strong> It knows
+      nothing about one-way streets, the Próspero Fernández, or which quebrada
+      has no bridge — Waze does that part. What the sheet settles is which
+      school is next. Waze takes one stop at a time; the link at the foot of
+      each leg opens the whole leg in Google Maps if you want to see it as one line.
+    </p>
+  </header>
+
+  <section class="leg">
+    <div class="leg-head">
+      <span class="leg-n">Leg 1</span>
+      <h2>El Carmen → Belo Horizonte</h2>
+      <span class="leg-stats">10 stops · 4.5 km</span>
+    </div>
+    <ol class="stops">
+      
+      <li class="stop">
+        <div class="marker">
+          <span class="num">1</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>El Carmen</h3>
+          <p class="addr">Calle El Alto, El Carmen, San Antonio</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            
+            <span class="dot">·</span><span class="code">MEP 100517-00</span>
+          </p>
+          
+          <p class="coords"><code>9.896587, -84.141322</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.896587,-84.141322&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.896587,-84.141322">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>706 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">2</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>C.T.P. de Escazú</h3>
+          <p class="addr">Calle Masilla Sur, Sabanillas, San Antonio</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            <span class="dot">·</span><span>Secundaria</span>
+            <span class="dot">·</span><span class="code">MEP 104681-00</span>
+          </p>
+          
+          <p class="coords"><code>9.902779, -84.139892</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.902779,-84.139892&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.902779,-84.139892">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>626 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">3</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>Juan XXIII</h3>
+          <p class="addr">Calle del Llano, Hoja Blanca, San Antonio</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            
+            <span class="dot">·</span><span class="code">MEP 100628-00</span>
+          </p>
+          <p class="also">También aquí: J.N. Juan XXIII · CINDEA Escazú-Juan XXIII</p>
+          <p class="coords"><code>9.904545, -84.134466</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.904545,-84.134466&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.904545,-84.134466">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>1.1 km</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">4</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Greenland School</h3>
+          <p class="addr">Calle Los Gatos, Chirca, San Antonio</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200056-00</span>
+          </p>
+          
+          <p class="coords"><code>9.912703, -84.140659</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.912703,-84.140659&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.912703,-84.140659">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>354 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">5</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Jardín Infantil Sorpresitas</h3>
+          <p class="addr">Avenida 40, Hulera, Escazú</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            <span class="dot">·</span><span>Preescolar</span>
+            <span class="dot">·</span><span class="code">MEP 200055-00</span>
+          </p>
+          
+          <p class="coords"><code>9.915877, -84.140888</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.915877,-84.140888&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.915877,-84.140888">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>343 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">6</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>Liceo de Escazú</h3>
+          <p class="addr">Avenida 42, Profesores, San Antonio</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            <span class="dot">·</span><span>Secundaria</span>
+            <span class="dot">·</span><span class="code">MEP 104023-00</span>
+          </p>
+          
+          <p class="coords"><code>9.914786, -84.137960</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.914786,-84.137960&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.914786,-84.137960">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>77 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">7</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>Benjamín Herrera Angulo</h3>
+          <p class="addr">Avenida 40, Santa Eduviges, San Antonio</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            <span class="dot">·</span><span>Preescolar y primaria</span>
+            <span class="dot">·</span><span class="code">MEP 100613-00</span>
+          </p>
+          
+          <p class="coords"><code>9.915443, -84.138173</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.915443,-84.138173&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.915443,-84.138173">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>213 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">8</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Colegio Nuestra Señora del Pilar</h3>
+          <p class="addr">Avenida 36, Hulera, Escazú</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200054-00</span>
+          </p>
+          
+          <p class="coords"><code>9.917258, -84.138781</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.917258,-84.138781&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.917258,-84.138781">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>297 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">9</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Garabatos Instituto Preescolar</h3>
+          <p class="addr">Avenida 32, Guapinol, Escazú</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200053-00</span>
+          </p>
+          
+          <p class="coords"><code>9.919432, -84.137213</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.919432,-84.137213&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.919432,-84.137213">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>767 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">10</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>Bello Horizonte</h3>
+          <p class="addr">Calle 110, Bello Horizonte, San Rafael</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            
+            <span class="dot">·</span><span class="code">MEP 100519-00</span>
+          </p>
+          
+          <p class="coords"><code>9.919641, -84.130212</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.919641,-84.130212&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.919641,-84.130212">Maps</a>
+        </div>
+      </li>
+    </ol>
+    <div class="leg-foot">
+      <p>San Antonio / Escazú</p>
+      <a href="https://www.google.com/maps/dir/9.896587,-84.141322/9.902779,-84.139892/9.904545,-84.134466/9.912703,-84.140659/9.915877,-84.140888/9.914786,-84.137960/9.915443,-84.138173/9.917258,-84.138781/9.919432,-84.137213/9.919641,-84.130212">Whole leg in Google Maps</a>
+    </div>
+  </section>
+  <section class="leg">
+    <div class="leg-head">
+      <span class="leg-n">Leg 2</span>
+      <h2>Belo Horizonte → Bebedero</h2>
+      <span class="leg-stats">10 stops · 5.1 km</span>
+    </div>
+    <ol class="stops">
+      
+      <li class="stop">
+        <div class="marker">
+          <span class="num">1</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Saint Augustine College</h3>
+          <p class="addr">Avenida 12, Palma de Mayorca, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200058-00</span>
+          </p>
+          
+          <p class="coords"><code>9.927621, -84.128140</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.927621,-84.128140&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.927621,-84.128140">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>194 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">2</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Integral Kallpa</h3>
+          <p class="addr">Calle Vista Alegre, Tena, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200062-00</span>
+          </p>
+          
+          <p class="coords"><code>9.929339, -84.128443</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.929339,-84.128443&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.929339,-84.128443">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>762 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">3</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>I.E.G.B. Pbro. Yanuario Quesada</h3>
+          <p class="addr">Carretera John F. Kennedy, Betina, San Rafael</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            <span class="dot">·</span><span>Básica general</span>
+            <span class="dot">·</span><span class="code">MEP 104805-00</span>
+          </p>
+          
+          <p class="coords"><code>9.929608, -84.135395</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.929608,-84.135395&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.929608,-84.135395">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>216 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">4</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Hometwo Montessori</h3>
+          <p class="addr">Avenida Fernández Delgado, Maynard, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200060-00</span>
+          </p>
+          
+          <p class="coords"><code>9.927758, -84.136001</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.927758,-84.136001&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.927758,-84.136001">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>688 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">5</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Kids World Montessori (Escazu)</h3>
+          <p class="addr">Avenida 20, Faroles, Escazú</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 205255-00</span>
+          </p>
+          
+          <p class="coords"><code>9.924626, -84.141415</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.924626,-84.141415&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.924626,-84.141415">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>625 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">6</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>República de Venezuela</h3>
+          <p class="addr">Avenida 32, Guapinol, Escazú</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            
+            <span class="dot">·</span><span class="code">MEP 100552-00</span>
+          </p>
+          <p class="also">También aquí: CINDEA Escazú</p>
+          <p class="coords"><code>9.919060, -84.140626</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.919060,-84.140626&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.919060,-84.140626">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>325 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">7</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>CONED Escazú</h3>
+          <p class="addr">Calle 140, Carrizal, Escazú</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            <span class="dot">·</span><span>Adultos</span>
+            <span class="dot">·</span><span class="code">MEP 105542-00</span>
+          </p>
+          
+          <p class="coords"><code>9.917405, -84.143074</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.917405,-84.143074&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.917405,-84.143074">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>534 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">8</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>Jardín de Niños Corazón de Jesús</h3>
+          <p class="addr">Calle 150, Carrizal, Escazú</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            <span class="dot">·</span><span>Preescolar</span>
+            <span class="dot">·</span><span class="code">MEP —</span>
+          </p>
+          
+          <p class="coords"><code>9.914864, -84.147209</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.914864,-84.147209&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.914864,-84.147209">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>90 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">9</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>Corazón de Jesús</h3>
+          <p class="addr">Calle 150, Carrizal, Escazú</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            
+            <span class="dot">·</span><span class="code">MEP 100536-00</span>
+          </p>
+          
+          <p class="coords"><code>9.914643, -84.147998</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.914643,-84.147998&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.914643,-84.147998">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>1.7 km</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">10</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>David Marín Hidalgo</h3>
+          <p class="addr">Calle Bebedero, Bebedero, San Antonio</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            
+            <span class="dot">·</span><span class="code">MEP 100518-00</span>
+          </p>
+          
+          <p class="coords"><code>9.903983, -84.159223</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.903983,-84.159223&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.903983,-84.159223">Maps</a>
+        </div>
+      </li>
+    </ol>
+    <div class="leg-foot">
+      <p>Escazú / San Rafael</p>
+      <a href="https://www.google.com/maps/dir/9.927621,-84.128140/9.929339,-84.128443/9.929608,-84.135395/9.927758,-84.136001/9.924626,-84.141415/9.919060,-84.140626/9.917405,-84.143074/9.914864,-84.147209/9.914643,-84.147998/9.903983,-84.159223">Whole leg in Google Maps</a>
+    </div>
+  </section>
+  <section class="leg">
+    <div class="leg-head">
+      <span class="leg-n">Leg 3</span>
+      <h2>San Rafael → Guachipelín</h2>
+      <span class="leg-stats">13 stops · 7.8 km</span>
+    </div>
+    <ol class="stops">
+      
+      <li class="stop">
+        <div class="marker">
+          <span class="num">1</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Kinder Pandas Daycare</h3>
+          <p class="addr">Cond. Los Guayabos, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 205422-00</span>
+          </p>
+          
+          <p class="coords"><code>9.926571, -84.149670</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.926571,-84.149670&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.926571,-84.149670">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>490 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">2</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Arandú / Centro Educativo Arandú School</h3>
+          <p class="addr">Calle Real, Ayala, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            <span class="dot">·</span><span>Básica general</span>
+            <span class="dot">·</span><span class="code">MEP 200057-00</span>
+          </p>
+          
+          <p class="coords"><code>9.930231, -84.147178</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.930231,-84.147178&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.930231,-84.147178">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>266 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">3</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo True North Personalized Learning School</h3>
+          <p class="addr">Calle Guachipelines, Ayala, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            <span class="dot">·</span><span>Básica general</span>
+            <span class="dot">·</span><span class="code">MEP 205203-00</span>
+          </p>
+          
+          <p class="coords"><code>9.931262, -84.149367</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.931262,-84.149367&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.931262,-84.149367">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>458 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">4</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Jardín Infantil Integral Borboleta e Itskatzú Educación Integral</h3>
+          <p class="addr">Carretera John F. Kennedy, Bajo Palomas, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            <span class="dot">·</span><span>Preescolar</span>
+            <span class="dot">·</span><span class="code">MEP 200061-00</span>
+          </p>
+          
+          <p class="coords"><code>9.932950, -84.153177</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.932950,-84.153177&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.932950,-84.153177">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>1.4 km</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">5</span>
+          <span class="disc public" title="Público"></span>
+        </div>
+        <div class="body">
+          <h3>Guachipelín</h3>
+          <p class="addr">Vía 310, Ayala, San Rafael</p>
+          <p class="meta">
+            <span class="sector public">Público</span>
+            
+            <span class="dot">·</span><span class="code">MEP 100559-00</span>
+          </p>
+          
+          <p class="coords"><code>9.944419, -84.159054</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.944419,-84.159054&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.944419,-84.159054">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>936 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">6</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Colegio Santa María (Saint Mary High School)</h3>
+          <p class="addr">Calle Guachipelines, Real de Pereira, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            <span class="dot">·</span><span>Secundaria</span>
+            <span class="dot">·</span><span class="code">MEP 200066-00</span>
+          </p>
+          
+          <p class="coords"><code>9.950648, -84.164800</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.950648,-84.164800&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.950648,-84.164800">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>176 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">7</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Royal International Education</h3>
+          <p class="addr">Calle Guachipelines, Real de Pereira, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 205510-00</span>
+          </p>
+          
+          <p class="coords"><code>9.952213, -84.164588</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.952213,-84.164588&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.952213,-84.164588">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>393 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">8</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Lighthouse International School</h3>
+          <p class="addr">Calle Guachipelines, Real de Pereira, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200063-00</span>
+          </p>
+          
+          <p class="coords"><code>9.955160, -84.166564</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.955160,-84.166564&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.955160,-84.166564">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>367 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">9</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Washington School</h3>
+          <p class="addr">Calle Guachipelines, Real de Pereira, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200068-00</span>
+          </p>
+          
+          <p class="coords"><code>9.956642, -84.169559</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.956642,-84.169559&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.956642,-84.169559">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>663 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">10</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>West College / West Primary</h3>
+          <p class="addr">Avenida 1, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200069-00</span>
+          </p>
+          
+          <p class="coords"><code>9.960007, -84.174557</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.960007,-84.174557&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.960007,-84.174557">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>390 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">11</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Centro Educativo Kipos</h3>
+          <p class="addr">Avenida Real de Pereira, Real de Pereira, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 205395-00</span>
+          </p>
+          
+          <p class="coords"><code>9.961919, -84.177537</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.961919,-84.177537&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.961919,-84.177537">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>488 m</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">12</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Escuela Vista del Monte (Mount View School)</h3>
+          <p class="addr">Calle Guachipelines, Real de Pereira, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200064-00</span>
+          </p>
+          
+          <p class="coords"><code>9.961410, -84.173112</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.961410,-84.173112&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.961410,-84.173112">Maps</a>
+        </div>
+      </li>
+      <li class="hop" aria-hidden="true"><span>1.8 km</span></li>
+      <li class="stop">
+        <div class="marker">
+          <span class="num">13</span>
+          <span class="disc private" title="Privado"></span>
+        </div>
+        <div class="body">
+          <h3>Blue Valley School (Colegio Valle Azul)</h3>
+          <p class="addr">Calle Mango, San Rafael</p>
+          <p class="meta">
+            <span class="sector private">Privado</span>
+            
+            <span class="dot">·</span><span class="code">MEP 200067-00</span>
+          </p>
+          
+          <p class="coords"><code>9.953543, -84.159150</code></p>
+        </div>
+        <div class="go">
+          <a class="waze" href="https://waze.com/ul?ll=9.953543,-84.159150&amp;navigate=yes">Waze</a>
+          <a class="maps" href="https://www.google.com/maps/search/?api=1&amp;query=9.953543,-84.159150">Maps</a>
+        </div>
+      </li>
+    </ol>
+    <div class="leg-foot">
+      <p>San Rafael / San Antonio</p>
+      <a href="https://www.google.com/maps/dir/9.926571,-84.149670/9.930231,-84.147178/9.931262,-84.149367/9.932950,-84.153177/9.944419,-84.159054/9.950648,-84.164800/9.952213,-84.164588/9.955160,-84.166564/9.956642,-84.169559/9.960007,-84.174557">Whole leg in Google Maps (1/2)</a><a href="https://www.google.com/maps/dir/9.960007,-84.174557/9.961919,-84.177537/9.961410,-84.173112/9.953543,-84.159150">Whole leg in Google Maps (2/2)</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Roster: the Ministerio de Educación Pública's own register, queried from
+      SIGMEP (<code>MEP_CEPUBCR_1</code> público, <code>MEP_CEPRIVCR_1</code>
+      privado). Positions sharpened against OpenStreetMap campus geometry where
+      it exists; addresses reverse-geocoded from the final position. Every
+      site's provenance, including the two registry rows this sheet deliberately
+      drops, is in <code>data/schools.geojson</code>.
+    </p>
+    <p>
+      Regenerate with <code>node scripts/build-schools.mjs</code> then
+      <code>node scripts/build-school-route.mjs</code> and
+      <code>node scripts/build-school-route-page.mjs</code>.
+    </p>
+  </footer>
+</div>

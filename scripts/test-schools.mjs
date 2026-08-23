@@ -230,6 +230,24 @@ check("the sheet says the order is not a driving route",
   /visiting order, not a driving route/i.test(sheet));
 check("every leg gets Google Maps links on the sheet",
   (sheet.match(/google\.com\/maps\/dir\//g) ?? []).length >= route.metadata.legs.length);
+const page = read("data/route/school-route.html");
+check("the run-sheet page carries every stop with a Waze control",
+  (page.match(/class="stop"/g) ?? []).length === feats.length &&
+  (page.match(/waze\.com\/ul/g) ?? []).length === feats.length);
+check("the page names itself and paints its own ground",
+  /^<title>[^<]{4,60}<\/title>/m.test(page) && /body\s*\{[^}]*background:\s*var\(--paper\)/s.test(page));
+// The classic unreadable-artifact bug: a colour whose only definition sits
+// behind a theme stamp never applies in the un-stamped "system" state.
+check("both themes are defined at token level, including the un-stamped state",
+  /@media \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme="light"\]\)/.test(page) &&
+  /:root\[data-theme="dark"\]/.test(page) &&
+  /:root\s*\{[^}]*--paper:/s.test(page));
+check("the page reuses the map's public/private mark, not a new one",
+  /\.disc\.public\s*\{\s*background:\s*var\(--ink\)/.test(page) &&
+  /\.disc\.private\s*\{\s*background:\s*var\(--plate\)/.test(page));
+check("navigation controls clear the 44px tap floor",
+  /\.go a \{[^}]*min-height:\s*44px/s.test(page));
+
 check("the route is regenerable from the roster",
   route.metadata.generated_by === "scripts/build-school-route.mjs" &&
   read("scripts/build-school-route.mjs").includes("data\", \"schools.geojson"));
