@@ -21,6 +21,11 @@
 //   canton boundary              OSM relation 4071270 (Escazú, admin_level 6),
 //                                used to test whether a registry point is
 //                                actually inside the canton it claims.
+//   street address               Nominatim reverse geocode of the final pin.
+//                                Costa Rica has no street numbering to speak
+//                                of, so this is road + barrio + town, which is
+//                                what a driver reads off a sign. Rate-limited
+//                                to Nominatim's 1 req/s policy.
 //
 // Run: `node scripts/build-schools.mjs`   (network required, ~30s)
 //      `node scripts/build-schools.mjs --dry`  prints the reconciliation only.
@@ -48,6 +53,7 @@ const OVERPASS_ENDPOINTS = [
 ];
 const USER_AGENT = "streetlens-build-schools/1.0 (https://github.com/filippo-fonseca/streetlens)";
 const SIGMEP = "https://sig.mep.go.cr/server/rest/services";
+const NOMINATIM = "https://nominatim.openstreetmap.org/reverse";
 const CANTON_RELATION = 4071270;
 
 /** OSM and MEP are called a match inside this radius when their names share a
@@ -198,6 +204,57 @@ async function overpassLive(query) {
 
 async function sigmep(service) {
   return cached(`sigmep:${service}`, () => sigmepLive(service));
+}
+
+/**
+ * Reverse-geocode one pin into something a person can read off a street sign.
+ *
+ * Costa Rican addressing is famously not a house number on a street, so the
+ * useful string here is road + barrio + town — enough to know you have arrived
+ * and enough to sanity-check a coordinate that landed on the wrong block. The
+ * coordinate stays the machine-readable truth; this is for the human holding
+ * the sheet.
+ *
+ * Nominatim's usage policy is one request per second with an identifying
+ * User-Agent, and this walks 33 pins, so it sleeps between calls and caches.
+ * A failure yields null rather than throwing: a missing address costs a line of
+ * the run sheet, and is not worth failing the whole roster over.
+ */
+async function reverseGeocode(lon, lat) {
+  return cached(`nominatim:${lat.toFixed(6)},${lon.toFixed(6)}`, async () => {
+    await sleep(1100);
+    const params = new URLSearchParams({
+      format: "jsonv2",
+      lat: String(lat),
+      lon: String(lon),
+      zoom: "18",
+      addressdetails: "1",
+      "accept-language": "es",
+    });
+    try {
+      const res = await fetch(`${NOMINATIM}?${params}`, {
+        headers: { "user-agent": USER_AGENT },
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json?.address ?? null;
+    } catch {
+      return null;
+    }
+  });
+}
+
+/** road, barrio, town — skipping the parts that repeat or say nothing. */
+function formatAddress(a) {
+  if (!a) return null;
+  const parts = [
+    a.road ?? a.pedestrian ?? a.residential,
+    a.neighbourhood ?? a.suburb ?? a.hamlet,
+    a.town ?? a.village ?? a.city_district,
+  ].filter(Boolean);
+  const seen = new Set();
+  const out = parts.filter((p) => !seen.has(p) && seen.add(p));
+  return out.length ? out.join(", ") : null;
 }
 
 async function sigmepLive(service) {
@@ -422,6 +479,13 @@ for (const o of osmOnly) {
   sites.push({ sector: admit.sector, anchor: o.lonlat, osm: o, osmDist: 0, rows: [], admit });
 }
 
+/* --- addresses ----------------------------------------------------------- */
+console.log("→ reverse-geocoding %d pins (1 req/s, Nominatim policy)", sites.length);
+for (const [i, site] of sites.entries()) {
+  site.address = formatAddress(await reverseGeocode(site.anchor[0], site.anchor[1]));
+  if ((i + 1) % 10 === 0) console.log("  %d/%d", i + 1, sites.length);
+}
+
 /* --- emit ---------------------------------------------------------------- */
 const features = sites
   .map((s) => {
@@ -446,6 +510,9 @@ const features = sites
         sector: s.sector,
         level: primary ? levelFrom(primary.name, s.osm?.tags) : (s.admit?.level ?? null),
         district: primary?.district ?? s.osm?.tags?.["addr:city"] ?? null,
+        // Road + barrio + town, for the human reading a run sheet in a car.
+        // The coordinate above stays the machine-readable truth.
+        address: s.address ?? null,
         locality: primary?.locality ?? null,
         mep_code: primary?.code ?? null,
         mep_circuit: primary?.circuit ?? null,

@@ -101,6 +101,10 @@ check("display names are cased, not the register's caps",
   feats.every((f) => f.properties.display_name && f.properties.display_name !== f.properties.name.toUpperCase()
     || !/[A-Z]{4,}/.test(f.properties.name)));
 
+check("every pin has a human-readable address, not just a coordinate",
+  feats.every((f) => typeof f.properties.address === "string" && f.properties.address.length > 3),
+  `${feats.filter((f) => f.properties.address).length}/${feats.length}`);
+
 check("level is never invented — it is a known value or null",
   feats.every((f) =>
     f.properties.level === null ||
@@ -214,6 +218,14 @@ check("stop numbers within a leg are 1..n with no gaps",
 check("no leg is trivially small",
   route.metadata.legs.every((l) => l.stops >= 3),
   route.metadata.legs.map((l) => l.stops).join("/"));
+check("every stop is navigable from a phone",
+  routeStops.every((f) => /^https:\/\/waze\.com\/ul\?ll=-?\d+\.\d+,-?\d+\.\d+&navigate=yes$/.test(f.properties.waze)) &&
+  routeStops.every((f) => typeof f.properties.address === "string"));
+check("the sheet carries an address column and per-stop Waze links",
+  /\| Address \|/.test(sheet) &&
+  (sheet.match(/\[Waze\]\(https:\/\/waze\.com\/ul/g) ?? []).length === feats.length);
+check("the sheet says Waze is one stop at a time",
+  /Waze takes one stop at a time/i.test(sheet));
 check("the sheet says the order is not a driving route",
   /visiting order, not a driving route/i.test(sheet));
 check("every leg gets Google Maps links on the sheet",

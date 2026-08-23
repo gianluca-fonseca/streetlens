@@ -10,6 +10,11 @@ streets, the Próspero Fernández, and which quebrada has no bridge. Point the
 nav app at the next stop and let it find the road; what this settles is which
 stop is next.
 
+**Waze takes one stop at a time** — it has no multi-stop URL. So the route is
+the ORDER in this sheet: tap the next school's Waze link when you finish the
+last one. The Google Maps link at the foot of each leg does carry the whole
+leg at once, if you would rather see it as one line.
+
 Files: `school-route.gpx` (waypoints + one route per leg, for OsmAnd / Gaia /
 Garmin), `school-route.geojson` (the same thing for a map).
 
@@ -17,65 +22,65 @@ Garmin), `school-route.geojson` (the same thing for a map).
 
 10 stops · 4.5 km straight-line
 
-| # | School | Sector | MEP | Latitude, longitude |
-| --: | --- | --- | --- | --- |
-| 1 | El Carmen | Público | 100517-00 | `9.896587, -84.141322` |
-| 2 | C.T.P. de Escazú | Público | 104681-00 | `9.902779, -84.139892` |
-| 3 | Juan XXIII | Público | 100628-00 | `9.904545, -84.134466` |
-| 4 | Centro Educativo Greenland School | Privado | 200056-00 | `9.912703, -84.140659` |
-| 5 | Jardín Infantil Sorpresitas | Privado | 200055-00 | `9.915877, -84.140888` |
-| 6 | Liceo de Escazú | Público | 104023-00 | `9.914786, -84.137960` |
-| 7 | Benjamín Herrera Angulo | Público | 100613-00 | `9.915443, -84.138173` |
-| 8 | Colegio Nuestra Señora del Pilar | Privado | 200054-00 | `9.917258, -84.138781` |
-| 9 | Centro Educativo Garabatos Instituto Preescolar | Privado | 200053-00 | `9.919432, -84.137213` |
-| 10 | Bello Horizonte | Público | 100519-00 | `9.919641, -84.130212` |
+| # | School | Sector | Address | Coordinates | Navigate |
+| --: | --- | --- | --- | --- | --- |
+| 1 | **El Carmen**<br>`100517-00` | Público | Calle El Alto, El Carmen, San Antonio | `9.896587, -84.141322` | [Waze](https://waze.com/ul?ll=9.896587,-84.141322&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.896587,-84.141322) |
+| 2 | **C.T.P. de Escazú**<br>`104681-00` | Público | Calle Masilla Sur, Sabanillas, San Antonio | `9.902779, -84.139892` | [Waze](https://waze.com/ul?ll=9.902779,-84.139892&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.902779,-84.139892) |
+| 3 | **Juan XXIII**<br>`100628-00` | Público | Calle del Llano, Hoja Blanca, San Antonio | `9.904545, -84.134466` | [Waze](https://waze.com/ul?ll=9.904545,-84.134466&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.904545,-84.134466) |
+| 4 | **Centro Educativo Greenland School**<br>`200056-00` | Privado | Calle Los Gatos, Chirca, San Antonio | `9.912703, -84.140659` | [Waze](https://waze.com/ul?ll=9.912703,-84.140659&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.912703,-84.140659) |
+| 5 | **Jardín Infantil Sorpresitas**<br>`200055-00` | Privado | Avenida 40, Hulera, Escazú | `9.915877, -84.140888` | [Waze](https://waze.com/ul?ll=9.915877,-84.140888&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.915877,-84.140888) |
+| 6 | **Liceo de Escazú**<br>`104023-00` | Público | Avenida 42, Profesores, San Antonio | `9.914786, -84.137960` | [Waze](https://waze.com/ul?ll=9.914786,-84.137960&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.914786,-84.137960) |
+| 7 | **Benjamín Herrera Angulo**<br>`100613-00` | Público | Avenida 40, Santa Eduviges, San Antonio | `9.915443, -84.138173` | [Waze](https://waze.com/ul?ll=9.915443,-84.138173&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.915443,-84.138173) |
+| 8 | **Colegio Nuestra Señora del Pilar**<br>`200054-00` | Privado | Avenida 36, Hulera, Escazú | `9.917258, -84.138781` | [Waze](https://waze.com/ul?ll=9.917258,-84.138781&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.917258,-84.138781) |
+| 9 | **Centro Educativo Garabatos Instituto Preescolar**<br>`200053-00` | Privado | Avenida 32, Guapinol, Escazú | `9.919432, -84.137213` | [Waze](https://waze.com/ul?ll=9.919432,-84.137213&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.919432,-84.137213) |
+| 10 | **Bello Horizonte**<br>`100519-00` | Público | Calle 110, Bello Horizonte, San Rafael | `9.919641, -84.130212` | [Waze](https://waze.com/ul?ll=9.919641,-84.130212&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.919641,-84.130212) |
 
-**Open in Google Maps** (1 link, split so none drops its tail):
+**Whole leg in Google Maps** (1 link, split so none drops its tail):
 
-1. [Stops El Carmen → Bello Horizonte (10)](https://www.google.com/maps/dir/9.896587,-84.141322/9.902779,-84.139892/9.904545,-84.134466/9.912703,-84.140659/9.915877,-84.140888/9.914786,-84.137960/9.915443,-84.138173/9.917258,-84.138781/9.919432,-84.137213/9.919641,-84.130212)
+1. [El Carmen → Bello Horizonte (10 stops)](https://www.google.com/maps/dir/9.896587,-84.141322/9.902779,-84.139892/9.904545,-84.134466/9.912703,-84.140659/9.915877,-84.140888/9.914786,-84.137960/9.915443,-84.138173/9.917258,-84.138781/9.919432,-84.137213/9.919641,-84.130212)
 
 ## Leg 2 — Escazú / San Rafael / San Antonio — Belo Horizonte, Trejos Montealegre, Maynard
 
 10 stops · 5.1 km straight-line
 
-| # | School | Sector | MEP | Latitude, longitude |
-| --: | --- | --- | --- | --- |
-| 1 | Centro Educativo Saint Augustine College | Privado | 200058-00 | `9.927621, -84.128140` |
-| 2 | Integral Kallpa | Privado | 200062-00 | `9.929339, -84.128443` |
-| 3 | I.E.G.B. Pbro. Yanuario Quesada | Público | 104805-00 | `9.929608, -84.135395` |
-| 4 | Hometwo Montessori | Privado | 200060-00 | `9.927758, -84.136001` |
-| 5 | Centro Educativo Kids World Montessori (Escazu) | Privado | 205255-00 | `9.924626, -84.141415` |
-| 6 | República de Venezuela | Público | 100552-00 | `9.919060, -84.140626` |
-| 7 | CONED Escazú | Público | 105542-00 | `9.917405, -84.143074` |
-| 8 | Jardín de Niños Corazón de Jesús | Público | — | `9.914864, -84.147209` |
-| 9 | Corazón de Jesús | Público | 100536-00 | `9.914643, -84.147998` |
-| 10 | David Marín Hidalgo | Público | 100518-00 | `9.903983, -84.159223` |
+| # | School | Sector | Address | Coordinates | Navigate |
+| --: | --- | --- | --- | --- | --- |
+| 1 | **Centro Educativo Saint Augustine College**<br>`200058-00` | Privado | Avenida 12, Palma de Mayorca, San Rafael | `9.927621, -84.128140` | [Waze](https://waze.com/ul?ll=9.927621,-84.128140&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.927621,-84.128140) |
+| 2 | **Integral Kallpa**<br>`200062-00` | Privado | Calle Vista Alegre, Tena, San Rafael | `9.929339, -84.128443` | [Waze](https://waze.com/ul?ll=9.929339,-84.128443&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.929339,-84.128443) |
+| 3 | **I.E.G.B. Pbro. Yanuario Quesada**<br>`104805-00` | Público | Carretera John F. Kennedy, Betina, San Rafael | `9.929608, -84.135395` | [Waze](https://waze.com/ul?ll=9.929608,-84.135395&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.929608,-84.135395) |
+| 4 | **Hometwo Montessori**<br>`200060-00` | Privado | Avenida Fernández Delgado, Maynard, San Rafael | `9.927758, -84.136001` | [Waze](https://waze.com/ul?ll=9.927758,-84.136001&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.927758,-84.136001) |
+| 5 | **Centro Educativo Kids World Montessori (Escazu)**<br>`205255-00` | Privado | Avenida 20, Faroles, Escazú | `9.924626, -84.141415` | [Waze](https://waze.com/ul?ll=9.924626,-84.141415&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.924626,-84.141415) |
+| 6 | **República de Venezuela**<br>`100552-00` | Público | Avenida 32, Guapinol, Escazú | `9.919060, -84.140626` | [Waze](https://waze.com/ul?ll=9.919060,-84.140626&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.919060,-84.140626) |
+| 7 | **CONED Escazú**<br>`105542-00` | Público | Calle 140, Carrizal, Escazú | `9.917405, -84.143074` | [Waze](https://waze.com/ul?ll=9.917405,-84.143074&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.917405,-84.143074) |
+| 8 | **Jardín de Niños Corazón de Jesús**<br>`—` | Público | Calle 150, Carrizal, Escazú | `9.914864, -84.147209` | [Waze](https://waze.com/ul?ll=9.914864,-84.147209&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.914864,-84.147209) |
+| 9 | **Corazón de Jesús**<br>`100536-00` | Público | Calle 150, Carrizal, Escazú | `9.914643, -84.147998` | [Waze](https://waze.com/ul?ll=9.914643,-84.147998&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.914643,-84.147998) |
+| 10 | **David Marín Hidalgo**<br>`100518-00` | Público | Calle Bebedero, Bebedero, San Antonio | `9.903983, -84.159223` | [Waze](https://waze.com/ul?ll=9.903983,-84.159223&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.903983,-84.159223) |
 
-**Open in Google Maps** (1 link, split so none drops its tail):
+**Whole leg in Google Maps** (1 link, split so none drops its tail):
 
-1. [Stops Centro Educativo Saint Augustine College → David Marín Hidalgo (10)](https://www.google.com/maps/dir/9.927621,-84.128140/9.929339,-84.128443/9.929608,-84.135395/9.927758,-84.136001/9.924626,-84.141415/9.919060,-84.140626/9.917405,-84.143074/9.914864,-84.147209/9.914643,-84.147998/9.903983,-84.159223)
+1. [Centro Educativo Saint Augustine College → David Marín Hidalgo (10 stops)](https://www.google.com/maps/dir/9.927621,-84.128140/9.929339,-84.128443/9.929608,-84.135395/9.927758,-84.136001/9.924626,-84.141415/9.919060,-84.140626/9.917405,-84.143074/9.914864,-84.147209/9.914643,-84.147998/9.903983,-84.159223)
 
 ## Leg 3 — San Rafael / San Antonio — San Rafael, Laureles, San Antonio
 
 13 stops · 7.8 km straight-line
 
-| # | School | Sector | MEP | Latitude, longitude |
-| --: | --- | --- | --- | --- |
-| 1 | Centro Educativo Kinder Pandas Daycare | Privado | 205422-00 | `9.926571, -84.149670` |
-| 2 | Centro Educativo Arandú / Centro Educativo Arandú School | Privado | 200057-00 | `9.930231, -84.147178` |
-| 3 | Centro Educativo True North Personalized Learning School | Privado | 205203-00 | `9.931262, -84.149367` |
-| 4 | Jardín Infantil Integral Borboleta e Itskatzú Educación Integral | Privado | 200061-00 | `9.932950, -84.153177` |
-| 5 | Guachipelín | Público | 100559-00 | `9.944419, -84.159054` |
-| 6 | Colegio Santa María (Saint Mary High School) | Privado | 200066-00 | `9.950648, -84.164800` |
-| 7 | Centro Educativo Royal International Education | Privado | 205510-00 | `9.952213, -84.164588` |
-| 8 | Lighthouse International School | Privado | 200063-00 | `9.955160, -84.166564` |
-| 9 | Washington School | Privado | 200068-00 | `9.956642, -84.169559` |
-| 10 | West College / West Primary | Privado | 200069-00 | `9.960007, -84.174557` |
-| 11 | Centro Educativo Kipos | Privado | 205395-00 | `9.961919, -84.177537` |
-| 12 | Escuela Vista del Monte (Mount View School) | Privado | 200064-00 | `9.961410, -84.173112` |
-| 13 | Blue Valley School (Colegio Valle Azul) | Privado | 200067-00 | `9.953543, -84.159150` |
+| # | School | Sector | Address | Coordinates | Navigate |
+| --: | --- | --- | --- | --- | --- |
+| 1 | **Centro Educativo Kinder Pandas Daycare**<br>`205422-00` | Privado | Cond. Los Guayabos, San Rafael | `9.926571, -84.149670` | [Waze](https://waze.com/ul?ll=9.926571,-84.149670&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.926571,-84.149670) |
+| 2 | **Centro Educativo Arandú / Centro Educativo Arandú School**<br>`200057-00` | Privado | Calle Real, Ayala, San Rafael | `9.930231, -84.147178` | [Waze](https://waze.com/ul?ll=9.930231,-84.147178&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.930231,-84.147178) |
+| 3 | **Centro Educativo True North Personalized Learning School**<br>`205203-00` | Privado | Calle Guachipelines, Ayala, San Rafael | `9.931262, -84.149367` | [Waze](https://waze.com/ul?ll=9.931262,-84.149367&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.931262,-84.149367) |
+| 4 | **Jardín Infantil Integral Borboleta e Itskatzú Educación Integral**<br>`200061-00` | Privado | Carretera John F. Kennedy, Bajo Palomas, San Rafael | `9.932950, -84.153177` | [Waze](https://waze.com/ul?ll=9.932950,-84.153177&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.932950,-84.153177) |
+| 5 | **Guachipelín**<br>`100559-00` | Público | Vía 310, Ayala, San Rafael | `9.944419, -84.159054` | [Waze](https://waze.com/ul?ll=9.944419,-84.159054&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.944419,-84.159054) |
+| 6 | **Colegio Santa María (Saint Mary High School)**<br>`200066-00` | Privado | Calle Guachipelines, Real de Pereira, San Rafael | `9.950648, -84.164800` | [Waze](https://waze.com/ul?ll=9.950648,-84.164800&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.950648,-84.164800) |
+| 7 | **Centro Educativo Royal International Education**<br>`205510-00` | Privado | Calle Guachipelines, Real de Pereira, San Rafael | `9.952213, -84.164588` | [Waze](https://waze.com/ul?ll=9.952213,-84.164588&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.952213,-84.164588) |
+| 8 | **Lighthouse International School**<br>`200063-00` | Privado | Calle Guachipelines, Real de Pereira, San Rafael | `9.955160, -84.166564` | [Waze](https://waze.com/ul?ll=9.955160,-84.166564&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.955160,-84.166564) |
+| 9 | **Washington School**<br>`200068-00` | Privado | Calle Guachipelines, Real de Pereira, San Rafael | `9.956642, -84.169559` | [Waze](https://waze.com/ul?ll=9.956642,-84.169559&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.956642,-84.169559) |
+| 10 | **West College / West Primary**<br>`200069-00` | Privado | Avenida 1, San Rafael | `9.960007, -84.174557` | [Waze](https://waze.com/ul?ll=9.960007,-84.174557&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.960007,-84.174557) |
+| 11 | **Centro Educativo Kipos**<br>`205395-00` | Privado | Avenida Real de Pereira, Real de Pereira, San Rafael | `9.961919, -84.177537` | [Waze](https://waze.com/ul?ll=9.961919,-84.177537&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.961919,-84.177537) |
+| 12 | **Escuela Vista del Monte (Mount View School)**<br>`200064-00` | Privado | Calle Guachipelines, Real de Pereira, San Rafael | `9.961410, -84.173112` | [Waze](https://waze.com/ul?ll=9.961410,-84.173112&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.961410,-84.173112) |
+| 13 | **Blue Valley School (Colegio Valle Azul)**<br>`200067-00` | Privado | Calle Mango, San Rafael | `9.953543, -84.159150` | [Waze](https://waze.com/ul?ll=9.953543,-84.159150&navigate=yes) · [Maps](https://www.google.com/maps/search/?api=1&query=9.953543,-84.159150) |
 
-**Open in Google Maps** (2 links, split so none drops its tail):
+**Whole leg in Google Maps** (2 links, split so none drops its tail):
 
-1. [Stops Centro Educativo Kinder Pandas Daycare → West College / West Primary (10)](https://www.google.com/maps/dir/9.926571,-84.149670/9.930231,-84.147178/9.931262,-84.149367/9.932950,-84.153177/9.944419,-84.159054/9.950648,-84.164800/9.952213,-84.164588/9.955160,-84.166564/9.956642,-84.169559/9.960007,-84.174557)
-2. [Stops West College / West Primary → Blue Valley School (Colegio Valle Azul) (4)](https://www.google.com/maps/dir/9.960007,-84.174557/9.961919,-84.177537/9.961410,-84.173112/9.953543,-84.159150)
+1. [Centro Educativo Kinder Pandas Daycare → West College / West Primary (10 stops)](https://www.google.com/maps/dir/9.926571,-84.149670/9.930231,-84.147178/9.931262,-84.149367/9.932950,-84.153177/9.944419,-84.159054/9.950648,-84.164800/9.952213,-84.164588/9.955160,-84.166564/9.956642,-84.169559/9.960007,-84.174557)
+2. [West College / West Primary → Blue Valley School (Colegio Valle Azul) (4 stops)](https://www.google.com/maps/dir/9.960007,-84.174557/9.961919,-84.177537/9.961410,-84.173112/9.953543,-84.159150)

@@ -113,6 +113,22 @@ function order(stops) {
 }
 
 /**
+ * A Waze deep link for one stop.
+ *
+ * `ll` + `navigate=yes` rather than a search string, on purpose: Waze's search
+ * would have to guess which "Escuela Corazón de Jesús" is meant (there are two
+ * in this metro area alone, and the register knows it), while a coordinate is
+ * unambiguous. Waze routes one stop at a time — it has no multi-stop URL — so
+ * the route lives in the sheet's ordering and Waze does each hop.
+ */
+const wazeLink = (s) =>
+  `https://waze.com/ul?ll=${s.lonlat[1].toFixed(6)},${s.lonlat[0].toFixed(6)}&navigate=yes`;
+
+/** One Google Maps link per stop, for the same job on a non-Waze phone. */
+const mapsPin = (s) =>
+  `https://www.google.com/maps/search/?api=1&query=${s.lonlat[1].toFixed(6)},${s.lonlat[0].toFixed(6)}`;
+
+/**
  * Google Maps `dir/` links, batched. One link per ~10 stops: the URL form takes
  * more, but Maps quietly drops the tail on a long one, and a link that silently
  * loses the last four schools is worse than four links that all work.
@@ -155,6 +171,7 @@ const stops = schools.features.map((f) => ({
   district: (f.properties.district ?? "").toUpperCase(),
   locality: f.properties.locality,
   mep: f.properties.mep_code,
+  address: f.properties.address,
   lonlat: f.geometry.coordinates,
 }));
 
@@ -217,7 +234,7 @@ ${stops
   .map(
     (s) => `  <wpt lat="${s.lonlat[1].toFixed(6)}" lon="${s.lonlat[0].toFixed(6)}">
     <name>${esc(s.name)}</name>
-    <desc>${esc(`${s.sector === "public" ? "Público" : "Privado"}${s.mep ? ` · MEP ${s.mep}` : ""}${s.locality ? ` · ${s.locality}` : ""}`)}</desc>
+    <desc>${esc(`${s.sector === "public" ? "Público" : "Privado"}${s.mep ? ` · MEP ${s.mep}` : ""}${s.address ? ` · ${s.address}` : ""}`)}</desc>
     <sym>School</sym>
   </wpt>`,
   )
@@ -263,6 +280,8 @@ const routeGeo = {
           name: s.name,
           sector: s.sector,
           mep_code: s.mep,
+          address: s.address,
+          waze: wazeLink(s),
           leg: li + 1,
           leg_title: l.title,
           stop: i + 1,
@@ -296,6 +315,11 @@ const md = [
   "nav app at the next stop and let it find the road; what this settles is which",
   "stop is next.",
   "",
+  "**Waze takes one stop at a time** — it has no multi-stop URL. So the route is",
+  "the ORDER in this sheet: tap the next school's Waze link when you finish the",
+  "last one. The Google Maps link at the foot of each leg does carry the whole",
+  "leg at once, if you would rather see it as one line.",
+  "",
   "Files: `school-route.gpx` (waypoints + one route per leg, for OsmAnd / Gaia /",
   "Garmin), `school-route.geojson` (the same thing for a map).",
   "",
@@ -305,19 +329,19 @@ for (const [li, l] of legs.filter((x) => x.stops.length).entries()) {
   md.push("");
   md.push(`${l.stops.length} stops · ${(legLength(l.stops) / 1000).toFixed(1)} km straight-line`);
   md.push("");
-  md.push("| # | School | Sector | MEP | Latitude, longitude |");
-  md.push("| --: | --- | --- | --- | --- |");
+  md.push("| # | School | Sector | Address | Coordinates | Navigate |");
+  md.push("| --: | --- | --- | --- | --- | --- |");
   l.stops.forEach((s, i) => {
     md.push(
-      `| ${i + 1} | ${s.name} | ${s.sector === "public" ? "Público" : "Privado"} | ${s.mep ?? "—"} | \`${s.lonlat[1].toFixed(6)}, ${s.lonlat[0].toFixed(6)}\` |`,
+      `| ${i + 1} | **${s.name}**<br>\`${s.mep ?? "—"}\` | ${s.sector === "public" ? "Público" : "Privado"} | ${s.address ?? "—"} | \`${s.lonlat[1].toFixed(6)}, ${s.lonlat[0].toFixed(6)}\` | [Waze](${wazeLink(s)}) · [Maps](${mapsPin(s)}) |`,
     );
   });
   md.push("");
   const links = mapsLinks(l.stops);
-  md.push(`**Open in Google Maps** (${links.length} link${links.length === 1 ? "" : "s"}, split so none drops its tail):`);
+  md.push(`**Whole leg in Google Maps** (${links.length} link${links.length === 1 ? "" : "s"}, split so none drops its tail):`);
   md.push("");
   links.forEach((lk, i) => {
-    md.push(`${i + 1}. [Stops ${lk.from.name} → ${lk.to.name} (${lk.count})](${lk.url})`);
+    md.push(`${i + 1}. [${lk.from.name} → ${lk.to.name} (${lk.count} stops)](${lk.url})`);
   });
   md.push("");
 }
