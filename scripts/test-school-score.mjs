@@ -313,6 +313,24 @@ console.log("the seal");
   check("the seal expires", /VIGENTE/.test(comp) && /validUntil/.test(comp));
   check("the awarding body is a labelled slot, not a drawn logo",
     /awardedBy/.test(comp) && /logo del ente/i.test(comp) && !/purdy/i.test(comp));
+
+  // The convener's asset is supplied by the PAGE and stays out of the seal.
+  // Merging a sponsor's mark into a certification mark is what makes a seal
+  // die with its sponsor, and it is a claim the standard has not yet earned —
+  // hence the label says proposed, on both locales.
+  {
+    const page = read("app/[locale]/schools/page.tsx");
+    const en = JSON.parse(read("messages/en.json")).schoolsPage;
+    const es = JSON.parse(read("messages/es.json")).schoolsPage;
+    check("the partner mark is passed in beside the seal, never drawn into it",
+      /awardedBy=\{/.test(page) && /brand\/grupo-purdy\.png/.test(page));
+    check("the partner mark inverts for dark rather than sitting on a white box",
+      /dark:invert/.test(page));
+    check("the lockup labels the award as proposed, not granted",
+      /sealAwardedByProposed/.test(page) &&
+      /proposed/i.test(en.sealAwardedByProposed) && /propuesta/i.test(es.sealAwardedByProposed) &&
+      /proposal/i.test(en.sealNote) && /propuesta/i.test(es.sealNote));
+  }
   check("the exported SVG is well-formed and self-coloured",
     svg.startsWith("<svg") && svg.trimEnd().endsWith("</svg>") && !svg.includes("currentColor"));
 }

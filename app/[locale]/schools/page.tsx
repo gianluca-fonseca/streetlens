@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
@@ -181,8 +182,22 @@ export default async function SchoolsPage({
             state="awarded"
             municipality={`Cantón de ${MUNICIPALITY.name}`}
             validUntil={new Date().getFullYear() + 2}
-            awardedByLabel={t("sealAwardedBy")}
+            awardedByLabel={t("sealAwardedByProposed")}
             verifiedByLabel={t("sealVerifiedBy")}
+            awardedBy={
+              /* The partner's own asset, kept OUT of the seal component: the
+                 mark belongs to the standard, the logo belongs to the convener,
+                 and merging them is the thing the lockup exists to prevent.
+                 Black artwork on transparency, so it inverts for dark. */
+              <Image
+                src="/brand/grupo-purdy.png"
+                alt="Grupo Purdy"
+                width={274}
+                height={80}
+                className="h-[30px] w-auto dark:invert"
+                priority={false}
+              />
+            }
           />
           <p className="mt-5 max-w-[54ch] text-[12px] leading-relaxed text-neutral-strong">
             {t("sealNote")}

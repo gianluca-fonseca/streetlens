@@ -2012,7 +2012,7 @@
     "statAwaiting": "Sin datos",
     "statToRecord": "Por registrar",
     "home": "Inicio",
-    "sealAwardedBy": "Otorgado por",
+    "sealAwardedByProposed": "Otorgado por (propuesta)",
     "sealVerifiedBy": "Medición verificada por",
     "sealNote": "Una propuesta, no una certificación vigente. El sello pertenece al estándar y no a quien lo financie, y el ente que lo otorga aparece al lado y no fundido dentro. Esa separación es lo que da peso a sellos como Bandera Azul: que cambie un patrocinador no invalida cada sello ya emitido."
   }

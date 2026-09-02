@@ -2012,7 +2012,7 @@
     "statAwaiting": "Awaiting data",
     "statToRecord": "Still to record",
     "home": "Home",
-    "sealAwardedBy": "Awarded by",
+    "sealAwardedByProposed": "Awarded by (proposed)",
     "sealVerifiedBy": "Measurement verified by",
     "sealNote": "A proposal, not a live certification. The mark belongs to the standard, not to whoever funds it, and the awarding body is named beside it rather than merged into it. That separation is why seals like Bandera Azul carry weight: a sponsor changing does not invalidate every mark ever issued."
   }
