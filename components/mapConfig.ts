@@ -494,3 +494,202 @@ export const BASEMAP = {
     labelHalo: "#0a0a0a",
   },
 } as const;
+
+/* ------------------------------------------------------------------ *
+ * School pins (the "Escuela Segura" overlay)
+ *
+ * Schools are an OVERLAY on the score map, not a sixth lens, so they must be
+ * readable without spending any of the page's chroma budget. The sealed score
+ * RAMP and the flash pink are the only strong colour on this product (see the
+ * BASEMAP note below), and a school pin that arrived in its own hue would put a
+ * sixth colour family next to five that already encode a number — the reader
+ * would look for the value it encodes and there isn't one.
+ *
+ * So the pins separate by FORM, in the page's own ink:
+ *
+ *   public school    SOLID ink disc, paper ring
+ *   private school   HOLLOW disc (paper fill, ink ring)
+ *
+ * Filled-vs-hollow survives greyscale, every kind of colour blindness, and a
+ * phone in sunlight, which colour alone would not. The paper-coloured ring is
+ * what keeps a pin legible where it lands on a dark score line: it is the same
+ * device the basemap already uses for label haloes.
+ * ------------------------------------------------------------------ */
+
+export const SCHOOL_PIN = {
+  light: {
+    /** Public: solid disc. Near-ink rather than pure black, matching label ink. */
+    fill: "#3d3d3d",
+    /** Private: the disc reads as an outline against the page. */
+    hollow: "#fafafa",
+    ring: "#fafafa",
+    stroke: "#3d3d3d",
+    label: "#3d3d3d",
+    labelHalo: "#fafafa",
+  },
+  dark: {
+    fill: "#d8d8d8",
+    hollow: "#0a0a0a",
+    ring: "#0a0a0a",
+    stroke: "#d8d8d8",
+    label: "#d8d8d8",
+    labelHalo: "#0a0a0a",
+  },
+} as const;
+
+/**
+ * Pin radius by zoom. Small enough at canton zoom that 33 pins read as a
+ * distribution rather than a blanket over the network, and large enough by
+ * street zoom to be a comfortable tap target.
+ */
+export const schoolRadiusExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  11,
+  3,
+  13.5,
+  5,
+  16,
+  8,
+] as unknown as ExpressionSpecification;
+
+/** Solid for a public school, paper-filled (so it reads hollow) for a private one. */
+export function schoolFillExpression(theme: RampTheme): ExpressionSpecification {
+  const pin = SCHOOL_PIN[theme];
+  return [
+    "case",
+    ["==", ["get", "sector"], "public"],
+    pin.fill,
+    pin.hollow,
+  ] as unknown as ExpressionSpecification;
+}
+
+/**
+ * Ring colour. A public pin takes the paper ring that lifts it off a score line;
+ * a private pin's ring IS its ink, because the ring is the whole mark.
+ */
+export function schoolRingExpression(theme: RampTheme): ExpressionSpecification {
+  const pin = SCHOOL_PIN[theme];
+  return [
+    "case",
+    ["==", ["get", "sector"], "public"],
+    pin.ring,
+    pin.stroke,
+  ] as unknown as ExpressionSpecification;
+}
+
+/** Ring width, matched to the radius ramp so the mark keeps its proportions. */
+export const schoolRingWidthExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  11,
+  1.2,
+  16,
+  2.2,
+] as unknown as ExpressionSpecification;
+
+/* ------------------------------------------------------------------ *
+ * School zones, and the capture backlog inside them
+ *
+ * Three marks, and they answer three different questions:
+ *
+ *   the RING          where the zone ends. A drawn circle at the walk radius,
+ *                     pulsing slowly so it reads as a live boundary rather than
+ *                     a printed one. It is a MARKER, not the measurement: the
+ *                     score comes from the walkshed, and streets inside the ring
+ *                     the walkshed cannot reach are simply not drawn as members.
+ *   a ZONE STREET     a street the score is actually computed from. Painted on
+ *                     the normal score ramp, because it IS a scored street —
+ *                     nothing about being near a school changes its reading.
+ *   a GAP             a street inside the zone that nobody has recorded yet.
+ *                     This is the one that has to shout: it is the field
+ *                     backlog, the thing a camera should be pointed at next,
+ *                     and the reason a school reads `sin datos`.
+ *
+ * The gap takes the accent — the only place in the product where flash pink is
+ * spent on data rather than on an active control. It earns the exception: a gap
+ * is not a score on a scale, it is an absence, and it must never be mistaken for
+ * a low reading. Dashed, so it also reads as provisional, and moving, so it
+ * reads as an instruction rather than a state.
+ * ------------------------------------------------------------------ */
+
+export const SCHOOL_ZONE_PAINT = {
+  light: {
+    ring: "#c0106b",
+    ringFill: "rgba(192, 16, 107, 0.055)",
+    gateRing: "#111111",
+    gap: "#f0268c",
+  },
+  dark: {
+    ring: "#ff4fa3",
+    ringFill: "rgba(255, 79, 163, 0.09)",
+    gateRing: "#f2f2f2",
+    gap: "#ff4fa3",
+  },
+} as const;
+
+/** Dashed: an unrecorded street is an instruction, not a reading. */
+export const SCHOOL_GAP_CASING = {
+  dash: [1.4, 1.2] as [number, number],
+} as const;
+
+/**
+ * Gap width by zoom. Thin at canton scale and thick at street scale, because
+ * the two zooms are two different questions. Zoomed out, thirty-three backlogs
+ * at once only need to say WHERE the work is, and a fat casing at that density
+ * swamps the score ramp it is supposed to sit beside. Zoomed in, the reader is
+ * planning a route down one street and the mark has to be unmissable.
+ */
+export const schoolGapWidthExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  11,
+  1.8,
+  14,
+  3.4,
+  16,
+  5,
+] as unknown as ExpressionSpecification;
+
+/**
+ * The pulse. One shared driver rather than a CSS animation, because these are
+ * WebGL layers and there is no element to animate.
+ *
+ * Deliberately slow (a ~2.6 s cycle) and shallow: a fast or high-contrast pulse
+ * on a map the reader is trying to study is an irritant, and thirty-three of
+ * them at once would be unusable. Returns 0..1.
+ */
+export const ZONE_PULSE_PERIOD_MS = 2600;
+
+export function zonePulse(elapsedMs: number): number {
+  return 0.5 - 0.5 * Math.cos((2 * Math.PI * elapsedMs) / ZONE_PULSE_PERIOD_MS);
+}
+
+/**
+ * A geodesic circle as a GeoJSON polygon.
+ *
+ * A MapLibre `circle` layer sizes in PIXELS, so it would stay the same size on
+ * screen as the reader zooms — the ring would silently stop meaning 400 metres,
+ * which is the one thing it exists to say. A polygon is in world coordinates and
+ * therefore keeps its promise at every zoom.
+ */
+export function geodesicCircle(
+  center: [number, number],
+  radiusM: number,
+  steps = 72,
+): [number, number][] {
+  const [lon, lat] = center;
+  const latRad = (lat * Math.PI) / 180;
+  // Degrees per metre, corrected for latitude on the longitude axis.
+  const dLat = radiusM / 111_320;
+  const dLon = radiusM / (111_320 * Math.cos(latRad));
+  const ring: [number, number][] = [];
+  for (let i = 0; i <= steps; i++) {
+    const a = (2 * Math.PI * i) / steps;
+    ring.push([lon + dLon * Math.cos(a), lat + dLat * Math.sin(a)]);
+  }
+  return ring;
+}

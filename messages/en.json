@@ -86,6 +86,51 @@
       "excellent": "Excellent"
     }
   },
+  "schools": {
+    "toggleLabel": "Schools",
+    "sector": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "level": {
+      "preschool": "Preschool",
+      "primary": "Primary",
+      "preschool_primary": "Preschool + primary",
+      "secondary": "Secondary",
+      "basica_general": "General basic",
+      "adult": "Adult education"
+    },
+    "district": "District",
+    "locality": "Locality",
+    "mepCode": "MEP code",
+    "circuit": "Circuit",
+    "alsoHere": "Also at this site",
+    "website": "School website",
+    "close": "Close school details",
+    "provenanceMepOsm": "MEP register, positioned on the OpenStreetMap campus ({delta} m from the registry point).",
+    "provenanceMepOnly": "MEP register. No mapped campus yet, so the pin is the registry's own surveyed point.",
+    "provenanceOsmOnly": "From OpenStreetMap. Not a separate row in the MEP register.",
+    "sealLabel": "Escuela Segura",
+    "tier": {
+      "sin_datos": "Awaiting data",
+      "critico": "Critical",
+      "en_riesgo": "At risk",
+      "en_progreso": "Improving",
+      "escuela_segura": "Escuela Segura"
+    },
+    "complianceLabel": "Walk meeting Ley 7600",
+    "scoreLabel": "School Score",
+    "awaitingData": "Only {pct} of the walk to this school has been surveyed. Too little to publish a rating we would stand behind.",
+    "gapNote": "{count, plural, one {# street} other {# streets}} still to record · {metres} m",
+    "zoneLabel": "School zone",
+    "gateRing": "Gate ring · 150 m",
+    "walkRing": "Walk ring · 400 m",
+    "coverageLabel": "Zone surveyed",
+    "priorityLabel": "Intervention priority",
+    "overriddenLabel": "Published figure set by hand",
+    "assessmentModel": "Written by the model from the figures above",
+    "assessmentHuman": "Written by the team"
+  },
   "panel": {
     "eyebrow": "Escazú pilot",
     "heroStat": "{pct}% of audited segments fail Ley 7600 accessibility minimums",
@@ -175,7 +220,8 @@
       "import": "Bulk import",
       "ops": "Pipeline ops",
       "logout": "Log out",
-      "publicMap": "Public map"
+      "publicMap": "Public map",
+      "schools": "Schools"
     },
     "login": {
       "title": "Admin access",
@@ -707,17 +753,17 @@
     "hero": {
       "wordmark": "StreetLens",
       "byCusp": "by CUSP",
-      "question": "How good are our streets?",
-      "subtitle": "Cleaner, more livable cities for everyone start with streets you can measure.",
-      "pilot": "Pilot program · Escazú, Costa Rica",
+      "question": "How safe is the walk to school?",
+      "subtitle": "Every child's route to class is public infrastructure. In Escazú we measured all 33 of them, street by street, against a standard anyone can check.",
+      "pilot": "Pilot program · Escazú, Costa Rica",
+      "scrollCue": "Keep reading",
       "requestCity": "Want this for your city? Request it",
       "madeBy": "Made with ❤️ by <name>Gianluca Fonseca</name>",
       "banner": {
         "methodQuestion": "How does StreetLens work?",
         "methodLink": "Method",
         "platform": "Open the platform",
-        "insightsLink": "Insights",
-        "origin": "Costa Rica"
+        "insightsLink": "Insights"
       },
       "segments": {
         "title": "Lowest-scoring streets",
@@ -744,9 +790,34 @@
       "map": {
         "live": "Live map",
         "relief": "Height is a chart, not terrain: taller means a higher overall score.",
-        "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform."
+        "affordance": "Drag to pan. Hold ⌘ or Ctrl to zoom. Tap a segment to open it in the platform.",
+        "place": "Escazú, Costa Rica",
+        "placeNote": "The pilot street network"
       },
       "openSource": "The code is public: view / contribute"
+    },
+    "schoolSafety": {
+      "eyebrow": "Escuela Segura",
+      "title": "A seal for the streets around a school",
+      "body": "Bandera Azul works because the standard is public, the verification is independent, and the seal expires. Escuela Segura is built the same way, on one question: what share of the walk to this school meets Ley 7600? StreetLens measures it from the streets themselves. The seal is awarded by a convening body, not by us.",
+      "statSchools": "Schools mapped",
+      "statRated": "Rated so far",
+      "statAwaiting": "Awaiting survey",
+      "statGap": "Streets still to record",
+      "pointOne": {
+        "title": "The children with the least choice walk the most",
+        "body": "A family with a car can drive around a missing sidewalk. A family without one cannot. Fixing school streets reaches the households with no way around the problem."
+      },
+      "pointTwo": {
+        "title": "One canton, then the country",
+        "body": "Costa Rica has more than four thousand schools. Escazú is not the goal, it is the template: a standard and an instrument the next canton can adopt without inventing either."
+      },
+      "pointThree": {
+        "title": "No rating without evidence",
+        "body": "Below 60% of the walk surveyed, a school publishes no score at all. Most of the canton sits there today, and saying so is the point."
+      },
+      "ctaStandard": "Read the standard",
+      "ctaMap": "Open the zones on the map"
     },
     "mission": {
       "eyebrow": "The mission",
@@ -1878,5 +1949,71 @@
       "insights": "Open insights →",
       "map": "Open the map →"
     }
+  },
+  "schoolsPage": {
+    "meta": {
+      "title": "Escuela Segura · {municipality}",
+      "description": "Every school in {municipality}, rated on the streets children actually walk to reach it. A published standard, anchored to Ley 7600, with the evidence behind every rating."
+    },
+    "eyebrow": "Escuela Segura",
+    "title": "Rate the walk, not the school",
+    "standfirst": "A child's route to class is public infrastructure, and in {municipality} nobody has measured it. This is every school in the canton, rated on the streets inside its own walking catchment, against a standard anyone can check.",
+    "why": {
+      "title": "Why school zones first",
+      "equity": {
+        "title": "The children with the least choice walk the most",
+        "body": "A family with a car can drive around a missing sidewalk. A family without one cannot, and their children walk or cycle the same broken block twice a day, every school day. Fixing the streets around public schools reaches exactly the households that have no way around the problem."
+      },
+      "precedent": {
+        "title": "One canton is a template, not an endpoint",
+        "body": "There are more than four thousand schools in Costa Rica. The point of doing Escazú properly is not Escazú: it is a standard, a method, and a working instrument that any canton can adopt without inventing its own. Get one right and the rest is repetition."
+      },
+      "tractable": {
+        "title": "The fix is often small and specific",
+        "body": "Most of what makes a school walk dangerous is not a corridor rebuild. It is a crossing that was never painted, a ramp that stops at a kerb, a drain that floods the only sidewalk. Naming those, school by school, turns an overwhelming problem into a fundable list."
+      }
+    },
+    "standard": {
+      "title": "The standard",
+      "zoneTitle": "The zone is a walk, not a radius",
+      "zoneBody": "Two rings, both measured along the street network rather than as a straight line: the gate ring at {gate} m, and the walking catchment at {walk} m, about five minutes at a child's pace. Gate-ring streets count double. A circle drawn on a map would include streets across the highway that no child has ever walked to school on.",
+      "scoreTitle": "Two numbers, two jobs",
+      "scoreBody": "The tier comes from Ley 7600 compliance: what share of the weighted walk meets the legal accessibility minimum. That is what the seal turns on, and it is arguable in front of a ministry. The 0–100 School Score sits underneath as the diagnostic that says what to fix.",
+      "coverageTitle": "No rating without evidence",
+      "coverageBody": "Below {minCoverage}% of the walk surveyed, a school publishes as Sin datos suficientes: no tier, no number. A green rating computed from three observed streets is worse than no rating at all, and today that rule holds back most of the canton.",
+      "vetoTitle": "One lethal block caps the school",
+      "vetoBody": "A single segment inside the gate ring below the safety floor caps a school at Crítico whatever its average says. A mean is very good at hiding one bad block, and a seal earned that way would be worth nothing.",
+      "sealTitle": "The seal is earned, verified, and expires",
+      "sealBody": "Escuela Segura requires {minSeal}% coverage, no gate veto, a compliant walk, and at least one human field audit — not a camera pass alone. It lasts {months} months. StreetLens measures; the seal is awarded by a convening body, the way Bandera Azul works."
+    },
+    "tiersTitle": "The ladder",
+    "leaderboardTitle": "Every school in the canton",
+    "leaderboardNote": "Ordered by the share of the walk that meets Ley 7600. Schools without enough survey coverage sit at the bottom without a rank, because that is a verdict on us, not on them.",
+    "priorityTitle": "Where an intervention goes furthest",
+    "priorityNote": "Deficit × children exposed × how much of the fix sits in the cheap gate ring. Not simply the worst schools: the worst school is not automatically the best place to spend.",
+    "backlogTitle": "What we still have to record",
+    "backlogNote": "Streets inside a school zone that no camera has passed. This is the field backlog, and it is the honest reason so many schools read Sin datos.",
+    "columns": {
+      "school": "School",
+      "sector": "Sector",
+      "tier": "Rating",
+      "compliance": "Ley 7600",
+      "score": "Score",
+      "coverage": "Surveyed",
+      "toRecord": "To record",
+      "priority": "Priority"
+    },
+    "openMap": "See the zones on the map",
+    "provenanceTitle": "Where the numbers come from",
+    "provenanceBody": "The roster is the MEP's own register. Street scores come from the same capture pipeline that scores every street in the canton: nothing about being near a school changes how a street is measured. The school rating is an aggregation of those scores over the walkshed, and it is recomputed on every page load, so it moves the moment new field data lands.",
+    "crashNote": "Crash and incident history is not yet part of the rating. It is carried in the formula at zero weight so its absence is stated rather than assumed away; adding a collision feed is the next thing that would make these ratings stronger.",
+    "statSchools": "Schools",
+    "statScored": "Rated",
+    "statAwaiting": "Awaiting data",
+    "statToRecord": "Still to record",
+    "home": "Home",
+    "sealAwardedByProposed": "Awarded by (proposed)",
+    "sealVerifiedBy": "Measurement verified by",
+    "sealNote": "A proposal, not a live certification. The mark belongs to the standard, not to whoever funds it, and the awarding body is named beside it rather than merged into it. That separation is why seals like Bandera Azul carry weight: a sponsor changing does not invalidate every mark ever issued."
   }
 }

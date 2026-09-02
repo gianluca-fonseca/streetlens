@@ -13,6 +13,7 @@ import {
 } from "@/lib/map-panel-storage";
 import ExploreCta from "@/components/ExploreCta";
 import LayerSwitcher from "@/components/LayerSwitcher";
+import SchoolsToggle from "@/components/SchoolsToggle";
 import Legend from "@/components/Legend";
 import ProvenanceNote from "@/components/ProvenanceNote";
 import styles from "@/components/ui/zen.module.css";
@@ -32,10 +33,17 @@ export default function MapPanel({
   stats,
   activeLayer,
   onSelectLayer,
+  schoolCounts = null,
+  schoolsOn = false,
+  onToggleSchools,
 }: Readonly<{
   stats: StreetStats;
   activeLayer: ScoreLayer;
   onSelectLayer: (layer: ScoreLayer) => void;
+  /** Public/private site counts, or null when there is no roster to overlay. */
+  schoolCounts?: { public: number; private: number } | null;
+  schoolsOn?: boolean;
+  onToggleSchools?: (next: boolean) => void;
 }>) {
   const t = useTranslations("panel");
   const demoEnabled = useDemoData();
@@ -185,6 +193,18 @@ export default function MapPanel({
       <ProvenanceNote stats={stats} tone="panel" className="-mt-1" />
 
       <LayerSwitcher active={activeLayer} onSelect={onSelectLayer} />
+
+      {/* Outside the collapsible blocks, next to the switcher rather than in the
+          legend: the school overlay reads ACROSS whichever lens is active, and a
+          reader who collapsed the panel for more map is exactly the reader
+          comparing pins against the streets under them. */}
+      {schoolCounts && onToggleSchools ? (
+        <SchoolsToggle
+          active={schoolsOn}
+          counts={schoolCounts}
+          onToggle={onToggleSchools}
+        />
+      ) : null}
 
       <div
         data-expanded={expanded ? "true" : "false"}

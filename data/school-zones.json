@@ -1,0 +1,4195 @@
+{
+  "generated_by": "scripts/build-school-zones.mjs",
+  "gate_radius_m": 150,
+  "walk_radius_m": 400,
+  "non_walkable": [
+    "motorway",
+    "motorway_link",
+    "trunk_link",
+    "construction",
+    "raceway"
+  ],
+  "note": "Zone MEMBERSHIP only — geometry, no scores. Scores are computed at read time from live segment data so a refresh reflects new field work immediately. See lib/school-score.ts.",
+  "totals": {
+    "schools": 33,
+    "members": 613,
+    "unreachable": 0,
+    "mean_members": 18.6,
+    "max_snap_m": 89.8
+  },
+  "zones": [
+    {
+      "school_id": "school-200067-00",
+      "name": "Blue Valley School (Colegio Valle Azul)",
+      "snap_m": 24.6,
+      "length_m": {
+        "total": 507.8,
+        "gate": 0
+      },
+      "counts": {
+        "members": 3,
+        "gate": 0
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0535",
+          "ring": "walk",
+          "walk_m": 194.1,
+          "length_m": 169.9
+        },
+        {
+          "segment_id": "esc-sr-0536",
+          "ring": "walk",
+          "walk_m": 271.2,
+          "length_m": 173.2
+        },
+        {
+          "segment_id": "esc-sr-0534",
+          "ring": "walk",
+          "walk_m": 286.9,
+          "length_m": 164.7
+        }
+      ]
+    },
+    {
+      "school_id": "school-200057-00",
+      "name": "Centro Educativo Arandú / Centro Educativo Arandú School",
+      "snap_m": 48.9,
+      "length_m": {
+        "total": 2542.8,
+        "gate": 488.7
+      },
+      "counts": {
+        "members": 16,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0644",
+          "ring": "gate",
+          "walk_m": 48.9,
+          "length_m": 186.2
+        },
+        {
+          "segment_id": "esc-sr-0645",
+          "ring": "gate",
+          "walk_m": 48.9,
+          "length_m": 152
+        },
+        {
+          "segment_id": "esc-sr-0382",
+          "ring": "gate",
+          "walk_m": 139,
+          "length_m": 150.5
+        },
+        {
+          "segment_id": "esc-sr-0069",
+          "ring": "walk",
+          "walk_m": 201,
+          "length_m": 158.5
+        },
+        {
+          "segment_id": "esc-sr-0790",
+          "ring": "walk",
+          "walk_m": 201,
+          "length_m": 161.2
+        },
+        {
+          "segment_id": "esc-sr-0791",
+          "ring": "walk",
+          "walk_m": 201,
+          "length_m": 195.6
+        },
+        {
+          "segment_id": "esc-sr-0792",
+          "ring": "walk",
+          "walk_m": 235.1,
+          "length_m": 153.1
+        },
+        {
+          "segment_id": "esc-sr-0811",
+          "ring": "walk",
+          "walk_m": 252.5,
+          "length_m": 171.4
+        },
+        {
+          "segment_id": "esc-sr-0793",
+          "ring": "walk",
+          "walk_m": 282.2,
+          "length_m": 162.8
+        },
+        {
+          "segment_id": "esc-sr-0367",
+          "ring": "walk",
+          "walk_m": 283.7,
+          "length_m": 240.8
+        },
+        {
+          "segment_id": "esc-sr-0383",
+          "ring": "walk",
+          "walk_m": 289.6,
+          "length_m": 166.4
+        },
+        {
+          "segment_id": "esc-sr-0812",
+          "ring": "walk",
+          "walk_m": 301.7,
+          "length_m": 88.6
+        },
+        {
+          "segment_id": "esc-sr-0754",
+          "ring": "walk",
+          "walk_m": 302.1,
+          "length_m": 134.9
+        },
+        {
+          "segment_id": "esc-sr-0326",
+          "ring": "walk",
+          "walk_m": 341.1,
+          "length_m": 140.6
+        },
+        {
+          "segment_id": "esc-sr-0070",
+          "ring": "walk",
+          "walk_m": 359.4,
+          "length_m": 218
+        },
+        {
+          "segment_id": "esc-sr-0434",
+          "ring": "walk",
+          "walk_m": 378.3,
+          "length_m": 62.2
+        }
+      ]
+    },
+    {
+      "school_id": "school-200053-00",
+      "name": "Centro Educativo Garabatos Instituto Preescolar",
+      "snap_m": 23.7,
+      "length_m": {
+        "total": 5484.8,
+        "gate": 1861.2
+      },
+      "counts": {
+        "members": 37,
+        "gate": 12
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0016",
+          "ring": "gate",
+          "walk_m": 23.7,
+          "length_m": 97.1
+        },
+        {
+          "segment_id": "esc-sa-0237",
+          "ring": "gate",
+          "walk_m": 23.7,
+          "length_m": 195.6
+        },
+        {
+          "segment_id": "esc-sa-0238",
+          "ring": "gate",
+          "walk_m": 23.7,
+          "length_m": 92.5
+        },
+        {
+          "segment_id": "esc-sa-0359",
+          "ring": "gate",
+          "walk_m": 23.7,
+          "length_m": 190.7
+        },
+        {
+          "segment_id": "esc-sa-0072",
+          "ring": "gate",
+          "walk_m": 116.2,
+          "length_m": 99
+        },
+        {
+          "segment_id": "esc-sa-0339",
+          "ring": "gate",
+          "walk_m": 116.2,
+          "length_m": 99.2
+        },
+        {
+          "segment_id": "esc-sa-0381",
+          "ring": "gate",
+          "walk_m": 116.2,
+          "length_m": 191.1
+        },
+        {
+          "segment_id": "esc-sa-0002",
+          "ring": "gate",
+          "walk_m": 118.5,
+          "length_m": 196.6
+        },
+        {
+          "segment_id": "esc-sa-0387",
+          "ring": "gate",
+          "walk_m": 118.5,
+          "length_m": 189
+        },
+        {
+          "segment_id": "esc-sa-0225",
+          "ring": "gate",
+          "walk_m": 122,
+          "length_m": 119.9
+        },
+        {
+          "segment_id": "esc-sa-0226",
+          "ring": "gate",
+          "walk_m": 122,
+          "length_m": 188.7
+        },
+        {
+          "segment_id": "esc-sa-0152",
+          "ring": "gate",
+          "walk_m": 142.1,
+          "length_m": 201.8
+        },
+        {
+          "segment_id": "esc-sa-0012",
+          "ring": "walk",
+          "walk_m": 214.3,
+          "length_m": 188
+        },
+        {
+          "segment_id": "esc-sa-0242",
+          "ring": "walk",
+          "walk_m": 214.3,
+          "length_m": 93.5
+        },
+        {
+          "segment_id": "esc-sa-0360",
+          "ring": "walk",
+          "walk_m": 214.3,
+          "length_m": 194
+        },
+        {
+          "segment_id": "esc-sa-0010",
+          "ring": "walk",
+          "walk_m": 215.3,
+          "length_m": 189.1
+        },
+        {
+          "segment_id": "esc-sa-0011",
+          "ring": "walk",
+          "walk_m": 215.3,
+          "length_m": 84.3
+        },
+        {
+          "segment_id": "esc-sa-0236",
+          "ring": "walk",
+          "walk_m": 215.3,
+          "length_m": 79.8
+        },
+        {
+          "segment_id": "esc-sa-0243",
+          "ring": "walk",
+          "walk_m": 219.2,
+          "length_m": 111.2
+        },
+        {
+          "segment_id": "esc-sa-0379",
+          "ring": "walk",
+          "walk_m": 219.2,
+          "length_m": 190.8
+        },
+        {
+          "segment_id": "esc-sa-0380",
+          "ring": "walk",
+          "walk_m": 219.2,
+          "length_m": 194.4
+        },
+        {
+          "segment_id": "esc-sa-0151",
+          "ring": "walk",
+          "walk_m": 225.3,
+          "length_m": 181.8
+        },
+        {
+          "segment_id": "esc-sa-0241",
+          "ring": "walk",
+          "walk_m": 306.6,
+          "length_m": 189.6
+        },
+        {
+          "segment_id": "esc-sa-0386",
+          "ring": "walk",
+          "walk_m": 306.6,
+          "length_m": 190.7
+        },
+        {
+          "segment_id": "esc-sa-0388",
+          "ring": "walk",
+          "walk_m": 307.5,
+          "length_m": 94.9
+        },
+        {
+          "segment_id": "esc-sa-0232",
+          "ring": "walk",
+          "walk_m": 307.5,
+          "length_m": 191.2
+        },
+        {
+          "segment_id": "esc-sa-0227",
+          "ring": "walk",
+          "walk_m": 310.4,
+          "length_m": 188.9
+        },
+        {
+          "segment_id": "esc-sa-0013",
+          "ring": "walk",
+          "walk_m": 314.4,
+          "length_m": 200.4
+        },
+        {
+          "segment_id": "esc-sa-0001",
+          "ring": "walk",
+          "walk_m": 314.6,
+          "length_m": 191.1
+        },
+        {
+          "segment_id": "esc-sa-0224",
+          "ring": "walk",
+          "walk_m": 315,
+          "length_m": 227
+        },
+        {
+          "segment_id": "esc-sa-0246",
+          "ring": "walk",
+          "walk_m": 343.9,
+          "length_m": 208.7
+        },
+        {
+          "segment_id": "esc-sa-0230",
+          "ring": "walk",
+          "walk_m": 344.4,
+          "length_m": 74.1
+        },
+        {
+          "segment_id": "esc-sa-0148",
+          "ring": "walk",
+          "walk_m": 344.4,
+          "length_m": 43.9
+        },
+        {
+          "segment_id": "esc-sa-0147",
+          "ring": "walk",
+          "walk_m": 346.1,
+          "length_m": 136.5
+        },
+        {
+          "segment_id": "esc-sa-0367",
+          "ring": "walk",
+          "walk_m": 352,
+          "length_m": 43.3
+        },
+        {
+          "segment_id": "esc-sa-0366",
+          "ring": "walk",
+          "walk_m": 395.3,
+          "length_m": 55.5
+        },
+        {
+          "segment_id": "esc-sa-0369",
+          "ring": "walk",
+          "walk_m": 395.3,
+          "length_m": 80.9
+        }
+      ]
+    },
+    {
+      "school_id": "school-200056-00",
+      "name": "Centro Educativo Greenland School",
+      "snap_m": 4.1,
+      "length_m": {
+        "total": 3050.2,
+        "gate": 577.5
+      },
+      "counts": {
+        "members": 23,
+        "gate": 4
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0031",
+          "ring": "gate",
+          "walk_m": 47.5,
+          "length_m": 151.2
+        },
+        {
+          "segment_id": "esc-sa-0028",
+          "ring": "gate",
+          "walk_m": 55.5,
+          "length_m": 192.5
+        },
+        {
+          "segment_id": "esc-sa-0180",
+          "ring": "gate",
+          "walk_m": 55.5,
+          "length_m": 77.6
+        },
+        {
+          "segment_id": "esc-sa-0030",
+          "ring": "gate",
+          "walk_m": 145.3,
+          "length_m": 156.2
+        },
+        {
+          "segment_id": "esc-sa-0032",
+          "ring": "walk",
+          "walk_m": 190.8,
+          "length_m": 219.3
+        },
+        {
+          "segment_id": "esc-sa-0290",
+          "ring": "walk",
+          "walk_m": 190.8,
+          "length_m": 168.4
+        },
+        {
+          "segment_id": "esc-sa-0477",
+          "ring": "walk",
+          "walk_m": 213.8,
+          "length_m": 129.4
+        },
+        {
+          "segment_id": "esc-sa-0029",
+          "ring": "walk",
+          "walk_m": 248,
+          "length_m": 71.2
+        },
+        {
+          "segment_id": "esc-sa-0092",
+          "ring": "walk",
+          "walk_m": 248,
+          "length_m": 111.7
+        },
+        {
+          "segment_id": "esc-sa-0026",
+          "ring": "walk",
+          "walk_m": 301.5,
+          "length_m": 220
+        },
+        {
+          "segment_id": "esc-sa-0382",
+          "ring": "walk",
+          "walk_m": 301.5,
+          "length_m": 199.7
+        },
+        {
+          "segment_id": "esc-sa-0027",
+          "ring": "walk",
+          "walk_m": 319.3,
+          "length_m": 139.4
+        },
+        {
+          "segment_id": "esc-sa-0474",
+          "ring": "walk",
+          "walk_m": 319.3,
+          "length_m": 48.7
+        },
+        {
+          "segment_id": "esc-sa-0393",
+          "ring": "walk",
+          "walk_m": 325.8,
+          "length_m": 88.1
+        },
+        {
+          "segment_id": "esc-sa-0103",
+          "ring": "walk",
+          "walk_m": 343.1,
+          "length_m": 157
+        },
+        {
+          "segment_id": "esc-sa-0444",
+          "ring": "walk",
+          "walk_m": 343.1,
+          "length_m": 40.9
+        },
+        {
+          "segment_id": "esc-sa-0285",
+          "ring": "walk",
+          "walk_m": 359.1,
+          "length_m": 203.3
+        },
+        {
+          "segment_id": "esc-sa-0286",
+          "ring": "walk",
+          "walk_m": 359.1,
+          "length_m": 182.1
+        },
+        {
+          "segment_id": "esc-sa-0234",
+          "ring": "walk",
+          "walk_m": 364.8,
+          "length_m": 101
+        },
+        {
+          "segment_id": "esc-sa-0235",
+          "ring": "walk",
+          "walk_m": 368,
+          "length_m": 49.9
+        },
+        {
+          "segment_id": "esc-sa-0390",
+          "ring": "walk",
+          "walk_m": 368,
+          "length_m": 199.9
+        },
+        {
+          "segment_id": "esc-sa-0445",
+          "ring": "walk",
+          "walk_m": 386.9,
+          "length_m": 54.5
+        },
+        {
+          "segment_id": "esc-sa-0266",
+          "ring": "walk",
+          "walk_m": 393.7,
+          "length_m": 88.2
+        }
+      ]
+    },
+    {
+      "school_id": "school-205255-00",
+      "name": "Centro Educativo Kids World Montessori (Escazu)",
+      "snap_m": 26.8,
+      "length_m": {
+        "total": 4563.1,
+        "gate": 1126.3
+      },
+      "counts": {
+        "members": 31,
+        "gate": 9
+      },
+      "members": [
+        {
+          "segment_id": "esc-ce-0004",
+          "ring": "gate",
+          "walk_m": 26.8,
+          "length_m": 207
+        },
+        {
+          "segment_id": "esc-ce-0035",
+          "ring": "gate",
+          "walk_m": 26.8,
+          "length_m": 166.5
+        },
+        {
+          "segment_id": "esc-ce-0045",
+          "ring": "gate",
+          "walk_m": 67.6,
+          "length_m": 72.1
+        },
+        {
+          "segment_id": "esc-ce-0001",
+          "ring": "gate",
+          "walk_m": 115.7,
+          "length_m": 181.9
+        },
+        {
+          "segment_id": "esc-ce-0003",
+          "ring": "gate",
+          "walk_m": 129.5,
+          "length_m": 56.3
+        },
+        {
+          "segment_id": "esc-ce-0074",
+          "ring": "gate",
+          "walk_m": 129.5,
+          "length_m": 100
+        },
+        {
+          "segment_id": "esc-ce-0076",
+          "ring": "gate",
+          "walk_m": 129.5,
+          "length_m": 99.6
+        },
+        {
+          "segment_id": "esc-ce-0007",
+          "ring": "gate",
+          "walk_m": 133.3,
+          "length_m": 88.6
+        },
+        {
+          "segment_id": "esc-ce-0057",
+          "ring": "gate",
+          "walk_m": 139.6,
+          "length_m": 154.3
+        },
+        {
+          "segment_id": "esc-ce-0006",
+          "ring": "walk",
+          "walk_m": 162.9,
+          "length_m": 162.8
+        },
+        {
+          "segment_id": "esc-ce-0002",
+          "ring": "walk",
+          "walk_m": 185.8,
+          "length_m": 172.8
+        },
+        {
+          "segment_id": "esc-sa-0003",
+          "ring": "walk",
+          "walk_m": 203.1,
+          "length_m": 189.6
+        },
+        {
+          "segment_id": "esc-ce-0036",
+          "ring": "walk",
+          "walk_m": 210.4,
+          "length_m": 193.8
+        },
+        {
+          "segment_id": "esc-ce-0075",
+          "ring": "walk",
+          "walk_m": 226.8,
+          "length_m": 192.1
+        },
+        {
+          "segment_id": "esc-ce-0014",
+          "ring": "walk",
+          "walk_m": 229.4,
+          "length_m": 197.2
+        },
+        {
+          "segment_id": "esc-ce-0011",
+          "ring": "walk",
+          "walk_m": 233.9,
+          "length_m": 41.2
+        },
+        {
+          "segment_id": "esc-ce-0085",
+          "ring": "walk",
+          "walk_m": 233.9,
+          "length_m": 94.5
+        },
+        {
+          "segment_id": "esc-ce-0010",
+          "ring": "walk",
+          "walk_m": 245.9,
+          "length_m": 177.7
+        },
+        {
+          "segment_id": "esc-ce-0046",
+          "ring": "walk",
+          "walk_m": 283.3,
+          "length_m": 217.7
+        },
+        {
+          "segment_id": "esc-ce-0073",
+          "ring": "walk",
+          "walk_m": 297.6,
+          "length_m": 194.3
+        },
+        {
+          "segment_id": "esc-ce-0093",
+          "ring": "walk",
+          "walk_m": 297.6,
+          "length_m": 117.2
+        },
+        {
+          "segment_id": "esc-ce-0005",
+          "ring": "walk",
+          "walk_m": 325.7,
+          "length_m": 213.4
+        },
+        {
+          "segment_id": "esc-sa-0475",
+          "ring": "walk",
+          "walk_m": 328.4,
+          "length_m": 92.9
+        },
+        {
+          "segment_id": "esc-ce-0089",
+          "ring": "walk",
+          "walk_m": 328.4,
+          "length_m": 96.4
+        },
+        {
+          "segment_id": "esc-ce-0023",
+          "ring": "walk",
+          "walk_m": 334.8,
+          "length_m": 49.9
+        },
+        {
+          "segment_id": "esc-ce-0012",
+          "ring": "walk",
+          "walk_m": 358.6,
+          "length_m": 173.3
+        },
+        {
+          "segment_id": "esc-sr-0395",
+          "ring": "walk",
+          "walk_m": 358.6,
+          "length_m": 157
+        },
+        {
+          "segment_id": "esc-sr-0436",
+          "ring": "walk",
+          "walk_m": 358.6,
+          "length_m": 226.4
+        },
+        {
+          "segment_id": "esc-sr-0515",
+          "ring": "walk",
+          "walk_m": 378.2,
+          "length_m": 156.8
+        },
+        {
+          "segment_id": "esc-sr-0807",
+          "ring": "walk",
+          "walk_m": 378.2,
+          "length_m": 137.1
+        },
+        {
+          "segment_id": "esc-sa-0004",
+          "ring": "walk",
+          "walk_m": 392.7,
+          "length_m": 182.7
+        }
+      ]
+    },
+    {
+      "school_id": "school-205422-00",
+      "name": "Centro Educativo Kinder Pandas Daycare",
+      "snap_m": 25.4,
+      "length_m": {
+        "total": 1291.9,
+        "gate": 402.7
+      },
+      "counts": {
+        "members": 8,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0810",
+          "ring": "gate",
+          "walk_m": 25.4,
+          "length_m": 83.8
+        },
+        {
+          "segment_id": "esc-sr-0670",
+          "ring": "gate",
+          "walk_m": 53.8,
+          "length_m": 166
+        },
+        {
+          "segment_id": "esc-sr-0671",
+          "ring": "gate",
+          "walk_m": 98.5,
+          "length_m": 152.9
+        },
+        {
+          "segment_id": "esc-ce-0020",
+          "ring": "walk",
+          "walk_m": 251.5,
+          "length_m": 165.3
+        },
+        {
+          "segment_id": "esc-sr-0217",
+          "ring": "walk",
+          "walk_m": 251.5,
+          "length_m": 224.5
+        },
+        {
+          "segment_id": "esc-sr-0218",
+          "ring": "walk",
+          "walk_m": 344.9,
+          "length_m": 142.7
+        },
+        {
+          "segment_id": "esc-sr-0059",
+          "ring": "walk",
+          "walk_m": 379.3,
+          "length_m": 186.4
+        },
+        {
+          "segment_id": "esc-sr-0058",
+          "ring": "walk",
+          "walk_m": 398.4,
+          "length_m": 170.3
+        }
+      ]
+    },
+    {
+      "school_id": "school-205395-00",
+      "name": "Centro Educativo Kipos",
+      "snap_m": 35.4,
+      "length_m": {
+        "total": 2338.6,
+        "gate": 381.1
+      },
+      "counts": {
+        "members": 19,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0673",
+          "ring": "gate",
+          "walk_m": 35.4,
+          "length_m": 162.9
+        },
+        {
+          "segment_id": "esc-sr-0674",
+          "ring": "gate",
+          "walk_m": 113.4,
+          "length_m": 41.2
+        },
+        {
+          "segment_id": "esc-sr-0672",
+          "ring": "gate",
+          "walk_m": 120.2,
+          "length_m": 177
+        },
+        {
+          "segment_id": "esc-sr-0545",
+          "ring": "walk",
+          "walk_m": 154.7,
+          "length_m": 161.2
+        },
+        {
+          "segment_id": "esc-sr-0610",
+          "ring": "walk",
+          "walk_m": 154.7,
+          "length_m": 174.8
+        },
+        {
+          "segment_id": "esc-sr-0653",
+          "ring": "walk",
+          "walk_m": 226.7,
+          "length_m": 77.6
+        },
+        {
+          "segment_id": "esc-sr-0661",
+          "ring": "walk",
+          "walk_m": 226.7,
+          "length_m": 43.7
+        },
+        {
+          "segment_id": "esc-sr-0317",
+          "ring": "walk",
+          "walk_m": 265.5,
+          "length_m": 55.5
+        },
+        {
+          "segment_id": "esc-sr-0350",
+          "ring": "walk",
+          "walk_m": 270.4,
+          "length_m": 75
+        },
+        {
+          "segment_id": "esc-sr-0055",
+          "ring": "walk",
+          "walk_m": 297.2,
+          "length_m": 214.1
+        },
+        {
+          "segment_id": "esc-sr-0652",
+          "ring": "walk",
+          "walk_m": 297.2,
+          "length_m": 144
+        },
+        {
+          "segment_id": "esc-sr-0741",
+          "ring": "walk",
+          "walk_m": 297.2,
+          "length_m": 152.9
+        },
+        {
+          "segment_id": "esc-sr-0335",
+          "ring": "walk",
+          "walk_m": 304.3,
+          "length_m": 113.5
+        },
+        {
+          "segment_id": "esc-sr-0469",
+          "ring": "walk",
+          "walk_m": 304.3,
+          "length_m": 119.4
+        },
+        {
+          "segment_id": "esc-sr-0546",
+          "ring": "walk",
+          "walk_m": 315.9,
+          "length_m": 180.3
+        },
+        {
+          "segment_id": "esc-sr-0316",
+          "ring": "walk",
+          "walk_m": 320.9,
+          "length_m": 180.7
+        },
+        {
+          "segment_id": "esc-sr-0611",
+          "ring": "walk",
+          "walk_m": 329.5,
+          "length_m": 121.1
+        },
+        {
+          "segment_id": "esc-sr-0354",
+          "ring": "walk",
+          "walk_m": 345.5,
+          "length_m": 67.1
+        },
+        {
+          "segment_id": "esc-sr-0362",
+          "ring": "walk",
+          "walk_m": 345.5,
+          "length_m": 76.6
+        }
+      ]
+    },
+    {
+      "school_id": "school-205510-00",
+      "name": "Centro Educativo Royal International Education",
+      "snap_m": 42.4,
+      "length_m": {
+        "total": 1162.1,
+        "gate": 476.6
+      },
+      "counts": {
+        "members": 8,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0554",
+          "ring": "gate",
+          "walk_m": 42.4,
+          "length_m": 151.3
+        },
+        {
+          "segment_id": "esc-sr-0553",
+          "ring": "gate",
+          "walk_m": 105.9,
+          "length_m": 161.1
+        },
+        {
+          "segment_id": "esc-sr-0555",
+          "ring": "gate",
+          "walk_m": 130.1,
+          "length_m": 164.2
+        },
+        {
+          "segment_id": "esc-sr-0422",
+          "ring": "walk",
+          "walk_m": 267.1,
+          "length_m": 121.3
+        },
+        {
+          "segment_id": "esc-sr-0556",
+          "ring": "walk",
+          "walk_m": 294.3,
+          "length_m": 161.1
+        },
+        {
+          "segment_id": "esc-sr-0349",
+          "ring": "walk",
+          "walk_m": 316.8,
+          "length_m": 160
+        },
+        {
+          "segment_id": "esc-sr-0421",
+          "ring": "walk",
+          "walk_m": 388.3,
+          "length_m": 177
+        },
+        {
+          "segment_id": "esc-sr-0332",
+          "ring": "walk",
+          "walk_m": 388.6,
+          "length_m": 66.1
+        }
+      ]
+    },
+    {
+      "school_id": "school-200058-00",
+      "name": "Centro Educativo Saint Augustine College",
+      "snap_m": 20.7,
+      "length_m": {
+        "total": 4605.1,
+        "gate": 994.2
+      },
+      "counts": {
+        "members": 31,
+        "gate": 6
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0235",
+          "ring": "gate",
+          "walk_m": 20.7,
+          "length_m": 159.7
+        },
+        {
+          "segment_id": "esc-sr-0234",
+          "ring": "gate",
+          "walk_m": 35,
+          "length_m": 150.2
+        },
+        {
+          "segment_id": "esc-sr-0403",
+          "ring": "gate",
+          "walk_m": 35,
+          "length_m": 150.4
+        },
+        {
+          "segment_id": "esc-sr-0241",
+          "ring": "gate",
+          "walk_m": 70.6,
+          "length_m": 199.4
+        },
+        {
+          "segment_id": "esc-sr-0242",
+          "ring": "gate",
+          "walk_m": 70.6,
+          "length_m": 175.1
+        },
+        {
+          "segment_id": "esc-sr-0240",
+          "ring": "gate",
+          "walk_m": 148.9,
+          "length_m": 159.4
+        },
+        {
+          "segment_id": "esc-sr-0236",
+          "ring": "walk",
+          "walk_m": 166.1,
+          "length_m": 97.2
+        },
+        {
+          "segment_id": "esc-sr-0239",
+          "ring": "walk",
+          "walk_m": 183.1,
+          "length_m": 156.3
+        },
+        {
+          "segment_id": "esc-sr-0494",
+          "ring": "walk",
+          "walk_m": 185.2,
+          "length_m": 172.5
+        },
+        {
+          "segment_id": "esc-sr-0495",
+          "ring": "walk",
+          "walk_m": 185.2,
+          "length_m": 217
+        },
+        {
+          "segment_id": "esc-sr-0404",
+          "ring": "walk",
+          "walk_m": 185.3,
+          "length_m": 61.1
+        },
+        {
+          "segment_id": "esc-sr-0503",
+          "ring": "walk",
+          "walk_m": 230.4,
+          "length_m": 153
+        },
+        {
+          "segment_id": "esc-sr-0243",
+          "ring": "walk",
+          "walk_m": 245.7,
+          "length_m": 171.7
+        },
+        {
+          "segment_id": "esc-sr-0496",
+          "ring": "walk",
+          "walk_m": 246.5,
+          "length_m": 209.3
+        },
+        {
+          "segment_id": "esc-sr-0010",
+          "ring": "walk",
+          "walk_m": 263.3,
+          "length_m": 167.8
+        },
+        {
+          "segment_id": "esc-sr-0443",
+          "ring": "walk",
+          "walk_m": 270.1,
+          "length_m": 156
+        },
+        {
+          "segment_id": "esc-sr-0247",
+          "ring": "walk",
+          "walk_m": 270.4,
+          "length_m": 104
+        },
+        {
+          "segment_id": "esc-sr-0250",
+          "ring": "walk",
+          "walk_m": 286.1,
+          "length_m": 87.8
+        },
+        {
+          "segment_id": "esc-sr-0444",
+          "ring": "walk",
+          "walk_m": 308.3,
+          "length_m": 150.8
+        },
+        {
+          "segment_id": "esc-sr-0009",
+          "ring": "walk",
+          "walk_m": 319.3,
+          "length_m": 176
+        },
+        {
+          "segment_id": "esc-sr-0690",
+          "ring": "walk",
+          "walk_m": 333.3,
+          "length_m": 65.5
+        },
+        {
+          "segment_id": "esc-sr-0445",
+          "ring": "walk",
+          "walk_m": 336.7,
+          "length_m": 86.6
+        },
+        {
+          "segment_id": "esc-sr-0442",
+          "ring": "walk",
+          "walk_m": 342.4,
+          "length_m": 156.5
+        },
+        {
+          "segment_id": "esc-sr-0584",
+          "ring": "walk",
+          "walk_m": 354.5,
+          "length_m": 101
+        },
+        {
+          "segment_id": "esc-sr-0595",
+          "ring": "walk",
+          "walk_m": 367.8,
+          "length_m": 74.2
+        },
+        {
+          "segment_id": "esc-sr-0583",
+          "ring": "walk",
+          "walk_m": 373.9,
+          "length_m": 230.2
+        },
+        {
+          "segment_id": "esc-sr-0586",
+          "ring": "walk",
+          "walk_m": 373.9,
+          "length_m": 157.4
+        },
+        {
+          "segment_id": "esc-sr-0246",
+          "ring": "walk",
+          "walk_m": 374.4,
+          "length_m": 170.2
+        },
+        {
+          "segment_id": "esc-sr-0011",
+          "ring": "walk",
+          "walk_m": 375.1,
+          "length_m": 166.9
+        },
+        {
+          "segment_id": "esc-sr-0502",
+          "ring": "walk",
+          "walk_m": 383.4,
+          "length_m": 168.8
+        },
+        {
+          "segment_id": "esc-sr-0450",
+          "ring": "walk",
+          "walk_m": 393.1,
+          "length_m": 153.1
+        }
+      ]
+    },
+    {
+      "school_id": "school-205203-00",
+      "name": "Centro Educativo True North Personalized Learning School",
+      "snap_m": 11.4,
+      "length_m": {
+        "total": 2722.6,
+        "gate": 765.1
+      },
+      "counts": {
+        "members": 17,
+        "gate": 5
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0754",
+          "ring": "gate",
+          "walk_m": 49.2,
+          "length_m": 134.9
+        },
+        {
+          "segment_id": "esc-sr-0793",
+          "ring": "gate",
+          "walk_m": 90.7,
+          "length_m": 162.8
+        },
+        {
+          "segment_id": "esc-sr-0647",
+          "ring": "gate",
+          "walk_m": 91.3,
+          "length_m": 116.2
+        },
+        {
+          "segment_id": "esc-sr-0792",
+          "ring": "gate",
+          "walk_m": 110.6,
+          "length_m": 153.1
+        },
+        {
+          "segment_id": "esc-sr-0753",
+          "ring": "gate",
+          "walk_m": 111.7,
+          "length_m": 198.1
+        },
+        {
+          "segment_id": "esc-sr-0644",
+          "ring": "walk",
+          "walk_m": 157.7,
+          "length_m": 186.2
+        },
+        {
+          "segment_id": "esc-sr-0058",
+          "ring": "walk",
+          "walk_m": 209.1,
+          "length_m": 170.3
+        },
+        {
+          "segment_id": "esc-sr-0794",
+          "ring": "walk",
+          "walk_m": 233.5,
+          "length_m": 192.2
+        },
+        {
+          "segment_id": "esc-sr-0326",
+          "ring": "walk",
+          "walk_m": 263.7,
+          "length_m": 140.6
+        },
+        {
+          "segment_id": "esc-sr-0791",
+          "ring": "walk",
+          "walk_m": 263.7,
+          "length_m": 195.6
+        },
+        {
+          "segment_id": "esc-sr-0059",
+          "ring": "walk",
+          "walk_m": 319.4,
+          "length_m": 186.4
+        },
+        {
+          "segment_id": "esc-sr-0575",
+          "ring": "walk",
+          "walk_m": 320.3,
+          "length_m": 66
+        },
+        {
+          "segment_id": "esc-sr-0742",
+          "ring": "walk",
+          "walk_m": 329.4,
+          "length_m": 74.7
+        },
+        {
+          "segment_id": "esc-sr-0207",
+          "ring": "walk",
+          "walk_m": 334.6,
+          "length_m": 202.3
+        },
+        {
+          "segment_id": "esc-sr-0217",
+          "ring": "walk",
+          "walk_m": 335.3,
+          "length_m": 224.5
+        },
+        {
+          "segment_id": "esc-sr-0645",
+          "ring": "walk",
+          "walk_m": 343.9,
+          "length_m": 152
+        },
+        {
+          "segment_id": "esc-sr-0574",
+          "ring": "walk",
+          "walk_m": 386.3,
+          "length_m": 166.7
+        }
+      ]
+    },
+    {
+      "school_id": "school-200054-00",
+      "name": "Colegio Nuestra Señora del Pilar",
+      "snap_m": 61.6,
+      "length_m": {
+        "total": 5525.8,
+        "gate": 578.5
+      },
+      "counts": {
+        "members": 35,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0001",
+          "ring": "gate",
+          "walk_m": 61.6,
+          "length_m": 191.1
+        },
+        {
+          "segment_id": "esc-sa-0002",
+          "ring": "gate",
+          "walk_m": 61.6,
+          "length_m": 196.6
+        },
+        {
+          "segment_id": "esc-sa-0379",
+          "ring": "gate",
+          "walk_m": 61.6,
+          "length_m": 190.8
+        },
+        {
+          "segment_id": "esc-sa-0013",
+          "ring": "walk",
+          "walk_m": 155.2,
+          "length_m": 200.4
+        },
+        {
+          "segment_id": "esc-sa-0237",
+          "ring": "walk",
+          "walk_m": 156.9,
+          "length_m": 195.6
+        },
+        {
+          "segment_id": "esc-sa-0243",
+          "ring": "walk",
+          "walk_m": 156.9,
+          "length_m": 111.2
+        },
+        {
+          "segment_id": "esc-sa-0380",
+          "ring": "walk",
+          "walk_m": 156.9,
+          "length_m": 194.4
+        },
+        {
+          "segment_id": "esc-sa-0070",
+          "ring": "walk",
+          "walk_m": 157.1,
+          "length_m": 96.7
+        },
+        {
+          "segment_id": "esc-sa-0239",
+          "ring": "walk",
+          "walk_m": 157.1,
+          "length_m": 192
+        },
+        {
+          "segment_id": "esc-sa-0360",
+          "ring": "walk",
+          "walk_m": 157.1,
+          "length_m": 194
+        },
+        {
+          "segment_id": "esc-sa-0226",
+          "ring": "walk",
+          "walk_m": 160.9,
+          "length_m": 188.7
+        },
+        {
+          "segment_id": "esc-sa-0014",
+          "ring": "walk",
+          "walk_m": 249.1,
+          "length_m": 191.5
+        },
+        {
+          "segment_id": "esc-sa-0389",
+          "ring": "walk",
+          "walk_m": 252.7,
+          "length_m": 96.3
+        },
+        {
+          "segment_id": "esc-sa-0470",
+          "ring": "walk",
+          "walk_m": 252.7,
+          "length_m": 122.5
+        },
+        {
+          "segment_id": "esc-sa-0069",
+          "ring": "walk",
+          "walk_m": 253.8,
+          "length_m": 186
+        },
+        {
+          "segment_id": "esc-sa-0232",
+          "ring": "walk",
+          "walk_m": 253.8,
+          "length_m": 191.2
+        },
+        {
+          "segment_id": "esc-sa-0233",
+          "ring": "walk",
+          "walk_m": 253.8,
+          "length_m": 196
+        },
+        {
+          "segment_id": "esc-sa-0225",
+          "ring": "walk",
+          "walk_m": 254.2,
+          "length_m": 119.9
+        },
+        {
+          "segment_id": "esc-sa-0227",
+          "ring": "walk",
+          "walk_m": 255,
+          "length_m": 188.9
+        },
+        {
+          "segment_id": "esc-sa-0359",
+          "ring": "walk",
+          "walk_m": 258.2,
+          "length_m": 190.7
+        },
+        {
+          "segment_id": "esc-sa-0387",
+          "ring": "walk",
+          "walk_m": 258.2,
+          "length_m": 189
+        },
+        {
+          "segment_id": "esc-sa-0230",
+          "ring": "walk",
+          "walk_m": 282.1,
+          "length_m": 74.1
+        },
+        {
+          "segment_id": "esc-sa-0430",
+          "ring": "walk",
+          "walk_m": 342.3,
+          "length_m": 179.9
+        },
+        {
+          "segment_id": "esc-sa-0223",
+          "ring": "walk",
+          "walk_m": 345.3,
+          "length_m": 191.8
+        },
+        {
+          "segment_id": "esc-sa-0240",
+          "ring": "walk",
+          "walk_m": 345.3,
+          "length_m": 99.1
+        },
+        {
+          "segment_id": "esc-sa-0391",
+          "ring": "walk",
+          "walk_m": 347.4,
+          "length_m": 192.4
+        },
+        {
+          "segment_id": "esc-sa-0012",
+          "ring": "walk",
+          "walk_m": 351.1,
+          "length_m": 188
+        },
+        {
+          "segment_id": "esc-sa-0242",
+          "ring": "walk",
+          "walk_m": 351.1,
+          "length_m": 93.5
+        },
+        {
+          "segment_id": "esc-sa-0017",
+          "ring": "walk",
+          "walk_m": 351.4,
+          "length_m": 189.8
+        },
+        {
+          "segment_id": "esc-sa-0222",
+          "ring": "walk",
+          "walk_m": 351.4,
+          "length_m": 60.4
+        },
+        {
+          "segment_id": "esc-sa-0381",
+          "ring": "walk",
+          "walk_m": 351.8,
+          "length_m": 191.1
+        },
+        {
+          "segment_id": "esc-sa-0016",
+          "ring": "walk",
+          "walk_m": 352.5,
+          "length_m": 97.1
+        },
+        {
+          "segment_id": "esc-sa-0238",
+          "ring": "walk",
+          "walk_m": 352.5,
+          "length_m": 92.5
+        },
+        {
+          "segment_id": "esc-sa-0229",
+          "ring": "walk",
+          "walk_m": 356.3,
+          "length_m": 205
+        },
+        {
+          "segment_id": "esc-sa-0051",
+          "ring": "walk",
+          "walk_m": 391.1,
+          "length_m": 47.6
+        }
+      ]
+    },
+    {
+      "school_id": "school-200066-00",
+      "name": "Colegio Santa María (Saint Mary High School)",
+      "snap_m": 50.5,
+      "length_m": {
+        "total": 774.9,
+        "gate": 312.4
+      },
+      "counts": {
+        "members": 5,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0553",
+          "ring": "gate",
+          "walk_m": 106.1,
+          "length_m": 161.1
+        },
+        {
+          "segment_id": "esc-sr-0554",
+          "ring": "gate",
+          "walk_m": 106.1,
+          "length_m": 151.3
+        },
+        {
+          "segment_id": "esc-sr-0555",
+          "ring": "walk",
+          "walk_m": 257.4,
+          "length_m": 164.2
+        },
+        {
+          "segment_id": "esc-sr-0422",
+          "ring": "walk",
+          "walk_m": 260.7,
+          "length_m": 121.3
+        },
+        {
+          "segment_id": "esc-sr-0421",
+          "ring": "walk",
+          "walk_m": 381.9,
+          "length_m": 177
+        }
+      ]
+    },
+    {
+      "school_id": "school-200064-00",
+      "name": "Escuela Vista del Monte (Mount View School)",
+      "snap_m": 53.6,
+      "length_m": {
+        "total": 4086.8,
+        "gate": 331.9
+      },
+      "counts": {
+        "members": 28,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0562",
+          "ring": "gate",
+          "walk_m": 53.6,
+          "length_m": 155.6
+        },
+        {
+          "segment_id": "esc-sr-0563",
+          "ring": "gate",
+          "walk_m": 53.6,
+          "length_m": 176.3
+        },
+        {
+          "segment_id": "esc-sr-0546",
+          "ring": "walk",
+          "walk_m": 171.1,
+          "length_m": 180.3
+        },
+        {
+          "segment_id": "esc-sr-0765",
+          "ring": "walk",
+          "walk_m": 173.1,
+          "length_m": 155
+        },
+        {
+          "segment_id": "esc-sr-0551",
+          "ring": "walk",
+          "walk_m": 186.2,
+          "length_m": 192.5
+        },
+        {
+          "segment_id": "esc-sr-0561",
+          "ring": "walk",
+          "walk_m": 209.3,
+          "length_m": 152.9
+        },
+        {
+          "segment_id": "esc-sr-0564",
+          "ring": "walk",
+          "walk_m": 229.9,
+          "length_m": 123
+        },
+        {
+          "segment_id": "esc-sr-0768",
+          "ring": "walk",
+          "walk_m": 230.2,
+          "length_m": 151.1
+        },
+        {
+          "segment_id": "esc-sr-0628",
+          "ring": "walk",
+          "walk_m": 252.3,
+          "length_m": 221.5
+        },
+        {
+          "segment_id": "esc-sr-0352",
+          "ring": "walk",
+          "walk_m": 259.3,
+          "length_m": 164.9
+        },
+        {
+          "segment_id": "esc-sr-0629",
+          "ring": "walk",
+          "walk_m": 263.9,
+          "length_m": 90.2
+        },
+        {
+          "segment_id": "esc-sr-0770",
+          "ring": "walk",
+          "walk_m": 281.7,
+          "length_m": 98
+        },
+        {
+          "segment_id": "esc-sr-0772",
+          "ring": "walk",
+          "walk_m": 316.8,
+          "length_m": 76.1
+        },
+        {
+          "segment_id": "esc-sr-0766",
+          "ring": "walk",
+          "walk_m": 328.1,
+          "length_m": 205.1
+        },
+        {
+          "segment_id": "esc-sr-0769",
+          "ring": "walk",
+          "walk_m": 332.6,
+          "length_m": 89.9
+        },
+        {
+          "segment_id": "esc-sr-0545",
+          "ring": "walk",
+          "walk_m": 342.5,
+          "length_m": 161.2
+        },
+        {
+          "segment_id": "esc-sr-0630",
+          "ring": "walk",
+          "walk_m": 349.8,
+          "length_m": 82.6
+        },
+        {
+          "segment_id": "esc-sr-0094",
+          "ring": "walk",
+          "walk_m": 352.9,
+          "length_m": 164.1
+        },
+        {
+          "segment_id": "esc-sr-0560",
+          "ring": "walk",
+          "walk_m": 362.1,
+          "length_m": 196.4
+        },
+        {
+          "segment_id": "esc-sr-0813",
+          "ring": "walk",
+          "walk_m": 376.6,
+          "length_m": 192.7
+        },
+        {
+          "segment_id": "esc-sr-0342",
+          "ring": "walk",
+          "walk_m": 378.7,
+          "length_m": 87.8
+        },
+        {
+          "segment_id": "esc-sr-0552",
+          "ring": "walk",
+          "walk_m": 378.7,
+          "length_m": 175.7
+        },
+        {
+          "segment_id": "esc-sr-0767",
+          "ring": "walk",
+          "walk_m": 379.8,
+          "length_m": 162.7
+        },
+        {
+          "segment_id": "esc-sr-0329",
+          "ring": "walk",
+          "walk_m": 384.7,
+          "length_m": 51.1
+        },
+        {
+          "segment_id": "esc-sr-0714",
+          "ring": "walk",
+          "walk_m": 385.5,
+          "length_m": 230.2
+        },
+        {
+          "segment_id": "esc-sr-0734",
+          "ring": "walk",
+          "walk_m": 385.5,
+          "length_m": 120.9
+        },
+        {
+          "segment_id": "esc-sr-0343",
+          "ring": "walk",
+          "walk_m": 388.5,
+          "length_m": 173.5
+        },
+        {
+          "segment_id": "esc-sr-0317",
+          "ring": "walk",
+          "walk_m": 392.9,
+          "length_m": 55.5
+        }
+      ]
+    },
+    {
+      "school_id": "school-200060-00",
+      "name": "Hometwo Montessori",
+      "snap_m": 21.2,
+      "length_m": {
+        "total": 2430.6,
+        "gate": 674.7
+      },
+      "counts": {
+        "members": 17,
+        "gate": 5
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0578",
+          "ring": "gate",
+          "walk_m": 64.6,
+          "length_m": 123.1
+        },
+        {
+          "segment_id": "esc-sr-0083",
+          "ring": "gate",
+          "walk_m": 88.6,
+          "length_m": 101.5
+        },
+        {
+          "segment_id": "esc-sr-0127",
+          "ring": "gate",
+          "walk_m": 116.5,
+          "length_m": 187.8
+        },
+        {
+          "segment_id": "esc-sr-0577",
+          "ring": "gate",
+          "walk_m": 116.5,
+          "length_m": 161.7
+        },
+        {
+          "segment_id": "esc-sr-0365",
+          "ring": "gate",
+          "walk_m": 135.8,
+          "length_m": 100.6
+        },
+        {
+          "segment_id": "esc-sr-0084",
+          "ring": "walk",
+          "walk_m": 185.1,
+          "length_m": 219
+        },
+        {
+          "segment_id": "esc-sr-0393",
+          "ring": "walk",
+          "walk_m": 190.1,
+          "length_m": 50.5
+        },
+        {
+          "segment_id": "esc-sr-0569",
+          "ring": "walk",
+          "walk_m": 190.1,
+          "length_m": 111.3
+        },
+        {
+          "segment_id": "esc-sr-0392",
+          "ring": "walk",
+          "walk_m": 240.6,
+          "length_m": 151.4
+        },
+        {
+          "segment_id": "esc-sr-0517",
+          "ring": "walk",
+          "walk_m": 259.9,
+          "length_m": 164
+        },
+        {
+          "segment_id": "esc-ce-0052",
+          "ring": "walk",
+          "walk_m": 277.6,
+          "length_m": 141.8
+        },
+        {
+          "segment_id": "esc-sr-0389",
+          "ring": "walk",
+          "walk_m": 278.2,
+          "length_m": 200.9
+        },
+        {
+          "segment_id": "esc-sr-0304",
+          "ring": "walk",
+          "walk_m": 283.8,
+          "length_m": 167.1
+        },
+        {
+          "segment_id": "esc-sr-0128",
+          "ring": "walk",
+          "walk_m": 304.3,
+          "length_m": 150.2
+        },
+        {
+          "segment_id": "esc-sr-0245",
+          "ring": "walk",
+          "walk_m": 330.3,
+          "length_m": 175.9
+        },
+        {
+          "segment_id": "esc-sr-0751",
+          "ring": "walk",
+          "walk_m": 351.6,
+          "length_m": 52.6
+        },
+        {
+          "segment_id": "esc-sr-0288",
+          "ring": "walk",
+          "walk_m": 394.5,
+          "length_m": 171.2
+        }
+      ]
+    },
+    {
+      "school_id": "school-200062-00",
+      "name": "Integral Kallpa",
+      "snap_m": 26.8,
+      "length_m": {
+        "total": 3420.1,
+        "gate": 819
+      },
+      "counts": {
+        "members": 23,
+        "gate": 5
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0241",
+          "ring": "gate",
+          "walk_m": 26.8,
+          "length_m": 199.4
+        },
+        {
+          "segment_id": "esc-sr-0443",
+          "ring": "gate",
+          "walk_m": 26.8,
+          "length_m": 156
+        },
+        {
+          "segment_id": "esc-sr-0442",
+          "ring": "gate",
+          "walk_m": 99.1,
+          "length_m": 156.5
+        },
+        {
+          "segment_id": "esc-sr-0444",
+          "ring": "gate",
+          "walk_m": 110.6,
+          "length_m": 150.8
+        },
+        {
+          "segment_id": "esc-sr-0239",
+          "ring": "gate",
+          "walk_m": 113.8,
+          "length_m": 156.3
+        },
+        {
+          "segment_id": "esc-sr-0494",
+          "ring": "walk",
+          "walk_m": 165.9,
+          "length_m": 172.5
+        },
+        {
+          "segment_id": "esc-sr-0450",
+          "ring": "walk",
+          "walk_m": 209.7,
+          "length_m": 153.1
+        },
+        {
+          "segment_id": "esc-sr-0247",
+          "ring": "walk",
+          "walk_m": 220.4,
+          "length_m": 104
+        },
+        {
+          "segment_id": "esc-sr-0235",
+          "ring": "walk",
+          "walk_m": 226.2,
+          "length_m": 159.7
+        },
+        {
+          "segment_id": "esc-sr-0242",
+          "ring": "walk",
+          "walk_m": 226.2,
+          "length_m": 175.1
+        },
+        {
+          "segment_id": "esc-sr-0240",
+          "ring": "walk",
+          "walk_m": 233,
+          "length_m": 159.4
+        },
+        {
+          "segment_id": "esc-sr-0441",
+          "ring": "walk",
+          "walk_m": 255.6,
+          "length_m": 150.7
+        },
+        {
+          "segment_id": "esc-sr-0445",
+          "ring": "walk",
+          "walk_m": 261.4,
+          "length_m": 86.6
+        },
+        {
+          "segment_id": "esc-sr-0234",
+          "ring": "walk",
+          "walk_m": 290.5,
+          "length_m": 150.2
+        },
+        {
+          "segment_id": "esc-sr-0403",
+          "ring": "walk",
+          "walk_m": 290.5,
+          "length_m": 150.4
+        },
+        {
+          "segment_id": "esc-sr-0595",
+          "ring": "walk",
+          "walk_m": 292.5,
+          "length_m": 74.2
+        },
+        {
+          "segment_id": "esc-sr-0584",
+          "ring": "walk",
+          "walk_m": 304.5,
+          "length_m": 101
+        },
+        {
+          "segment_id": "esc-sr-0495",
+          "ring": "walk",
+          "walk_m": 305.6,
+          "length_m": 217
+        },
+        {
+          "segment_id": "esc-sr-0236",
+          "ring": "walk",
+          "walk_m": 321.7,
+          "length_m": 97.2
+        },
+        {
+          "segment_id": "esc-sr-0246",
+          "ring": "walk",
+          "walk_m": 324.4,
+          "length_m": 170.2
+        },
+        {
+          "segment_id": "esc-sr-0009",
+          "ring": "walk",
+          "walk_m": 348,
+          "length_m": 176
+        },
+        {
+          "segment_id": "esc-sr-0451",
+          "ring": "walk",
+          "walk_m": 362.8,
+          "length_m": 150.8
+        },
+        {
+          "segment_id": "esc-sr-0503",
+          "ring": "walk",
+          "walk_m": 386,
+          "length_m": 153
+        }
+      ]
+    },
+    {
+      "school_id": "school-200061-00",
+      "name": "Jardín Infantil Integral Borboleta e Itskatzú Educación Integral",
+      "snap_m": 23.3,
+      "length_m": {
+        "total": 1141.1,
+        "gate": 342.1
+      },
+      "counts": {
+        "members": 7,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0796",
+          "ring": "gate",
+          "walk_m": 93.2,
+          "length_m": 170.9
+        },
+        {
+          "segment_id": "esc-sr-0795",
+          "ring": "gate",
+          "walk_m": 109.3,
+          "length_m": 171.2
+        },
+        {
+          "segment_id": "esc-sr-0213",
+          "ring": "walk",
+          "walk_m": 202.6,
+          "length_m": 218.9
+        },
+        {
+          "segment_id": "esc-sr-0102",
+          "ring": "walk",
+          "walk_m": 247.9,
+          "length_m": 54.9
+        },
+        {
+          "segment_id": "esc-sr-0797",
+          "ring": "walk",
+          "walk_m": 247.9,
+          "length_m": 176.5
+        },
+        {
+          "segment_id": "esc-sr-0794",
+          "ring": "walk",
+          "walk_m": 280.6,
+          "length_m": 192.2
+        },
+        {
+          "segment_id": "esc-sr-0101",
+          "ring": "walk",
+          "walk_m": 302.8,
+          "length_m": 156.5
+        }
+      ]
+    },
+    {
+      "school_id": "school-200055-00",
+      "name": "Jardín Infantil Sorpresitas",
+      "snap_m": 22.2,
+      "length_m": {
+        "total": 5451.6,
+        "gate": 1529.7
+      },
+      "counts": {
+        "members": 38,
+        "gate": 12
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0223",
+          "ring": "gate",
+          "walk_m": 22.2,
+          "length_m": 191.8
+        },
+        {
+          "segment_id": "esc-sa-0252",
+          "ring": "gate",
+          "walk_m": 22.2,
+          "length_m": 70.4
+        },
+        {
+          "segment_id": "esc-sa-0390",
+          "ring": "gate",
+          "walk_m": 22.2,
+          "length_m": 199.9
+        },
+        {
+          "segment_id": "esc-sa-0292",
+          "ring": "gate",
+          "walk_m": 92.6,
+          "length_m": 107
+        },
+        {
+          "segment_id": "esc-sa-0266",
+          "ring": "gate",
+          "walk_m": 93.6,
+          "length_m": 88.2
+        },
+        {
+          "segment_id": "esc-sa-0233",
+          "ring": "gate",
+          "walk_m": 117.3,
+          "length_m": 196
+        },
+        {
+          "segment_id": "esc-sa-0234",
+          "ring": "gate",
+          "walk_m": 117.3,
+          "length_m": 101
+        },
+        {
+          "segment_id": "esc-sa-0235",
+          "ring": "gate",
+          "walk_m": 119.3,
+          "length_m": 49.9
+        },
+        {
+          "segment_id": "esc-sa-0474",
+          "ring": "gate",
+          "walk_m": 119.3,
+          "length_m": 48.7
+        },
+        {
+          "segment_id": "esc-sa-0014",
+          "ring": "gate",
+          "walk_m": 125,
+          "length_m": 191.5
+        },
+        {
+          "segment_id": "esc-sa-0015",
+          "ring": "gate",
+          "walk_m": 125,
+          "length_m": 92.9
+        },
+        {
+          "segment_id": "esc-sa-0391",
+          "ring": "gate",
+          "walk_m": 125,
+          "length_m": 192.4
+        },
+        {
+          "segment_id": "esc-sa-0027",
+          "ring": "walk",
+          "walk_m": 168,
+          "length_m": 139.4
+        },
+        {
+          "segment_id": "esc-sa-0029",
+          "ring": "walk",
+          "walk_m": 168,
+          "length_m": 71.2
+        },
+        {
+          "segment_id": "esc-sa-0090",
+          "ring": "walk",
+          "walk_m": 196.1,
+          "length_m": 177.5
+        },
+        {
+          "segment_id": "esc-sa-0291",
+          "ring": "walk",
+          "walk_m": 196.1,
+          "length_m": 122.7
+        },
+        {
+          "segment_id": "esc-sa-0472",
+          "ring": "walk",
+          "walk_m": 199.6,
+          "length_m": 191.8
+        },
+        {
+          "segment_id": "esc-sa-0239",
+          "ring": "walk",
+          "walk_m": 214,
+          "length_m": 192
+        },
+        {
+          "segment_id": "esc-sa-0240",
+          "ring": "walk",
+          "walk_m": 214,
+          "length_m": 99.1
+        },
+        {
+          "segment_id": "esc-sa-0389",
+          "ring": "walk",
+          "walk_m": 214,
+          "length_m": 96.3
+        },
+        {
+          "segment_id": "esc-sa-0069",
+          "ring": "walk",
+          "walk_m": 219.8,
+          "length_m": 186
+        },
+        {
+          "segment_id": "esc-sa-0028",
+          "ring": "walk",
+          "walk_m": 239.3,
+          "length_m": 192.5
+        },
+        {
+          "segment_id": "esc-sa-0092",
+          "ring": "walk",
+          "walk_m": 239.3,
+          "length_m": 111.7
+        },
+        {
+          "segment_id": "esc-sa-0253",
+          "ring": "walk",
+          "walk_m": 307.4,
+          "length_m": 145.7
+        },
+        {
+          "segment_id": "esc-sa-0013",
+          "ring": "walk",
+          "walk_m": 310.2,
+          "length_m": 200.4
+        },
+        {
+          "segment_id": "esc-sa-0001",
+          "ring": "walk",
+          "walk_m": 310.3,
+          "length_m": 191.1
+        },
+        {
+          "segment_id": "esc-sa-0470",
+          "ring": "walk",
+          "walk_m": 310.3,
+          "length_m": 122.5
+        },
+        {
+          "segment_id": "esc-sa-0070",
+          "ring": "walk",
+          "walk_m": 313.3,
+          "length_m": 96.7
+        },
+        {
+          "segment_id": "esc-sa-0232",
+          "ring": "walk",
+          "walk_m": 313.3,
+          "length_m": 191.2
+        },
+        {
+          "segment_id": "esc-sa-0393",
+          "ring": "walk",
+          "walk_m": 317,
+          "length_m": 88.1
+        },
+        {
+          "segment_id": "esc-sa-0227",
+          "ring": "walk",
+          "walk_m": 317.4,
+          "length_m": 188.9
+        },
+        {
+          "segment_id": "esc-sa-0228",
+          "ring": "walk",
+          "walk_m": 317.4,
+          "length_m": 92.9
+        },
+        {
+          "segment_id": "esc-sa-0392",
+          "ring": "walk",
+          "walk_m": 317.4,
+          "length_m": 190.4
+        },
+        {
+          "segment_id": "esc-sa-0091",
+          "ring": "walk",
+          "walk_m": 318.8,
+          "length_m": 193.6
+        },
+        {
+          "segment_id": "esc-sa-0256",
+          "ring": "walk",
+          "walk_m": 318.8,
+          "length_m": 227.5
+        },
+        {
+          "segment_id": "esc-sa-0154",
+          "ring": "walk",
+          "walk_m": 391.4,
+          "length_m": 95.7
+        },
+        {
+          "segment_id": "esc-sa-0498",
+          "ring": "walk",
+          "walk_m": 391.4,
+          "length_m": 97
+        },
+        {
+          "segment_id": "esc-sa-0026",
+          "ring": "walk",
+          "walk_m": 392.2,
+          "length_m": 220
+        }
+      ]
+    },
+    {
+      "school_id": "school-200063-00",
+      "name": "Lighthouse International School",
+      "snap_m": 44.4,
+      "length_m": {
+        "total": 1622,
+        "gate": 318.1
+      },
+      "counts": {
+        "members": 12,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0556",
+          "ring": "gate",
+          "walk_m": 109.7,
+          "length_m": 161.1
+        },
+        {
+          "segment_id": "esc-sr-0557",
+          "ring": "gate",
+          "walk_m": 109.7,
+          "length_m": 157
+        },
+        {
+          "segment_id": "esc-sr-0744",
+          "ring": "walk",
+          "walk_m": 183,
+          "length_m": 68.4
+        },
+        {
+          "segment_id": "esc-sr-0360",
+          "ring": "walk",
+          "walk_m": 251.3,
+          "length_m": 163.6
+        },
+        {
+          "segment_id": "esc-sr-0558",
+          "ring": "walk",
+          "walk_m": 266.7,
+          "length_m": 167.6
+        },
+        {
+          "segment_id": "esc-sr-0555",
+          "ring": "walk",
+          "walk_m": 270.8,
+          "length_m": 164.2
+        },
+        {
+          "segment_id": "esc-sr-0623",
+          "ring": "walk",
+          "walk_m": 281.4,
+          "length_m": 240
+        },
+        {
+          "segment_id": "esc-sr-0349",
+          "ring": "walk",
+          "walk_m": 293.3,
+          "length_m": 160
+        },
+        {
+          "segment_id": "esc-sr-0527",
+          "ring": "walk",
+          "walk_m": 308.4,
+          "length_m": 58.7
+        },
+        {
+          "segment_id": "esc-sr-0361",
+          "ring": "walk",
+          "walk_m": 314.8,
+          "length_m": 95
+        },
+        {
+          "segment_id": "esc-sr-0467",
+          "ring": "walk",
+          "walk_m": 331.8,
+          "length_m": 120.3
+        },
+        {
+          "segment_id": "esc-sr-0332",
+          "ring": "walk",
+          "walk_m": 365.1,
+          "length_m": 66.1
+        }
+      ]
+    },
+    {
+      "school_id": "school-200068-00",
+      "name": "Washington School",
+      "snap_m": 62,
+      "length_m": {
+        "total": 2716.5,
+        "gate": 629.3
+      },
+      "counts": {
+        "members": 22,
+        "gate": 4
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0559",
+          "ring": "gate",
+          "walk_m": 62,
+          "length_m": 182.5
+        },
+        {
+          "segment_id": "esc-sr-0558",
+          "ring": "gate",
+          "walk_m": 93.7,
+          "length_m": 167.6
+        },
+        {
+          "segment_id": "esc-sr-0312",
+          "ring": "gate",
+          "walk_m": 99.8,
+          "length_m": 155.3
+        },
+        {
+          "segment_id": "esc-sr-0525",
+          "ring": "gate",
+          "walk_m": 103.3,
+          "length_m": 123.9
+        },
+        {
+          "segment_id": "esc-sr-0465",
+          "ring": "walk",
+          "walk_m": 153.9,
+          "length_m": 103.4
+        },
+        {
+          "segment_id": "esc-sr-0523",
+          "ring": "walk",
+          "walk_m": 205.7,
+          "length_m": 84.5
+        },
+        {
+          "segment_id": "esc-sr-0560",
+          "ring": "walk",
+          "walk_m": 212.9,
+          "length_m": 196.4
+        },
+        {
+          "segment_id": "esc-sr-0464",
+          "ring": "walk",
+          "walk_m": 240,
+          "length_m": 47.4
+        },
+        {
+          "segment_id": "esc-sr-0527",
+          "ring": "walk",
+          "walk_m": 241.1,
+          "length_m": 58.7
+        },
+        {
+          "segment_id": "esc-sr-0623",
+          "ring": "walk",
+          "walk_m": 246.6,
+          "length_m": 240
+        },
+        {
+          "segment_id": "esc-sr-0557",
+          "ring": "walk",
+          "walk_m": 261.4,
+          "length_m": 157
+        },
+        {
+          "segment_id": "esc-sr-0470",
+          "ring": "walk",
+          "walk_m": 263.1,
+          "length_m": 50.2
+        },
+        {
+          "segment_id": "esc-sr-0467",
+          "ring": "walk",
+          "walk_m": 264.5,
+          "length_m": 120.3
+        },
+        {
+          "segment_id": "esc-sr-0620",
+          "ring": "walk",
+          "walk_m": 271.7,
+          "length_m": 153.4
+        },
+        {
+          "segment_id": "esc-sr-0466",
+          "ring": "walk",
+          "walk_m": 272.7,
+          "length_m": 59.4
+        },
+        {
+          "segment_id": "esc-sr-0463",
+          "ring": "walk",
+          "walk_m": 287.4,
+          "length_m": 163.4
+        },
+        {
+          "segment_id": "esc-sr-0622",
+          "ring": "walk",
+          "walk_m": 307.6,
+          "length_m": 175.5
+        },
+        {
+          "segment_id": "esc-sr-0729",
+          "ring": "walk",
+          "walk_m": 327.1,
+          "length_m": 43
+        },
+        {
+          "segment_id": "esc-sr-0311",
+          "ring": "walk",
+          "walk_m": 356.9,
+          "length_m": 168.6
+        },
+        {
+          "segment_id": "esc-sr-0744",
+          "ring": "walk",
+          "walk_m": 372.2,
+          "length_m": 68.4
+        },
+        {
+          "segment_id": "esc-sr-0310",
+          "ring": "walk",
+          "walk_m": 383.6,
+          "length_m": 131.9
+        },
+        {
+          "segment_id": "esc-sr-0621",
+          "ring": "walk",
+          "walk_m": 389.1,
+          "length_m": 65.7
+        }
+      ]
+    },
+    {
+      "school_id": "school-200069-00",
+      "name": "West College / West Primary",
+      "snap_m": 7.4,
+      "length_m": {
+        "total": 1898.3,
+        "gate": 0
+      },
+      "counts": {
+        "members": 16,
+        "gate": 0
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0545",
+          "ring": "walk",
+          "walk_m": 203.9,
+          "length_m": 161.2
+        },
+        {
+          "segment_id": "esc-sr-0546",
+          "ring": "walk",
+          "walk_m": 218.5,
+          "length_m": 180.3
+        },
+        {
+          "segment_id": "esc-sr-0317",
+          "ring": "walk",
+          "walk_m": 235.9,
+          "length_m": 55.5
+        },
+        {
+          "segment_id": "esc-sr-0653",
+          "ring": "walk",
+          "walk_m": 274.6,
+          "length_m": 77.6
+        },
+        {
+          "segment_id": "esc-sr-0661",
+          "ring": "walk",
+          "walk_m": 274.6,
+          "length_m": 43.7
+        },
+        {
+          "segment_id": "esc-sr-0350",
+          "ring": "walk",
+          "walk_m": 275.2,
+          "length_m": 75
+        },
+        {
+          "segment_id": "esc-sr-0316",
+          "ring": "walk",
+          "walk_m": 291.4,
+          "length_m": 180.7
+        },
+        {
+          "segment_id": "esc-sr-0610",
+          "ring": "walk",
+          "walk_m": 346.7,
+          "length_m": 174.8
+        },
+        {
+          "segment_id": "esc-sr-0674",
+          "ring": "walk",
+          "walk_m": 346.7,
+          "length_m": 41.2
+        },
+        {
+          "segment_id": "esc-sr-0354",
+          "ring": "walk",
+          "walk_m": 350.2,
+          "length_m": 67.1
+        },
+        {
+          "segment_id": "esc-sr-0362",
+          "ring": "walk",
+          "walk_m": 350.2,
+          "length_m": 76.6
+        },
+        {
+          "segment_id": "esc-sr-0335",
+          "ring": "walk",
+          "walk_m": 352.2,
+          "length_m": 113.5
+        },
+        {
+          "segment_id": "esc-sr-0469",
+          "ring": "walk",
+          "walk_m": 352.2,
+          "length_m": 119.4
+        },
+        {
+          "segment_id": "esc-sr-0563",
+          "ring": "walk",
+          "walk_m": 353.9,
+          "length_m": 176.3
+        },
+        {
+          "segment_id": "esc-sr-0551",
+          "ring": "walk",
+          "walk_m": 368.9,
+          "length_m": 192.5
+        },
+        {
+          "segment_id": "esc-sr-0673",
+          "ring": "walk",
+          "walk_m": 387.9,
+          "length_m": 162.9
+        }
+      ]
+    },
+    {
+      "school_id": "school-100519-00",
+      "name": "Bello Horizonte",
+      "snap_m": 46,
+      "length_m": {
+        "total": 1316.5,
+        "gate": 0
+      },
+      "counts": {
+        "members": 8,
+        "gate": 0
+      },
+      "members": [
+        {
+          "segment_id": "esc-ce-0065",
+          "ring": "walk",
+          "walk_m": 175.5,
+          "length_m": 164.9
+        },
+        {
+          "segment_id": "esc-sr-0594",
+          "ring": "walk",
+          "walk_m": 205.4,
+          "length_m": 112.6
+        },
+        {
+          "segment_id": "esc-ce-0066",
+          "ring": "walk",
+          "walk_m": 216.6,
+          "length_m": 220.4
+        },
+        {
+          "segment_id": "esc-ce-0033",
+          "ring": "walk",
+          "walk_m": 288.4,
+          "length_m": 159
+        },
+        {
+          "segment_id": "esc-sr-0049",
+          "ring": "walk",
+          "walk_m": 291.6,
+          "length_m": 169.2
+        },
+        {
+          "segment_id": "esc-ce-0037",
+          "ring": "walk",
+          "walk_m": 299.2,
+          "length_m": 162.5
+        },
+        {
+          "segment_id": "esc-ce-0064",
+          "ring": "walk",
+          "walk_m": 299.2,
+          "length_m": 154
+        },
+        {
+          "segment_id": "esc-sr-0048",
+          "ring": "walk",
+          "walk_m": 313,
+          "length_m": 173.9
+        }
+      ]
+    },
+    {
+      "school_id": "school-100613-00",
+      "name": "Benjamín Herrera Angulo",
+      "snap_m": 55.5,
+      "length_m": {
+        "total": 4965.9,
+        "gate": 409.9
+      },
+      "counts": {
+        "members": 33,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0001",
+          "ring": "gate",
+          "walk_m": 55.5,
+          "length_m": 191.1
+        },
+        {
+          "segment_id": "esc-sa-0389",
+          "ring": "gate",
+          "walk_m": 55.5,
+          "length_m": 96.3
+        },
+        {
+          "segment_id": "esc-sa-0470",
+          "ring": "gate",
+          "walk_m": 55.5,
+          "length_m": 122.5
+        },
+        {
+          "segment_id": "esc-sa-0223",
+          "ring": "walk",
+          "walk_m": 151.8,
+          "length_m": 191.8
+        },
+        {
+          "segment_id": "esc-sa-0239",
+          "ring": "walk",
+          "walk_m": 151.8,
+          "length_m": 192
+        },
+        {
+          "segment_id": "esc-sa-0240",
+          "ring": "walk",
+          "walk_m": 151.8,
+          "length_m": 99.1
+        },
+        {
+          "segment_id": "esc-sa-0013",
+          "ring": "walk",
+          "walk_m": 153,
+          "length_m": 200.4
+        },
+        {
+          "segment_id": "esc-sa-0380",
+          "ring": "walk",
+          "walk_m": 177.9,
+          "length_m": 194.4
+        },
+        {
+          "segment_id": "esc-sa-0017",
+          "ring": "walk",
+          "walk_m": 177.9,
+          "length_m": 189.8
+        },
+        {
+          "segment_id": "esc-sa-0222",
+          "ring": "walk",
+          "walk_m": 177.9,
+          "length_m": 60.4
+        },
+        {
+          "segment_id": "esc-sa-0051",
+          "ring": "walk",
+          "walk_m": 207.7,
+          "length_m": 47.6
+        },
+        {
+          "segment_id": "esc-sa-0002",
+          "ring": "walk",
+          "walk_m": 246.6,
+          "length_m": 196.6
+        },
+        {
+          "segment_id": "esc-sa-0379",
+          "ring": "walk",
+          "walk_m": 246.6,
+          "length_m": 190.8
+        },
+        {
+          "segment_id": "esc-sa-0014",
+          "ring": "walk",
+          "walk_m": 246.9,
+          "length_m": 191.5
+        },
+        {
+          "segment_id": "esc-sa-0233",
+          "ring": "walk",
+          "walk_m": 248.5,
+          "length_m": 196
+        },
+        {
+          "segment_id": "esc-sa-0234",
+          "ring": "walk",
+          "walk_m": 248.5,
+          "length_m": 101
+        },
+        {
+          "segment_id": "esc-sa-0027",
+          "ring": "walk",
+          "walk_m": 250.8,
+          "length_m": 139.4
+        },
+        {
+          "segment_id": "esc-sa-0253",
+          "ring": "walk",
+          "walk_m": 250.8,
+          "length_m": 145.7
+        },
+        {
+          "segment_id": "esc-sa-0165",
+          "ring": "walk",
+          "walk_m": 273.3,
+          "length_m": 151
+        },
+        {
+          "segment_id": "esc-sa-0163",
+          "ring": "walk",
+          "walk_m": 283.3,
+          "length_m": 192.1
+        },
+        {
+          "segment_id": "esc-sa-0237",
+          "ring": "walk",
+          "walk_m": 341.9,
+          "length_m": 195.6
+        },
+        {
+          "segment_id": "esc-sa-0243",
+          "ring": "walk",
+          "walk_m": 341.9,
+          "length_m": 111.2
+        },
+        {
+          "segment_id": "esc-sa-0070",
+          "ring": "walk",
+          "walk_m": 342.1,
+          "length_m": 96.7
+        },
+        {
+          "segment_id": "esc-sa-0360",
+          "ring": "walk",
+          "walk_m": 342.1,
+          "length_m": 194
+        },
+        {
+          "segment_id": "esc-sa-0252",
+          "ring": "walk",
+          "walk_m": 343.6,
+          "length_m": 70.4
+        },
+        {
+          "segment_id": "esc-sa-0390",
+          "ring": "walk",
+          "walk_m": 343.6,
+          "length_m": 199.9
+        },
+        {
+          "segment_id": "esc-sa-0226",
+          "ring": "walk",
+          "walk_m": 345.8,
+          "length_m": 188.7
+        },
+        {
+          "segment_id": "esc-sa-0159",
+          "ring": "walk",
+          "walk_m": 349.4,
+          "length_m": 190.4
+        },
+        {
+          "segment_id": "esc-sa-0167",
+          "ring": "walk",
+          "walk_m": 374.6,
+          "length_m": 152.2
+        },
+        {
+          "segment_id": "esc-sa-0029",
+          "ring": "walk",
+          "walk_m": 390.2,
+          "length_m": 71.2
+        },
+        {
+          "segment_id": "esc-sa-0474",
+          "ring": "walk",
+          "walk_m": 390.2,
+          "length_m": 48.7
+        },
+        {
+          "segment_id": "esc-sa-0160",
+          "ring": "walk",
+          "walk_m": 396.5,
+          "length_m": 154.1
+        },
+        {
+          "segment_id": "esc-sa-0285",
+          "ring": "walk",
+          "walk_m": 396.5,
+          "length_m": 203.3
+        }
+      ]
+    },
+    {
+      "school_id": "school-104681-00",
+      "name": "C.T.P. de Escazú",
+      "snap_m": 58.1,
+      "length_m": {
+        "total": 959.9,
+        "gate": 116.7
+      },
+      "counts": {
+        "members": 7,
+        "gate": 1
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0218",
+          "ring": "gate",
+          "walk_m": 89,
+          "length_m": 116.7
+        },
+        {
+          "segment_id": "esc-sa-0111",
+          "ring": "walk",
+          "walk_m": 150.9,
+          "length_m": 197.8
+        },
+        {
+          "segment_id": "esc-sa-0110",
+          "ring": "walk",
+          "walk_m": 200.5,
+          "length_m": 200.6
+        },
+        {
+          "segment_id": "esc-sa-0112",
+          "ring": "walk",
+          "walk_m": 299.2,
+          "length_m": 195.2
+        },
+        {
+          "segment_id": "esc-sa-0329",
+          "ring": "walk",
+          "walk_m": 299.2,
+          "length_m": 60.8
+        },
+        {
+          "segment_id": "esc-sa-0522",
+          "ring": "walk",
+          "walk_m": 299.2,
+          "length_m": 110.1
+        },
+        {
+          "segment_id": "esc-sa-0145",
+          "ring": "walk",
+          "walk_m": 371.5,
+          "length_m": 78.7
+        }
+      ]
+    },
+    {
+      "school_id": "school-105542-00",
+      "name": "CONED Escazú",
+      "snap_m": 19.9,
+      "length_m": {
+        "total": 3642.9,
+        "gate": 855.2
+      },
+      "counts": {
+        "members": 27,
+        "gate": 5
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0255",
+          "ring": "gate",
+          "walk_m": 34.8,
+          "length_m": 173.3
+        },
+        {
+          "segment_id": "esc-sa-0256",
+          "ring": "gate",
+          "walk_m": 73,
+          "length_m": 227.5
+        },
+        {
+          "segment_id": "esc-sa-0283",
+          "ring": "gate",
+          "walk_m": 79,
+          "length_m": 138.1
+        },
+        {
+          "segment_id": "esc-sa-0091",
+          "ring": "gate",
+          "walk_m": 145.7,
+          "length_m": 193.6
+        },
+        {
+          "segment_id": "esc-sa-0291",
+          "ring": "gate",
+          "walk_m": 145.7,
+          "length_m": 122.7
+        },
+        {
+          "segment_id": "esc-sa-0006",
+          "ring": "walk",
+          "walk_m": 169.9,
+          "length_m": 100.6
+        },
+        {
+          "segment_id": "esc-sa-0158",
+          "ring": "walk",
+          "walk_m": 169.9,
+          "length_m": 96
+        },
+        {
+          "segment_id": "esc-sa-0471",
+          "ring": "walk",
+          "walk_m": 169.9,
+          "length_m": 67
+        },
+        {
+          "segment_id": "esc-sa-0093",
+          "ring": "walk",
+          "walk_m": 196.5,
+          "length_m": 41
+        },
+        {
+          "segment_id": "esc-sa-0154",
+          "ring": "walk",
+          "walk_m": 252.1,
+          "length_m": 95.7
+        },
+        {
+          "segment_id": "esc-sa-0373",
+          "ring": "walk",
+          "walk_m": 265.9,
+          "length_m": 201.8
+        },
+        {
+          "segment_id": "esc-sa-0090",
+          "ring": "walk",
+          "walk_m": 268.4,
+          "length_m": 177.5
+        },
+        {
+          "segment_id": "esc-sa-0005",
+          "ring": "walk",
+          "walk_m": 270.5,
+          "length_m": 198.1
+        },
+        {
+          "segment_id": "esc-sa-0155",
+          "ring": "walk",
+          "walk_m": 270.5,
+          "length_m": 160.2
+        },
+        {
+          "segment_id": "esc-sa-0026",
+          "ring": "walk",
+          "walk_m": 294.5,
+          "length_m": 220
+        },
+        {
+          "segment_id": "esc-sa-0292",
+          "ring": "walk",
+          "walk_m": 310.2,
+          "length_m": 107
+        },
+        {
+          "segment_id": "esc-sa-0254",
+          "ring": "walk",
+          "walk_m": 342,
+          "length_m": 105.4
+        },
+        {
+          "segment_id": "esc-sa-0228",
+          "ring": "walk",
+          "walk_m": 347.7,
+          "length_m": 92.9
+        },
+        {
+          "segment_id": "esc-sa-0472",
+          "ring": "walk",
+          "walk_m": 347.7,
+          "length_m": 191.8
+        },
+        {
+          "segment_id": "esc-sa-0498",
+          "ring": "walk",
+          "walk_m": 347.7,
+          "length_m": 97
+        },
+        {
+          "segment_id": "esc-sa-0394",
+          "ring": "walk",
+          "walk_m": 350,
+          "length_m": 151.1
+        },
+        {
+          "segment_id": "esc-sa-0015",
+          "ring": "walk",
+          "walk_m": 355.5,
+          "length_m": 92.9
+        },
+        {
+          "segment_id": "esc-sa-0156",
+          "ring": "walk",
+          "walk_m": 367.6,
+          "length_m": 143.9
+        },
+        {
+          "segment_id": "esc-sa-0068",
+          "ring": "walk",
+          "walk_m": 368.8,
+          "length_m": 71.9
+        },
+        {
+          "segment_id": "esc-sa-0231",
+          "ring": "walk",
+          "walk_m": 368.8,
+          "length_m": 182.9
+        },
+        {
+          "segment_id": "esc-sa-0252",
+          "ring": "walk",
+          "walk_m": 371.9,
+          "length_m": 70.4
+        },
+        {
+          "segment_id": "esc-sa-0199",
+          "ring": "walk",
+          "walk_m": 397.2,
+          "length_m": 122.6
+        }
+      ]
+    },
+    {
+      "school_id": "school-100536-00",
+      "name": "Corazón de Jesús",
+      "snap_m": 16.4,
+      "length_m": {
+        "total": 2211.3,
+        "gate": 410.3
+      },
+      "counts": {
+        "members": 16,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0296",
+          "ring": "gate",
+          "walk_m": 76.7,
+          "length_m": 176.4
+        },
+        {
+          "segment_id": "esc-sa-0295",
+          "ring": "gate",
+          "walk_m": 126.4,
+          "length_m": 152.8
+        },
+        {
+          "segment_id": "esc-sa-0396",
+          "ring": "gate",
+          "walk_m": 126.4,
+          "length_m": 81.1
+        },
+        {
+          "segment_id": "esc-sa-0353",
+          "ring": "walk",
+          "walk_m": 203.5,
+          "length_m": 148.2
+        },
+        {
+          "segment_id": "esc-sa-0357",
+          "ring": "walk",
+          "walk_m": 203.5,
+          "length_m": 178.4
+        },
+        {
+          "segment_id": "esc-sa-0395",
+          "ring": "walk",
+          "walk_m": 207.5,
+          "length_m": 172.4
+        },
+        {
+          "segment_id": "esc-sa-0377",
+          "ring": "walk",
+          "walk_m": 222.4,
+          "length_m": 124.8
+        },
+        {
+          "segment_id": "esc-sa-0294",
+          "ring": "walk",
+          "walk_m": 279.1,
+          "length_m": 192.5
+        },
+        {
+          "segment_id": "esc-sa-0376",
+          "ring": "walk",
+          "walk_m": 316.2,
+          "length_m": 129.5
+        },
+        {
+          "segment_id": "esc-sa-0375",
+          "ring": "walk",
+          "walk_m": 347.1,
+          "length_m": 126.4
+        },
+        {
+          "segment_id": "esc-sa-0259",
+          "ring": "walk",
+          "walk_m": 351.7,
+          "length_m": 151.3
+        },
+        {
+          "segment_id": "esc-sa-0352",
+          "ring": "walk",
+          "walk_m": 351.7,
+          "length_m": 157.4
+        },
+        {
+          "segment_id": "esc-sa-0394",
+          "ring": "walk",
+          "walk_m": 379.8,
+          "length_m": 151.1
+        },
+        {
+          "segment_id": "esc-sa-0358",
+          "ring": "walk",
+          "walk_m": 381.9,
+          "length_m": 76.4
+        },
+        {
+          "segment_id": "esc-sa-0264",
+          "ring": "walk",
+          "walk_m": 390.1,
+          "length_m": 74.3
+        },
+        {
+          "segment_id": "esc-sa-0378",
+          "ring": "walk",
+          "walk_m": 392.6,
+          "length_m": 118.3
+        }
+      ]
+    },
+    {
+      "school_id": "school-100518-00",
+      "name": "David Marín Hidalgo",
+      "snap_m": 88.7,
+      "length_m": {
+        "total": 1241.3,
+        "gate": 321.3
+      },
+      "counts": {
+        "members": 7,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0058",
+          "ring": "gate",
+          "walk_m": 88.7,
+          "length_m": 166.3
+        },
+        {
+          "segment_id": "esc-sa-0059",
+          "ring": "gate",
+          "walk_m": 121.1,
+          "length_m": 155
+        },
+        {
+          "segment_id": "esc-sa-0057",
+          "ring": "walk",
+          "walk_m": 222.6,
+          "length_m": 155.5
+        },
+        {
+          "segment_id": "esc-sa-0060",
+          "ring": "walk",
+          "walk_m": 276.1,
+          "length_m": 158.8
+        },
+        {
+          "segment_id": "esc-sa-0442",
+          "ring": "walk",
+          "walk_m": 299,
+          "length_m": 160.6
+        },
+        {
+          "segment_id": "esc-sa-0062",
+          "ring": "walk",
+          "walk_m": 378,
+          "length_m": 272.8
+        },
+        {
+          "segment_id": "esc-sa-0122",
+          "ring": "walk",
+          "walk_m": 378,
+          "length_m": 172.3
+        }
+      ]
+    },
+    {
+      "school_id": "school-100517-00",
+      "name": "El Carmen",
+      "snap_m": 53.1,
+      "length_m": {
+        "total": 1359.2,
+        "gate": 272.6
+      },
+      "counts": {
+        "members": 9,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0117",
+          "ring": "gate",
+          "walk_m": 53.1,
+          "length_m": 120.9
+        },
+        {
+          "segment_id": "esc-sa-0116",
+          "ring": "gate",
+          "walk_m": 74.4,
+          "length_m": 151.7
+        },
+        {
+          "segment_id": "esc-sa-0113",
+          "ring": "walk",
+          "walk_m": 226.1,
+          "length_m": 166.7
+        },
+        {
+          "segment_id": "esc-sa-0524",
+          "ring": "walk",
+          "walk_m": 226.1,
+          "length_m": 130.4
+        },
+        {
+          "segment_id": "esc-sa-0118",
+          "ring": "walk",
+          "walk_m": 235.4,
+          "length_m": 151.4
+        },
+        {
+          "segment_id": "esc-sa-0220",
+          "ring": "walk",
+          "walk_m": 248.3,
+          "length_m": 185.5
+        },
+        {
+          "segment_id": "esc-sa-0523",
+          "ring": "walk",
+          "walk_m": 356.5,
+          "length_m": 162.8
+        },
+        {
+          "segment_id": "esc-sa-0119",
+          "ring": "walk",
+          "walk_m": 386.8,
+          "length_m": 139
+        },
+        {
+          "segment_id": "esc-sa-0114",
+          "ring": "walk",
+          "walk_m": 392.8,
+          "length_m": 150.8
+        }
+      ]
+    },
+    {
+      "school_id": "school-100559-00",
+      "name": "Guachipelín",
+      "snap_m": 58.6,
+      "length_m": {
+        "total": 1810.9,
+        "gate": 403.3
+      },
+      "counts": {
+        "members": 13,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0001",
+          "ring": "gate",
+          "walk_m": 58.6,
+          "length_m": 183.4
+        },
+        {
+          "segment_id": "esc-sr-0002",
+          "ring": "gate",
+          "walk_m": 58.6,
+          "length_m": 159.2
+        },
+        {
+          "segment_id": "esc-sr-0376",
+          "ring": "gate",
+          "walk_m": 129.4,
+          "length_m": 60.7
+        },
+        {
+          "segment_id": "esc-sr-0150",
+          "ring": "walk",
+          "walk_m": 187.3,
+          "length_m": 165.1
+        },
+        {
+          "segment_id": "esc-sr-0747",
+          "ring": "walk",
+          "walk_m": 206.6,
+          "length_m": 141
+        },
+        {
+          "segment_id": "esc-sr-0003",
+          "ring": "walk",
+          "walk_m": 217.8,
+          "length_m": 158.9
+        },
+        {
+          "segment_id": "esc-sr-0158",
+          "ring": "walk",
+          "walk_m": 242,
+          "length_m": 201.1
+        },
+        {
+          "segment_id": "esc-sr-0057",
+          "ring": "walk",
+          "walk_m": 257.8,
+          "length_m": 204.6
+        },
+        {
+          "segment_id": "esc-sr-0375",
+          "ring": "walk",
+          "walk_m": 265.7,
+          "length_m": 85.2
+        },
+        {
+          "segment_id": "esc-sr-0369",
+          "ring": "walk",
+          "walk_m": 319.9,
+          "length_m": 97.4
+        },
+        {
+          "segment_id": "esc-sr-0461",
+          "ring": "walk",
+          "walk_m": 331.2,
+          "length_m": 123.3
+        },
+        {
+          "segment_id": "esc-sr-0151",
+          "ring": "walk",
+          "walk_m": 352.4,
+          "length_m": 80.2
+        },
+        {
+          "segment_id": "esc-sr-0370",
+          "ring": "walk",
+          "walk_m": 376.1,
+          "length_m": 150.8
+        }
+      ]
+    },
+    {
+      "school_id": "school-104805-00",
+      "name": "I.E.G.B. Pbro. Yanuario Quesada",
+      "snap_m": 59.8,
+      "length_m": {
+        "total": 1072.8,
+        "gate": 496.4
+      },
+      "counts": {
+        "members": 8,
+        "gate": 3
+      },
+      "members": [
+        {
+          "segment_id": "esc-sr-0283",
+          "ring": "gate",
+          "walk_m": 59.8,
+          "length_m": 173.9
+        },
+        {
+          "segment_id": "esc-sr-0506",
+          "ring": "gate",
+          "walk_m": 59.8,
+          "length_m": 103.5
+        },
+        {
+          "segment_id": "esc-sr-0084",
+          "ring": "gate",
+          "walk_m": 137,
+          "length_m": 219
+        },
+        {
+          "segment_id": "esc-sr-0392",
+          "ring": "walk",
+          "walk_m": 258.2,
+          "length_m": 151.4
+        },
+        {
+          "segment_id": "esc-sr-0393",
+          "ring": "walk",
+          "walk_m": 306.5,
+          "length_m": 50.5
+        },
+        {
+          "segment_id": "esc-sr-0577",
+          "ring": "walk",
+          "walk_m": 356,
+          "length_m": 161.7
+        },
+        {
+          "segment_id": "esc-sr-0083",
+          "ring": "walk",
+          "walk_m": 357,
+          "length_m": 101.5
+        },
+        {
+          "segment_id": "esc-sr-0569",
+          "ring": "walk",
+          "walk_m": 357,
+          "length_m": 111.3
+        }
+      ]
+    },
+    {
+      "school_id": "school-osm-way-1303988283",
+      "name": "Jardín de Niños Corazón de Jesús",
+      "snap_m": 17.9,
+      "length_m": {
+        "total": 2715,
+        "gate": 707.5
+      },
+      "counts": {
+        "members": 19,
+        "gate": 5
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0295",
+          "ring": "gate",
+          "walk_m": 17.9,
+          "length_m": 152.8
+        },
+        {
+          "segment_id": "esc-sa-0296",
+          "ring": "gate",
+          "walk_m": 33.9,
+          "length_m": 176.4
+        },
+        {
+          "segment_id": "esc-sa-0396",
+          "ring": "gate",
+          "walk_m": 33.9,
+          "length_m": 81.1
+        },
+        {
+          "segment_id": "esc-sa-0377",
+          "ring": "gate",
+          "walk_m": 97.9,
+          "length_m": 124.8
+        },
+        {
+          "segment_id": "esc-sa-0395",
+          "ring": "gate",
+          "walk_m": 115,
+          "length_m": 172.4
+        },
+        {
+          "segment_id": "esc-sa-0294",
+          "ring": "walk",
+          "walk_m": 154.7,
+          "length_m": 192.5
+        },
+        {
+          "segment_id": "esc-sa-0376",
+          "ring": "walk",
+          "walk_m": 191.8,
+          "length_m": 129.5
+        },
+        {
+          "segment_id": "esc-sa-0353",
+          "ring": "walk",
+          "walk_m": 210.3,
+          "length_m": 148.2
+        },
+        {
+          "segment_id": "esc-sa-0357",
+          "ring": "walk",
+          "walk_m": 210.3,
+          "length_m": 178.4
+        },
+        {
+          "segment_id": "esc-sa-0375",
+          "ring": "walk",
+          "walk_m": 222.7,
+          "length_m": 126.4
+        },
+        {
+          "segment_id": "esc-sa-0264",
+          "ring": "walk",
+          "walk_m": 265.6,
+          "length_m": 74.3
+        },
+        {
+          "segment_id": "esc-sa-0394",
+          "ring": "walk",
+          "walk_m": 287.4,
+          "length_m": 151.1
+        },
+        {
+          "segment_id": "esc-sa-0378",
+          "ring": "walk",
+          "walk_m": 300.2,
+          "length_m": 118.3
+        },
+        {
+          "segment_id": "esc-sa-0263",
+          "ring": "walk",
+          "walk_m": 339.9,
+          "length_m": 164.8
+        },
+        {
+          "segment_id": "esc-sa-0293",
+          "ring": "walk",
+          "walk_m": 347.2,
+          "length_m": 216.3
+        },
+        {
+          "segment_id": "esc-sa-0259",
+          "ring": "walk",
+          "walk_m": 358.6,
+          "length_m": 151.3
+        },
+        {
+          "segment_id": "esc-sa-0352",
+          "ring": "walk",
+          "walk_m": 358.6,
+          "length_m": 157.4
+        },
+        {
+          "segment_id": "esc-sa-0358",
+          "ring": "walk",
+          "walk_m": 388.7,
+          "length_m": 76.4
+        },
+        {
+          "segment_id": "esc-sa-0199",
+          "ring": "walk",
+          "walk_m": 391.3,
+          "length_m": 122.6
+        }
+      ]
+    },
+    {
+      "school_id": "school-100628-00",
+      "name": "Juan XXIII",
+      "snap_m": 56.9,
+      "length_m": {
+        "total": 1741.2,
+        "gate": 277
+      },
+      "counts": {
+        "members": 13,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0181",
+          "ring": "gate",
+          "walk_m": 56.9,
+          "length_m": 179.3
+        },
+        {
+          "segment_id": "esc-sa-0182",
+          "ring": "gate",
+          "walk_m": 56.9,
+          "length_m": 97.7
+        },
+        {
+          "segment_id": "esc-sa-0047",
+          "ring": "walk",
+          "walk_m": 159.7,
+          "length_m": 156.1
+        },
+        {
+          "segment_id": "esc-sa-0428",
+          "ring": "walk",
+          "walk_m": 159.7,
+          "length_m": 148.2
+        },
+        {
+          "segment_id": "esc-sa-0106",
+          "ring": "walk",
+          "walk_m": 264.4,
+          "length_m": 190.9
+        },
+        {
+          "segment_id": "esc-sa-0497",
+          "ring": "walk",
+          "walk_m": 265.5,
+          "length_m": 67
+        },
+        {
+          "segment_id": "esc-sa-0427",
+          "ring": "walk",
+          "walk_m": 307.9,
+          "length_m": 161.6
+        },
+        {
+          "segment_id": "esc-sa-0048",
+          "ring": "walk",
+          "walk_m": 315.8,
+          "length_m": 94.4
+        },
+        {
+          "segment_id": "esc-sa-0019",
+          "ring": "walk",
+          "walk_m": 332.5,
+          "length_m": 159.4
+        },
+        {
+          "segment_id": "esc-sa-0049",
+          "ring": "walk",
+          "walk_m": 347.3,
+          "length_m": 69.2
+        },
+        {
+          "segment_id": "esc-sa-0446",
+          "ring": "walk",
+          "walk_m": 356.7,
+          "length_m": 174.8
+        },
+        {
+          "segment_id": "esc-sa-0018",
+          "ring": "walk",
+          "walk_m": 367.4,
+          "length_m": 144.4
+        },
+        {
+          "segment_id": "esc-sa-0535",
+          "ring": "walk",
+          "walk_m": 367.4,
+          "length_m": 98.2
+        }
+      ]
+    },
+    {
+      "school_id": "school-104023-00",
+      "name": "Liceo de Escazú",
+      "snap_m": 89.8,
+      "length_m": {
+        "total": 1679.4,
+        "gate": 344.5
+      },
+      "counts": {
+        "members": 10,
+        "gate": 2
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0159",
+          "ring": "gate",
+          "walk_m": 89.8,
+          "length_m": 190.4
+        },
+        {
+          "segment_id": "esc-sa-0160",
+          "ring": "gate",
+          "walk_m": 89.8,
+          "length_m": 154.1
+        },
+        {
+          "segment_id": "esc-sa-0253",
+          "ring": "walk",
+          "walk_m": 243.9,
+          "length_m": 145.7
+        },
+        {
+          "segment_id": "esc-sa-0285",
+          "ring": "walk",
+          "walk_m": 243.9,
+          "length_m": 203.3
+        },
+        {
+          "segment_id": "esc-sa-0017",
+          "ring": "walk",
+          "walk_m": 280.2,
+          "length_m": 189.8
+        },
+        {
+          "segment_id": "esc-sa-0167",
+          "ring": "walk",
+          "walk_m": 305.4,
+          "length_m": 152.2
+        },
+        {
+          "segment_id": "esc-sa-0288",
+          "ring": "walk",
+          "walk_m": 341,
+          "length_m": 155.7
+        },
+        {
+          "segment_id": "esc-sa-0071",
+          "ring": "walk",
+          "walk_m": 378.4,
+          "length_m": 249.7
+        },
+        {
+          "segment_id": "esc-sa-0027",
+          "ring": "walk",
+          "walk_m": 389.6,
+          "length_m": 139.4
+        },
+        {
+          "segment_id": "esc-sa-0240",
+          "ring": "walk",
+          "walk_m": 389.6,
+          "length_m": 99.1
+        }
+      ]
+    },
+    {
+      "school_id": "school-100552-00",
+      "name": "República de Venezuela",
+      "snap_m": 52.4,
+      "length_m": {
+        "total": 6790.5,
+        "gate": 1706.6
+      },
+      "counts": {
+        "members": 47,
+        "gate": 11
+      },
+      "members": [
+        {
+          "segment_id": "esc-sa-0227",
+          "ring": "gate",
+          "walk_m": 52.4,
+          "length_m": 188.9
+        },
+        {
+          "segment_id": "esc-sa-0228",
+          "ring": "gate",
+          "walk_m": 52.4,
+          "length_m": 92.9
+        },
+        {
+          "segment_id": "esc-sa-0391",
+          "ring": "gate",
+          "walk_m": 52.4,
+          "length_m": 192.4
+        },
+        {
+          "segment_id": "esc-sa-0392",
+          "ring": "gate",
+          "walk_m": 52.4,
+          "length_m": 190.4
+        },
+        {
+          "segment_id": "esc-sa-0232",
+          "ring": "gate",
+          "walk_m": 144,
+          "length_m": 191.2
+        },
+        {
+          "segment_id": "esc-sa-0154",
+          "ring": "gate",
+          "walk_m": 145.4,
+          "length_m": 95.7
+        },
+        {
+          "segment_id": "esc-sa-0472",
+          "ring": "gate",
+          "walk_m": 145.4,
+          "length_m": 191.8
+        },
+        {
+          "segment_id": "esc-sa-0498",
+          "ring": "gate",
+          "walk_m": 145.4,
+          "length_m": 97
+        },
+        {
+          "segment_id": "esc-sa-0012",
+          "ring": "gate",
+          "walk_m": 148.7,
+          "length_m": 188
+        },
+        {
+          "segment_id": "esc-sa-0372",
+          "ring": "gate",
+          "walk_m": 148.7,
+          "length_m": 92.3
+        },
+        {
+          "segment_id": "esc-sa-0069",
+          "ring": "gate",
+          "walk_m": 150,
+          "length_m": 186
+        },
+        {
+          "segment_id": "esc-sa-0370",
+          "ring": "walk",
+          "walk_m": 176.7,
+          "length_m": 60
+        },
+        {
+          "segment_id": "esc-sa-0369",
+          "ring": "walk",
+          "walk_m": 208.4,
+          "length_m": 80.9
+        },
+        {
+          "segment_id": "esc-sa-0368",
+          "ring": "walk",
+          "walk_m": 233.2,
+          "length_m": 83.2
+        },
+        {
+          "segment_id": "esc-sa-0366",
+          "ring": "walk",
+          "walk_m": 236.6,
+          "length_m": 55.5
+        },
+        {
+          "segment_id": "esc-sa-0070",
+          "ring": "walk",
+          "walk_m": 240.2,
+          "length_m": 96.7
+        },
+        {
+          "segment_id": "esc-sa-0233",
+          "ring": "walk",
+          "walk_m": 240.2,
+          "length_m": 196
+        },
+        {
+          "segment_id": "esc-sa-0254",
+          "ring": "walk",
+          "walk_m": 241.1,
+          "length_m": 105.4
+        },
+        {
+          "segment_id": "esc-sa-0226",
+          "ring": "walk",
+          "walk_m": 241.3,
+          "length_m": 188.7
+        },
+        {
+          "segment_id": "esc-sa-0360",
+          "ring": "walk",
+          "walk_m": 241.3,
+          "length_m": 194
+        },
+        {
+          "segment_id": "esc-sa-0157",
+          "ring": "walk",
+          "walk_m": 242.9,
+          "length_m": 178.8
+        },
+        {
+          "segment_id": "esc-sa-0374",
+          "ring": "walk",
+          "walk_m": 242.9,
+          "length_m": 189.2
+        },
+        {
+          "segment_id": "esc-sa-0386",
+          "ring": "walk",
+          "walk_m": 242.9,
+          "length_m": 190.7
+        },
+        {
+          "segment_id": "esc-sa-0473",
+          "ring": "walk",
+          "walk_m": 243.7,
+          "length_m": 96.9
+        },
+        {
+          "segment_id": "esc-sa-0014",
+          "ring": "walk",
+          "walk_m": 244.9,
+          "length_m": 191.5
+        },
+        {
+          "segment_id": "esc-sa-0015",
+          "ring": "walk",
+          "walk_m": 244.9,
+          "length_m": 92.9
+        },
+        {
+          "segment_id": "esc-sa-0390",
+          "ring": "walk",
+          "walk_m": 244.9,
+          "length_m": 199.9
+        },
+        {
+          "segment_id": "esc-sa-0367",
+          "ring": "walk",
+          "walk_m": 254.2,
+          "length_m": 43.3
+        },
+        {
+          "segment_id": "esc-sa-0471",
+          "ring": "walk",
+          "walk_m": 256.2,
+          "length_m": 67
+        },
+        {
+          "segment_id": "esc-sa-0338",
+          "ring": "walk",
+          "walk_m": 300.9,
+          "length_m": 192.8
+        },
+        {
+          "segment_id": "esc-sa-0006",
+          "ring": "walk",
+          "walk_m": 323.2,
+          "length_m": 100.6
+        },
+        {
+          "segment_id": "esc-sa-0158",
+          "ring": "walk",
+          "walk_m": 323.2,
+          "length_m": 96
+        },
+        {
+          "segment_id": "esc-sa-0255",
+          "ring": "walk",
+          "walk_m": 323.2,
+          "length_m": 173.3
+        },
+        {
+          "segment_id": "esc-sa-0242",
+          "ring": "walk",
+          "walk_m": 332.4,
+          "length_m": 93.5
+        },
+        {
+          "segment_id": "esc-sa-0359",
+          "ring": "walk",
+          "walk_m": 332.4,
+          "length_m": 190.7
+        },
+        {
+          "segment_id": "esc-sa-0002",
+          "ring": "walk",
+          "walk_m": 335.9,
+          "length_m": 196.6
+        },
+        {
+          "segment_id": "esc-sa-0292",
+          "ring": "walk",
+          "walk_m": 336.6,
+          "length_m": 107
+        },
+        {
+          "segment_id": "esc-sa-0239",
+          "ring": "walk",
+          "walk_m": 336.9,
+          "length_m": 192
+        },
+        {
+          "segment_id": "esc-sa-0379",
+          "ring": "walk",
+          "walk_m": 336.9,
+          "length_m": 190.8
+        },
+        {
+          "segment_id": "esc-sa-0491",
+          "ring": "walk",
+          "walk_m": 338.1,
+          "length_m": 91.9
+        },
+        {
+          "segment_id": "esc-sa-0008",
+          "ring": "walk",
+          "walk_m": 338.5,
+          "length_m": 152.7
+        },
+        {
+          "segment_id": "esc-sa-0009",
+          "ring": "walk",
+          "walk_m": 338.5,
+          "length_m": 192.3
+        },
+        {
+          "segment_id": "esc-sa-0223",
+          "ring": "walk",
+          "walk_m": 347.7,
+          "length_m": 191.8
+        },
+        {
+          "segment_id": "esc-sa-0252",
+          "ring": "walk",
+          "walk_m": 347.7,
+          "length_m": 70.4
+        },
+        {
+          "segment_id": "esc-sa-0155",
+          "ring": "walk",
+          "walk_m": 362,
+          "length_m": 160.2
+        },
+        {
+          "segment_id": "esc-sa-0241",
+          "ring": "walk",
+          "walk_m": 394.4,
+          "length_m": 189.6
+        },
+        {
+          "segment_id": "esc-sa-0381",
+          "ring": "walk",
+          "walk_m": 394.4,
+          "length_m": 191.1
+        }
+      ]
+    }
+  ]
+}

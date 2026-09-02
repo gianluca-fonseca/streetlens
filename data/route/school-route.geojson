@@ -1,0 +1,1076 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "title": "Escazú schools — field collection route",
+    "generated_by": "scripts/build-school-route.mjs",
+    "ordering": "nearest-neighbour + 2-opt on straight-line distance; a visiting order, not a driving route",
+    "legs": [
+      {
+        "title": "El Carmen → Belo Horizonte",
+        "districts": [
+          "San Antonio",
+          "Escazú"
+        ],
+        "stops": 10,
+        "straight_line_km": 4.51
+      },
+      {
+        "title": "Belo Horizonte → Bebedero",
+        "districts": [
+          "Escazú",
+          "San Rafael"
+        ],
+        "stops": 10,
+        "straight_line_km": 5.14
+      },
+      {
+        "title": "San Rafael → Guachipelín",
+        "districts": [
+          "San Rafael",
+          "San Antonio"
+        ],
+        "stops": 13,
+        "straight_line_km": 7.82
+      }
+    ]
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "school-100517-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.141322,
+          9.896587
+        ]
+      },
+      "properties": {
+        "school_id": "school-100517-00",
+        "name": "El Carmen",
+        "sector": "public",
+        "level": null,
+        "mep_code": "100517-00",
+        "also_here": [],
+        "address": "Calle El Alto, El Carmen, San Antonio",
+        "waze": "https://waze.com/ul?ll=9.896587,-84.141322&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.896587,-84.141322",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 1,
+        "hop_from_previous_m": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104681-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.139892,
+          9.902779
+        ]
+      },
+      "properties": {
+        "school_id": "school-104681-00",
+        "name": "C.T.P. de Escazú",
+        "sector": "public",
+        "level": "secondary",
+        "mep_code": "104681-00",
+        "also_here": [],
+        "address": "Calle Masilla Sur, Sabanillas, San Antonio",
+        "waze": "https://waze.com/ul?ll=9.902779,-84.139892&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.902779,-84.139892",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 2,
+        "hop_from_previous_m": 706
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100628-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.134466,
+          9.904545
+        ]
+      },
+      "properties": {
+        "school_id": "school-100628-00",
+        "name": "Juan XXIII",
+        "sector": "public",
+        "level": null,
+        "mep_code": "100628-00",
+        "also_here": [
+          "J.N. Juan XXIII",
+          "CINDEA Escazú-Juan XXIII"
+        ],
+        "address": "Calle del Llano, Hoja Blanca, San Antonio",
+        "waze": "https://waze.com/ul?ll=9.904545,-84.134466&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.904545,-84.134466",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 3,
+        "hop_from_previous_m": 626
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200056-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140659,
+          9.912703
+        ]
+      },
+      "properties": {
+        "school_id": "school-200056-00",
+        "name": "Centro Educativo Greenland School",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200056-00",
+        "also_here": [],
+        "address": "Calle Los Gatos, Chirca, San Antonio",
+        "waze": "https://waze.com/ul?ll=9.912703,-84.140659&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.912703,-84.140659",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 4,
+        "hop_from_previous_m": 1133
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200055-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140888,
+          9.915877
+        ]
+      },
+      "properties": {
+        "school_id": "school-200055-00",
+        "name": "Jardín Infantil Sorpresitas",
+        "sector": "private",
+        "level": "preschool",
+        "mep_code": "200055-00",
+        "also_here": [],
+        "address": "Avenida 40, Hulera, Escazú",
+        "waze": "https://waze.com/ul?ll=9.915877,-84.140888&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.915877,-84.140888",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 5,
+        "hop_from_previous_m": 354
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104023-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.13796,
+          9.914786
+        ]
+      },
+      "properties": {
+        "school_id": "school-104023-00",
+        "name": "Liceo de Escazú",
+        "sector": "public",
+        "level": "secondary",
+        "mep_code": "104023-00",
+        "also_here": [],
+        "address": "Avenida 42, Profesores, San Antonio",
+        "waze": "https://waze.com/ul?ll=9.914786,-84.137960&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.914786,-84.137960",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 6,
+        "hop_from_previous_m": 343
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100613-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.138173,
+          9.915443
+        ]
+      },
+      "properties": {
+        "school_id": "school-100613-00",
+        "name": "Benjamín Herrera Angulo",
+        "sector": "public",
+        "level": "preschool_primary",
+        "mep_code": "100613-00",
+        "also_here": [],
+        "address": "Avenida 40, Santa Eduviges, San Antonio",
+        "waze": "https://waze.com/ul?ll=9.915443,-84.138173&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.915443,-84.138173",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 7,
+        "hop_from_previous_m": 77
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200054-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.138781,
+          9.917258
+        ]
+      },
+      "properties": {
+        "school_id": "school-200054-00",
+        "name": "Colegio Nuestra Señora del Pilar",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200054-00",
+        "also_here": [],
+        "address": "Avenida 36, Hulera, Escazú",
+        "waze": "https://waze.com/ul?ll=9.917258,-84.138781&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.917258,-84.138781",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 8,
+        "hop_from_previous_m": 213
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200053-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.137213,
+          9.919432
+        ]
+      },
+      "properties": {
+        "school_id": "school-200053-00",
+        "name": "Centro Educativo Garabatos Instituto Preescolar",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200053-00",
+        "also_here": [],
+        "address": "Avenida 32, Guapinol, Escazú",
+        "waze": "https://waze.com/ul?ll=9.919432,-84.137213&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.919432,-84.137213",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 9,
+        "hop_from_previous_m": 297
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100519-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.130212,
+          9.919641
+        ]
+      },
+      "properties": {
+        "school_id": "school-100519-00",
+        "name": "Bello Horizonte",
+        "sector": "public",
+        "level": null,
+        "mep_code": "100519-00",
+        "also_here": [],
+        "address": "Calle 110, Bello Horizonte, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.919641,-84.130212&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.919641,-84.130212",
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stop": 10,
+        "hop_from_previous_m": 767
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200058-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.12814,
+          9.927621
+        ]
+      },
+      "properties": {
+        "school_id": "school-200058-00",
+        "name": "Centro Educativo Saint Augustine College",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200058-00",
+        "also_here": [],
+        "address": "Avenida 12, Palma de Mayorca, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.927621,-84.128140&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.927621,-84.128140",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 1,
+        "hop_from_previous_m": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200062-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.128443,
+          9.929339
+        ]
+      },
+      "properties": {
+        "school_id": "school-200062-00",
+        "name": "Integral Kallpa",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200062-00",
+        "also_here": [],
+        "address": "Calle Vista Alegre, Tena, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.929339,-84.128443&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.929339,-84.128443",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 2,
+        "hop_from_previous_m": 194
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-104805-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.135395,
+          9.929608
+        ]
+      },
+      "properties": {
+        "school_id": "school-104805-00",
+        "name": "I.E.G.B. Pbro. Yanuario Quesada",
+        "sector": "public",
+        "level": "basica_general",
+        "mep_code": "104805-00",
+        "also_here": [],
+        "address": "Carretera John F. Kennedy, Betina, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.929608,-84.135395&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.929608,-84.135395",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 3,
+        "hop_from_previous_m": 762
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200060-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.136001,
+          9.927758
+        ]
+      },
+      "properties": {
+        "school_id": "school-200060-00",
+        "name": "Hometwo Montessori",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200060-00",
+        "also_here": [],
+        "address": "Avenida Fernández Delgado, Maynard, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.927758,-84.136001&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.927758,-84.136001",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 4,
+        "hop_from_previous_m": 216
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205255-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.141415,
+          9.924626
+        ]
+      },
+      "properties": {
+        "school_id": "school-205255-00",
+        "name": "Centro Educativo Kids World Montessori (Escazu)",
+        "sector": "private",
+        "level": null,
+        "mep_code": "205255-00",
+        "also_here": [],
+        "address": "Avenida 20, Faroles, Escazú",
+        "waze": "https://waze.com/ul?ll=9.924626,-84.141415&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.924626,-84.141415",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 5,
+        "hop_from_previous_m": 688
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100552-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.140626,
+          9.91906
+        ]
+      },
+      "properties": {
+        "school_id": "school-100552-00",
+        "name": "República de Venezuela",
+        "sector": "public",
+        "level": null,
+        "mep_code": "100552-00",
+        "also_here": [
+          "CINDEA Escazú"
+        ],
+        "address": "Avenida 32, Guapinol, Escazú",
+        "waze": "https://waze.com/ul?ll=9.919060,-84.140626&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.919060,-84.140626",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 6,
+        "hop_from_previous_m": 625
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-105542-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.143074,
+          9.917405
+        ]
+      },
+      "properties": {
+        "school_id": "school-105542-00",
+        "name": "CONED Escazú",
+        "sector": "public",
+        "level": "adult",
+        "mep_code": "105542-00",
+        "also_here": [],
+        "address": "Calle 140, Carrizal, Escazú",
+        "waze": "https://waze.com/ul?ll=9.917405,-84.143074&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.917405,-84.143074",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 7,
+        "hop_from_previous_m": 325
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-osm-way-1303988283-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147209,
+          9.914864
+        ]
+      },
+      "properties": {
+        "school_id": "school-osm-way-1303988283",
+        "name": "Jardín de Niños Corazón de Jesús",
+        "sector": "public",
+        "level": "preschool",
+        "mep_code": null,
+        "also_here": [],
+        "address": "Calle 150, Carrizal, Escazú",
+        "waze": "https://waze.com/ul?ll=9.914864,-84.147209&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.914864,-84.147209",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 8,
+        "hop_from_previous_m": 534
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100536-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147998,
+          9.914643
+        ]
+      },
+      "properties": {
+        "school_id": "school-100536-00",
+        "name": "Corazón de Jesús",
+        "sector": "public",
+        "level": null,
+        "mep_code": "100536-00",
+        "also_here": [],
+        "address": "Calle 150, Carrizal, Escazú",
+        "waze": "https://waze.com/ul?ll=9.914643,-84.147998&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.914643,-84.147998",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 9,
+        "hop_from_previous_m": 90
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100518-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.159223,
+          9.903983
+        ]
+      },
+      "properties": {
+        "school_id": "school-100518-00",
+        "name": "David Marín Hidalgo",
+        "sector": "public",
+        "level": null,
+        "mep_code": "100518-00",
+        "also_here": [],
+        "address": "Calle Bebedero, Bebedero, San Antonio",
+        "waze": "https://waze.com/ul?ll=9.903983,-84.159223&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.903983,-84.159223",
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stop": 10,
+        "hop_from_previous_m": 1708
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205422-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.14967,
+          9.926571
+        ]
+      },
+      "properties": {
+        "school_id": "school-205422-00",
+        "name": "Centro Educativo Kinder Pandas Daycare",
+        "sector": "private",
+        "level": null,
+        "mep_code": "205422-00",
+        "also_here": [],
+        "address": "Cond. Los Guayabos, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.926571,-84.149670&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.926571,-84.149670",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 1,
+        "hop_from_previous_m": null
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200057-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.147178,
+          9.930231
+        ]
+      },
+      "properties": {
+        "school_id": "school-200057-00",
+        "name": "Centro Educativo Arandú / Centro Educativo Arandú School",
+        "sector": "private",
+        "level": "basica_general",
+        "mep_code": "200057-00",
+        "also_here": [],
+        "address": "Calle Real, Ayala, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.930231,-84.147178&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.930231,-84.147178",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 2,
+        "hop_from_previous_m": 490
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205203-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.149367,
+          9.931262
+        ]
+      },
+      "properties": {
+        "school_id": "school-205203-00",
+        "name": "Centro Educativo True North Personalized Learning School",
+        "sector": "private",
+        "level": "basica_general",
+        "mep_code": "205203-00",
+        "also_here": [],
+        "address": "Calle Guachipelines, Ayala, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.931262,-84.149367&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.931262,-84.149367",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 3,
+        "hop_from_previous_m": 266
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200061-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.153177,
+          9.93295
+        ]
+      },
+      "properties": {
+        "school_id": "school-200061-00",
+        "name": "Jardín Infantil Integral Borboleta e Itskatzú Educación Integral",
+        "sector": "private",
+        "level": "preschool",
+        "mep_code": "200061-00",
+        "also_here": [],
+        "address": "Carretera John F. Kennedy, Bajo Palomas, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.932950,-84.153177&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.932950,-84.153177",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 4,
+        "hop_from_previous_m": 458
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-100559-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.159054,
+          9.944419
+        ]
+      },
+      "properties": {
+        "school_id": "school-100559-00",
+        "name": "Guachipelín",
+        "sector": "public",
+        "level": null,
+        "mep_code": "100559-00",
+        "also_here": [],
+        "address": "Vía 310, Ayala, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.944419,-84.159054&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.944419,-84.159054",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 5,
+        "hop_from_previous_m": 1429
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200066-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.1648,
+          9.950648
+        ]
+      },
+      "properties": {
+        "school_id": "school-200066-00",
+        "name": "Colegio Santa María (Saint Mary High School)",
+        "sector": "private",
+        "level": "secondary",
+        "mep_code": "200066-00",
+        "also_here": [],
+        "address": "Calle Guachipelines, Real de Pereira, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.950648,-84.164800&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.950648,-84.164800",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 6,
+        "hop_from_previous_m": 936
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205510-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.164588,
+          9.952213
+        ]
+      },
+      "properties": {
+        "school_id": "school-205510-00",
+        "name": "Centro Educativo Royal International Education",
+        "sector": "private",
+        "level": null,
+        "mep_code": "205510-00",
+        "also_here": [],
+        "address": "Calle Guachipelines, Real de Pereira, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.952213,-84.164588&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.952213,-84.164588",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 7,
+        "hop_from_previous_m": 176
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200063-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.166564,
+          9.95516
+        ]
+      },
+      "properties": {
+        "school_id": "school-200063-00",
+        "name": "Lighthouse International School",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200063-00",
+        "also_here": [],
+        "address": "Calle Guachipelines, Real de Pereira, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.955160,-84.166564&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.955160,-84.166564",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 8,
+        "hop_from_previous_m": 393
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200068-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.169559,
+          9.956642
+        ]
+      },
+      "properties": {
+        "school_id": "school-200068-00",
+        "name": "Washington School",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200068-00",
+        "also_here": [],
+        "address": "Calle Guachipelines, Real de Pereira, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.956642,-84.169559&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.956642,-84.169559",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 9,
+        "hop_from_previous_m": 367
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200069-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.174557,
+          9.960007
+        ]
+      },
+      "properties": {
+        "school_id": "school-200069-00",
+        "name": "West College / West Primary",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200069-00",
+        "also_here": [],
+        "address": "Avenida 1, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.960007,-84.174557&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.960007,-84.174557",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 10,
+        "hop_from_previous_m": 663
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-205395-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.177537,
+          9.961919
+        ]
+      },
+      "properties": {
+        "school_id": "school-205395-00",
+        "name": "Centro Educativo Kipos",
+        "sector": "private",
+        "level": null,
+        "mep_code": "205395-00",
+        "also_here": [],
+        "address": "Avenida Real de Pereira, Real de Pereira, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.961919,-84.177537&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.961919,-84.177537",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 11,
+        "hop_from_previous_m": 390
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200064-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.173112,
+          9.96141
+        ]
+      },
+      "properties": {
+        "school_id": "school-200064-00",
+        "name": "Escuela Vista del Monte (Mount View School)",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200064-00",
+        "also_here": [],
+        "address": "Calle Guachipelines, Real de Pereira, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.961410,-84.173112&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.961410,-84.173112",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 12,
+        "hop_from_previous_m": 488
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "school-200067-00-stop",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.15915,
+          9.953543
+        ]
+      },
+      "properties": {
+        "school_id": "school-200067-00",
+        "name": "Blue Valley School (Colegio Valle Azul)",
+        "sector": "private",
+        "level": null,
+        "mep_code": "200067-00",
+        "also_here": [],
+        "address": "Calle Mango, San Rafael",
+        "waze": "https://waze.com/ul?ll=9.953543,-84.159150&navigate=yes",
+        "maps": "https://www.google.com/maps/search/?api=1&query=9.953543,-84.159150",
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stop": 13,
+        "hop_from_previous_m": 1762
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "leg-1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.141322,
+            9.896587
+          ],
+          [
+            -84.139892,
+            9.902779
+          ],
+          [
+            -84.134466,
+            9.904545
+          ],
+          [
+            -84.140659,
+            9.912703
+          ],
+          [
+            -84.140888,
+            9.915877
+          ],
+          [
+            -84.13796,
+            9.914786
+          ],
+          [
+            -84.138173,
+            9.915443
+          ],
+          [
+            -84.138781,
+            9.917258
+          ],
+          [
+            -84.137213,
+            9.919432
+          ],
+          [
+            -84.130212,
+            9.919641
+          ]
+        ]
+      },
+      "properties": {
+        "leg": 1,
+        "leg_title": "El Carmen → Belo Horizonte",
+        "stops": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "leg-2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.12814,
+            9.927621
+          ],
+          [
+            -84.128443,
+            9.929339
+          ],
+          [
+            -84.135395,
+            9.929608
+          ],
+          [
+            -84.136001,
+            9.927758
+          ],
+          [
+            -84.141415,
+            9.924626
+          ],
+          [
+            -84.140626,
+            9.91906
+          ],
+          [
+            -84.143074,
+            9.917405
+          ],
+          [
+            -84.147209,
+            9.914864
+          ],
+          [
+            -84.147998,
+            9.914643
+          ],
+          [
+            -84.159223,
+            9.903983
+          ]
+        ]
+      },
+      "properties": {
+        "leg": 2,
+        "leg_title": "Belo Horizonte → Bebedero",
+        "stops": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "leg-3",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.14967,
+            9.926571
+          ],
+          [
+            -84.147178,
+            9.930231
+          ],
+          [
+            -84.149367,
+            9.931262
+          ],
+          [
+            -84.153177,
+            9.93295
+          ],
+          [
+            -84.159054,
+            9.944419
+          ],
+          [
+            -84.1648,
+            9.950648
+          ],
+          [
+            -84.164588,
+            9.952213
+          ],
+          [
+            -84.166564,
+            9.95516
+          ],
+          [
+            -84.169559,
+            9.956642
+          ],
+          [
+            -84.174557,
+            9.960007
+          ],
+          [
+            -84.177537,
+            9.961919
+          ],
+          [
+            -84.173112,
+            9.96141
+          ],
+          [
+            -84.15915,
+            9.953543
+          ]
+        ]
+      },
+      "properties": {
+        "leg": 3,
+        "leg_title": "San Rafael → Guachipelín",
+        "stops": 13
+      }
+    }
+  ]
+}

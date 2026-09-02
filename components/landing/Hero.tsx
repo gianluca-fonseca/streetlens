@@ -15,6 +15,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { BINS, sampleRamp } from "@/components/mapConfig";
 import { useTheme } from "@/components/ThemeProvider";
 import FlagCR from "@/components/ui/FlagCR";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 import Logo from "@/components/ui/Logo";
 import ProvenanceNote from "@/components/ProvenanceNote";
 import StatFigure from "@/components/ui/StatFigure";
@@ -23,6 +24,13 @@ import { cn } from "@/components/ui/cn";
 import { AUTHOR_LINKEDIN, CITY_REQUEST_URL, CUSP_URL, GITHUB_URL } from "@/lib/links";
 
 const AuditMap = dynamic(() => import("@/components/AuditMap"), { ssr: false });
+
+/** How many streets the left-rail list shows. Six, not ten: the list is the
+ * rail's supporting evidence, not its subject, and at ten it ran past the map on
+ * desktop and turned the phone layout into a long scroll with no visible end —
+ * which is exactly what buried the document below. Six leaves the rail room for
+ * the cue that says the page continues. */
+const WORST_LIMIT = 6;
 
 /**
  * The platform hero (rev 6, u21 — the mcbroken restructure). A slim top banner
@@ -45,13 +53,12 @@ function Banner() {
   return (
     <div className="w-full border-b border-transparent bg-ink-display text-paper dark:border-hairline dark:bg-paper-white dark:text-ink">
       <div className="mx-auto flex max-w-[1400px] items-center gap-x-4 px-[max(1rem,env(safe-area-inset-left))] py-2.5 text-[13px] leading-snug sm:px-6">
-        {/* Pilot-origin marker. Sits opposite the theme switcher so the centred
-            utility line keeps its balance; hidden below sm, where the banner
-            already wraps and every pixel is spoken for. */}
-        <span className="hidden shrink-0 items-center gap-1.5 sm:inline-flex">
-          <FlagCR className="h-3 w-5 shrink-0 rounded-[1px]" />
-          <span className="font-medium tracking-tight">{t("origin")}</span>
-        </span>
+        {/* The site is bilingual and, until now, the landing was the one surface
+            that never said so: every other chrome (map, street, insights) pairs
+            the language switch with the theme switch. It takes the left seat the
+            origin marker used to hold, so the centred utility line keeps the
+            balance a lone right-hand control would cost it. */}
+        <LocaleSwitcher className="shrink-0" />
         <span className="flex flex-1 flex-wrap items-center justify-center gap-x-5 gap-y-1 text-center">
           <span className="inline-flex items-center gap-1.5">
             {t("methodQuestion")}
@@ -149,6 +156,31 @@ function LegendChip() {
         </ul>
       ) : null}
     </div>
+  );
+}
+
+/** The document cue, at the foot of the left rail. The hero fills the viewport
+ * and reads as a finished object, so the manifesto under it is easy to miss
+ * entirely; this is the one mark that says the page keeps going. A plain hash
+ * anchor, so it works with JS off and inherits the smooth scroll `<main>` already
+ * declares — no scroll handler to keep in sync with the scroller. The chevron
+ * breathes downward; under reduced motion it simply holds still, because the
+ * label is what carries the meaning. */
+function ScrollCue({ label }: Readonly<{ label: string }>) {
+  return (
+    <a
+      href="#mission"
+      className="sl-hero-el group mt-4 inline-flex min-h-[44px] shrink-0 items-center justify-center gap-1.5 self-center rounded-[2px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface lg:self-start"
+      style={{ animationDelay: "760ms" }}
+    >
+      {label}
+      <ChevronDown
+        size={14}
+        strokeWidth={2}
+        aria-hidden="true"
+        className="sl-scroll-cue"
+      />
+    </a>
   );
 }
 
@@ -399,7 +431,7 @@ export default function Hero({
     }
     const worstStreets = [...byStreet.values()]
       .sort((a, b) => a.score - b.score)
-      .slice(0, 10);
+      .slice(0, WORST_LIMIT);
     const bikeMean = audited.length
       ? Math.round(
           audited.reduce((s, f) => s + f.properties.score_bike, 0) /
@@ -410,12 +442,14 @@ export default function Hero({
   }, [segments]);
 
   const cvObserved = useMemo(
-    () => (auditedHidden ? listRecentlyCvObserved(segments) : []),
+    () =>
+      auditedHidden ? listRecentlyCvObserved(segments).slice(0, WORST_LIMIT) : [],
     [auditedHidden, segments],
   );
 
   const cvWorst = useMemo(
-    () => (auditedHidden ? listWorstCvStreets(segments, { limit: 10 }) : []),
+    () =>
+      auditedHidden ? listWorstCvStreets(segments, { limit: WORST_LIMIT }) : [],
     [auditedHidden, segments],
   );
 
@@ -424,7 +458,13 @@ export default function Hero({
   const openPlatform = () => router.push("/map");
 
   return (
-    <section className="pb-10 sm:pb-14 lg:pb-16">
+    // The foot of this section must clear the plate's parallax drift. The plate
+    // translates down up to 88px (sl-parallax-drift) while the document below it
+    // stays put and paints ABOVE it, so whatever sits at the plate's bottom edge
+    // slides under the next band at full drift. That was harmless while the edge
+    // held nothing but the tail of a scrolling list; the document cue lives there
+    // now, and was being covered outright on phones. 88px of drift + a gap.
+    <section className="pb-[6.5rem] sm:pb-28 lg:pb-28">
       <Banner />
       {/* The plate plane: counter-drifts under the document on scroll (CSS
           scroll-driven, progressive, reduced-motion off). The banner stays in
@@ -453,10 +493,23 @@ export default function Hero({
                 </span>
               </a>
             </div>
+            {/* Pilot chip. The flag leads the line it already names, rather than
+                repeating "Costa Rica" on a second row: one object, one reading.
+                It is drawn as an SVG, not set as an emoji — the emoji falls back
+                to the letters "CR" on several platforms and the bands need to
+                stay crisp at this size. Decorative here, since the chip's own
+                text carries the country to a screen reader.
+
+                The line is too long for the narrow rail and wraps; `items-start`
+                keeps the flag on the FIRST line where it belongs, instead of
+                floating to the optical centre of a two-line block. The copy binds
+                "Costa Rica" with a non-breaking space, so the only break point is
+                the comma and "Rica" can never orphan. */}
             <p
-              className="sl-hero-el mt-4 inline-flex items-center rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted"
+              className="sl-hero-el mt-4 inline-flex items-start gap-1.5 rounded-[2px] border border-hairline bg-paper-white px-2 py-1 font-mono text-[11px] font-medium uppercase leading-[1.35] tracking-[0.1em] text-ink-muted"
               style={{ animationDelay: "160ms" }}
             >
+              <FlagCR decorative className="mt-[2px] h-3 w-5 shrink-0 rounded-[1px]" />
               {t("pilot")}
             </p>
             <h1
@@ -488,6 +541,21 @@ export default function Hero({
 
           {/* ── CENTER zone: the live map plate (z0 frame) + chips (z10) ── */}
           <div className="sl-hero-map flex min-w-0 flex-col lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-full">
+            {/* Plate label. The relief is a reading of ONE place, and nothing on
+                the map said which — the pilot chip naming Escazú sits in the left
+                rail, far from the frame, and drops below it entirely on phones.
+                An instrument label: place, a rule across the dead space, and the
+                encoding note. Same mono register as the captions under the map,
+                so the frame reads as one labelled object. */}
+            <div className="mb-2 flex items-center gap-3 px-1">
+              <h2 className="shrink-0 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-display">
+                {t("map.place")}
+              </h2>
+              <span aria-hidden="true" className="h-px min-w-4 flex-1 bg-hairline" />
+              <p className="hidden shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted sm:block">
+                {t("map.placeNote")}
+              </p>
+            </div>
             <div className="min-h-0 flex-1 rounded-[4px] border border-hairline bg-paper p-2 sm:p-3">
               <div
                 data-map-moving={mapMoving ? "true" : "false"}
@@ -602,7 +670,8 @@ export default function Hero({
             )}
           </div>
 
-          {/* ── LEFT zone body: the scrolling worst-streets list ──────── */}
+          {/* ── LEFT zone body: the worst-streets list, then the document cue
+               that closes the rail (and, on phones, the whole hero) ────── */}
           <div className="flex flex-col lg:col-start-1 lg:row-start-2 lg:min-h-0">
             <div className="shrink-0 text-center lg:text-left">
               <p className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink-muted">
@@ -667,6 +736,7 @@ export default function Hero({
                 ))}
               </ul>
             )}
+            <ScrollCue label={t("scrollCue")} />
           </div>
         </div>
       </div>

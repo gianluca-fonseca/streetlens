@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { History, LayoutGrid, ListChecks, Map, Upload, Activity } from "lucide-react";
+import { History, LayoutGrid, ListChecks, Map, Upload, Activity, GraduationCap } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
 import { LogoMark } from "@/components/ui/Logo";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
@@ -16,20 +16,22 @@ export default async function AdminHeader({
   active,
 }: Readonly<{
   locale: Locale;
-  active: "dashboard" | "queue" | "history" | "import" | "ops";
+  active: "dashboard" | "schools" | "queue" | "history" | "import" | "ops";
 }>) {
   const t = await getTranslations({ locale, namespace: "admin" });
   const other: Locale = locale === "en" ? "es" : "en";
   const suffix =
-    active === "queue"
-      ? "/queue"
-      : active === "history"
-        ? "/history"
-        : active === "import"
-          ? "/import"
-          : active === "ops"
-            ? "/ops"
-            : "";
+    active === "schools"
+      ? "/schools"
+      : active === "queue"
+        ? "/queue"
+        : active === "history"
+          ? "/history"
+          : active === "import"
+            ? "/import"
+            : active === "ops"
+              ? "/ops"
+              : "";
 
   const nav = [
     {
@@ -37,6 +39,12 @@ export default async function AdminHeader({
       href: `/${locale}/admin`,
       label: t("nav.dashboard"),
       Icon: LayoutGrid,
+    },
+    {
+      key: "schools" as const,
+      href: `/${locale}/admin/schools`,
+      label: t("nav.schools"),
+      Icon: GraduationCap,
     },
     {
       key: "queue" as const,

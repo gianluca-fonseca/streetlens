@@ -10,8 +10,14 @@ const LOCALES = [
 ] as const;
 
 /**
- * Compact EN|ES switch for persistent chrome (map header, etc.). The active
- * locale is marked; the other links to the same path in that locale.
+ * Compact EN|ES switch for persistent chrome (map header, landing banner, etc.).
+ * The active locale is marked; the other links to the same path in that locale.
+ *
+ * Styled entirely in `currentColor` (same rule as ThemeSwitcher, which it always
+ * sits beside) so one component reads correctly on every ground: the neutral
+ * map/insights/street chrome AND the landing's inverted black banner. Fixed ink
+ * tokens would have rendered near-black on that black plate in light mode.
+ * Emphasis is carried by weight and opacity, never by a token colour.
  */
 export default function LocaleSwitcher({
   className,
@@ -32,7 +38,7 @@ export default function LocaleSwitcher({
               {active ? (
                 <span
                   aria-current="true"
-                  className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center rounded-[2px] px-2 font-medium text-ink-display"
+                  className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center rounded-[2px] px-2 font-medium opacity-100"
                 >
                   {label}
                 </span>
@@ -40,7 +46,7 @@ export default function LocaleSwitcher({
                 <Link
                   href={pathname}
                   locale={code}
-                  className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center rounded-[2px] px-2 text-ink-muted underline-offset-4 transition-colors hover:text-ink-display hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex min-h-[32px] pointer-coarse:min-h-[44px] items-center rounded-[2px] px-2 opacity-55 underline-offset-4 transition-opacity hover:underline hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
                 >
                   {label}
                 </Link>
